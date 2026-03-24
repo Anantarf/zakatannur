@@ -99,7 +99,6 @@ final class RekapBuilder
 
     public static function buildDailyChartData(): array
     {
-        // Public Chart Logic: Starts from March 13, 2026
         $startDate = \Carbon\Carbon::create(2026, 3, 13, 0, 0, 0, 'Asia/Jakarta');
         $maxVisibleDate = now('Asia/Jakarta');
 

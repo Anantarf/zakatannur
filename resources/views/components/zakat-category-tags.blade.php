@@ -57,9 +57,8 @@
     @foreach($rows as $row)
         <div class="flex gap-1 justify-center">
             @foreach($row as $cat)
-                @php $label = \App\Models\ZakatTransaction::getCategoryLabel($cat); @endphp
                 <span class="inline-flex items-center justify-center rounded px-2 py-0.5 text-[9px] font-bold uppercase bg-emerald-50 text-emerald-700 border border-emerald-100 whitespace-nowrap leading-tight text-center">
-                    {{ $label }}
+                    {{ \App\Models\ZakatTransaction::CATEGORY_LABELS[$cat] ?? strtoupper($cat) }}
                 </span>
             @endforeach
         </div>

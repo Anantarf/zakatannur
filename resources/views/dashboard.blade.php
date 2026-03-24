@@ -69,7 +69,7 @@
                             <select name="metode" onchange="this.form.submit()" class="w-full appearance-none rounded-lg border-gray-200 bg-gray-50 pl-3 pr-8 py-2 text-sm font-bold text-gray-600 focus:border-emerald-500 focus:ring-emerald-500 transition-all cursor-pointer">
                                 <option value="">Semua Bentuk</option>
                                 @foreach ($methods ?? [] as $m)
-                                    <option value="{{ $m }}" @selected((string) $metode === (string) $m)>{{ \App\Models\ZakatTransaction::getMethodLabel($m) }}</option>
+                                    <option value="{{ $m }}" @selected((string) $metode === (string) $m)>{{ \App\Models\ZakatTransaction::METHOD_LABELS[$m] ?? strtoupper($m) }}</option>
                                 @endforeach
                             </select>
                             <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2.5 text-gray-400">

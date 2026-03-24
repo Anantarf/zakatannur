@@ -62,6 +62,28 @@ class Muzakki extends Model
         });
     }
 
+    public static function firstOrCreateNormalized(array $data): self
+    {
+        $name = trim(preg_replace('/\s+/', ' ', (string) $data['muzakki_name']));
+        $phone = preg_replace('/[^0-9]/', '', (string) ($data['muzakki_phone'] ?? ''));
+        $address = trim((string) ($data['muzakki_address'] ?? ''));
+
+        $criteria = ($phone !== '') 
+            ? ['name' => $name, 'phone' => $phone] 
+            : ['name' => $name, 'address' => $address];
+
+        $muzakki = self::withTrashed()->updateOrCreate($criteria, [
+            'address' => $address,
+            'phone'   => $phone
+        ]);
+        
+        if ($muzakki->trashed()) {
+            $muzakki->restore();
+        }
+
+        return $muzakki;
+    }
+
     /**
      * Get the transactions associated with the Muzakki.
      */

@@ -27,7 +27,6 @@ final class Format
         $escapedText = e($text);
         $escapedQuery = e($query);
 
-        // Case-insensitive replacement
         return str_ireplace(
             $escapedQuery,
             '<mark class="bg-yellow-200 font-bold text-gray-900 rounded-px px-0.5">' . $escapedQuery . '</mark>',

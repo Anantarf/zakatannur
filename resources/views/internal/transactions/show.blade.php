@@ -93,7 +93,7 @@
                                                 </td>
                                                 <td class="px-3 sm:px-6 py-4">
                                                     <span class="inline-flex items-center px-2.5 py-1 rounded text-[11px] font-bold uppercase tracking-wider {{ $tx->metode == 'beras' ? 'bg-amber-100 text-amber-700' : 'bg-emerald-100 text-emerald-700' }}">
-                                                        {{ \App\Models\ZakatTransaction::getMethodLabel($tx->metode) }}
+                                                        {{ $tx->metode_label }}
                                                     </span>
                                                 </td>
                                                 <td class="px-3 sm:px-6 py-4 text-right font-medium text-gray-500 text-xs">
@@ -110,7 +110,7 @@
                                                         @if($tx->metode == 'beras')
                                                             {{ rtrim(rtrim(number_format($tx->jumlah_beras_kg, 2, ',', '.'), '0'), ',') }} <span class="text-[9px] sm:text-xs font-bold text-gray-400 ml-0.5">kg</span>
                                                         @else
-                                                            <span class="text-[9px] sm:text-xs font-bold text-gray-400 mr-0.5">Rp</span>{{ number_format($tx->nominal_uang, 0, ',', '.') }}
+                                                            {{ \App\Support\Format::rupiah((int)$tx->nominal_uang) }}
                                                             @if($tx->is_transfer)
                                                                 <span class="ml-1 text-[9px] font-black text-emerald-600 bg-emerald-50 px-1 py-0.5 rounded border border-emerald-100 italic">TF</span>
                                                             @endif
@@ -151,7 +151,7 @@
                                         <span class="text-[10px] sm:text-[11px] font-black text-gray-400 uppercase tracking-[0.2em]">Total Uang</span>
                                         <div class="flex flex-col items-center sm:items-end">
                                             <p class="text-base sm:text-xl font-black text-slate-900 tabular-nums bg-white px-3 py-1 rounded-lg border border-emerald-100 shadow-sm">
-                                                <span class="text-xs font-bold text-gray-400 mr-1">Rp</span>{{ number_format($totalUang, 0, ',', '.') }}
+                                                {{ \App\Support\Format::rupiah((int)$totalUang) }}
                                             </p>
                                             @if($totalTf > 0)
                                                 <div class="flex items-center gap-2 mt-1.5 text-[10px] sm:text-[11px] font-bold text-gray-500 uppercase tracking-tight">
@@ -167,7 +167,7 @@
                                     <div class="flex items-center gap-4 relative z-10 w-full justify-between sm:justify-end {{ $totalUang > 0 ? 'pt-3 mt-1 border-t border-emerald-100/30' : '' }}">
                                         <span class="text-[10px] sm:text-[11px] font-black text-gray-400 uppercase tracking-[0.2em]">Total Beras</span>
                                         <p class="text-base sm:text-xl font-black text-amber-700 tabular-nums bg-white px-3 py-1 rounded-lg border border-amber-100 shadow-sm">
-                                            {{ rtrim(rtrim(number_format($totalBeras, 2, ',', '.'), '0'), ',') }} <span class="text-xs font-bold text-gray-400 ml-1 uppercase">kg</span>
+                                            {{ \App\Support\Format::kg((float)$totalBeras) }}
                                         </p>
                                     </div>
                                 @endif

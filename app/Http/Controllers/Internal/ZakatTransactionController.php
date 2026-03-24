@@ -92,7 +92,7 @@ class ZakatTransactionController extends Controller
             'totalTf' => (int) $totalTf,
             'totalCash' => (int) $totalCash,
             'totalBeras' => (float) $totalBeras,
-            'shiftLabel' => ZakatTransaction::getShiftLabel($tx->shift)
+            'shiftLabel' => $tx->shift_label
         ]);
     }
 

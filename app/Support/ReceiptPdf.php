@@ -63,7 +63,6 @@ final class ReceiptPdf
         $pdf->SetFont('helvetica', 'B', 12);
         $pdf->SetY(55);
         $title = 'TANDA TERIMA PEMBAYARAN ZAKAT ' . $firstTx->tahun_zakat;
-        // If year is 2026, usually corresponding to 1447H in your context
         if ($firstTx->tahun_zakat == 2026) $title .= ' (1447 H)';
         
         $pdf->Cell(0, 8, $title, 0, 1, 'C');
@@ -205,7 +204,6 @@ final class ReceiptPdf
             $pdf->SetY($startY + $rowH + 0.8); 
         }
 
-        // --- SECTION: Final Information Block (Summary + Keterangan + Signature) ---
         // Consolidate these to ensure they stay on the same page
         
         $summaryH = 15;

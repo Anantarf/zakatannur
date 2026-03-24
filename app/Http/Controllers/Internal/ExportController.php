@@ -69,13 +69,12 @@ class ExportController extends Controller
         // Set Default Font Arial
         $spreadsheet->getDefaultStyle()->getFont()->setName('Arial')->setSize(10);
 
-        // Title Row
         $sheet->setCellValue('A1', "REKAP ZAKAT - " . strtoupper($formattedDate));
         $sheet->mergeCells('A1:N1');
         $sheet->getStyle('A1')->getFont()->setBold(true)->setSize(14);
         $sheet->getStyle('A1')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
 
-        // Header Row 2 (Group Headers)
+        // Merged Header Headers
         $headers = [
             'A2' => 'No Transaksi',
             'B2' => 'Nama',
@@ -94,7 +93,6 @@ class ExportController extends Controller
             $sheet->setCellValue($cell, $value);
         }
 
-        // Merging for Header Row 2
         $sheet->mergeCells('A2:A3');
         $sheet->mergeCells('B2:B3');
         $sheet->mergeCells('C2:C3');
@@ -107,7 +105,6 @@ class ExportController extends Controller
         $sheet->mergeCells('M2:M3');
         $sheet->mergeCells('N2:N3');
 
-        // Header Row 3 (Sub Headers)
         $sheet->setCellValue('D3', 'Uang (Rp)');
         $sheet->setCellValue('E3', 'Beras (Kg)');
         $sheet->setCellValue('F3', 'Uang (Rp)');
@@ -115,24 +112,8 @@ class ExportController extends Controller
         $sheet->setCellValue('K3', 'Uang (Rp)');
         $sheet->setCellValue('L3', 'Beras (Kg)');
 
-        // Header Styling
-        $headerStyle = [
-            'font' => ['bold' => true],
-            'alignment' => [
-                'horizontal' => Alignment::HORIZONTAL_CENTER,
-                'vertical' => Alignment::VERTICAL_CENTER,
-            ],
-            'borders' => [
-                'allBorders' => ['borderStyle' => Border::BORDER_THIN],
-            ],
-            'fill' => [
-                'fillType' => Fill::FILL_SOLID,
-                'startColor' => ['rgb' => 'DCE6F1'], // Light Blue Gray
-            ],
-        ];
-        $sheet->getStyle('A2:N3')->applyFromArray($headerStyle);
+        $sheet->getStyle('A2:N3')->applyFromArray($this->getCommonHeaderStyle());
 
-        // Data Rows
         $rowIdx = 4;
         $totalFitrahUang = 0; $totalFitrahBeras = 0;
         $totalInfaqUang = 0; $totalInfaqBeras = 0;
@@ -201,14 +182,11 @@ class ExportController extends Controller
                 $rowIdx++;
             }
 
-            // Apply borders and number formatting
             $sheet->getStyle('A4:N' . ($rowIdx - 1))->getBorders()->getAllBorders()->setBorderStyle(Border::BORDER_THIN);
             
-            // Alignment
             $sheet->getStyle('C4:C' . ($rowIdx - 1))->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
             $sheet->getStyle('D4:L' . ($rowIdx - 1))->getAlignment()->setHorizontal(Alignment::HORIZONTAL_RIGHT);
 
-            // Number Formats
             $rupiahFormat = '#,##0';
             $berasFormat = '#,##0.00';
             
@@ -227,7 +205,6 @@ class ExportController extends Controller
             $berasFormat = '#,##0.00';
         }
 
-        // Total Row
         $sheet->setCellValue('A' . $rowIdx, 'TOTAL');
         $sheet->mergeCells('A' . $rowIdx . ':C' . $rowIdx);
         $sheet->setCellValue('D' . $rowIdx, $totalFitrahUang);
@@ -262,7 +239,6 @@ class ExportController extends Controller
         $sheet->getStyle('G' . $rowIdx)->getNumberFormat()->setFormatCode($berasFormat);
         $sheet->getStyle('L' . $rowIdx)->getNumberFormat()->setFormatCode($berasFormat);
 
-        // Summary Block at Bottom Right
         $sumStart = $rowIdx + 2;
         $sheet->setCellValue('L' . $sumStart, 'TOTAL SEMUA');
         $sheet->setCellValue('M' . $sumStart, $totalTf + $totalCash);
@@ -285,7 +261,6 @@ class ExportController extends Controller
         ];
         $sheet->getStyle('L' . $sumStart . ':M' . ($sumStart + 2))->applyFromArray($sumStyle);
 
-        // Auto size columns
         foreach (range('A', 'N') as $col) {
             $sheet->getColumnDimension($col)->setAutoSize(true);
         }
@@ -341,8 +316,8 @@ class ExportController extends Controller
 
         $headers = ['TANGGAL', 'SHIFT', 'FITRAH (RP)', 'FITRAH (KG)', 'JIWA (FITRAH)', 'MAL (RP)', 'INFAQ (RP)', 'FIDYAH (RP)', 'TF (RP)', 'CASH (RP)', 'GRAND TOTAL (RP)'];
         $sheet->fromArray($headers, null, 'A1');
-        $sheet->getStyle('A1:K1')->getFont()->setBold(true);
-        $sheet->getStyle('A1:K1')->getFill()->setFillType(Fill::FILL_SOLID)->getStartColor()->setRGB('DCE6F1');
+        
+        $sheet->getStyle('A1:K1')->applyFromArray($this->getCommonHeaderStyle());
 
         $rowIdx = 2;
         foreach ($summaryData as $row) {
@@ -378,5 +353,24 @@ class ExportController extends Controller
         $writer->save($tempFile);
 
         return response()->download($tempFile, $fileName)->deleteFileAfterSend(true);
+    }
+
+    private function getCommonHeaderStyle(): array
+    {
+        return [
+            'font' => ['bold' => true, 'color' => ['rgb' => 'FFFFFF']],
+            'alignment' => [
+                'horizontal' => Alignment::HORIZONTAL_CENTER,
+                'vertical' => Alignment::VERTICAL_CENTER,
+            ],
+            'borders' => [
+                'allBorders' => ['borderStyle' => Border::BORDER_THIN, 'color' => ['rgb' => '4472C4']],
+                'outline' => ['borderStyle' => Border::BORDER_MEDIUM, 'color' => ['rgb' => '4472C4']],
+            ],
+            'fill' => [
+                'fillType' => Fill::FILL_SOLID,
+                'startColor' => ['rgb' => '4472C4'],
+            ],
+        ];
     }
 }

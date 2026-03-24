@@ -54,8 +54,8 @@ class TransactionTransformer
                     'is_transfer' => (bool) $item->is_transfer,
                     'hari'      => $category === 'fidyah' ? $item->hari : '',
                     'nominal'   => $item->metode === ZakatTransaction::METHOD_BERAS
-                                   ? rtrim(rtrim(number_format((float) $item->jumlah_beras_kg, 2, '.', ''), '0'), '.')
-                                   : number_format((int) $item->nominal_uang, 0, ',', '.'),
+                                   ? $item->jumlah_beras_kg_display
+                                   : $item->nominal_uang_display,
                 ];
         }
 

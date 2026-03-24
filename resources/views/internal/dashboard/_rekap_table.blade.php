@@ -12,7 +12,7 @@
             @foreach ($payload['items'] as $item)
                 <tr class="hover:bg-gray-50 transition-colors">
                     <td class="px-2 sm:px-6 py-3 sm:py-4 font-bold text-gray-900 uppercase">
-                        {{ \App\Models\ZakatTransaction::getCategoryLabel($item['category']) }}
+                        {{ \App\Models\ZakatTransaction::CATEGORY_LABELS[$item['category']] ?? strtoupper($item['category']) }}
                     </td>
                     <td class="px-2 sm:px-6 py-3 sm:py-4 text-center">{{ number_format($item['jumlah_transaksi']) }}</td>
                     <td class="px-2 sm:px-6 py-3 sm:py-4 text-right text-emerald-700 whitespace-nowrap">{{ $item['total_uang_display'] }}</td>

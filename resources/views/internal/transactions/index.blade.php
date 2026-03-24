@@ -63,7 +63,7 @@
                             <select name="category" onchange="this.form.submit()" class="appearance-none rounded-xl border-gray-200 bg-gray-50 pl-4 pr-10 py-2 text-sm font-medium text-gray-600 focus:border-emerald-500 focus:ring-emerald-500 cursor-pointer w-full">
                                 <option value="">Semua Kategori</option>
                                 @foreach ($categories ?? [] as $c)
-                                    <option value="{{ $c }}" @selected(($category ?? '') === $c)>{{ \App\Models\ZakatTransaction::getCategoryLabel($c) }}</option>
+                                    <option value="{{ $c }}" @selected(($category ?? '') === $c)>{{ \App\Models\ZakatTransaction::CATEGORY_LABELS[$c] ?? strtoupper($c) }}</option>
                                 @endforeach
                             </select>
                             <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-gray-400">
@@ -130,9 +130,9 @@
                                     <td class="px-2 py-4">
                                         <div class="flex flex-wrap gap-1 justify-center max-w-[90px] mx-auto">
                                             @foreach(explode(',', $t->methods_list ?? '') as $met)
-                                                @if(trim($met))
-                                                    @php $label = \App\Models\ZakatTransaction::getMethodLabel(trim($met)); @endphp
-                                                    <span class="inline-flex items-center justify-center rounded px-2 py-0.5 text-[11px] font-semibold uppercase bg-amber-50 text-amber-700 border border-amber-100 whitespace-nowrap leading-tight text-center">{{ $label }}</span>
+                                                @php $met = trim($met); @endphp
+                                                @if($met)
+                                                    <span class="inline-flex items-center justify-center rounded px-2 py-0.5 text-[11px] font-semibold uppercase bg-amber-50 text-amber-700 border border-amber-100 whitespace-nowrap leading-tight text-center">{{ \App\Models\ZakatTransaction::METHOD_LABELS[$met] ?? strtoupper($met) }}</span>
                                                 @endif
                                             @endforeach
                                         </div>
@@ -141,14 +141,14 @@
                                         <div class="space-y-0.5">
                                             @if($t->total_uang > 0)
                                                 <div class="font-semibold text-gray-800 text-sm flex items-center justify-end gap-1">
-                                                    {{ \App\Support\Format::rupiah((int)$t->total_uang) }}
+                                                    {{ $t->total_uang_display }}
                                                     @if($t->has_transfer)
                                                         <span class="text-[9px] font-black text-emerald-600 bg-emerald-50 px-1 py-0.5 rounded border border-emerald-100 italic">TF</span>
                                                     @endif
                                                 </div>
                                             @endif
                                             @if($t->total_beras > 0)
-                                                <div class="font-semibold text-gray-800 text-sm">{{ \App\Support\Format::kg((float)$t->total_beras) }}</div>
+                                                <div class="font-semibold text-gray-800 text-sm">{{ $t->total_beras_display }}</div>
                                             @endif
                                         </div>
                                     </td>
@@ -156,7 +156,7 @@
                                         <div class="flex flex-col items-center gap-1 text-center">
                                             <span class="font-medium text-gray-700">{{ $t->petugas?->name ?? '-' }}</span>
                                             <span class="inline-flex items-center justify-center rounded px-2 py-0.5 text-[11px] font-bold uppercase bg-emerald-50 text-emerald-700 border border-emerald-100 whitespace-nowrap leading-tight text-center">
-                                                {{ \App\Models\ZakatTransaction::getShiftLabel($t->shift) }}
+                                                {{ $t->shift_label }}
                                             </span>
                                         </div>
                                     </td>

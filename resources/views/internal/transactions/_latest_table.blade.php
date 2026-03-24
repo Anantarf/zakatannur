@@ -38,9 +38,9 @@
                     <td class="px-2 py-3">
                         <div class="flex flex-wrap gap-1 justify-center max-w-[100px] mx-auto">
                             @foreach(explode(',', $t->methods_list ?? '') as $met)
-                                @if(trim($met))
-                                    @php $label = \App\Models\ZakatTransaction::getMethodLabel(trim($met)); @endphp
-                                    <span class="inline-flex items-center justify-center rounded px-1.5 py-1 text-[10px] sm:text-[11px] font-bold uppercase tracking-wide bg-amber-50 text-amber-700 border border-amber-100 whitespace-nowrap leading-tight text-center">{{ $label }}</span>
+                                @php $met = trim($met); @endphp
+                                @if($met)
+                                    <span class="inline-flex items-center justify-center rounded px-1.5 py-1 text-[10px] sm:text-[11px] font-bold uppercase tracking-wide bg-amber-50 text-amber-700 border border-amber-100 whitespace-nowrap leading-tight text-center">{{ \App\Models\ZakatTransaction::METHOD_LABELS[$met] ?? strtoupper($met) }}</span>
                                 @endif
                             @endforeach
                         </div>
@@ -49,14 +49,14 @@
                         <div class="space-y-1">
                                 @if($t->total_uang > 0)
                                     <div class="flex items-center justify-end gap-1.5">
-                                        <div class="font-bold text-gray-800 text-xs sm:text-sm">{{ \App\Support\Format::rupiah((int)$t->total_uang) }}</div>
+                                        <div class="font-bold text-gray-800 text-xs sm:text-sm">{{ $t->total_uang_display }}</div>
                                         @if($t->has_transfer)
                                             <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-black bg-emerald-100 text-emerald-700 border border-emerald-200 uppercase">TF</span>
                                         @endif
                                     </div>
                                 @endif
                                 @if($t->total_beras > 0)
-                                    <div class="font-bold text-gray-800 text-xs sm:text-sm">{{ \App\Support\Format::kg((float)$t->total_beras) }}</div>
+                                    <div class="font-bold text-gray-800 text-xs sm:text-sm">{{ $t->total_beras_display }}</div>
                                 @endif
                         </div>
                     </td>
@@ -64,7 +64,7 @@
                         <div class="flex flex-col items-center gap-1 mx-auto w-fit">
                             <span class="font-medium font-sans text-gray-700 text-center">{{ $t->petugas?->name ?? '-' }}</span>
                             <span class="inline-flex items-center justify-center rounded px-2 py-0.5 text-[10px] font-bold uppercase bg-emerald-50 text-emerald-700 border border-emerald-100 whitespace-nowrap leading-tight text-center">
-                                {{ \App\Models\ZakatTransaction::getShiftLabel($t->shift) }}
+                                {{ $t->shift_label }}
                             </span>
                         </div>
                     </td>

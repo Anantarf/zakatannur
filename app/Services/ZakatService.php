@@ -7,9 +7,13 @@ use App\Models\Muzakki;
 use App\Models\ZakatTransaction;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Database\QueryException;
 use App\Support\Format;
 use App\Support\Audit;
+use App\Events\ZakatTransactionCreated;
+use Illuminate\Database\Eloquent\Collection;
 
 class ZakatService
 {
@@ -27,33 +31,28 @@ class ZakatService
         $waktuTerima = $waktuTerima ?? $this->parseWaktuTerima($data['waktu_terima'] ?? null);
         $items = isset($data['items']) && is_array($data['items']) ? $data['items'] : [$data];
         
-        // Track stats for change detection outside the retry loop
         $oldUang = 0;
         $oldBeras = 0;
-        $isNominalChanged = false;
 
         $syncResults = $this->executeWithRetry(function () use ($data, $items, $petugasId, $waktuTerima, $noTransaksiOverride, &$oldUang, &$oldBeras) {
             $lockName = 'sync_tx_' . $waktuTerima->format('Ymd');
+            $lock = Cache::lock($lockName, 10);
+            
             try {
-                if (DB::getDriverName() === 'mysql') {
-                    $locked = DB::selectOne("SELECT GET_LOCK('{$lockName}', 10) as locked");
-                    if (!$locked || ((int)$locked->locked) !== 1) {
-                        throw new \RuntimeException("Gagal mendapatkan kunci transaksi setelah menunggu. Silakan coba lagi.");
-                    }
+                if (!$lock->get()) {
+                    throw new \RuntimeException("Gagal mendapatkan kunci transaksi setelah menunggu (Lock: {$lockName}). Silakan coba lagi.");
                 }
                 
                 $results = [];
                 $noTransaksi = $noTransaksiOverride ?? $this->generateNoTransaksi($waktuTerima);
 
-            // CRITICAL Guard: If this is a NEW transaction (no override), ensure number isn't already used.
-            // This prevents "Silent Overwrites" where a new input accidentally hijacks someone else's number.
+            // Prevent hijacking existing transaction numbers
             if (!$noTransaksiOverride) {
                 if (ZakatTransaction::where('no_transaksi', $noTransaksi)->exists()) {
                     throw new \RuntimeException("Nomor Transaksi {$noTransaksi} sudah terpakai. Sila klik simpan sekali lagi untuk mendapatkan nomor baru.");
                 }
             }
 
-            // Calculate existing totals BEFORE changes, to detect nominal delta for broadcast.
             $oldTotals = ZakatTransaction::where('no_transaksi', $noTransaksi)
                 ->selectRaw('SUM(nominal_uang) as uang, SUM(jumlah_beras_kg) as beras')
                 ->first();
@@ -66,7 +65,7 @@ class ZakatService
                 'muzakki_address' => $data['pembayar_alamat'],
             ];
 
-            $this->findOrCreateMuzakki($pembayarData);
+            Muzakki::firstOrCreateNormalized($pembayarData);
 
             // For EDIT: guard against changing the payer to a completely different person.
             $existingMainTx = $noTransaksiOverride
@@ -83,7 +82,6 @@ class ZakatService
                 }
             }
 
-            // Get existing IDs for this transaction number to track deletions
             $existingIds = ZakatTransaction::where('no_transaksi', $noTransaksi)->pluck('id')->toArray();
             $newIds = [];
 
@@ -97,8 +95,8 @@ class ZakatService
                 [$defaultFitrah, $defaultFidyah, $defaultBerasKg, $defaultFidyahBeras] = $this->getAnnualDefaults($tahunZakat);
 
                 $itemForComputation = array_merge($item, ['category' => $category, 'metode' => $metode, 'tahun_zakat' => $tahunZakat]);
-                $nominalUang = $this->computeNominalUang($itemForComputation, $defaultFitrah, $defaultFidyah);
-                $jumlahBerasKg = $this->computeJumlahBerasKg($itemForComputation, $defaultBerasKg, $defaultFidyahBeras);
+                $nominalUang = ZakatTransaction::computeNominalUang($itemForComputation, $defaultFitrah, $defaultFidyah);
+                $jumlahBerasKg = ZakatTransaction::computeJumlahBerasKg($itemForComputation, $defaultBerasKg, $defaultFidyahBeras);
                 $isKhusus = $this->determineIsKhusus($itemForComputation, $defaultFitrah, $defaultFidyah, $defaultBerasKg, $defaultFidyahBeras);
 
                 $itemMuzakkiData = [
@@ -107,7 +105,7 @@ class ZakatService
                     'muzakki_address' => $item['muzakki_address'] ?? $pembayarData['muzakki_address'] ?? '',
                 ];
                 
-                $muzakki = $this->findOrCreateMuzakki($itemMuzakkiData);
+                $muzakki = Muzakki::firstOrCreateNormalized($itemMuzakkiData);
 
                 $transaction = null;
                 if (!empty($item['id'])) {
@@ -160,7 +158,6 @@ class ZakatService
                 ZakatTransaction::whereIn('id', $idsToDelete)->forceDelete();
             }
 
-            // Consolidate Audit Log
             $action = $noTransaksiOverride ? 'Updated.Transaction' : 'Created.Transaction';
             Audit::log(request(), $action, null, [
                 'no_transaksi' => $noTransaksi,
@@ -174,23 +171,22 @@ class ZakatService
 
             return $results;
         } finally {
-            if (DB::getDriverName() === 'mysql') {
-                DB::statement("SELECT RELEASE_LOCK('{$lockName}')");
+            if (isset($lock)) {
+                $lock->release();
             }
         }
         });
 
-        // Broadcast check after successful commit
         $newUang = collect($syncResults)->sum('nominal_uang');
         $newBeras = collect($syncResults)->sum('jumlah_beras_kg');
         $isNominalChanged = (int)$oldUang !== (int)$newUang || abs((float)$oldBeras - (float)$newBeras) > 0.001;
 
         if (count($syncResults) > 0 && ($noTransaksiOverride === null || $isNominalChanged)) {
             try {
-                event(new \App\Events\ZakatTransactionCreated(new \Illuminate\Database\Eloquent\Collection($syncResults)));
+                event(new ZakatTransactionCreated(new Collection($syncResults)));
             } catch (\Throwable $e) {
                 // We log the error but let the request succeed because data is already persisted.
-                \Illuminate\Support\Facades\Log::error('Gagal broadcast transaksi: ' . $e->getMessage());
+                Log::error('Gagal broadcast transaksi: ' . $e->getMessage());
             }
         }
 
@@ -254,58 +250,10 @@ class ZakatService
         if (!empty($errors)) throw \Illuminate\Validation\ValidationException::withMessages($errors);
     }
 
-    private function computeNominalUang(array $data, int $defaultFitrah, int $defaultFidyah): ?int
-    {
-        if ($data['metode'] === ZakatTransaction::METHOD_BERAS) return null;
-        if (isset($data['nominal_uang']) && $data['nominal_uang'] !== '') return (int) $data['nominal_uang'];
-
-        if ($data['category'] === ZakatTransaction::CATEGORY_FITRAH && $defaultFitrah > 0) return ((int) ($data['jiwa'] ?? 1)) * $defaultFitrah;
-        if ($data['category'] === ZakatTransaction::CATEGORY_FIDYAH && $defaultFidyah > 0) return ((int) ($data['hari'] ?? 0)) * $defaultFidyah;
-
-        return null;
-    }
-
-    private function computeJumlahBerasKg(array $data, float $defaultBerasKg, float $defaultFidyahBeras): ?float
-    {
-        if (isset($data['jumlah_beras_kg']) && $data['jumlah_beras_kg'] !== null && $data['jumlah_beras_kg'] !== '') return (float) $data['jumlah_beras_kg'];
-
-        if ($data['category'] === ZakatTransaction::CATEGORY_FITRAH && $data['metode'] === ZakatTransaction::METHOD_BERAS) {
-            return round(((int) ($data['jiwa'] ?? 1)) * $defaultBerasKg, 2);
-        }
-        
-        if ($data['category'] === ZakatTransaction::CATEGORY_FIDYAH && $data['metode'] === ZakatTransaction::METHOD_BERAS) {
-            return round(((int) ($data['hari'] ?? 0)) * $defaultFidyahBeras, 2);
-        }
-
-        return null;
-    }
-
-    private function findOrCreateMuzakki(array $data): Muzakki
-    {
-        // LEAN: Auto-normalize data to prevent duplicates from typos/spaces
-        $name = trim(preg_replace('/\s+/', ' ', (string) $data['muzakki_name']));
-
-        $phone = preg_replace('/[^0-9]/', '', (string) ($data['muzakki_phone'] ?? ''));
-        $address = trim((string) ($data['muzakki_address'] ?? ''));
-
-        // Attempt match by name+phone if phone exists, otherwise name+address
-        $criteria = ($phone !== '') 
-            ? ['name' => $name, 'phone' => $phone] 
-            : ['name' => $name, 'address' => $address];
-
-        $muzakki = Muzakki::withTrashed()->updateOrCreate($criteria, [
-            'address' => $address,
-            'phone'   => $phone
-        ]);
-        if ($muzakki->trashed()) $muzakki->restore();
-
-        return $muzakki;
-    }
 
     private function generateNoTransaksi(Carbon $time): string
     {
         $prefix = 'TRX-' . $time->format('Ymd') . '-';
-        // Note: Lock is now handled in syncTransactions for better coverage
         $last = ZakatTransaction::withTrashed()
             ->where('no_transaksi', 'like', $prefix . '%')
             ->orderByRaw(
@@ -351,14 +299,11 @@ class ZakatService
             try {
                 return DB::transaction($callback);
             } catch (QueryException $e) {
-                // Retry if unique constraint collision on no_transaksi (Integrity constraint violation: 23000)
-                if ($e->getCode() === '23000' && str_contains($e->getMessage(), 'no_transaksi')) continue;
-                // Retry if Deadlock (SQLSTATE: 40001 or Error Code: 1213)
+                // Retry on unique constraint collision or deadlock
                 if ($e->getCode() === '40001' || $e->errorInfo[1] === 1213) continue;
                 
                 throw $e;
             } catch (\RuntimeException $e) {
-                // If it's a collision on custom number generation logic, allow silent retry instead of 500
                 if (str_contains($e->getMessage(), 'Nomor Transaksi') && str_contains($e->getMessage(), 'sudah terpakai')) {
                     continue; 
                 }

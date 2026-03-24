@@ -131,11 +131,11 @@
                                                                 <div class="flex items-center justify-between text-xs">
                                                                     <span class="text-slate-400 font-medium">Total Uang</span>
                                                                     <div class="flex items-center gap-2">
-                                                                        <span class="text-slate-500 line-through">Rp {{ number_format($log->metadata['totals']['old']['uang'] ?? 0, 0, ',', '.') }}</span>
+                                                                        <span class="text-slate-500 line-through">{{ \App\Support\Format::rupiah((int)($log->metadata['totals']['old']['uang'] ?? 0)) }}</span>
                                                                         <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6" />
                                                                         </svg>
-                                                                        <span class="text-emerald-400 font-black">Rp {{ number_format($log->metadata['totals']['new']['uang'] ?? 0, 0, ',', '.') }}</span>
+                                                                        <span class="text-emerald-400 font-black">{{ \App\Support\Format::rupiah((int)($log->metadata['totals']['new']['uang'] ?? 0)) }}</span>
                                                                     </div>
                                                                 </div>
                                                             @endif
@@ -143,11 +143,11 @@
                                                                 <div class="flex items-center justify-between text-xs">
                                                                     <span class="text-slate-400 font-medium">Total Beras</span>
                                                                     <div class="flex items-center gap-2">
-                                                                        <span class="text-slate-500 line-through text-[10px]">{{ number_format($log->metadata['totals']['old']['beras'] ?? 0, 2, ',', '.') }} Kg</span>
+                                                                        <span class="text-slate-500 line-through text-[10px]">{{ \App\Support\Format::kg((float)($log->metadata['totals']['old']['beras'] ?? 0)) }}</span>
                                                                         <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6" />
                                                                         </svg>
-                                                                        <span class="text-emerald-400 font-black">{{ number_format($log->metadata['totals']['new']['beras'] ?? 0, 2, ',', '.') }} Kg</span>
+                                                                        <span class="text-emerald-400 font-black">{{ \App\Support\Format::kg((float)($log->metadata['totals']['new']['beras'] ?? 0)) }}</span>
                                                                     </div>
                                                                 </div>
                                                             @endif
