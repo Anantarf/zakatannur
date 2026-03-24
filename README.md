@@ -27,7 +27,7 @@
 ## 📦 Installation & Setup
 
 ### Prerequisites
-- PHP 8.1 or higher
+- PHP 8.0 or higher
 - Composer
 - Node.js & NPM
 
@@ -61,8 +61,8 @@
    php artisan serve
    ```
 
-## 🔐 Default Credentials
-- **Super Admin**: `superadmin@zakatanur.local`
+## 🔐 Default Credentials (via Seeder)
+- **Username**: `superadmin`
 - **Password**: `password`
 *(Note: Please change these credentials immediately after deployment)*
 
