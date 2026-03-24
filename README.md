@@ -9,12 +9,12 @@
 ## 🚀 Key Features
 
 - **Multi-Category Transaction Support**: Handle Zakat Fitrah, Fidyah, Zakat Mal, and Infaq Shodaqoh in one unified interface.
-- **Modern "Lean Service, Fat Model" Architecture**: Business logic is centralized within Eloquent models using modern Attribute accessors (PHP 8.2+) for maximum reusability and clean views.
-- **Smart Receipt System**: Instant PDF receipt generation with professional overlays and dynamic labeling.
+- **"Lean Service, Fat Model" Architecture**: Business logic is centralized within Eloquent models using Attribute accessors (PHP 8.0+) for maximum reusability and clean views.
+- **Smart Receipt System**: Instant PDF receipt generation using FPDI and TCPDF with high-precision overlays.
 - **Public Transparency Dashboard**: Real-time summary charts and data API for public accountability.
-- **Advanced Audit Logging**: Tracking every transaction lifecycle (Created, Updated, Deleted, Restored) with detailed metadata.
-- **Database-Agnostic Design**: Optimized for both MySQL (Production) and SQLite (Testing/Dev).
-- **Responsive Internal UI**: Interactive batch-transaction powered by Alpine.js and Tailwind CSS.
+- **Advanced Audit Logging**: Tracking transaction lifecycle (Created, Updated, Deleted, Restored) with granular metadata.
+- **Database-Agnostic Design**: Native support for SQLite (Testing) and MySQL (Production).
+- **Interactive Internal UI**: Batch-transaction powered by Alpine.js and Laravel Vite.
 
 ## 🛠 Tech Stack
 
