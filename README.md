@@ -1,67 +1,81 @@
-# ZakatAnNur (ZAKAT TRIAL)
+# ZakatAnNur (Professional Zakat Management System)
 
-Aplikasi pencatatan Zakat/Infaq untuk operasional masjid + halaman transparansi publik.
+[![Laravel](https://img.shields.io/badge/Laravel-v9.x-red.svg)](https://laravel.com)
+[![PHP](https://img.shields.io/badge/PHP-v8.x-blue.svg)](https://php.net)
+[![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 
-## Stack
+**ZakatAnNur** is a robust, lightweight Zakat and Infaq management system designed for mosques and social organizations. It provides a seamless bridge between internal operational recording and public transparency.
 
-- Laravel 9 (PHP 8.0)
-- Breeze (Blade)
-- Tailwind (via Vite)
-- PDF receipt + overlay kop surat (FPDI/TCPDF)
+## 🚀 Key Features
 
-## Fitur MVP (ringkas)
+- **Multi-Category Transaction Support**: Handle Zakat Fitrah, Fidyah, Zakat Mal, and Infaq Shodaqoh in one unified interface.
+- **Modern "Lean Service, Fat Model" Architecture**: Business logic is centralized within Eloquent models using modern Attribute accessors (PHP 8.2+) for maximum reusability and clean views.
+- **Smart Receipt System**: Instant PDF receipt generation with professional overlays and dynamic labeling.
+- **Public Transparency Dashboard**: Real-time summary charts and data API for public accountability.
+- **Advanced Audit Logging**: Tracking every transaction lifecycle (Created, Updated, Deleted, Restored) with detailed metadata.
+- **Database-Agnostic Design**: Optimized for both MySQL (Production) and SQLite (Testing/Dev).
+- **Responsive Internal UI**: Interactive batch-transaction powered by Alpine.js and Tailwind CSS.
 
-- Input transaksi zakat + cetak receipt PDF
-- Rekap internal + export PDF
-- Halaman publik ringkasan + API publik ringkasan
-- Trash Bin (soft delete) transaksi + restore + audit metadata
-- User management sederhana (role-based)
-- Template kop surat (PDF-only) dengan versi + aktivasi
+## 🛠 Tech Stack
 
-## Aturan Bisnis Penting
+- **Framework**: [Laravel 9.x](https://laravel.com)
+- **Frontend**: [Tailwind CSS](https://tailwindcss.com), [Alpine.js](https://alpinejs.dev)
+- **Database**: MySQL / SQLite
+- **PDF Engine**: [FPDI](https://www.setasign.com/products/fpdi/about/) & [TCPDF](https://tcpdf.org/)
+- **Charts**: [Chart.js](https://www.chartjs.org/)
 
-- Nomor transaksi: `TRX-YYYYMMDD-####` (reset harian)
-- Waktu referensi WIB (Asia/Jakarta)
-- Rekap menampilkan total campuran: "Rp X + Y Kg"
-- Refresh publik: 0 (mati) atau 30–60 detik (default 45)
+## 📦 Installation & Setup
 
-## Setup Lokal
+### Prerequisites
+- PHP 8.1 or higher
+- Composer
+- Node.js & NPM
 
-Prereq: PHP 8.x, Composer, Node.js + npm.
+### Step-by-Step Guide
 
-1. Install dependency
+1. **Clone the repository**
+   ```bash
+   git clone https://github.com/Anantarf/zakatannur.git
+   cd zakatannur
+   ```
 
-- `composer install`
-- `npm install`
+2. **Install dependencies**
+   ```bash
+   composer install
+   npm install && npm run build
+   ```
 
-2. Environment
+3. **Configure Environment**
+   ```bash
+   cp .env.example .env
+   php artisan key:generate
+   ```
 
-- `copy .env.example .env`
-- `php artisan key:generate`
+4. **Run Migrations & Seeders**
+   ```bash
+   php artisan migrate --seed
+   ```
 
-3. DB + seed
+5. **Start Development Server**
+   ```bash
+   php artisan serve
+   ```
 
-- `php artisan migrate`
-- `php artisan db:seed`
+## 🔐 Default Credentials
+- **Super Admin**: `superadmin@zakatanur.local`
+- **Password**: `password`
+*(Note: Please change these credentials immediately after deployment)*
 
-4. Jalankan
+## 🧪 Testing
+The system includes a comprehensive test suite to ensure business logic integrity:
+```bash
+php artisan test
+```
 
-- Terminal 1: `php artisan serve`
-- Terminal 2: `npm run dev`
+## 📜 Business Rules
+- **Transaction Logic**: Automated computation of Zakat Fitrah (Jiwa) and Fidyah (Hari) based on annual settings.
+- **Concurrency**: Implements `Cache::lock` to prevent race conditions during transaction number generation.
+- **Soft Deletes**: Transactions are safeguarded via soft deletes with a dedicated Trash Bin for recovery.
 
-## Akun Default (Seeder)
-
-Seeder membuat super admin:
-
-- Email: `superadmin@zakatanur.local`
-- Password: `password`
-
-Catatan: ganti password ini untuk production.
-
-## Testing
-
-- `php artisan test`
-
-## Ops / Go-Live
-
-Lihat checklist production di [docs/go-live.md](docs/go-live.md).
+---
+Built with ❤️ for religious and social transparency.
