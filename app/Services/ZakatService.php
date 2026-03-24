@@ -35,9 +35,11 @@ class ZakatService
         $syncResults = $this->executeWithRetry(function () use ($data, $items, $petugasId, $waktuTerima, $noTransaksiOverride, &$oldUang, &$oldBeras) {
             $lockName = 'sync_tx_' . $waktuTerima->format('Ymd');
             try {
-                $locked = DB::selectOne("SELECT GET_LOCK('{$lockName}', 10) as locked");
-                if (!$locked || ((int)$locked->locked) !== 1) {
-                    throw new \RuntimeException("Gagal mendapatkan kunci transaksi setelah menunggu. Silakan coba lagi.");
+                if (DB::getDriverName() === 'mysql') {
+                    $locked = DB::selectOne("SELECT GET_LOCK('{$lockName}', 10) as locked");
+                    if (!$locked || ((int)$locked->locked) !== 1) {
+                        throw new \RuntimeException("Gagal mendapatkan kunci transaksi setelah menunggu. Silakan coba lagi.");
+                    }
                 }
                 
                 $results = [];
@@ -172,7 +174,9 @@ class ZakatService
 
             return $results;
         } finally {
-            DB::statement("SELECT RELEASE_LOCK('{$lockName}')");
+            if (DB::getDriverName() === 'mysql') {
+                DB::statement("SELECT RELEASE_LOCK('{$lockName}')");
+            }
         }
         });
 
@@ -304,7 +308,11 @@ class ZakatService
         // Note: Lock is now handled in syncTransactions for better coverage
         $last = ZakatTransaction::withTrashed()
             ->where('no_transaksi', 'like', $prefix . '%')
-            ->orderByRaw('CAST(SUBSTRING(no_transaksi, 14) AS UNSIGNED) DESC')
+            ->orderByRaw(
+                DB::getDriverName() === 'sqlite'
+                    ? 'CAST(SUBSTR(no_transaksi, 14) AS INTEGER) DESC'
+                    : 'CAST(SUBSTRING(no_transaksi, 14) AS UNSIGNED) DESC'
+            )
             ->orderByDesc('id')
             ->value('no_transaksi');
             

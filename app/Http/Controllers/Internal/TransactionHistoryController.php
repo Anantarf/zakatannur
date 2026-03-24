@@ -161,6 +161,11 @@ class TransactionHistoryController extends Controller
         $payer = $transaction->pembayar_nama;
 
         DB::transaction(function () use ($no, $request, $transaction, $payer) {
+            ZakatTransaction::where('no_transaksi', $no)->update([
+                'deleted_by' => $request->user()->id,
+                'deleted_reason' => $request->input('deleted_reason'),
+            ]);
+
             // Delete the entire group
             $affected = ZakatTransaction::where('no_transaksi', $no)->delete();
 

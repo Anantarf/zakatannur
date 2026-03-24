@@ -15,7 +15,7 @@ class UserManagementController extends Controller
     public function index(Request $request)
     {
         $users = User::query()
-            ->orderByRaw("FIELD(role, 'super_admin', 'admin', 'staff')")
+            ->orderByRaw("CASE WHEN role = 'super_admin' THEN 1 WHEN role = 'admin' THEN 2 WHEN role = 'staff' THEN 3 ELSE 4 END")
             ->orderBy('name')
             ->paginate(20)
             ->withQueryString();

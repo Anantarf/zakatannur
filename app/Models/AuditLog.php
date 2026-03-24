@@ -18,6 +18,7 @@ class AuditLog extends Model
 
     protected $casts = [
         'metadata' => 'array',
+        'actor_user_id' => 'integer',
     ];
 
     public function actorUser()

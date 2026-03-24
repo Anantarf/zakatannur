@@ -30,10 +30,10 @@ class PeriodSettingsTest extends TestCase
         $response->assertForbidden();
     }
 
-    public function test_admin_can_view_period_settings(): void
+    public function test_super_admin_can_view_period_settings(): void
     {
         $user = User::factory()->create([
-            'role' => User::ROLE_ADMIN,
+            'role' => User::ROLE_SUPER_ADMIN,
         ]);
 
         $response = $this->actingAs($user)->get('/internal/settings/period');
@@ -42,10 +42,10 @@ class PeriodSettingsTest extends TestCase
         $response->assertSee('Konfigurasi Periode');
     }
 
-    public function test_admin_can_update_period_settings_and_defaults(): void
+    public function test_super_admin_can_update_period_settings_and_defaults(): void
     {
         $user = User::factory()->create([
-            'role' => User::ROLE_ADMIN,
+            'role' => User::ROLE_SUPER_ADMIN,
         ]);
 
         AppSetting::query()->create(['key' => AppSetting::KEY_ACTIVE_YEAR, 'value' => '2026']);
@@ -55,6 +55,7 @@ class PeriodSettingsTest extends TestCase
             'default_fitrah_cash_per_jiwa' => 55000,
             'default_fitrah_beras_per_jiwa' => 2.5,
             'default_fidyah_per_hari' => 60000,
+            'default_fidyah_beras_per_hari' => 0.75,
             'public_refresh_interval_seconds' => 15,
         ];
 
@@ -77,6 +78,7 @@ class PeriodSettingsTest extends TestCase
             'default_fitrah_cash_per_jiwa' => 55000,
             'default_fitrah_beras_per_jiwa' => 2.50,
             'default_fidyah_per_hari' => 60000,
+            'default_fidyah_beras_per_hari' => 0.75,
         ]);
 
         $annual = AnnualSetting::query()->where('year', 2026)->first();
@@ -86,7 +88,7 @@ class PeriodSettingsTest extends TestCase
     public function test_refresh_interval_validation_allows_zero_or_10_to_60(): void
     {
         $user = User::factory()->create([
-            'role' => User::ROLE_ADMIN,
+            'role' => User::ROLE_SUPER_ADMIN,
         ]);
 
         $badPayload = [
@@ -94,6 +96,7 @@ class PeriodSettingsTest extends TestCase
             'default_fitrah_cash_per_jiwa' => 50000,
             'default_fitrah_beras_per_jiwa' => 2.5,
             'default_fidyah_per_hari' => 50000,
+            'default_fidyah_beras_per_hari' => 0.75,
             'public_refresh_interval_seconds' => 5,
         ];
 
@@ -128,7 +131,7 @@ class PeriodSettingsTest extends TestCase
             ->assertForbidden();
     }
 
-    public function test_admin_can_start_new_period_and_annual_defaults_are_copied(): void
+    public function test_super_admin_can_start_new_period_and_annual_defaults_are_copied(): void
     {
         AppSetting::query()->create(['key' => AppSetting::KEY_ACTIVE_YEAR, 'value' => '2026']);
         AnnualSetting::query()->create([
@@ -138,7 +141,7 @@ class PeriodSettingsTest extends TestCase
             'default_fidyah_per_hari' => 60000,
         ]);
 
-        $admin = User::factory()->create(['role' => User::ROLE_ADMIN]);
+        $admin = User::factory()->create(['role' => User::ROLE_SUPER_ADMIN]);
 
         $this->actingAs($admin)
             ->post('/internal/settings/period/start-new', [
@@ -164,7 +167,7 @@ class PeriodSettingsTest extends TestCase
     {
         AppSetting::query()->create(['key' => AppSetting::KEY_ACTIVE_YEAR, 'value' => '2026']);
 
-        $admin = User::factory()->create(['role' => User::ROLE_ADMIN]);
+        $admin = User::factory()->create(['role' => User::ROLE_SUPER_ADMIN]);
 
         // missing backup_confirmed
         $this->actingAs($admin)

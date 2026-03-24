@@ -26,11 +26,12 @@ Route::middleware(['auth', 'role:staff,admin,super_admin'])
     ->name('internal.')
     ->prefix('internal')
     ->group(function () {
-        Route::get('/transactions/trash', [TransactionHistoryController::class, 'trash'])->name('transactions.trash');
-        Route::post('/transactions/{transaction}/trash', [TransactionHistoryController::class, 'destroy'])->name('transactions.destroy');
-        Route::post('/transactions/{transactionId}/restore', [TransactionHistoryController::class, 'restore'])->name('transactions.restore');
+
 
         Route::middleware(['role:admin,super_admin'])->group(function () {
+            Route::get('/transactions/trash', [TransactionHistoryController::class, 'trash'])->name('transactions.trash');
+            Route::post('/transactions/{transaction}/trash', [TransactionHistoryController::class, 'destroy'])->name('transactions.destroy');
+            Route::post('/transactions/{transactionId}/restore', [TransactionHistoryController::class, 'restore'])->name('transactions.restore');
             Route::delete('/transactions/{transactionId}/force-delete', [TransactionHistoryController::class, 'forceDelete'])->name('transactions.forceDelete');
 
             Route::get('/muzakki/trash', [MuzakkiController::class, 'trash'])->name('muzakki.trash');

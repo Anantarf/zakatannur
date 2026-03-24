@@ -89,6 +89,7 @@ class TransactionTrashTest extends TestCase
         $this->assertSame('Duplikat', $trx->deleted_reason);
 
         $this->actingAs($admin)
+            ->from(route('internal.transactions.trash'))
             ->post('/internal/transactions/' . $trx->id . '/restore')
             ->assertRedirect(route('internal.transactions.trash'));
 

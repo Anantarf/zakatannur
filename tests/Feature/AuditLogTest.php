@@ -42,11 +42,11 @@ class AuditLogTest extends TestCase
             ->assertRedirect(route('internal.transactions.index'));
 
         $this->assertDatabaseHas('audit_logs', [
-            'action'       => 'transaction.receipt_trashed',
+            'action'       => 'transaction.delete',
             'actor_user_id'=> $admin->id,
         ]);
 
-        $log = \App\Models\AuditLog::where('action', 'transaction.receipt_trashed')->first();
+        $log = \App\Models\AuditLog::where('action', 'transaction.delete')->first();
         $this->assertEquals('TRX-20260308-0001', $log->metadata['no_transaksi']);
     }
 
@@ -54,7 +54,7 @@ class AuditLogTest extends TestCase
     {
         AppSetting::query()->create(['key' => AppSetting::KEY_ACTIVE_YEAR, 'value' => '2026']);
 
-        $admin = User::factory()->create(['role' => User::ROLE_ADMIN]);
+        $admin = User::factory()->create(['role' => User::ROLE_SUPER_ADMIN]);
 
         $this->actingAs($admin)
             ->post('/internal/settings/period/start-new', [
