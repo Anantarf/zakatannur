@@ -61,10 +61,6 @@
    php artisan serve
    ```
 
-## 🔐 Default Credentials (via Seeder)
-- **Username**: `superadmin`
-- **Password**: `password`
-*(Note: Please change these credentials immediately after deployment)*
 
 ## 🧪 Testing
 The system includes a comprehensive test suite to ensure business logic integrity:
