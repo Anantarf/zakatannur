@@ -37,7 +37,7 @@ jobs:
         rsync -avz --delete \
         -e "ssh -p ${{ secrets.SSH_PORT || '22' }} -o StrictHostKeyChecking=no" \
         ./ \
-        ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:/home/${{ secrets.SSH_USER }}/public_html/zakat-app/ \
+        ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:~/public_html/zakat-app/ \
         --exclude '.git*' \
         --exclude 'node_modules' \
         --exclude 'storage/*.key' \
@@ -52,7 +52,7 @@ jobs:
         key: ${{ secrets.SSH_PRIVATE_KEY }}
         port: ${{ secrets.SSH_PORT || '22' }}
         script: |
-          cd /home/${{ secrets.SSH_USER }}/public_html/zakat-app
+          cd ~/public_html/zakat-app
           php artisan migrate --force
           php artisan config:cache
           php artisan route:cache
