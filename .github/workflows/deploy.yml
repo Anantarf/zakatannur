@@ -35,7 +35,7 @@ jobs:
     - name: Deploy with rsync
       run: |
         rsync -avz --delete \
-        -e "ssh -p ${{ secrets.SSH_PORT || '22' }} -o StrictHostKeyChecking=no" \
+        -e "ssh -p ${{ secrets.SSH_PORT || '22' }} -o StrictHostKeyChecking=no -vvv" \
         ./ \
         ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:~/public_html/zakat-app/ \
         --exclude '.git*' \
@@ -51,6 +51,7 @@ jobs:
         username: ${{ secrets.SSH_USER }}
         key: ${{ secrets.SSH_PRIVATE_KEY }}
         port: ${{ secrets.SSH_PORT || '22' }}
+        debug: true
         script: |
           cd ~/public_html/zakat-app
           php artisan migrate --force
