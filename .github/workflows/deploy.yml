@@ -9,12 +9,12 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
 
     - name: Setup PHP
       uses: shivammathur/setup-php@v2
       with:
-        php-version: '8.1' # Sesuaikan dengan versi cPanel Anda
+        php-version: '8.1'
         extensions: mbstring, xml, bcmath, gd, zip
 
     - name: Install Composer Dependencies
@@ -35,9 +35,9 @@ jobs:
     - name: Deploy with rsync
       run: |
         rsync -avz --delete \
-        -e "ssh -p ${{ secrets.SSH_PORT }} -o StrictHostKeyChecking=no" \
+        -e "ssh -p ${{ secrets.SSH_PORT || '22' }} -o StrictHostKeyChecking=no" \
         ./ \
-        ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:/home/${{ secrets.SSH_USER }}/public_html/zakatannur/ \
+        ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:/home/${{ secrets.SSH_USER }}/public_html/zakat-app/ \
         --exclude '.git*' \
         --exclude 'node_modules' \
         --exclude 'storage/*.key' \
@@ -50,9 +50,9 @@ jobs:
         host: ${{ secrets.SSH_HOST }}
         username: ${{ secrets.SSH_USER }}
         key: ${{ secrets.SSH_PRIVATE_KEY }}
-        port: ${{ secrets.SSH_PORT }}
+        port: ${{ secrets.SSH_PORT || '22' }}
         script: |
-          cd /home/${{ secrets.SSH_USER }}/public_html/zakatannur
+          cd /home/${{ secrets.SSH_USER }}/public_html/zakat-app
           php artisan migrate --force
           php artisan config:cache
           php artisan route:cache
