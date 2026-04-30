@@ -1,0 +1,60 @@
+name: Deploy Laravel to cPanel
+
+on:
+  push:
+    branches: [ master ]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Setup PHP
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: '8.1'
+        extensions: mbstring, xml, bcmath, gd, zip
+
+    - name: Install Composer Dependencies
+      run: composer install --no-dev --optimize-autoloader --no-interaction
+
+    - name: Install NPM Dependencies & Build
+      run: |
+        npm install
+        npm run build
+
+    - name: Setup SSH Key
+      uses: shimataro/ssh-key-action@v2
+      with:
+        key: ${{ secrets.SSH_PRIVATE_KEY }}
+        known_hosts: unnecessary
+        if_key_exists: replace
+
+    - name: Deploy with rsync
+      run: |
+        rsync -avz --delete \
+        -e "ssh -p ${{ secrets.SSH_PORT || '22' }} -o StrictHostKeyChecking=no -vvv" \
+        ./ \
+        ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:~/public_html/zakat-app/ \
+        --exclude '.git*' \
+        --exclude 'node_modules' \
+        --exclude 'storage/*.key' \
+        --exclude '.env' \
+        --exclude 'vendor'
+
+    - name: Run Remote Commands (Migrate & Cache)
+      uses: appleboy/ssh-action@master
+      with:
+        host: ${{ secrets.SSH_HOST }}
+        username: ${{ secrets.SSH_USER }}
+        key: ${{ secrets.SSH_PRIVATE_KEY }}
+        port: ${{ secrets.SSH_PORT || '22' }}
+        debug: true
+        script: |
+          cd ~/public_html/zakat-app
+          php artisan migrate --force
+          php artisan config:cache
+          php artisan route:cache
+          php artisan view:cache
