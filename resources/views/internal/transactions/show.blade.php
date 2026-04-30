@@ -13,21 +13,7 @@
     <div class="py-8">
         <div class="max-w-4xl mx-auto sm:px-6 lg:px-8">
             
-             @if (session('status'))
-                <div class="mb-6 px-5 py-4 rounded-2xl bg-emerald-600 text-white text-sm font-bold flex items-center gap-3 shadow-[0_10px_30px_rgba(16,185,129,0.3)] animate-bounce-subtle mx-2 sm:mx-0">
-                    <div class="w-8 h-8 rounded-full bg-white flex items-center justify-center shrink-0">
-                        <svg class="h-5 w-5 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" /></svg>
-                    </div>
-                    <span>{{ session('status') }}</span>
-                </div>
-                <style>
-                    @keyframes bounce-subtle {
-                        0%, 100% { transform: translateY(0); }
-                        50% { transform: translateY(-3px); }
-                    }
-                    .animate-bounce-subtle { animation: bounce-subtle 3s ease-in-out infinite; }
-                </style>
-            @endif
+            {{-- session('status') is handled globally by the app layout toast --}}
 
             <div class="bg-white rounded-2xl shadow-lg shadow-gray-200/50 border border-emerald-100/30 overflow-hidden relative">
                 <!-- Subtle Emerald Accent -->
@@ -43,7 +29,7 @@
                             </div>
                             <div class="w-full sm:w-auto sm:text-right">
                                 <p class="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-1">Waktu Transaksi</p>
-                                <p class="text-sm font-bold text-gray-600 tabular-nums">{{ $mainTx->created_at->format('d/m/Y H:i') }} WIB</p>
+                                <p class="text-sm font-bold text-gray-600 tabular-nums">{{ ($mainTx->waktu_terima ?? $mainTx->created_at)->format('d/m/Y H:i') }} WIB</p>
                             </div>
                         </div>
                         
@@ -71,14 +57,12 @@
                                     </tr>
                                 </thead>
                                 <tbody class="divide-y divide-gray-50">
-                                    @php
-                                        $rowNo = 1;
-                                    @endphp
-                                    <?php foreach ($groupedArr as $muzakkiName => $txsArr): ?>
-                                        <?php $txCount = count($txsArr); ?>
-                                        <?php foreach ($txsArr as $i => $tx): ?>
-                                            <?php /** @var \App\Models\ZakatTransaction $tx */ ?>
-                                            <tr class="hover:bg-emerald-50/30 transition-colors <?php echo $i > 0 ? 'border-t border-dashed border-gray-100' : ''; ?>">
+                                    @php $rowNo = 1; @endphp
+                                    @foreach ($groupedArr as $muzakkiName => $txsArr)
+                                        @php $txCount = count($txsArr); @endphp
+                                        @foreach ($txsArr as $i => $tx)
+                                            {{-- @var \App\Models\ZakatTransaction $tx --}}
+                                            <tr class="hover:bg-emerald-50/30 transition-colors {{ $i > 0 ? 'border-t border-dashed border-gray-100' : '' }}">
                                                 {{-- Nama hanya muncul di baris pertama --}}
                                                 @if($i === 0)
                                                     <td class="px-3 sm:px-6 py-4 align-top" rowspan="{{ $txCount }}">
@@ -92,14 +76,14 @@
                                                     <x-zakat-category-tags :categories="[$tx->category]" />
                                                 </td>
                                                 <td class="px-3 sm:px-6 py-4">
-                                                    <span class="inline-flex items-center px-2.5 py-1 rounded text-[11px] font-bold uppercase tracking-wider {{ $tx->metode == 'beras' ? 'bg-amber-100 text-amber-700' : 'bg-emerald-100 text-emerald-700' }}">
+                                                    <span class="inline-flex items-center px-2.5 py-1 rounded text-[11px] font-bold uppercase tracking-wider {{ $tx->metode === 'beras' ? 'bg-amber-100 text-amber-700' : 'bg-emerald-100 text-emerald-700' }}">
                                                         {{ $tx->metode_label }}
                                                     </span>
                                                 </td>
                                                 <td class="px-3 sm:px-6 py-4 text-right font-medium text-gray-500 text-xs">
-                                                    @if($tx->category == 'fitrah' && $tx->jiwa)
+                                                    @if($tx->category === 'fitrah' && $tx->jiwa)
                                                         <span class="px-2 py-1 bg-gray-50 rounded-md border border-gray-100 font-bold text-gray-600">{{ $tx->jiwa }} Jiwa</span>
-                                                    @elseif($tx->category == 'fidyah' && $tx->hari)
+                                                    @elseif($tx->category === 'fidyah' && $tx->hari)
                                                         <span class="px-2 py-1 bg-gray-50 rounded-md border border-gray-100 font-bold text-gray-600">{{ $tx->hari }} Hari</span>
                                                     @else
                                                         -
@@ -107,7 +91,7 @@
                                                 </td>
                                                 <td class="px-2 sm:px-6 py-4 text-right">
                                                     <p class="text-[10px] sm:text-sm font-bold text-gray-900 tabular-nums whitespace-nowrap">
-                                                        @if($tx->metode == 'beras')
+                                                        @if($tx->metode === 'beras')
                                                             {{ rtrim(rtrim(number_format($tx->jumlah_beras_kg, 2, ',', '.'), '0'), ',') }} <span class="text-[9px] sm:text-xs font-bold text-gray-400 ml-0.5">kg</span>
                                                         @else
                                                             {{ \App\Support\Format::rupiah((int)$tx->nominal_uang) }}
@@ -118,8 +102,8 @@
                                                     </p>
                                                 </td>
                                             </tr>
-                                        <?php endforeach; ?>
-                                    <?php endforeach; ?>
+                                        @endforeach
+                                    @endforeach
                                 </tbody>
                             </table>
                         </div>
@@ -185,10 +169,15 @@
                                  INPUT BARU
                              </a>
                              @php
-                                 $canModify = auth()->user()->role !== 'staff' || 
-                                             ($mainTx->petugas_id === auth()->id() && $mainTx->created_at->isToday());
+                                 // Mirror authorizeEdit() logic: use waktu_terima ?? created_at, same as the controller.
+                                 // Also hide Edit button if transaction is void.
+                                 $txDate = ($mainTx->waktu_terima ?? $mainTx->created_at)->timezone('Asia/Jakarta');
+                                 $canModify = $mainTx->status !== \App\Models\ZakatTransaction::STATUS_VOID && (
+                                     in_array(auth()->user()->role, [\App\Models\User::ROLE_ADMIN, \App\Models\User::ROLE_SUPER_ADMIN]) ||
+                                     ((int) $mainTx->petugas_id === auth()->id() && $txDate->isToday())
+                                 );
                              @endphp
-                             
+
                              @if($canModify)
                                  <a href="{{ route('internal.transactions.edit', ['transaction' => $mainTx->id]) }}" class="flex-none px-6 py-4 bg-white border border-gray-200 hover:bg-gray-50 text-gray-500 hover:text-gray-700 text-xs font-black rounded-xl transition-all shadow-sm flex items-center justify-center sm:order-3 uppercase tracking-widest">
                                      <svg class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h14a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>

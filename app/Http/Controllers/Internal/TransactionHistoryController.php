@@ -8,6 +8,7 @@ use App\Models\ZakatTransaction;
 use App\Support\Audit;
 use App\Support\ViewOptions;
 use Illuminate\Http\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
@@ -39,7 +40,7 @@ class TransactionHistoryController extends Controller
             ->orderByRaw('COALESCE(MAX(waktu_terima), MAX(created_at)) DESC')
             ->orderByDesc('no_transaksi')
             ->paginate(20)
-            ->withQueryString();
+            ->appends($request->query());
 
         $years = ViewOptions::years($filters['activeYear']);
         $petugasOptions = ViewOptions::petugasOptions();
@@ -89,7 +90,12 @@ class TransactionHistoryController extends Controller
         ])->validate();
 
         $q = isset($validated['q']) ? trim((string) $validated['q']) : '';
-        $year = array_key_exists('year', $validated) ? ($validated['year'] !== null ? (int) $validated['year'] : null) : $activeYear;
+
+        // Intent: ?year= not present → default to activeYear (most common use case).
+        // ?year= present but empty string → null (user explicitly chose "Semua Waktu").
+        $year = array_key_exists('year', $validated)
+            ? ($validated['year'] !== null ? (int) $validated['year'] : null)
+            : $activeYear;
 
         return [
             'q' => $q,
@@ -134,7 +140,7 @@ class TransactionHistoryController extends Controller
             ->groupBy('no_transaksi')
             ->orderByDesc('deleted_at')
             ->paginate(20)
-            ->withQueryString();
+            ->appends($request->query());
 
         $transactions->getCollection()->transform(function ($transaction) use ($purgeDays) {
             // Fix: deleted_at inside MAX() might be stringy, ensure it's parsed as localized carbon
@@ -191,13 +197,13 @@ class TransactionHistoryController extends Controller
         // Staff Restrictions:
         // 1. Can only delete their own transactions
         if ((int)$tx->petugas_id !== (int)$user->id) {
-            abort(\Illuminate\Http\Response::HTTP_FORBIDDEN, 'Anda hanya dapat menghapus transaksi yang Anda layani sendiri.');
+            abort(Response::HTTP_FORBIDDEN, 'Anda hanya dapat menghapus transaksi yang Anda layani sendiri.');
         }
 
         // 2. Can only delete today's transactions
         $txDate = ($tx->waktu_terima ?? $tx->created_at)->timezone('Asia/Jakarta');
         if (!$txDate->isToday()) {
-            abort(\Illuminate\Http\Response::HTTP_FORBIDDEN, 'Batas waktu penghapusan harian telah berakhir. Silakan hubungi Admin untuk menghapus data hari sebelumnya.');
+            abort(Response::HTTP_FORBIDDEN, 'Batas waktu penghapusan harian telah berakhir. Silakan hubungi Admin untuk menghapus data hari sebelumnya.');
         }
     }
 

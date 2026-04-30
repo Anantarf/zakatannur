@@ -89,7 +89,13 @@ class ZakatTransaction extends Model
         return $value !== null && in_array($value, self::STATUSES, true);
     }
 
+    public static function getShiftLabel(?string $shift): string
+    {
+        return self::SHIFT_LABELS[$shift] ?? '-';
+    }
+
     protected $fillable = [
+            // --- User-submitted form fields ---
             'no_transaksi',
             'shift',
             'muzakki_id',
@@ -100,26 +106,28 @@ class ZakatTransaction extends Model
             'jumlah_beras_kg',
             'jiwa',
             'hari',
-            'is_khusus',
-            'default_fitrah_cash_per_jiwa_used',
-            'default_fidyah_per_hari_used',
-            'petugas_id',
-            'keterangan',
             'is_transfer',
-            'status',
-            'void_reason',
-            'voided_at',
-            'voided_by',
+            'keterangan',
             'waktu_terima',
-
-            'deleted_by',
-            'deleted_reason',
-            'restored_at',
-            'restored_by',
-
             'pembayar_nama',
             'pembayar_alamat',
             'pembayar_phone',
+
+            // --- Server-assigned only (never from user form input) ---
+            'is_khusus',
+            'default_fitrah_cash_per_jiwa_used',
+            'default_fidyah_per_hari_used',
+            'petugas_id',    // Always set from authenticated session in ZakatService
+
+            // --- Lifecycle fields: set by controllers, never by form input ---
+            'status',        // Always hardcoded to STATUS_VALID on create/update
+            'void_reason',   // Set only by TransactionHistoryController::void()
+            'voided_at',
+            'voided_by',
+            'deleted_by',    // Set only by TransactionHistoryController::destroy()
+            'deleted_reason',
+            'restored_at',   // Set only by TransactionHistoryController::restore()
+            'restored_by',
         ];
 
     protected $casts = [

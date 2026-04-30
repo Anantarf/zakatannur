@@ -28,7 +28,7 @@ class AuditLogController extends Controller
             $query->orderBy('created_at', 'desc');
         }
 
-        $logs = $query->paginate(50)->withQueryString();
+        $logs = $query->paginate(50)->appends($request->query());
 
         return view('internal.audit_logs.index', compact('logs', 'sortBy', 'sortDir'));
     }

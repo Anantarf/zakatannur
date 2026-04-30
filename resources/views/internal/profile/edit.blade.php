@@ -87,9 +87,9 @@
                         </div>
 
                         <div class="flex items-center justify-end gap-4 mt-8 pt-4 border-t border-gray-50">
-                            <x-primary-button class="bg-emerald-600 hover:bg-emerald-700 shadow-lg shadow-emerald-100 px-8 py-3 rounded-xl transition-all h-auto">
+                            <x-emerald-button class="px-8 py-3">
                                 {{ __('Simpan Perubahan') }}
-                            </x-primary-button>
+                            </x-emerald-button>
                         </div>
                     </form>
                 </div>

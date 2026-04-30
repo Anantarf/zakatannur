@@ -11,7 +11,7 @@ use App\Models\ZakatTransaction;
 use App\Support\ReceiptPdf;
 use App\Support\ViewOptions;
 use Illuminate\Http\Request;
-use Illuminate\Http\Response;
+use Symfony\Component\HttpFoundation\Response;
 use Illuminate\Support\Facades\Storage;
 
 class ZakatTransactionController extends Controller
@@ -19,27 +19,18 @@ class ZakatTransactionController extends Controller
     public function create(Request $request)
     {
         $activeYear = AppSetting::getInt(AppSetting::KEY_ACTIVE_YEAR, (int) now()->year);
-        $years = ViewOptions::years($activeYear);
 
-        $annualSetting = \App\Models\AnnualSetting::where('year', $activeYear)->first();
-        $berasPerJiwa = $annualSetting ? $annualSetting->default_fitrah_beras_per_jiwa : 2.5;
-
-        $fitrahUang = $annualSetting ? $annualSetting->default_fitrah_cash_per_jiwa : 50000;
-        $fidyahUang = $annualSetting ? $annualSetting->default_fidyah_per_hari : 30000;
-        $fidyahBeras = $annualSetting ? $annualSetting->default_fidyah_beras_per_hari : 0.75;
-
-        return view('internal.transactions.create', [
-            'years' => $years,
-            'activeYear' => $activeYear,
-            'categories' => ZakatTransaction::CATEGORIES,
-            'methods' => ZakatTransaction::METHODS,
-            'shifts' => ZakatTransaction::SHIFTS,
-            'shiftLabels' => ZakatTransaction::SHIFT_LABELS,
-            'berasPerJiwa' => (float) $berasPerJiwa,
-            'fitrahUang' => (int) $fitrahUang,
-            'fidyahUang' => (int) $fidyahUang,
-            'fidyahBeras' => (float) $fidyahBeras,
-        ]);
+        return view('internal.transactions.create', array_merge(
+            $this->getAnnualDefaults($activeYear),
+            [
+                'years'      => ViewOptions::years($activeYear),
+                'activeYear' => $activeYear,
+                'categories' => ZakatTransaction::CATEGORIES,
+                'methods'    => ZakatTransaction::METHODS,
+                'shifts'     => ZakatTransaction::SHIFTS,
+                'shiftLabels'=> ZakatTransaction::SHIFT_LABELS,
+            ]
+        ));
     }
 
     public function store(StoreZakatTransactionRequest $request, \App\Services\ZakatService $service)
@@ -130,6 +121,7 @@ class ZakatTransactionController extends Controller
                 ->withErrors(['letterhead' => 'Template kop belum aktif. Minta super_admin mengaktifkan template kop terlebih dahulu.']);
         }
 
+        /** @var \Illuminate\Filesystem\FilesystemAdapter $disk */
         $disk = Storage::disk('local');
         if (!$disk->exists($template->storage_path)) {
             return redirect()->route('internal.transactions.create')
@@ -162,33 +154,23 @@ class ZakatTransactionController extends Controller
             ->orderBy('id', 'asc')
             ->get();
 
-        $activeYear = $tx->tahun_zakat;
-        $years = ViewOptions::years($activeYear);
-
-        $annualSetting = \App\Models\AnnualSetting::where('year', $activeYear)->first();
-        $berasPerJiwa = $annualSetting ? $annualSetting->default_fitrah_beras_per_jiwa : 2.5;
-        $fitrahUang = $annualSetting ? $annualSetting->default_fitrah_cash_per_jiwa : 50000;
-        $fidyahUang = $annualSetting ? $annualSetting->default_fidyah_per_hari : 30000;
-        $fidyahBeras = $annualSetting ? $annualSetting->default_fidyah_beras_per_hari : 0.75;
-
         $persons = \App\Transformers\TransactionTransformer::toAlpinePersons($all);
 
-        return view('internal.transactions.create', [
-            'isEdit' => true,
-            'mainTx' => $tx,
-            'persons' => $persons,
-            'years' => $years,
-            'activeYear' => $activeYear,
-            'categories' => ZakatTransaction::CATEGORIES,
-            'methods' => ZakatTransaction::METHODS,
-            'shifts' => ZakatTransaction::SHIFTS,
-            'shiftLabels' => ZakatTransaction::SHIFT_LABELS,
-            'officers' => User::orderBy('name')->get(['id', 'name', 'role']),
-            'berasPerJiwa' => (float) $berasPerJiwa,
-            'fitrahUang' => (int) $fitrahUang,
-            'fidyahUang' => (int) $fidyahUang,
-            'fidyahBeras' => (float) $fidyahBeras,
-        ]);
+        return view('internal.transactions.create', array_merge(
+            $this->getAnnualDefaults($tx->tahun_zakat),
+            [
+                'isEdit'     => true,
+                'mainTx'     => $tx,
+                'persons'    => $persons,
+                'years'      => ViewOptions::years($tx->tahun_zakat),
+                'activeYear' => $tx->tahun_zakat,
+                'categories' => ZakatTransaction::CATEGORIES,
+                'methods'    => ZakatTransaction::METHODS,
+                'shifts'     => ZakatTransaction::SHIFTS,
+                'shiftLabels'=> ZakatTransaction::SHIFT_LABELS,
+                'officers'   => User::orderBy('name')->get(['id', 'name', 'role']),
+            ]
+        ));
     }
 
     public function update(StoreZakatTransactionRequest $request, int $transaction, \App\Services\ZakatService $service)
@@ -231,5 +213,21 @@ class ZakatTransactionController extends Controller
         if (request()->has('tahun_zakat') && (int)request('tahun_zakat') !== (int)$tx->tahun_zakat) {
             abort(Response::HTTP_FORBIDDEN, 'Tahun zakat tidak dapat diubah oleh Staff setelah transaksi tersimpan.');
         }
+    }
+
+    /**
+     * Returns AnnualSetting-based defaults for the given year, with safe fallbacks.
+     * Single source of truth — used by both create() and edit().
+     */
+    private function getAnnualDefaults(int $year): array
+    {
+        $s = \App\Models\AnnualSetting::where('year', $year)->first();
+
+        return [
+            'berasPerJiwa' => (float) ($s->default_fitrah_beras_per_jiwa ?? 2.5),
+            'fitrahUang'   => (int)   ($s->default_fitrah_cash_per_jiwa  ?? 50000),
+            'fidyahUang'   => (int)   ($s->default_fidyah_per_hari       ?? 30000),
+            'fidyahBeras'  => (float) ($s->default_fidyah_beras_per_hari ?? 0.75),
+        ];
     }
 }

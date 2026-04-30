@@ -413,10 +413,10 @@
                                         class="flex-1 flex justify-center items-center gap-2 rounded-xl bg-slate-100 px-6 py-4 text-sm font-bold text-slate-600 hover:bg-slate-200 transition-all active:scale-[0.98]">
                                          Kembali
                                      </a>
-                                     <button type="submit" 
+                                     <x-emerald-button 
                                              :disabled="submitting || !hasChanged"
-                                             :class="{'opacity-50 cursor-not-allowed': submitting || !hasChanged}"
-                                             class="flex-[2] flex justify-center items-center gap-2 rounded-xl bg-emerald-600 px-6 py-4 text-base font-black text-white shadow-lg shadow-emerald-100 hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 transition-all transform hover:-translate-y-0.5 active:scale-[0.98]">
+                                             x-bind:class="{'opacity-50 cursor-not-allowed': submitting || !hasChanged}"
+                                             class="flex-[2] py-4 text-base">
                                           
                                           <template x-if="submitting">
                                               <div class="flex items-center gap-2">
@@ -434,13 +434,13 @@
                                                   <span x-text="hasChanged ? 'Simpan Perubahan' : 'Tidak Ada Perubahan'"></span>
                                               </div>
                                           </template>
-                                      </button>
+                                      </x-emerald-button>
                                  </div>
                              @else
-                                 <button type="submit" 
+                                 <x-emerald-button 
                                          :disabled="submitting"
-                                         :class="{'opacity-50 cursor-not-allowed': submitting}"
-                                         class="w-full flex justify-center items-center gap-2 rounded-xl bg-emerald-600 px-6 py-4 text-base font-black text-white shadow-lg shadow-emerald-100 hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 transition-all transform hover:-translate-y-0.5 active:scale-[0.98]">
+                                         x-bind:class="{'opacity-50 cursor-not-allowed': submitting}"
+                                         class="w-full py-4 text-base">
                                       
                                       <template x-if="submitting">
                                           <div class="flex items-center gap-2">
@@ -460,7 +460,7 @@
                                               <span>Proses & Simpan Transaksi</span>
                                           </div>
                                       </template>
-                                  </button>
+                                  </x-emerald-button>
                              @endif
                              <p class="text-center text-[10px] text-gray-400 font-bold uppercase tracking-widest mt-3">
                                  <span x-show="!submitting">{{ isset($isEdit) ? 'Data lama akan digantikan dengan input baru di halaman ini' : 'Satu Kali Klik untuk Menyimpan Seluruh Data Anggota' }}</span>

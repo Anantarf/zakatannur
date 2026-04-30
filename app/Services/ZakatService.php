@@ -67,20 +67,8 @@ class ZakatService
 
             Muzakki::firstOrCreateNormalized($pembayarData);
 
-            // For EDIT: guard against changing the payer to a completely different person.
-            $existingMainTx = $noTransaksiOverride
-                ? ZakatTransaction::where('no_transaksi', $noTransaksi)->first()
-                : null;
-
-            if ($existingMainTx) {
-                $oldNameShort = strtolower(substr(trim($existingMainTx->pembayar_nama), 0, 4));
-                $newNameShort = strtolower(substr(trim($pembayarData['muzakki_name']), 0, 4));
-                if ($oldNameShort !== $newNameShort) {
-                    throw \Illuminate\Validation\ValidationException::withMessages([
-                        'pembayar_nama' => "Data tidak dapat diubah menjadi orang lain ({$existingMainTx->pembayar_nama}). Gunakan input transaksi baru untuk orang yang berbeda."
-                    ]);
-                }
-            }
+            // For EDIT: The system maintains the same No. Transaksi. 
+            // We allow name corrections (e.g. typos) but the No. Transaksi remains the primary anchor.
 
             $existingIds = ZakatTransaction::where('no_transaksi', $noTransaksi)->pluck('id')->toArray();
             $newIds = [];
@@ -125,8 +113,8 @@ class ZakatService
                     'is_khusus' => $isKhusus,
                     'default_fitrah_cash_per_jiwa_used' => $defaultFitrah > 0 ? $defaultFitrah : null,
                     'default_fidyah_per_hari_used' => $defaultFidyah > 0 ? $defaultFidyah : null,
-                    'petugas_id' => $item['petugas_id'] ?? $data['petugas_id'] ?? $petugasId,
-                    'waktu_terima' => $item['waktu_terima'] ?? $data['waktu_terima'] ?? now(),
+                    'petugas_id' => $petugasId, // Always server-side — never trust client-submitted petugas_id
+                    'waktu_terima' => $waktuTerima, // always use the parsed & normalized Carbon instance
                     'shift' => $data['shift'] ?? ZakatTransaction::SHIFT_PAGI,
                     'keterangan' => $data['keterangan'] ?? null,
                     'is_transfer' => ($metode === ZakatTransaction::METHOD_UANG) ? ($item['is_transfer'] ?? false) : false,
@@ -155,7 +143,7 @@ class ZakatService
             ];
 
             if (!empty($idsToDelete)) {
-                ZakatTransaction::whereIn('id', $idsToDelete)->forceDelete();
+                ZakatTransaction::whereIn('id', $idsToDelete)->delete(); // Use Soft Delete
             }
 
             $action = $noTransaksiOverride ? 'Updated.Transaction' : 'Created.Transaction';

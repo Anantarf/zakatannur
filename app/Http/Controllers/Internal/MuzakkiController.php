@@ -16,7 +16,7 @@ class MuzakkiController extends Controller
             ->search($q)
             ->orderBy('name');
 
-        $muzakki = $query->paginate(20)->withQueryString();
+        $muzakki = $query->paginate(20)->appends($request->query());
 
         return view('internal.muzakki.index', [
             'muzakki' => $muzakki,
@@ -82,7 +82,7 @@ class MuzakkiController extends Controller
             ->search($q)
             ->orderBy('deleted_at', 'desc');
 
-        $muzakki = $query->paginate(20)->withQueryString();
+        $muzakki = $query->paginate(20)->appends($request->query());
 
         return view('internal.muzakki.trash', [
             'muzakki' => $muzakki,

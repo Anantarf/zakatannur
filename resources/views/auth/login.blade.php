@@ -48,9 +48,9 @@
         </div>
 
         <div class="flex items-center justify-end mt-6">
-            <x-primary-button class="w-full justify-center bg-emerald-600 hover:bg-emerald-700 focus:bg-emerald-700 active:bg-emerald-800 focus:ring-emerald-500 rounded-xl py-3 text-sm font-bold">
+            <x-emerald-button class="w-full">
                 {{ __('Masuk') }}
-            </x-primary-button>
+            </x-emerald-button>
         </div>
     </form>
 </x-guest-layout>

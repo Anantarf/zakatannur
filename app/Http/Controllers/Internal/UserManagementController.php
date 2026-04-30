@@ -6,7 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\User;
 use App\Support\Audit;
 use Illuminate\Http\Request;
-use Illuminate\Http\Response;
+use Symfony\Component\HttpFoundation\Response;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rule;
 
@@ -18,7 +18,7 @@ class UserManagementController extends Controller
             ->orderByRaw("CASE WHEN role = 'super_admin' THEN 1 WHEN role = 'admin' THEN 2 WHEN role = 'staff' THEN 3 ELSE 4 END")
             ->orderBy('name')
             ->paginate(20)
-            ->withQueryString();
+            ->appends($request->query());
 
         return view('internal.users.index', [
             'users' => $users,
@@ -27,6 +27,7 @@ class UserManagementController extends Controller
 
     public function create(Request $request)
     {
+        /** @var User $actor */
         $actor = $request->user();
 
         return view('internal.users.form', [
@@ -37,6 +38,7 @@ class UserManagementController extends Controller
 
     public function store(Request $request)
     {
+        /** @var User $actor */
         $actor = $request->user();
 
         $allowedRoles = $this->allowedRolesForActor($actor);
@@ -48,6 +50,7 @@ class UserManagementController extends Controller
             'password' => ['required', 'string', 'min:8', 'max:255'],
         ]);
 
+        /** @var User $user */
         $user = User::query()->create([
             'name' => $data['name'],
             'username' => $data['username'],
@@ -71,6 +74,7 @@ class UserManagementController extends Controller
 
     public function edit(Request $request, User $user)
     {
+        /** @var User $actor */
         $actor = $request->user();
 
         if (!$this->canManageUser($actor, $user)) {
@@ -85,6 +89,7 @@ class UserManagementController extends Controller
 
     public function update(Request $request, User $user)
     {
+        /** @var User $actor */
         $actor = $request->user();
 
         if (!$this->canManageUser($actor, $user)) {

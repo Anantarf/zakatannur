@@ -7,7 +7,7 @@ use App\Models\Template;
 use App\Support\Audit;
 use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
-use Illuminate\Http\Response;
+use Symfony\Component\HttpFoundation\Response;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
@@ -134,6 +134,7 @@ class TemplateController extends Controller
             abort(Response::HTTP_NOT_FOUND);
         }
 
+        /** @var \Illuminate\Filesystem\FilesystemAdapter $disk */
         $disk = Storage::disk('local');
         if (!$disk->exists($template->storage_path)) {
             abort(Response::HTTP_NOT_FOUND);

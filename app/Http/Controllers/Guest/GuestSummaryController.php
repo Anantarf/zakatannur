@@ -35,7 +35,7 @@ class GuestSummaryController extends Controller
                 'computed_at_wib' => now('Asia/Jakarta')->format('d/m/Y H:i:s'),
                 'items' => $rekap['items'],
                 'totals' => $rekap['totals'],
-                'dailyChartData' => RekapBuilder::buildDailyChartData(),
+                'dailyChartData' => RekapBuilder::buildDailyChartData($year),
             ];
         });
 

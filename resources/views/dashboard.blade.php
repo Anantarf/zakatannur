@@ -115,6 +115,7 @@
     </div>
 </x-app-layout>
 
+@push('scripts')
 <script src="https://cdn.jsdelivr.net/npm/chart.js" defer></script>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
@@ -184,3 +185,4 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 </script>
+@endpush

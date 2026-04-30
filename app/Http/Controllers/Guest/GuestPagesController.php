@@ -47,7 +47,7 @@ class GuestPagesController extends Controller
                     'labels' => $chartLabels,
                     'data' => $chartData,
                 ],
-                'dailyChartData' => \App\Support\RekapBuilder::buildDailyChartData()
+                'dailyChartData' => \App\Support\RekapBuilder::buildDailyChartData($selectedYear)
             ];
         });
 

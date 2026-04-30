@@ -3,6 +3,8 @@
 namespace App\Support;
 
 use App\Models\ZakatTransaction;
+use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
 
 final class RekapBuilder
 {
@@ -65,14 +67,14 @@ final class RekapBuilder
             $soulsCount = (int) data_get($row, 'total_jiwa', 0);
 
             $items[] = [
-                'category' => $category,
-                'jumlah_transaksi' => $transactionCount,
-                'total_jiwa' => $soulsCount,
-                'total_uang' => $totalUang,
-                'total_uang_display' => Format::rupiah($totalUang),
-                'total_beras_kg' => $totalBerasKgRounded,
+                'category'               => $category,
+                'jumlah_transaksi'       => $transactionCount,
+                'total_jiwa'             => $soulsCount,
+                'total_uang'             => $totalUang,
+                'total_uang_display'     => Format::rupiah($totalUang),
+                'total_beras_kg'         => $totalBerasKgRounded,
                 'total_beras_kg_display' => Format::kg($totalBerasKgRounded),
-                'total_display' => Format::rupiah($totalUang) . ' + ' . Format::kg($totalBerasKgRounded),
+                'total_display'          => Format::rupiah($totalUang) . ' + ' . Format::kg($totalBerasKgRounded),
             ];
 
             $totalCount += $transactionCount;
@@ -84,72 +86,67 @@ final class RekapBuilder
         $grandTotalBerasRounded = round($grandTotalBeras, 2);
 
         return [
-            'items' => $items,
+            'items'  => $items,
             'totals' => [
-                'jumlah_transaksi' => $totalCount,
-                'total_jiwa' => $totalJiwaAccumulated,
-                'total_uang' => $grandTotalUang,
-                'total_uang_display' => Format::rupiah($grandTotalUang),
-                'total_beras_kg' => $grandTotalBerasRounded,
+                'jumlah_transaksi'       => $totalCount,
+                'total_jiwa'             => $totalJiwaAccumulated,
+                'total_uang'             => $grandTotalUang,
+                'total_uang_display'     => Format::rupiah($grandTotalUang),
+                'total_beras_kg'         => $grandTotalBerasRounded,
                 'total_beras_kg_display' => Format::kg($grandTotalBerasRounded),
-                'total_display' => Format::rupiah($grandTotalUang) . ' + ' . Format::kg($grandTotalBerasRounded),
+                'total_display'          => Format::rupiah($grandTotalUang) . ' + ' . Format::kg($grandTotalBerasRounded),
             ],
         ];
     }
 
-    public static function buildDailyChartData(): array
+    /**
+     * Build daily chart data for the given year.
+     *
+     * Returns an array with three parallel arrays keyed by:
+     *   - 'labels' : string[]  — e.g. ['1 Jan', '2 Jan', ...]
+     *   - 'uang'   : int[]    — daily SUM(nominal_uang)
+     *   - 'beras'  : float[]  — daily SUM(jumlah_beras_kg)
+     *
+     * Every day from Jan 1 to min(today, Dec 31) of $year is included,
+     * with 0 for days that have no transactions.
+     *
+     * @return array{labels: string[], uang: int[], beras: float[]}
+     */
+    public static function buildDailyChartData(?int $year = null): array
     {
-        $startDate = \Carbon\Carbon::create(2026, 3, 13, 0, 0, 0, 'Asia/Jakarta');
-        $maxVisibleDate = now('Asia/Jakarta');
+        $year = $year ?? (int) now()->year;
 
-        $dailyStats = ZakatTransaction::select(
-            \Illuminate\Support\Facades\DB::raw('DATE(COALESCE(waktu_terima, created_at)) as date'),
-            \Illuminate\Support\Facades\DB::raw('SUM(nominal_uang) as total_uang'),
-            \Illuminate\Support\Facades\DB::raw('SUM(jumlah_beras_kg) as total_beras')
-        )
-        ->where('status', ZakatTransaction::STATUS_VALID)
-        ->whereRaw('COALESCE(waktu_terima, created_at) >= ?', [$startDate->format('Y-m-d') . ' 00:00:00'])
-        ->whereRaw('COALESCE(waktu_terima, created_at) <= ?', [$maxVisibleDate->format('Y-m-d') . ' 23:59:59'])
-        ->groupBy('date')
-        ->orderBy('date', 'ASC')
-        ->get()
-        ->keyBy('date');
+        $rows = ZakatTransaction::query()
+            ->where('status', ZakatTransaction::STATUS_VALID)
+            ->whereYear('created_at', $year)
+            ->select(
+                DB::raw('DATE(created_at) as day'),
+                DB::raw('COALESCE(SUM(nominal_uang), 0) as total_uang'),
+                DB::raw('COALESCE(SUM(jumlah_beras_kg), 0) as total_beras')
+            )
+            ->groupBy('day')
+            ->orderBy('day')
+            ->get()
+            ->keyBy('day');
 
-        $dailyChartLabels = [];
-        $dailyChartUang = [];
-        $dailyChartBeras = [];
-        $runningUang = 0;
-        $runningBeras = 0;
-
-        $current = $startDate->copy();
-        $endTimeline = $maxVisibleDate->copy()->addDays(2);
-
-        while ($current->lte($endTimeline)) {
-            $dateStr = $current->format('Y-m-d');
-            $dailyChartLabels[] = $current->translatedFormat('d M');
-            
-            if ($current->lte($maxVisibleDate)) {
-                $stat = $dailyStats->get($dateStr);
-                $todayUang = (int) data_get($stat, 'total_uang', 0);
-                $todayBeras = (float) data_get($stat, 'total_beras', 0);
-
-                $runningUang += $todayUang;
-                $runningBeras += $todayBeras;
-
-                $dailyChartUang[] = $runningUang;
-                $dailyChartBeras[] = $runningBeras;
-            } else {
-                $dailyChartUang[] = null;
-                $dailyChartBeras[] = null;
-            }
-            
-            $current->addDay();
+        $start = Carbon::create($year, 1, 1)->startOfDay();
+        $end   = Carbon::create($year, 12, 31)->endOfDay();
+        if ($end->isFuture()) {
+            $end = now()->startOfDay();
         }
 
-        return [
-            'labels' => $dailyChartLabels,
-            'uang' => $dailyChartUang,
-            'beras' => $dailyChartBeras,
-        ];
+        $labels = [];
+        $uang   = [];
+        $beras  = [];
+
+        for ($day = $start->copy(); $day->lte($end); $day->addDay()) {
+            $key      = $day->toDateString(); // 'YYYY-MM-DD'
+            $row      = $rows->get($key);
+            $labels[] = $day->format('j M');  // '1 Jan'
+            $uang[]   = $row ? (int) $row->total_uang   : 0;
+            $beras[]  = $row ? (float) $row->total_beras : 0.0;
+        }
+
+        return compact('labels', 'uang', 'beras');
     }
 }
