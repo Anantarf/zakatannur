@@ -25,7 +25,7 @@ class GuestSummaryController extends Controller
             AppSetting::getInt(AppSetting::KEY_PUBLIC_REFRESH_INTERVAL_SECONDS, 15), 15
         );
         $cacheKey = 'public_summary_year_' . $year;
-        $isFresh = !Cache::has($cacheKey);
+        $wasAlreadyCached = Cache::has($cacheKey);
 
         $payload = Cache::remember($cacheKey, $cacheTtlSeconds, function () use ($year) {
             $rekap = RekapBuilder::build($year);
@@ -40,7 +40,7 @@ class GuestSummaryController extends Controller
         });
 
         return response()->json([
-            'status' => $isFresh ? 'FRESH' : 'CACHED',
+            'status' => $wasAlreadyCached ? 'CACHED' : 'FRESH',
             'updated_at_wib' => $payload['computed_at_wib'] . ' WIB',
             'data' => $payload,
         ]);

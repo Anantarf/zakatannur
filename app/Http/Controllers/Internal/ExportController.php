@@ -23,87 +23,93 @@ class ExportController extends Controller
         ini_set('memory_limit', '512M');
         set_time_limit(300);
 
-        $request->validate([
-            'date' => 'required|date_format:Y-m-d',
-        ]);
+        $request->validate(['date' => 'required|date_format:Y-m-d']);
         $date = $request->query('date');
-        $formattedDate = Carbon::parse($date)->translatedFormat('d F Y');
-
         $start = Carbon::parse($date, 'Asia/Jakarta')->startOfDay();
         $end = Carbon::parse($date, 'Asia/Jakarta')->endOfDay();
 
-        $transactions = ZakatTransaction::query()
-            ->select(
-                'no_transaksi',
-                DB::raw('MAX(pembayar_nama) as pembayar_nama'),
-                DB::raw('MAX(shift) as shift'),
-                DB::raw('MAX(keterangan) as keterangan'),
-                DB::raw('MAX(waktu_terima) as waktu_terima'),
-                DB::raw('MAX(created_at) as created_at'),
-                DB::raw('SUM(CASE WHEN category = "fitrah" THEN nominal_uang ELSE 0 END) as fitrah_uang'),
-                DB::raw('SUM(CASE WHEN category = "fitrah" AND metode = "beras" THEN jumlah_beras_kg ELSE 0 END) as fitrah_beras'),
-                DB::raw('MAX(CASE WHEN category = "fitrah" THEN is_transfer ELSE 0 END) as fitrah_has_tf'),
-                DB::raw('SUM(CASE WHEN category = "infaq" THEN nominal_uang ELSE 0 END) as infaq_uang'),
-                DB::raw('SUM(CASE WHEN category = "infaq" AND metode = "beras" THEN jumlah_beras_kg ELSE 0 END) as infaq_beras'),
-                DB::raw('MAX(CASE WHEN category = "infaq" THEN is_transfer ELSE 0 END) as infaq_has_tf'),
-                DB::raw('SUM(CASE WHEN category = "fidyah" THEN nominal_uang ELSE 0 END) as fidyah_uang'),
-                DB::raw('MAX(CASE WHEN category = "fidyah" THEN is_transfer ELSE 0 END) as fidyah_has_tf'),
-                DB::raw('SUM(CASE WHEN category = "mal" THEN nominal_uang ELSE 0 END) as mal_uang'),
-                DB::raw('MAX(CASE WHEN category = "mal" THEN is_transfer ELSE 0 END) as mal_has_tf'),
-                DB::raw('SUM(jiwa) as total_jiwa'),
-                DB::raw('SUM(CASE WHEN is_transfer = 1 THEN nominal_uang ELSE 0 END) as tx_tf_uang'),
-                DB::raw('SUM(CASE WHEN is_transfer = 0 THEN nominal_uang ELSE 0 END) as tx_cash_uang'),
-                DB::raw('MAX(CASE WHEN metode = "uang" THEN is_transfer ELSE 0 END) as has_transfer')
-            )
+        $transactions = $this->fetchDailyTransactions($start, $end);
+
+        $spreadsheet = new Spreadsheet();
+        $spreadsheet->getDefaultStyle()->getFont()->setName('Arial')->setSize(10);
+        $sheet = $this->setupDailySheet($spreadsheet, Carbon::parse($date)->translatedFormat('d F Y'));
+
+        [$rowIdx, $totals] = $this->writeDailyRows($sheet, $transactions);
+        $this->writeDailyTotalRow($sheet, $rowIdx, $totals);
+        $this->writeDailySummarySection($sheet, $rowIdx, $totals['tf'], $totals['cash']);
+
+        foreach (range('A', 'N') as $col) {
+            $sheet->getColumnDimension($col)->setAutoSize(true);
+        }
+
+        return $this->downloadSpreadsheet($spreadsheet, 'Rekap_Zakat_' . $date . '.xlsx');
+    }
+
+    private function fetchDailyTransactions(Carbon $start, Carbon $end)
+    {
+        return ZakatTransaction::query()
+            ->selectRaw("
+                no_transaksi,
+                MAX(pembayar_nama) as pembayar_nama,
+                MAX(shift) as shift,
+                MAX(keterangan) as keterangan,
+                MAX(waktu_terima) as waktu_terima,
+                MAX(created_at) as created_at,
+                SUM(CASE WHEN category = ? THEN nominal_uang ELSE 0 END) as fitrah_uang,
+                SUM(CASE WHEN category = ? AND metode = ? THEN jumlah_beras_kg ELSE 0 END) as fitrah_beras,
+                MAX(CASE WHEN category = ? THEN is_transfer ELSE 0 END) as fitrah_has_tf,
+                SUM(CASE WHEN category = ? THEN nominal_uang ELSE 0 END) as infaq_uang,
+                SUM(CASE WHEN category = ? AND metode = ? THEN jumlah_beras_kg ELSE 0 END) as infaq_beras,
+                MAX(CASE WHEN category = ? THEN is_transfer ELSE 0 END) as infaq_has_tf,
+                SUM(CASE WHEN category = ? THEN nominal_uang ELSE 0 END) as fidyah_uang,
+                MAX(CASE WHEN category = ? THEN is_transfer ELSE 0 END) as fidyah_has_tf,
+                SUM(CASE WHEN category = ? THEN nominal_uang ELSE 0 END) as mal_uang,
+                MAX(CASE WHEN category = ? THEN is_transfer ELSE 0 END) as mal_has_tf,
+                SUM(jiwa) as total_jiwa,
+                SUM(CASE WHEN is_transfer = 1 THEN nominal_uang ELSE 0 END) as tx_tf_uang,
+                SUM(CASE WHEN is_transfer = 0 THEN nominal_uang ELSE 0 END) as tx_cash_uang,
+                MAX(CASE WHEN metode = ? THEN is_transfer ELSE 0 END) as has_transfer
+            ", [
+                ZakatTransaction::CATEGORY_FITRAH,
+                ZakatTransaction::CATEGORY_FITRAH, ZakatTransaction::METHOD_BERAS,
+                ZakatTransaction::CATEGORY_FITRAH,
+                ZakatTransaction::CATEGORY_INFAK,
+                ZakatTransaction::CATEGORY_INFAK, ZakatTransaction::METHOD_BERAS,
+                ZakatTransaction::CATEGORY_INFAK,
+                ZakatTransaction::CATEGORY_FIDYAH,
+                ZakatTransaction::CATEGORY_FIDYAH,
+                ZakatTransaction::CATEGORY_MAL,
+                ZakatTransaction::CATEGORY_MAL,
+                ZakatTransaction::METHOD_UANG,
+            ])
             ->where('status', ZakatTransaction::STATUS_VALID)
             ->whereRaw('COALESCE(waktu_terima, created_at) >= ?', [$start])
             ->whereRaw('COALESCE(waktu_terima, created_at) <= ?', [$end])
             ->groupBy('no_transaksi')
             ->orderBy('waktu_terima', 'asc')
             ->get();
+    }
 
-        $spreadsheet = new Spreadsheet();
+    private function setupDailySheet(Spreadsheet $spreadsheet, string $formattedDate)
+    {
         $sheet = $spreadsheet->getActiveSheet();
         $sheet->setTitle('Rekap Harian');
 
-        // Set Default Font Arial
-        $spreadsheet->getDefaultStyle()->getFont()->setName('Arial')->setSize(10);
-
-        $sheet->setCellValue('A1', "REKAP ZAKAT - " . strtoupper($formattedDate));
+        $sheet->setCellValue('A1', 'REKAP ZAKAT - ' . strtoupper($formattedDate));
         $sheet->mergeCells('A1:N1');
         $sheet->getStyle('A1')->getFont()->setBold(true)->setSize(14);
         $sheet->getStyle('A1')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
 
-        // Merged Header Headers
-        $headers = [
-            'A2' => 'No Transaksi',
-            'B2' => 'Nama',
-            'C2' => 'Shift',
-            'D2' => 'Fitrah',
-            'F2' => 'Infaq',
-            'H2' => 'Fidyah',
-            'I2' => 'Mal',
-            'J2' => 'Jiwa',
-            'K2' => 'Jumlah Zakat Fitrah',
-            'M2' => 'Transfer',
-            'N2' => 'Keterangan'
-        ];
-
-        foreach ($headers as $cell => $value) {
+        foreach (['A2' => 'No Transaksi', 'B2' => 'Nama', 'C2' => 'Shift', 'D2' => 'Fitrah',
+                  'F2' => 'Infaq', 'H2' => 'Fidyah', 'I2' => 'Mal', 'J2' => 'Jiwa',
+                  'K2' => 'Jumlah Zakat Fitrah', 'M2' => 'Transfer', 'N2' => 'Keterangan'] as $cell => $value) {
             $sheet->setCellValue($cell, $value);
         }
 
-        $sheet->mergeCells('A2:A3');
-        $sheet->mergeCells('B2:B3');
-        $sheet->mergeCells('C2:C3');
-        $sheet->mergeCells('D2:E2'); // Fitrah group
-        $sheet->mergeCells('F2:G2'); // Infaq group
-        $sheet->mergeCells('H2:H3');
-        $sheet->mergeCells('I2:I3');
-        $sheet->mergeCells('J2:J3');
-        $sheet->mergeCells('K2:L2'); // Jumlah Zakat Fitrah group
-        $sheet->mergeCells('M2:M3');
-        $sheet->mergeCells('N2:N3');
+        foreach (['A2:A3', 'B2:B3', 'C2:C3', 'D2:E2', 'F2:G2', 'H2:H3',
+                  'I2:I3', 'J2:J3', 'K2:L2', 'M2:M3', 'N2:N3'] as $range) {
+            $sheet->mergeCells($range);
+        }
 
         $sheet->setCellValue('D3', 'Uang (Rp)');
         $sheet->setCellValue('E3', 'Beras (Kg)');
@@ -114,162 +120,133 @@ class ExportController extends Controller
 
         $sheet->getStyle('A2:N3')->applyFromArray($this->getCommonHeaderStyle());
 
+        return $sheet;
+    }
+
+    private function writeDailyRows($sheet, $transactions): array
+    {
         $rowIdx = 4;
-        $totalFitrahUang = 0; $totalFitrahBeras = 0;
-        $totalInfaqUang = 0; $totalInfaqBeras = 0;
-        $totalFidyah = 0; $totalMal = 0; $totalJiwa = 0;
-        $totalTf = 0; $totalCash = 0;
+        $totals = ['fitrahUang' => 0, 'fitrahBeras' => 0.0, 'infaqUang' => 0, 'infaqBeras' => 0.0,
+                   'fidyah' => 0, 'mal' => 0, 'jiwa' => 0, 'tf' => 0, 'cash' => 0];
 
-        if ($transactions->isNotEmpty()) {
-            foreach ($transactions as $tx) {
-                $fitrahUang = (int)data_get($tx, 'fitrah_uang');
-                $fitrahBeras = (float)data_get($tx, 'fitrah_beras');
-                $infaqUang = (int)data_get($tx, 'infaq_uang');
-                $infaqBeras = (float)data_get($tx, 'infaq_beras');
-                $fidyah = (int)data_get($tx, 'fidyah_uang');
-                $mal = (int)data_get($tx, 'mal_uang');
-                $jiwa = (int)data_get($tx, 'total_jiwa');
+        foreach ($transactions as $tx) {
+            $fitrahUang  = (int)data_get($tx, 'fitrah_uang');
+            $fitrahBeras = (float)data_get($tx, 'fitrah_beras');
+            $infaqUang   = (int)data_get($tx, 'infaq_uang');
+            $infaqBeras  = (float)data_get($tx, 'infaq_beras');
+            $fidyah      = (int)data_get($tx, 'fidyah_uang');
+            $mal         = (int)data_get($tx, 'mal_uang');
+            $jiwa        = (int)data_get($tx, 'total_jiwa');
+            $hasTf       = (bool)data_get($tx, 'has_transfer');
 
-                $sheet->setCellValue('A' . $rowIdx, data_get($tx, 'no_transaksi'));
-                $sheet->setCellValue('B' . $rowIdx, data_get($tx, 'pembayar_nama'));
-                $sheet->setCellValue('C' . $rowIdx, ZakatTransaction::getShiftLabel(data_get($tx, 'shift')));
-                $sheet->setCellValue('D' . $rowIdx, $fitrahUang);
-                $sheet->setCellValue('E' . $rowIdx, $fitrahBeras);
-                $sheet->setCellValue('F' . $rowIdx, $infaqUang);
-                $sheet->setCellValue('G' . $rowIdx, $infaqBeras);
-                $sheet->setCellValue('H' . $rowIdx, $fidyah);
-                $sheet->setCellValue('I' . $rowIdx, $mal);
-                $sheet->setCellValue('J' . $rowIdx, $jiwa);
-                $sheet->setCellValue('K' . $rowIdx, $fitrahUang); // As per image "Jumlah Zakat Fitrah (Uang)"
-                $sheet->setCellValue('L' . $rowIdx, $fitrahBeras);
-                
-                $hasTf = (bool)data_get($tx, 'has_transfer');
-                $txTfUang = (int)data_get($tx, 'tx_tf_uang');
-                $txCashUang = (int)data_get($tx, 'tx_cash_uang');
+            $sheet->setCellValue('A' . $rowIdx, data_get($tx, 'no_transaksi'));
+            $sheet->setCellValue('B' . $rowIdx, data_get($tx, 'pembayar_nama'));
+            $sheet->setCellValue('C' . $rowIdx, ZakatTransaction::getShiftLabel(data_get($tx, 'shift')));
+            $sheet->setCellValue('D' . $rowIdx, $fitrahUang);
+            $sheet->setCellValue('E' . $rowIdx, $fitrahBeras);
+            $sheet->setCellValue('F' . $rowIdx, $infaqUang);
+            $sheet->setCellValue('G' . $rowIdx, $infaqBeras);
+            $sheet->setCellValue('H' . $rowIdx, $fidyah);
+            $sheet->setCellValue('I' . $rowIdx, $mal);
+            $sheet->setCellValue('J' . $rowIdx, $jiwa);
+            $sheet->setCellValue('K' . $rowIdx, $fitrahUang);
+            $sheet->setCellValue('L' . $rowIdx, $fitrahBeras);
+            $sheet->setCellValue('M' . $rowIdx, $hasTf ? 'TF' : '');
+            $sheet->setCellValue('N' . $rowIdx, '');
 
-                $sheet->setCellValue('M' . $rowIdx, $hasTf ? 'TF' : '');
-                $sheet->setCellValue('N' . $rowIdx, ''); // Keterangan di kosongkan sesuai permintaan
-
-                if ($hasTf) {
-                    $sheet->getStyle('A'.$rowIdx.':N'.$rowIdx)->getFill()->setFillType(Fill::FILL_SOLID)->getStartColor()->setRGB('C6EFCE'); // Green tint like in image
-
-                    if ((bool)data_get($tx, 'fitrah_has_tf')) {
-                        $sheet->getStyle('D'.$rowIdx)->getFill()->setFillType(Fill::FILL_SOLID)->getStartColor()->setRGB('A9D08E');
-                        $sheet->getStyle('K'.$rowIdx)->getFill()->setFillType(Fill::FILL_SOLID)->getStartColor()->setRGB('A9D08E');
-                    }
-                    if ((bool)data_get($tx, 'infaq_has_tf')) {
-                        $sheet->getStyle('F'.$rowIdx)->getFill()->setFillType(Fill::FILL_SOLID)->getStartColor()->setRGB('A9D08E');
-                    }
-                    if ((bool)data_get($tx, 'fidyah_has_tf')) {
-                        $sheet->getStyle('H'.$rowIdx)->getFill()->setFillType(Fill::FILL_SOLID)->getStartColor()->setRGB('A9D08E');
-                    }
-                    if ((bool)data_get($tx, 'mal_has_tf')) {
-                        $sheet->getStyle('I'.$rowIdx)->getFill()->setFillType(Fill::FILL_SOLID)->getStartColor()->setRGB('A9D08E');
+            if ($hasTf) {
+                $sheet->getStyle('A'.$rowIdx.':N'.$rowIdx)->getFill()->setFillType(Fill::FILL_SOLID)->getStartColor()->setRGB('C6EFCE');
+                foreach (['fitrah_has_tf' => ['D', 'K'], 'infaq_has_tf' => ['F'], 'fidyah_has_tf' => ['H'], 'mal_has_tf' => ['I']] as $field => $cols) {
+                    if ((bool)data_get($tx, $field)) {
+                        foreach ($cols as $col) {
+                            $sheet->getStyle($col.$rowIdx)->getFill()->setFillType(Fill::FILL_SOLID)->getStartColor()->setRGB('A9D08E');
+                        }
                     }
                 }
-
-                $totalTf += $txTfUang;
-                $totalCash += $txCashUang;
-
-                $totalFitrahUang += $fitrahUang;
-                $totalFitrahBeras += $fitrahBeras;
-                $totalInfaqUang += $infaqUang;
-                $totalInfaqBeras += $infaqBeras;
-                $totalFidyah += $fidyah;
-                $totalMal += $mal;
-                $totalJiwa += $jiwa;
-
-                $rowIdx++;
             }
 
-            $sheet->getStyle('A4:N' . ($rowIdx - 1))->getBorders()->getAllBorders()->setBorderStyle(Border::BORDER_THIN);
-            
-            $sheet->getStyle('C4:C' . ($rowIdx - 1))->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
-            $sheet->getStyle('D4:L' . ($rowIdx - 1))->getAlignment()->setHorizontal(Alignment::HORIZONTAL_RIGHT);
-
-            $rupiahFormat = '#,##0';
-            $berasFormat = '#,##0.00';
-            
-            $sheet->getStyle('D4:D' . ($rowIdx - 1))->getNumberFormat()->setFormatCode($rupiahFormat);
-            $sheet->getStyle('E4:E' . ($rowIdx - 1))->getNumberFormat()->setFormatCode($berasFormat);
-            $sheet->getStyle('F4:F' . ($rowIdx - 1))->getNumberFormat()->setFormatCode($rupiahFormat);
-            $sheet->getStyle('G4:G' . ($rowIdx - 1))->getNumberFormat()->setFormatCode($berasFormat);
-            $sheet->getStyle('H4:H' . ($rowIdx - 1))->getNumberFormat()->setFormatCode($rupiahFormat);
-            $sheet->getStyle('I4:I' . ($rowIdx - 1))->getNumberFormat()->setFormatCode($rupiahFormat);
-            $sheet->getStyle('K4:K' . ($rowIdx - 1))->getNumberFormat()->setFormatCode($rupiahFormat);
-            $sheet->getStyle('L4:L' . ($rowIdx - 1))->getNumberFormat()->setFormatCode($berasFormat);
-        } else {
-            // If empty, just set rowIdx after headers
-            $rowIdx = 4;
-            $rupiahFormat = '#,##0';
-            $berasFormat = '#,##0.00';
+            $totals['tf']         += (int)data_get($tx, 'tx_tf_uang');
+            $totals['cash']       += (int)data_get($tx, 'tx_cash_uang');
+            $totals['fitrahUang'] += $fitrahUang;
+            $totals['fitrahBeras']+= $fitrahBeras;
+            $totals['infaqUang']  += $infaqUang;
+            $totals['infaqBeras'] += $infaqBeras;
+            $totals['fidyah']     += $fidyah;
+            $totals['mal']        += $mal;
+            $totals['jiwa']       += $jiwa;
+            $rowIdx++;
         }
 
+        if ($rowIdx > 4) {
+            $lastData = $rowIdx - 1;
+            $sheet->getStyle('A4:N' . $lastData)->getBorders()->getAllBorders()->setBorderStyle(Border::BORDER_THIN);
+            $sheet->getStyle('C4:C' . $lastData)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+            $sheet->getStyle('D4:L' . $lastData)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_RIGHT);
+
+            $sheet->getStyle('D4:D'.$lastData)->getNumberFormat()->setFormatCode('#,##0');
+            $sheet->getStyle('E4:E'.$lastData)->getNumberFormat()->setFormatCode('#,##0.00');
+            $sheet->getStyle('F4:F'.$lastData)->getNumberFormat()->setFormatCode('#,##0');
+            $sheet->getStyle('G4:G'.$lastData)->getNumberFormat()->setFormatCode('#,##0.00');
+            $sheet->getStyle('H4:H'.$lastData)->getNumberFormat()->setFormatCode('#,##0');
+            $sheet->getStyle('I4:I'.$lastData)->getNumberFormat()->setFormatCode('#,##0');
+            $sheet->getStyle('K4:K'.$lastData)->getNumberFormat()->setFormatCode('#,##0');
+            $sheet->getStyle('L4:L'.$lastData)->getNumberFormat()->setFormatCode('#,##0.00');
+        }
+
+        return [$rowIdx, $totals];
+    }
+
+    private function writeDailyTotalRow($sheet, int $rowIdx, array $totals): void
+    {
         $sheet->setCellValue('A' . $rowIdx, 'TOTAL');
         $sheet->mergeCells('A' . $rowIdx . ':C' . $rowIdx);
-        $sheet->setCellValue('D' . $rowIdx, $totalFitrahUang);
-        $sheet->setCellValue('E' . $rowIdx, $totalFitrahBeras);
-        $sheet->setCellValue('F' . $rowIdx, $totalInfaqUang);
-        $sheet->setCellValue('G' . $rowIdx, $totalInfaqBeras);
-        $sheet->setCellValue('H' . $rowIdx, $totalFidyah);
-        $sheet->setCellValue('I' . $rowIdx, $totalMal);
-        $sheet->setCellValue('J' . $rowIdx, $totalJiwa);
-        $sheet->setCellValue('K' . $rowIdx, $totalFitrahUang);
-        $sheet->setCellValue('L' . $rowIdx, $totalFitrahBeras);
+        $sheet->setCellValue('D' . $rowIdx, $totals['fitrahUang']);
+        $sheet->setCellValue('E' . $rowIdx, $totals['fitrahBeras']);
+        $sheet->setCellValue('F' . $rowIdx, $totals['infaqUang']);
+        $sheet->setCellValue('G' . $rowIdx, $totals['infaqBeras']);
+        $sheet->setCellValue('H' . $rowIdx, $totals['fidyah']);
+        $sheet->setCellValue('I' . $rowIdx, $totals['mal']);
+        $sheet->setCellValue('J' . $rowIdx, $totals['jiwa']);
+        $sheet->setCellValue('K' . $rowIdx, $totals['fitrahUang']);
+        $sheet->setCellValue('L' . $rowIdx, $totals['fitrahBeras']);
 
-        $totalStyle = [
-            'font' => ['bold' => true],
-            'fill' => [
-                'fillType' => Fill::FILL_SOLID,
-                'startColor' => ['rgb' => 'D9E1F2'], // Soft blue
-            ],
-            'borders' => [
-                'allBorders' => ['borderStyle' => Border::BORDER_THIN],
-            ],
-            'alignment' => [
-                'horizontal' => Alignment::HORIZONTAL_RIGHT,
-            ]
-        ];
-        $sheet->getStyle('A' . $rowIdx . ':N' . $rowIdx)->applyFromArray($totalStyle);
-        $sheet->getStyle('A' . $rowIdx)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+        $sheet->getStyle('A'.$rowIdx.':N'.$rowIdx)->applyFromArray([
+            'font'      => ['bold' => true],
+            'fill'      => ['fillType' => Fill::FILL_SOLID, 'startColor' => ['rgb' => 'D9E1F2']],
+            'borders'   => ['allBorders' => ['borderStyle' => Border::BORDER_THIN]],
+            'alignment' => ['horizontal' => Alignment::HORIZONTAL_RIGHT],
+        ]);
+        $sheet->getStyle('A'.$rowIdx)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
 
-        // Apply formats to Total Row
-        $sheet->getStyle('D' . $rowIdx . ':K' . $rowIdx)->getNumberFormat()->setFormatCode($rupiahFormat);
-        $sheet->getStyle('E' . $rowIdx)->getNumberFormat()->setFormatCode($berasFormat);
-        $sheet->getStyle('G' . $rowIdx)->getNumberFormat()->setFormatCode($berasFormat);
-        $sheet->getStyle('L' . $rowIdx)->getNumberFormat()->setFormatCode($berasFormat);
+        $sheet->getStyle('D'.$rowIdx.':K'.$rowIdx)->getNumberFormat()->setFormatCode('#,##0');
+        $sheet->getStyle('E'.$rowIdx)->getNumberFormat()->setFormatCode('#,##0.00');
+        $sheet->getStyle('G'.$rowIdx)->getNumberFormat()->setFormatCode('#,##0.00');
+        $sheet->getStyle('L'.$rowIdx)->getNumberFormat()->setFormatCode('#,##0.00');
+    }
 
-        $sumStart = $rowIdx + 2;
-        $sheet->setCellValue('L' . $sumStart, 'TOTAL SEMUA');
-        $sheet->setCellValue('M' . $sumStart, $totalTf + $totalCash);
-        $sheet->setCellValue('L' . ($sumStart + 1), 'TF');
-        $sheet->setCellValue('M' . ($sumStart + 1), $totalTf);
-        $sheet->setCellValue('L' . ($sumStart + 2), 'CASH');
-        $sheet->setCellValue('M' . ($sumStart + 2), $totalCash);
-        
-        $sheet->getStyle('M' . $sumStart . ':M' . ($sumStart + 2))->getNumberFormat()->setFormatCode($rupiahFormat);
-        
-        $sumStyle = [
-            'font' => ['bold' => true],
-            'borders' => [
-                'allBorders' => ['borderStyle' => Border::BORDER_THIN],
-            ],
-            'fill' => [
-                'fillType' => Fill::FILL_SOLID,
-                'startColor' => ['rgb' => 'FFF2CC'], // Light Yellow
-            ],
-        ];
-        $sheet->getStyle('L' . $sumStart . ':M' . ($sumStart + 2))->applyFromArray($sumStyle);
+    private function writeDailySummarySection($sheet, int $totalRowIdx, int $totalTf, int $totalCash): void
+    {
+        $base = $totalRowIdx + 2;
+        $sheet->setCellValue('L' . $base,       'TOTAL SEMUA');
+        $sheet->setCellValue('M' . $base,       $totalTf + $totalCash);
+        $sheet->setCellValue('L' . ($base + 1), 'TF');
+        $sheet->setCellValue('M' . ($base + 1), $totalTf);
+        $sheet->setCellValue('L' . ($base + 2), 'CASH');
+        $sheet->setCellValue('M' . ($base + 2), $totalCash);
 
-        foreach (range('A', 'N') as $col) {
-            $sheet->getColumnDimension($col)->setAutoSize(true);
-        }
+        $sheet->getStyle('M'.$base.':M'.($base + 2))->getNumberFormat()->setFormatCode('#,##0');
+        $sheet->getStyle('L'.$base.':M'.($base + 2))->applyFromArray([
+            'font'    => ['bold' => true],
+            'borders' => ['allBorders' => ['borderStyle' => Border::BORDER_THIN]],
+            'fill'    => ['fillType' => Fill::FILL_SOLID, 'startColor' => ['rgb' => 'FFF2CC']],
+        ]);
+    }
 
-        $fileName = 'Rekap_Zakat_' . $date . '.xlsx';
+    private function downloadSpreadsheet(Spreadsheet $spreadsheet, string $fileName)
+    {
         $writer = new Xlsx($spreadsheet);
         $tempFile = tempnam(sys_get_temp_dir(), 'php_xlsx');
         $writer->save($tempFile);
-
         return response()->download($tempFile, $fileName)->deleteFileAfterSend(true);
     }
 
@@ -347,12 +324,7 @@ class ExportController extends Controller
             $sheet->getColumnDimension($col)->setAutoSize(true);
         }
 
-        $fileName = 'Rekap_Tahunan_' . $year . '.xlsx';
-        $writer = new Xlsx($spreadsheet);
-        $tempFile = tempnam(sys_get_temp_dir(), 'php_xlsx');
-        $writer->save($tempFile);
-
-        return response()->download($tempFile, $fileName)->deleteFileAfterSend(true);
+        return $this->downloadSpreadsheet($spreadsheet, 'Rekap_Tahunan_' . $year . '.xlsx');
     }
 
     private function getCommonHeaderStyle(): array

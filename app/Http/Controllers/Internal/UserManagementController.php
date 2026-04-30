@@ -44,7 +44,7 @@ class UserManagementController extends Controller
         $allowedRoles = $this->allowedRolesForActor($actor);
 
         $data = $request->validate([
-            'name' => ['required', 'string', 'max:10'],
+            'name' => ['required', 'string', 'max:100'],
             'username' => ['required', 'string', 'regex:/^[a-zA-Z0-9_]+$/', 'max:50', 'unique:users,username'],
             'role' => ['required', 'string', Rule::in($allowedRoles)],
             'password' => ['required', 'string', 'min:8', 'max:255'],
@@ -99,7 +99,7 @@ class UserManagementController extends Controller
         $allowedRoles = $this->allowedRolesForActor($actor, $user);
 
         $data = $request->validate([
-            'name' => ['required', 'string', 'max:10'],
+            'name' => ['required', 'string', 'max:100'],
             'username' => ['required', 'string', 'regex:/^[a-zA-Z0-9_]+$/', 'max:50', Rule::unique('users', 'username')->ignore($user->id)],
             'role' => ['required', 'string', Rule::in($allowedRoles)],
             'password' => ['nullable', 'string', 'min:8', 'max:255'],

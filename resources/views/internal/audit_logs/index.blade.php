@@ -110,7 +110,7 @@
                                                                 <h4 class="text-xs font-black text-emerald-400 uppercase tracking-widest">Ringkasan Transaksi</h4>
                                                                 <span class="text-[10px] text-slate-500 font-mono">{{ $log->metadata['no_transaksi'] ?? '-' }}</span>
                                                             </div>
-                                                            <div class="grid grid-cols-3 gap-4">
+                                                            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
                                                                 <div class="bg-slate-800/50 p-3 rounded-lg border border-slate-700/50">
                                                                     <div class="text-[9px] text-slate-500 uppercase font-bold mb-1">Tambah</div>
                                                                     <div class="text-lg font-black text-emerald-500">{{ $log->metadata['summary']['added'] ?? 0 }}</div>

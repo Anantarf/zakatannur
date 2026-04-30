@@ -59,9 +59,7 @@
                                     <option value="{{ $y }}" @selected((string) $year === (string) $y)>Tahun {{ $y }}</option>
                                 @endforeach
                             </select>
-                            <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2.5 text-gray-400">
-                                <svg class="h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
-                            </div>
+
                         </div>
 
                         <!-- Filter Bentuk Zakat -->
@@ -72,9 +70,7 @@
                                     <option value="{{ $m }}" @selected((string) $metode === (string) $m)>{{ \App\Models\ZakatTransaction::METHOD_LABELS[$m] ?? strtoupper($m) }}</option>
                                 @endforeach
                             </select>
-                            <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2.5 text-gray-400">
-                                <svg class="h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
-                            </div>
+
                         </div>
 
                         @if(request('days')) <input type="hidden" name="days" value="{{ request('days') }}"> @endif
@@ -116,73 +112,91 @@
 </x-app-layout>
 
 @push('scripts')
-<script src="https://cdn.jsdelivr.net/npm/chart.js" defer></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    const ctx = document.getElementById('dailyTrendChart').getContext('2d');
-    
-    // Create Gradient
-    const gradient = ctx.createLinearGradient(0, 0, 0, 250);
-    gradient.addColorStop(0, 'rgba(16, 185, 129, 0.2)');
-    gradient.addColorStop(1, 'rgba(16, 185, 129, 0)');
+(function() {
+    function initChart() {
+        try {
+            if (typeof Chart === 'undefined') {
+                setTimeout(initChart, 100);
+                return;
+            }
+            const canvas = document.getElementById('dailyTrendChart');
+            if (!canvas) return;
+            
+            const ctx = canvas.getContext('2d');
+            const gradient = ctx.createLinearGradient(0, 0, 0, 250);
+            gradient.addColorStop(0, 'rgba(16, 185, 129, 0.2)');
+            gradient.addColorStop(1, 'rgba(16, 185, 129, 0)');
 
-    new Chart(ctx, {
-        type: 'line',
-        data: {
-            labels: {!! json_encode($chartData['labels']) !!},
-            datasets: [{
-                label: 'Jumlah Transaksi',
-                data: {!! json_encode($chartData['values']) !!},
-                borderColor: '#10b981',
-                backgroundColor: gradient,
-                borderWidth: 3,
-                fill: true,
-                tension: 0.4,
-                pointBackgroundColor: '#fff',
-                pointBorderColor: '#10b981',
-                pointBorderWidth: 2,
-                pointRadius: 4,
-                pointHoverRadius: 6
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                legend: { display: false },
-                tooltip: {
-                    backgroundColor: '#1e293b',
-                    padding: 12,
-                    titleFont: { size: 12, weight: 'bold' },
-                    bodyFont: { size: 12 },
-                    displayColors: false,
-                    callbacks: {
-                        label: function(context) {
-                            return context.raw + ' Transaksi';
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: {!! json_encode($chartData['labels'] ?? []) !!},
+                    datasets: [{
+                        label: 'Jumlah Transaksi',
+                        data: {!! json_encode($chartData['values'] ?? []) !!},
+                        borderColor: '#10b981',
+                        backgroundColor: gradient,
+                        borderWidth: 3,
+                        fill: true,
+                        tension: 0.4,
+                        pointBackgroundColor: '#fff',
+                        pointBorderColor: '#10b981',
+                        pointBorderWidth: 2,
+                        pointRadius: 4,
+                        pointHoverRadius: 6
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            backgroundColor: '#1e293b',
+                            padding: 12,
+                            titleFont: { size: 12, weight: 'bold' },
+                            bodyFont: { size: 12 },
+                            displayColors: false,
+                            callbacks: {
+                                label: function(context) {
+                                    return context.raw + ' Transaksi';
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: { color: '#f1f5f9' },
+                            ticks: {
+                                stepSize: 1,
+                                color: '#64748b',
+                                font: { size: 11, weight: '600' }
+                            }
+                        },
+                        x: {
+                            grid: { display: false },
+                            ticks: {
+                                color: '#64748b',
+                                font: { size: 11, weight: '600' }
+                            }
                         }
                     }
                 }
-            },
-            scales: {
-                y: {
-                    beginAtZero: true,
-                    grid: { color: '#f1f5f9', drawBorder: false },
-                    ticks: {
-                        stepSize: 1,
-                        color: '#64748b',
-                        font: { size: 11, weight: '600' }
-                    }
-                },
-                x: {
-                    grid: { display: false },
-                    ticks: {
-                        color: '#64748b',
-                        font: { size: 11, weight: '600' }
-                    }
-                }
-            }
+            });
+        } catch (e) {
+            console.error("Chart Error: ", e);
+            alert("Gagal memuat grafik: " + e.message);
         }
-    });
-});
+    }
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initChart);
+    } else {
+        initChart();
+    }
+})();
 </script>
 @endpush

@@ -49,4 +49,14 @@ class User extends Authenticatable
     {
         return $this->role === self::ROLE_STAFF;
     }
+
+    public function isAdminOrAbove(): bool
+    {
+        return $this->isAdmin() || $this->isSuperAdmin();
+    }
+
+    public function canInputTransactions(): bool
+    {
+        return in_array($this->role, [self::ROLE_STAFF, self::ROLE_ADMIN, self::ROLE_SUPER_ADMIN], true);
+    }
 }

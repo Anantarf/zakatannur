@@ -20,7 +20,7 @@
                     @php
                         /** @var \App\Models\User|null $user */
                         $user = auth()->user();
-                        $canInputTransaksi = $user && (method_exists($user, 'isSuperAdmin') && $user->isSuperAdmin() || in_array(data_get($user, 'role'), ['staff', 'admin'], true));
+                        $canInputTransaksi = $user?->canInputTransactions() ?? false;
                     @endphp
 
                     @if ($canInputTransaksi)
@@ -40,7 +40,7 @@
                     @endif
 
                     @php
-                        $isAdmin = $user && in_array($user->role, [\App\Models\User::ROLE_ADMIN, \App\Models\User::ROLE_SUPER_ADMIN], true);
+                        $isAdmin = $user?->isAdminOrAbove() ?? false;
                     @endphp
 
                     @if ($isAdmin)
@@ -104,12 +104,9 @@
                         </x-dropdown-link>
 
                         <!-- Authentication -->
-                        <form method="POST" action="{{ route('logout') }}">
+                        <form method="POST" action="{{ route('logout') }}" x-data>
                             @csrf
-
-                            <x-dropdown-link :href="route('logout')"
-                                    onclick="event.preventDefault();
-                                                this.closest('form').submit();">
+                            <x-dropdown-link :href="route('logout')" @click.prevent="$el.closest('form').submit()">
                                 {{ __('Keluar') }}
                             </x-dropdown-link>
                         </form>
@@ -139,7 +136,7 @@
             @php
                 /** @var \App\Models\User|null $user */
                 $user = auth()->user();
-                $canInputTransaksi = $user && (method_exists($user, 'isSuperAdmin') && $user->isSuperAdmin() || in_array(data_get($user, 'role'), ['staff', 'admin'], true));
+                $canInputTransaksi = $user?->canInputTransactions() ?? false;
             @endphp
 
             @if ($canInputTransaksi)
@@ -193,12 +190,9 @@
                 </x-responsive-nav-link>
 
                 <!-- Authentication -->
-                <form method="POST" action="{{ route('logout') }}">
+                <form method="POST" action="{{ route('logout') }}" x-data>
                     @csrf
-
-                    <x-responsive-nav-link :href="route('logout')"
-                            onclick="event.preventDefault();
-                                        this.closest('form').submit();">
+                    <x-responsive-nav-link :href="route('logout')" @click.prevent="$el.closest('form').submit()">
                         {{ __('Keluar') }}
                     </x-responsive-nav-link>
                 </form>

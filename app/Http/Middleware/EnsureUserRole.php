@@ -35,6 +35,5 @@ class EnsureUserRole
         }
 
         abort(Response::HTTP_FORBIDDEN);
-        return response('', 403);
     }
 }

@@ -13,6 +13,7 @@ class TransactionTransformer
     public static function toAlpinePersons(Collection $transactions): array
     {
         $persons = [];
+        $cardCounter = 0;
 
         foreach ($transactions as $item) {
             /** @var ZakatTransaction $item */
@@ -32,7 +33,7 @@ class TransactionTransformer
             if ($foundIndex === -1) {
                 // New card needed
                 $persons[] = [
-                    'id' => mt_rand(1000, 9999) . '-' . $muzakkiId,
+                    'id' => (++$cardCounter) . '-' . $muzakkiId,
                     'muzakki_id' => $muzakkiId,
                     'name' => $name,
                     'zakat' => [

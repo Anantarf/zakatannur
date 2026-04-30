@@ -55,7 +55,6 @@ class ZakatTransactionController extends Controller
         $transactions = ZakatTransaction::query()
             ->with(['muzakki' => fn($q) => $q->withTrashed()])
             ->where('no_transaksi', $tx->no_transaksi)
-            ->where('pembayar_nama', $tx->pembayar_nama)
             ->orderBy('id', 'asc')
             ->get();
 
@@ -96,7 +95,6 @@ class ZakatTransactionController extends Controller
         $transactions = ZakatTransaction::query()
             ->with(['muzakki' => fn($q) => $q->withTrashed()])
             ->where('no_transaksi', $tx->no_transaksi)
-            ->where('pembayar_nama', $tx->pembayar_nama)
             ->where('status', ZakatTransaction::STATUS_VALID)
             ->orderBy('id', 'asc')
             ->get();
@@ -146,8 +144,8 @@ class ZakatTransactionController extends Controller
     {
         $tx = ZakatTransaction::findOrFail($transaction);
 
-        // Strict Edit Regulation
-        $this->authorizeEdit($request->user(), $tx);
+        // Strict Edit Regulation (Moved to Policy)
+        $this->authorize('update', $tx);
 
         $all = ZakatTransaction::with(['muzakki' => fn($q) => $q->withTrashed()])
             ->where('no_transaksi', $tx->no_transaksi)
@@ -179,8 +177,13 @@ class ZakatTransactionController extends Controller
 
         $tx = ZakatTransaction::findOrFail($transaction);
 
-        // Strict Edit Regulation
-        $this->authorizeEdit($request->user(), $tx);
+        // Strict Edit Regulation (Moved to Policy)
+        $this->authorize('update', $tx);
+
+        $user = $request->user();
+        if ($user->role === User::ROLE_STAFF && isset($data['tahun_zakat']) && (int)$data['tahun_zakat'] !== (int)$tx->tahun_zakat) {
+            return back()->withErrors(['tahun_zakat' => 'Tahun zakat tidak dapat diubah oleh Staff setelah transaksi tersimpan.']);
+        }
 
         $service->validateNominalDefaults($data);
         $results = $service->storeTransaction($data, $request->user()->id, $tx->no_transaksi);
@@ -191,29 +194,6 @@ class ZakatTransactionController extends Controller
             ->with('status', 'Transaksi berhasil diupdate!');
     }
 
-    private function authorizeEdit(User $user, ZakatTransaction $tx): void
-    {
-        if ($user->role === User::ROLE_SUPER_ADMIN || $user->role === User::ROLE_ADMIN) {
-            return;
-        }
-
-        // Staff Restrictions:
-        // 1. Can only edit their own transactions
-        if ((int)$tx->petugas_id !== (int)$user->id) {
-            abort(Response::HTTP_FORBIDDEN, 'Anda hanya dapat mengedit transaksi yang Anda layani sendiri.');
-        }
-
-        // 2. Can only edit today's transactions (within same calendar date)
-        $txDate = ($tx->waktu_terima ?? $tx->created_at)->timezone('Asia/Jakarta');
-        if (!$txDate->isToday()) {
-            abort(Response::HTTP_FORBIDDEN, 'Batas waktu pengeditan harian telah berakhir. Silakan hubungi Admin untuk perubahan data hari sebelumnya.');
-        }
-
-        // 3. Prevent changing year (tahun_zakat) during edit by Staff via request comparison
-        if (request()->has('tahun_zakat') && (int)request('tahun_zakat') !== (int)$tx->tahun_zakat) {
-            abort(Response::HTTP_FORBIDDEN, 'Tahun zakat tidak dapat diubah oleh Staff setelah transaksi tersimpan.');
-        }
-    }
 
     /**
      * Returns AnnualSetting-based defaults for the given year, with safe fallbacks.

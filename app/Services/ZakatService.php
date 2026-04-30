@@ -30,27 +30,44 @@ class ZakatService
     {
         $waktuTerima = $waktuTerima ?? $this->parseWaktuTerima($data['waktu_terima'] ?? null);
         $items = isset($data['items']) && is_array($data['items']) ? $data['items'] : [$data];
-        
-        $oldUang = 0;
-        $oldBeras = 0;
 
-        $syncResults = $this->executeWithRetry(function () use ($data, $items, $petugasId, $waktuTerima, $noTransaksiOverride, &$oldUang, &$oldBeras) {
-            $lockName = 'sync_tx_' . $waktuTerima->format('Ymd');
-            $lock = Cache::lock($lockName, 10);
-            
+        $syncResult = $this->executeWithRetry(
+            fn() => $this->performSync($data, $items, $petugasId, $waktuTerima, $noTransaksiOverride)
+        );
+
+        $syncResults = $syncResult['results'];
+        $oldUang = $syncResult['oldUang'];
+        $oldBeras = $syncResult['oldBeras'];
+
+        $newUang = collect($syncResults)->sum('nominal_uang');
+        $newBeras = collect($syncResults)->sum('jumlah_beras_kg');
+        $isNominalChanged = (int)$oldUang !== (int)$newUang || abs((float)$oldBeras - (float)$newBeras) > 0.001;
+
+        if (count($syncResults) > 0 && ($noTransaksiOverride === null || $isNominalChanged)) {
             try {
-                if (!$lock->get()) {
-                    throw new \RuntimeException("Gagal mendapatkan kunci transaksi setelah menunggu (Lock: {$lockName}). Silakan coba lagi.");
-                }
-                
-                $results = [];
-                $noTransaksi = $noTransaksiOverride ?? $this->generateNoTransaksi($waktuTerima);
+                event(new ZakatTransactionCreated(new Collection($syncResults)));
+            } catch (\Throwable $e) {
+                Log::error('Gagal broadcast transaksi: ' . $e->getMessage());
+            }
+        }
 
-            // Prevent hijacking existing transaction numbers
-            if (!$noTransaksiOverride) {
-                if (ZakatTransaction::where('no_transaksi', $noTransaksi)->exists()) {
-                    throw new \RuntimeException("Nomor Transaksi {$noTransaksi} sudah terpakai. Sila klik simpan sekali lagi untuk mendapatkan nomor baru.");
-                }
+        return $syncResults;
+    }
+
+    private function performSync(array $data, array $items, int $petugasId, Carbon $waktuTerima, ?string $noTransaksiOverride): array
+    {
+        $lockName = 'sync_tx_' . $waktuTerima->format('Ymd');
+        $lock = Cache::lock($lockName, 10);
+
+        try {
+            if (!$lock->get()) {
+                throw new \RuntimeException("Gagal mendapatkan kunci transaksi setelah menunggu (Lock: {$lockName}). Silakan coba lagi.");
+            }
+
+            $noTransaksi = $noTransaksiOverride ?? $this->generateNoTransaksi($waktuTerima);
+
+            if (!$noTransaksiOverride && ZakatTransaction::where('no_transaksi', $noTransaksi)->exists()) {
+                throw new \RuntimeException("Nomor Transaksi {$noTransaksi} sudah terpakai. Sila klik simpan sekali lagi untuk mendapatkan nomor baru.");
             }
 
             $oldTotals = ZakatTransaction::where('no_transaksi', $noTransaksi)
@@ -64,121 +81,95 @@ class ZakatService
                 'muzakki_phone'   => $data['pembayar_phone'] ?? '',
                 'muzakki_address' => $data['pembayar_alamat'],
             ];
-
             Muzakki::firstOrCreateNormalized($pembayarData);
 
-            // For EDIT: The system maintains the same No. Transaksi. 
-            // We allow name corrections (e.g. typos) but the No. Transaksi remains the primary anchor.
-
             $existingIds = ZakatTransaction::where('no_transaksi', $noTransaksi)->pluck('id')->toArray();
-            $newIds = [];
-
-            foreach ($items as $item) {
-                $category = $item['category'] ?? $data['category'] ?? null;
-                $metode = $item['metode'] ?? $data['metode'] ?? null;
-
-                if (!$category || !$metode) continue;
-
-                $tahunZakat = (int) ($item['tahun_zakat'] ?? $data['tahun_zakat'] ?? $waktuTerima->year);
-                [$defaultFitrah, $defaultFidyah, $defaultBerasKg, $defaultFidyahBeras] = $this->getAnnualDefaults($tahunZakat);
-
-                $itemForComputation = array_merge($item, ['category' => $category, 'metode' => $metode, 'tahun_zakat' => $tahunZakat]);
-                $nominalUang = ZakatTransaction::computeNominalUang($itemForComputation, $defaultFitrah, $defaultFidyah);
-                $jumlahBerasKg = ZakatTransaction::computeJumlahBerasKg($itemForComputation, $defaultBerasKg, $defaultFidyahBeras);
-                $isKhusus = $this->determineIsKhusus($itemForComputation, $defaultFitrah, $defaultFidyah, $defaultBerasKg, $defaultFidyahBeras);
-
-                $itemMuzakkiData = [
-                    'muzakki_name'    => $item['muzakki_name'] ?? $pembayarData['muzakki_name'],
-                    'muzakki_phone'   => $item['muzakki_phone'] ?? $pembayarData['muzakki_phone'] ?? '',
-                    'muzakki_address' => $item['muzakki_address'] ?? $pembayarData['muzakki_address'] ?? '',
-                ];
-                
-                $muzakki = Muzakki::firstOrCreateNormalized($itemMuzakkiData);
-
-                $transaction = null;
-                if (!empty($item['id'])) {
-                    $transaction = ZakatTransaction::withTrashed()->find($item['id']);
-                }
-
-                $txData = [
-                    'no_transaksi' => $noTransaksi,
-                    'muzakki_id' => $muzakki->id,
-                    'category' => $category,
-                    'tahun_zakat' => $tahunZakat,
-                    'metode' => $metode,
-                    'nominal_uang' => $nominalUang,
-                    'jumlah_beras_kg' => $jumlahBerasKg,
-                    'jiwa' => $item['jiwa'] ?? $data['jiwa'] ?? null,
-                    'hari' => $item['hari'] ?? $data['hari'] ?? null,
-                    'is_khusus' => $isKhusus,
-                    'default_fitrah_cash_per_jiwa_used' => $defaultFitrah > 0 ? $defaultFitrah : null,
-                    'default_fidyah_per_hari_used' => $defaultFidyah > 0 ? $defaultFidyah : null,
-                    'petugas_id' => $petugasId, // Always server-side — never trust client-submitted petugas_id
-                    'waktu_terima' => $waktuTerima, // always use the parsed & normalized Carbon instance
-                    'shift' => $data['shift'] ?? ZakatTransaction::SHIFT_PAGI,
-                    'keterangan' => $data['keterangan'] ?? null,
-                    'is_transfer' => ($metode === ZakatTransaction::METHOD_UANG) ? ($item['is_transfer'] ?? false) : false,
-                    'status' => ZakatTransaction::STATUS_VALID,
-                    'pembayar_nama' => $pembayarData['muzakki_name'],
-                    'pembayar_alamat' => $pembayarData['muzakki_address'],
-                    'pembayar_phone' => $pembayarData['muzakki_phone'],
-                ];
-
-                if ($transaction) {
-                    if ($transaction->trashed()) $transaction->restore();
-                    $transaction->update($txData);
-                } else {
-                    $transaction = ZakatTransaction::create($txData);
-                }
-
-                $newIds[] = $transaction->id;
-                $results[] = $transaction;
-            }
+            [$results, $newIds] = $this->processItems($items, $data, $pembayarData, $petugasId, $waktuTerima, $noTransaksi);
 
             $idsToDelete = array_diff($existingIds, $newIds);
+            if (!empty($idsToDelete)) {
+                ZakatTransaction::whereIn('id', $idsToDelete)->delete();
+            }
+
             $summary = [
-                'added' => count($newIds) - count(array_intersect($existingIds, $newIds)),
+                'added'   => count($newIds) - count(array_intersect($existingIds, $newIds)),
                 'updated' => count(array_intersect($existingIds, $newIds)),
                 'removed' => count($idsToDelete),
             ];
 
-            if (!empty($idsToDelete)) {
-                ZakatTransaction::whereIn('id', $idsToDelete)->delete(); // Use Soft Delete
-            }
-
-            $action = $noTransaksiOverride ? 'Updated.Transaction' : 'Created.Transaction';
-            Audit::log(request(), $action, null, [
+            Audit::log(request(), $noTransaksiOverride ? 'Updated.Transaction' : 'Created.Transaction', null, [
                 'no_transaksi' => $noTransaksi,
-                'pembayar' => $pembayarData['muzakki_name'],
-                'summary' => $summary,
-                'totals' => [
+                'pembayar'     => $pembayarData['muzakki_name'],
+                'summary'      => $summary,
+                'totals'       => [
                     'old' => ['uang' => $oldUang, 'beras' => $oldBeras],
                     'new' => ['uang' => (int) collect($results)->sum('nominal_uang'), 'beras' => (float) collect($results)->sum('jumlah_beras_kg')],
-                ]
+                ],
             ]);
 
-            return $results;
+            return ['results' => $results, 'oldUang' => $oldUang, 'oldBeras' => $oldBeras];
         } finally {
-            if (isset($lock)) {
-                $lock->release();
-            }
+            if (isset($lock)) $lock->release();
         }
-        });
+    }
 
-        $newUang = collect($syncResults)->sum('nominal_uang');
-        $newBeras = collect($syncResults)->sum('jumlah_beras_kg');
-        $isNominalChanged = (int)$oldUang !== (int)$newUang || abs((float)$oldBeras - (float)$newBeras) > 0.001;
+    private function processItems(array $items, array $data, array $pembayarData, int $petugasId, Carbon $waktuTerima, string $noTransaksi): array
+    {
+        $results = [];
+        $newIds = [];
 
-        if (count($syncResults) > 0 && ($noTransaksiOverride === null || $isNominalChanged)) {
-            try {
-                event(new ZakatTransactionCreated(new Collection($syncResults)));
-            } catch (\Throwable $e) {
-                // We log the error but let the request succeed because data is already persisted.
-                Log::error('Gagal broadcast transaksi: ' . $e->getMessage());
+        foreach ($items as $item) {
+            $category = $item['category'] ?? $data['category'] ?? null;
+            $metode = $item['metode'] ?? $data['metode'] ?? null;
+            if (!$category || !$metode) continue;
+
+            $tahunZakat = (int) ($item['tahun_zakat'] ?? $data['tahun_zakat'] ?? $waktuTerima->year);
+            [$defaultFitrah, $defaultFidyah, $defaultBerasKg, $defaultFidyahBeras] = $this->getAnnualDefaults($tahunZakat);
+
+            $itemForComputation = array_merge($item, ['category' => $category, 'metode' => $metode, 'tahun_zakat' => $tahunZakat]);
+            $muzakki = Muzakki::firstOrCreateNormalized([
+                'muzakki_name'    => $item['muzakki_name'] ?? $pembayarData['muzakki_name'],
+                'muzakki_phone'   => $item['muzakki_phone'] ?? $pembayarData['muzakki_phone'] ?? '',
+                'muzakki_address' => $item['muzakki_address'] ?? $pembayarData['muzakki_address'] ?? '',
+            ]);
+
+            $txData = [
+                'no_transaksi'                     => $noTransaksi,
+                'muzakki_id'                       => $muzakki->id,
+                'category'                         => $category,
+                'tahun_zakat'                      => $tahunZakat,
+                'metode'                           => $metode,
+                'nominal_uang'                     => ZakatTransaction::computeNominalUang($itemForComputation, $defaultFitrah, $defaultFidyah),
+                'jumlah_beras_kg'                  => ZakatTransaction::computeJumlahBerasKg($itemForComputation, $defaultBerasKg, $defaultFidyahBeras),
+                'jiwa'                             => $item['jiwa'] ?? $data['jiwa'] ?? null,
+                'hari'                             => $item['hari'] ?? $data['hari'] ?? null,
+                'is_khusus'                        => $this->determineIsKhusus($itemForComputation, $defaultFitrah, $defaultFidyah, $defaultBerasKg, $defaultFidyahBeras),
+                'default_fitrah_cash_per_jiwa_used' => $defaultFitrah > 0 ? $defaultFitrah : null,
+                'default_fidyah_per_hari_used'     => $defaultFidyah > 0 ? $defaultFidyah : null,
+                'petugas_id'                       => $petugasId,
+                'waktu_terima'                     => $waktuTerima,
+                'shift'                            => $data['shift'] ?? ZakatTransaction::SHIFT_PAGI,
+                'keterangan'                       => $data['keterangan'] ?? null,
+                'is_transfer'                      => ($metode === ZakatTransaction::METHOD_UANG) ? ($item['is_transfer'] ?? false) : false,
+                'status'                           => ZakatTransaction::STATUS_VALID,
+                'pembayar_nama'                    => $pembayarData['muzakki_name'],
+                'pembayar_alamat'                  => $pembayarData['muzakki_address'],
+                'pembayar_phone'                   => $pembayarData['muzakki_phone'],
+            ];
+
+            $transaction = !empty($item['id']) ? ZakatTransaction::withTrashed()->find($item['id']) : null;
+            if ($transaction) {
+                if ($transaction->trashed()) $transaction->restore();
+                $transaction->update($txData);
+            } else {
+                $transaction = ZakatTransaction::create($txData);
             }
+
+            $newIds[] = $transaction->id;
+            $results[] = $transaction;
         }
 
-        return $syncResults;
+        return [$results, $newIds];
     }
 
     private function parseWaktuTerima(?string $input, ?string $noTransaksiOverride = null): Carbon
