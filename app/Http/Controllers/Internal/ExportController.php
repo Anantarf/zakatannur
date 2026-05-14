@@ -20,11 +20,9 @@ class ExportController extends Controller
 
     public function exportDaily(Request $request)
     {
-        ini_set('memory_limit', '512M');
-        set_time_limit(300);
+        $this->prepareDailyExportEnvironment();
+        $date = $this->validateDailyExportRequest($request);
 
-        $request->validate(['date' => 'required|date_format:Y-m-d']);
-        $date = $request->query('date');
         $start = Carbon::parse($date, 'Asia/Jakarta')->startOfDay();
         $end = Carbon::parse($date, 'Asia/Jakarta')->endOfDay();
 
@@ -43,6 +41,18 @@ class ExportController extends Controller
         }
 
         return $this->downloadSpreadsheet($spreadsheet, 'Rekap_Zakat_' . $date . '.xlsx');
+    }
+
+    private function prepareDailyExportEnvironment(): void
+    {
+        ini_set('memory_limit', (string) config('zakat.export.memory_limit', '512M'));
+        set_time_limit((int) config('zakat.export.execution_time_seconds', 300));
+    }
+
+    private function validateDailyExportRequest(Request $request): string
+    {
+        $validated = $request->validate(['date' => 'required|date_format:Y-m-d']);
+        return (string) $validated['date'];
     }
 
     private function fetchDailyTransactions(Carbon $start, Carbon $end)
@@ -82,7 +92,7 @@ class ExportController extends Controller
                 ZakatTransaction::CATEGORY_MAL,
                 ZakatTransaction::METHOD_UANG,
             ])
-            ->where('status', ZakatTransaction::STATUS_VALID)
+            ->valid()
             ->whereRaw('COALESCE(waktu_terima, created_at) >= ?', [$start])
             ->whereRaw('COALESCE(waktu_terima, created_at) <= ?', [$end])
             ->groupBy('no_transaksi')
@@ -252,15 +262,10 @@ class ExportController extends Controller
 
     public function exportYearly(Request $request)
     {
-        ini_set('memory_limit', '1024M'); // Yearly often needs more
-        set_time_limit(600);
+        $this->prepareYearlyExportEnvironment();
+        $year = $this->validateYearlyExportRequest($request);
 
-        $request->validate([
-            'year' => 'required|integer|min:2000|max:2100',
-        ]);
-        $year = $request->query('year');
-
-        $summaryData = ZakatTransaction::where('status', ZakatTransaction::STATUS_VALID)
+        $summaryData = ZakatTransaction::valid()
             ->where('tahun_zakat', $year)
             ->selectRaw("
                 DATE(CONVERT_TZ(COALESCE(waktu_terima, created_at), '+00:00', '+07:00')) as date,
@@ -325,6 +330,24 @@ class ExportController extends Controller
         }
 
         return $this->downloadSpreadsheet($spreadsheet, 'Rekap_Tahunan_' . $year . '.xlsx');
+    }
+
+    private function prepareYearlyExportEnvironment(): void
+    {
+        ini_set('memory_limit', (string) config('zakat.export.yearly_memory_limit', '1024M')); // Yearly often needs more
+        set_time_limit((int) config('zakat.export.yearly_execution_time_seconds', 600));
+    }
+
+    private function validateYearlyExportRequest(Request $request): int
+    {
+        $yearMin = (int) config('zakat.year_bounds.min', 2000);
+        $yearMax = (int) config('zakat.year_bounds.max', 2100);
+
+        $validated = $request->validate([
+            'year' => ['required', 'integer', 'min:' . $yearMin, 'max:' . $yearMax],
+        ]);
+
+        return (int) $validated['year'];
     }
 
     private function getCommonHeaderStyle(): array

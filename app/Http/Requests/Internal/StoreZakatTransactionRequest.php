@@ -18,28 +18,28 @@ class StoreZakatTransactionRequest extends FormRequest
     {
         return [
             // Global fields
-            'pembayar_nama' => ['required', 'string', 'max:255'],
-            'pembayar_phone' => ['nullable', 'string', 'max:50'],
+            'pembayar_nama' => ['required', 'string', 'max:' . (int) config('zakat.validation.payer_name_max', 255)],
+            'pembayar_phone' => ['nullable', 'string', 'max:' . (int) config('zakat.validation.payer_phone_max', 50)],
             'pembayar_alamat' => ['required', 'string'],
-            'tahun_zakat' => ['required', 'integer', 'min:2000', 'max:2100'],
+            'tahun_zakat' => ['required', 'integer', 'min:' . (int) config('zakat.year_bounds.min', 2000), 'max:' . (int) config('zakat.year_bounds.max', 2100)],
             'waktu_terima' => ['nullable', 'date'],
             'shift' => ['required', 'string', Rule::in(ZakatTransaction::SHIFTS)],
             'keterangan' => ['nullable', 'string'],
 
             // Legacy individual fields (if not batch)
-            'muzakki_name' => ['required_without:items', 'string', 'max:255', 'nullable'],
+            'muzakki_name' => ['required_without:items', 'string', 'max:' . (int) config('zakat.validation.muzakki_name_max', 255), 'nullable'],
             'muzakki_address' => ['nullable', 'string'],
-            'muzakki_phone' => ['nullable', 'string', 'max:50'],
+            'muzakki_phone' => ['nullable', 'string', 'max:' . (int) config('zakat.validation.payer_phone_max', 50)],
             'category' => ['required_without:items', 'string', Rule::in(ZakatTransaction::CATEGORIES), 'nullable'],
             'metode' => ['required_without:items', 'string', Rule::in(ZakatTransaction::METHODS), 'nullable'],
             'jiwa' => ['nullable', 'integer', 'min:1'],
             'hari' => ['nullable', 'integer', 'min:1'],
-            'nominal_uang' => ['nullable', 'numeric', 'min:0'],
+            'nominal_uang' => ['nullable', 'numeric', 'min:1'],
             'jumlah_beras_kg' => ['nullable', 'numeric', 'min:0'],
 
-            // Batch items array (capped at 30 to prevent memory exhaustion)
-            'items' => ['required_without:muzakki_name', 'array', 'min:1', 'max:30'],
-            'items.*.muzakki_name' => ['required_with:items', 'string', 'max:255'],
+            // Batch items array (capped by config to prevent memory exhaustion)
+            'items' => ['required_without:muzakki_name', 'array', 'min:1', 'max:' . (int) config('zakat.transaction.max_batch_items', 30)],
+            'items.*.muzakki_name' => ['required_with:items', 'string', 'max:' . (int) config('zakat.validation.muzakki_name_max', 255)],
             'items.*.category' => [
                 Rule::requiredIf(fn() => $this->filled('items') && !$this->filled('category')),
                 'nullable', 'string', Rule::in(ZakatTransaction::CATEGORIES)

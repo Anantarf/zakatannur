@@ -20,10 +20,10 @@ class PeriodSettingsController extends Controller
         $annual = AnnualSetting::query()->firstOrCreate(
             ['year' => $activeYear],
             [
-                'default_fitrah_cash_per_jiwa' => 50000,
-                'default_fitrah_beras_per_jiwa' => 2.50,
-                'default_fidyah_per_hari' => 50000,
-                'default_fidyah_beras_per_hari' => 0.75,
+                'default_fitrah_cash_per_jiwa' => (int) config('zakat.annual_defaults.fitrah_cash_per_jiwa', 50000),
+                'default_fitrah_beras_per_jiwa' => (float) config('zakat.annual_defaults.fitrah_beras_per_jiwa', 2.50),
+                'default_fidyah_per_hari' => (int) config('zakat.annual_defaults.fidyah_per_hari', 30000),
+                'default_fidyah_beras_per_hari' => (float) config('zakat.annual_defaults.fidyah_beras_per_hari', 0.75),
             ]
         );
 
@@ -46,14 +46,17 @@ class PeriodSettingsController extends Controller
     public function update(Request $request)
     {
         $currentActiveYear = AppSetting::getInt(AppSetting::KEY_ACTIVE_YEAR, (int) now()->year);
+        $publicRefreshMinSeconds = (int) config('zakat.public_refresh.min_seconds', 10);
+        $publicRefreshMaxSeconds = (int) config('zakat.public_refresh.max_seconds', 60);
+        $publicRefreshFormMaxSeconds = (int) config('zakat.public_refresh.form_max_seconds', 600);
 
         $validator = Validator::make($request->all(), [
-            'active_year' => ['required', 'integer', 'min:2000', 'max:2100'],
+            'active_year' => ['required', 'integer', 'min:' . (int) config('zakat.year_bounds.min', 2000), 'max:' . (int) config('zakat.year_bounds.max', 2100)],
             'default_fitrah_cash_per_jiwa' => ['required', 'integer', 'min:0', 'max:100000000'],
             'default_fitrah_beras_per_jiwa' => ['required', 'numeric', 'min:0', 'max:100'],
             'default_fidyah_per_hari' => ['required', 'integer', 'min:0', 'max:100000000'],
             'default_fidyah_beras_per_hari' => ['required', 'numeric', 'min:0', 'max:100'],
-            'public_refresh_interval_seconds' => ['required', 'integer', 'min:0', 'max:600'],
+            'public_refresh_interval_seconds' => ['required', 'integer', 'min:0', 'max:' . $publicRefreshFormMaxSeconds],
         ]);
 
         $validator->after(function ($validator) use ($currentActiveYear) {
@@ -62,8 +65,8 @@ class PeriodSettingsController extends Controller
             $activeYearInput = (int) ($input['active_year'] ?? 0);
 
             // Keputusan: 0 = off; selain itu 10–60 detik.
-            if ($interval !== 0 && ($interval < 10 || $interval > 60)) {
-                $validator->errors()->add('public_refresh_interval_seconds', 'Interval refresh publik harus 0 (mati) atau 10–60 detik.');
+            if ($interval !== 0 && ($interval < $publicRefreshMinSeconds || $interval > $publicRefreshMaxSeconds)) {
+                $validator->errors()->add('public_refresh_interval_seconds', 'Interval refresh publik harus 0 (mati) atau ' . $publicRefreshMinSeconds . '–' . $publicRefreshMaxSeconds . ' detik.');
             }
 
             // Antisipasi: perubahan Tahun Aktif hanya via flow "Mulai Periode Baru".
@@ -104,6 +107,8 @@ class PeriodSettingsController extends Controller
             );
         });
 
+        AppSetting::clearCache();
+
         Audit::log($request, 'settings.period.updated', null, [
             'active_year' => $activeYear,
             'default_fitrah_cash_per_jiwa' => $defaultFitrah,
@@ -121,7 +126,7 @@ class PeriodSettingsController extends Controller
         $activeYear = AppSetting::getInt(AppSetting::KEY_ACTIVE_YEAR, (int) now()->year);
 
         $validator = Validator::make($request->all(), [
-            'new_year' => ['required', 'integer', 'min:2000', 'max:2100'],
+            'new_year' => ['required', 'integer', 'min:' . (int) config('zakat.year_bounds.min', 2000), 'max:' . (int) config('zakat.year_bounds.max', 2100)],
             'backup_confirmed' => ['accepted'],
         ]);
 
@@ -142,10 +147,10 @@ class PeriodSettingsController extends Controller
             $currentAnnual = AnnualSetting::query()->firstOrCreate(
                 ['year' => $activeYear],
                 [
-                    'default_fitrah_cash_per_jiwa' => 50000,
-                    'default_fitrah_beras_per_jiwa' => 2.50,
-                    'default_fidyah_per_hari' => 50000,
-                    'default_fidyah_beras_per_hari' => 0.75,
+                    'default_fitrah_cash_per_jiwa' => (int) config('zakat.annual_defaults.fitrah_cash_per_jiwa', 50000),
+                    'default_fitrah_beras_per_jiwa' => (float) config('zakat.annual_defaults.fitrah_beras_per_jiwa', 2.50),
+                    'default_fidyah_per_hari' => (int) config('zakat.annual_defaults.fidyah_per_hari', 30000),
+                    'default_fidyah_beras_per_hari' => (float) config('zakat.annual_defaults.fidyah_beras_per_hari', 0.75),
                 ]
             );
 
@@ -164,6 +169,8 @@ class PeriodSettingsController extends Controller
                 ['value' => (string) $newYear]
             );
         });
+
+        AppSetting::clearCache();
 
         Audit::log($request, 'period.start_new', null, [
             'from_year' => $activeYear,

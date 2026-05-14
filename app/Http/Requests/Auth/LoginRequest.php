@@ -27,7 +27,7 @@ class LoginRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'username' => ['required', 'string', 'max:50'],
+            'username' => ['required', 'string', 'max:' . (int) config('zakat.validation.username_max', 50)],
             'password' => ['required', 'string'],
         ];
     }

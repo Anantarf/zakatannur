@@ -11,8 +11,8 @@ class ZakatTransactionObserver
     private function clearPublicCache(ZakatTransaction $model)
     {
         $year = $model->tahun_zakat;
-        \Illuminate\Support\Facades\Cache::forget('public_summary_year_' . $year);
-        \Illuminate\Support\Facades\Cache::forget('public_home_stats_' . $year);
+        \Illuminate\Support\Facades\Cache::forget(\App\Models\AppSetting::cacheKeyForPublicSummary($year));
+        \Illuminate\Support\Facades\Cache::forget(\App\Models\AppSetting::cacheKeyForPublicHomeStats($year));
     }
 
     private function log(ZakatTransaction $model, string $action, array $metadata = [])

@@ -116,9 +116,9 @@ class MuzakkiController extends Controller
     private function validateData(Request $request): array
     {
         return $request->validate([
-            'name' => ['required', 'string', 'max:150'],
+            'name' => ['required', 'string', 'max:' . (int) config('zakat.validation.muzakki_name_edit_max', 150)],
             'address' => ['nullable', 'string'],
-            'phone' => ['nullable', 'string', 'max:30'],
+            'phone' => ['nullable', 'string', 'max:' . (int) config('zakat.validation.muzakki_phone_max', 30)],
         ], [
             'name.required' => 'Nama wajib diisi.',
         ]);

@@ -9,12 +9,12 @@ use Illuminate\Console\Command;
 
 class PurgeOldTrashedMuzakki extends Command
 {
-    protected $signature = 'muzakki:purge-trash {--days=30 : Days after soft-delete before permanent removal}';
+    protected $signature = 'muzakki:purge-trash {--days= : Days after soft-delete before permanent removal}';
     protected $description = 'Permanently delete soft-deleted Muzakki records older than the specified number of days';
 
     public function handle(): int
     {
-        $days = (int) $this->option('days');
+        $days = (int) ($this->option('days') ?: config('zakat.retention.purge_days', 30));
         $cutoff = Carbon::now()->subDays($days);
 
         // Get count of total trashed candidates before deletion

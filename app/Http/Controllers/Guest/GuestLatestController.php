@@ -14,7 +14,7 @@ class GuestLatestController extends Controller
         $activeYear = AppSetting::getInt(AppSetting::KEY_ACTIVE_YEAR, (int) now()->year);
 
         // Fetch 5 latest validated transactions within the current active year
-        $latest = ZakatTransaction::where('status', ZakatTransaction::STATUS_VALID)
+        $latest = ZakatTransaction::valid()
             ->where('tahun_zakat', $activeYear)
             ->orderByRaw('COALESCE(waktu_terima, created_at) DESC')
             ->limit(5)

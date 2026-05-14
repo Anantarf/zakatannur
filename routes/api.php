@@ -22,3 +22,7 @@ Route::get('/public/summary', [GuestSummaryController::class, 'index'])
 Route::get('/public/latest', [GuestLatestController::class, 'index'])
     ->middleware(['throttle:public-summary'])
     ->withoutMiddleware('throttle:api');
+
+Route::post('/chatbot/message', [\App\Http\Controllers\Api\ChatbotController::class, 'chat'])
+    ->middleware(['throttle:60,1']) // Batasi 60 request per menit per IP untuk mencegah spam
+    ->withoutMiddleware('throttle:api');

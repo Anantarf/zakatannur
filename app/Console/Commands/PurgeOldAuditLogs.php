@@ -28,9 +28,10 @@ class PurgeOldAuditLogs extends Command
     {
         $this->info('Memulai pembersihan log audit lama...');
 
-        $count = AuditLog::where('created_at', '<', now()->subDays(30))->delete();
+        $purgeDays = (int) config('zakat.retention.purge_days', 30);
+        $count = AuditLog::where('created_at', '<', now()->subDays($purgeDays))->delete();
 
-        $this->info("Berhasil menghapus {$count} baris log yang sudah berumur lebih dari 30 hari.");
+        $this->info("Berhasil menghapus {$count} baris log yang sudah berumur lebih dari {$purgeDays} hari.");
 
         return Command::SUCCESS;
     }

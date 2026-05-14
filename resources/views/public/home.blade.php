@@ -975,6 +975,7 @@ window.zakatApp = () => ({
     }
 </script>
 
+<x-chatbot-widget />
 </body>
 </html>
 <?php /**PATH C:\Users\Ananta Raihan\Kuliah\ZAKAT TRIAL\resources\views/public/home.blade.php ENDPATH**/ ?>

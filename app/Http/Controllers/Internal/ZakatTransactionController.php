@@ -16,7 +16,7 @@ use Illuminate\Support\Facades\Storage;
 
 class ZakatTransactionController extends Controller
 {
-    public function create(Request $request)
+    public function create(Request $request): \Illuminate\View\View
     {
         $activeYear = AppSetting::getInt(AppSetting::KEY_ACTIVE_YEAR, (int) now()->year);
 
@@ -33,7 +33,7 @@ class ZakatTransactionController extends Controller
         ));
     }
 
-    public function store(StoreZakatTransactionRequest $request, \App\Services\ZakatService $service)
+    public function store(StoreZakatTransactionRequest $request, \App\Services\ZakatService $service): \Illuminate\Http\RedirectResponse
     {
         $data = $request->validated();
         $service->validateNominalDefaults($data);
@@ -48,7 +48,7 @@ class ZakatTransactionController extends Controller
             ->with('status', 'Transaksi berhasil disimpan!');
     }
 
-    public function show(Request $request, int $transaction)
+    public function show(Request $request, int $transaction): \Illuminate\View\View
     {
         $tx = ZakatTransaction::withTrashed()->findOrFail($transaction);
 
@@ -86,7 +86,7 @@ class ZakatTransactionController extends Controller
         ]);
     }
 
-    public function receipt(Request $request, int $transaction)
+    public function receipt(Request $request, int $transaction): \Illuminate\Http\Response
     {
         $user = $request->user();
 
@@ -95,7 +95,7 @@ class ZakatTransactionController extends Controller
         $transactions = ZakatTransaction::query()
             ->with(['muzakki' => fn($q) => $q->withTrashed()])
             ->where('no_transaksi', $tx->no_transaksi)
-            ->where('status', ZakatTransaction::STATUS_VALID)
+            ->valid()
             ->orderBy('id', 'asc')
             ->get();
 
@@ -105,6 +105,7 @@ class ZakatTransactionController extends Controller
             $transactions = ZakatTransaction::withTrashed()
                 ->with(['muzakki' => fn($q) => $q->withTrashed()])
                 ->where('no_transaksi', $tx->no_transaksi)
+                ->valid()
                 ->get();
         }
 
@@ -140,7 +141,7 @@ class ZakatTransactionController extends Controller
         ]);
     }
 
-    public function edit(Request $request, int $transaction)
+    public function edit(Request $request, int $transaction): \Illuminate\View\View
     {
         $tx = ZakatTransaction::findOrFail($transaction);
 
@@ -171,7 +172,7 @@ class ZakatTransactionController extends Controller
         ));
     }
 
-    public function update(StoreZakatTransactionRequest $request, int $transaction, \App\Services\ZakatService $service)
+    public function update(StoreZakatTransactionRequest $request, int $transaction, \App\Services\ZakatService $service): \Illuminate\Http\RedirectResponse
     {
         $data = $request->validated();
 
@@ -204,10 +205,10 @@ class ZakatTransactionController extends Controller
         $s = \App\Models\AnnualSetting::where('year', $year)->first();
 
         return [
-            'berasPerJiwa' => (float) ($s->default_fitrah_beras_per_jiwa ?? 2.5),
-            'fitrahUang'   => (int)   ($s->default_fitrah_cash_per_jiwa  ?? 50000),
-            'fidyahUang'   => (int)   ($s->default_fidyah_per_hari       ?? 30000),
-            'fidyahBeras'  => (float) ($s->default_fidyah_beras_per_hari ?? 0.75),
+            'berasPerJiwa' => (float) ($s->default_fitrah_beras_per_jiwa ?? config('zakat.annual_defaults.fitrah_beras_per_jiwa', 2.5)),
+            'fitrahUang'   => (int)   ($s->default_fitrah_cash_per_jiwa  ?? config('zakat.annual_defaults.fitrah_cash_per_jiwa', 50000)),
+            'fidyahUang'   => (int)   ($s->default_fidyah_per_hari       ?? config('zakat.annual_defaults.fidyah_per_hari', 30000)),
+            'fidyahBeras'  => (float) ($s->default_fidyah_beras_per_hari ?? config('zakat.annual_defaults.fidyah_beras_per_hari', 0.75)),
         ];
     }
 }

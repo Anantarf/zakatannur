@@ -12,6 +12,11 @@ use Illuminate\Validation\Rule;
 
 class UserManagementController extends Controller
 {
+    private const NAME_MAX_LENGTH = 100;
+    private const USERNAME_MAX_LENGTH = 50;
+    private const PASSWORD_MAX_LENGTH = 255;
+    private const PASSWORD_MIN_LENGTH = 8;
+
     public function index(Request $request)
     {
         $users = User::query()
@@ -44,10 +49,10 @@ class UserManagementController extends Controller
         $allowedRoles = $this->allowedRolesForActor($actor);
 
         $data = $request->validate([
-            'name' => ['required', 'string', 'max:100'],
-            'username' => ['required', 'string', 'regex:/^[a-zA-Z0-9_]+$/', 'max:50', 'unique:users,username'],
+            'name' => ['required', 'string', 'max:' . self::NAME_MAX_LENGTH],
+            'username' => ['required', 'string', 'regex:/^[a-zA-Z0-9_]+$/', 'max:' . self::USERNAME_MAX_LENGTH, 'unique:users,username'],
             'role' => ['required', 'string', Rule::in($allowedRoles)],
-            'password' => ['required', 'string', 'min:8', 'max:255'],
+            'password' => ['required', 'string', 'min:' . self::PASSWORD_MIN_LENGTH, 'max:' . self::PASSWORD_MAX_LENGTH],
         ]);
 
         /** @var User $user */
@@ -99,10 +104,10 @@ class UserManagementController extends Controller
         $allowedRoles = $this->allowedRolesForActor($actor, $user);
 
         $data = $request->validate([
-            'name' => ['required', 'string', 'max:100'],
-            'username' => ['required', 'string', 'regex:/^[a-zA-Z0-9_]+$/', 'max:50', Rule::unique('users', 'username')->ignore($user->id)],
+            'name' => ['required', 'string', 'max:' . self::NAME_MAX_LENGTH],
+            'username' => ['required', 'string', 'regex:/^[a-zA-Z0-9_]+$/', 'max:' . self::USERNAME_MAX_LENGTH, Rule::unique('users', 'username')->ignore($user->id)],
             'role' => ['required', 'string', Rule::in($allowedRoles)],
-            'password' => ['nullable', 'string', 'min:8', 'max:255'],
+            'password' => ['nullable', 'string', 'min:' . self::PASSWORD_MIN_LENGTH, 'max:' . self::PASSWORD_MAX_LENGTH],
         ]);
 
         $user->fill($request->only(['name', 'username', 'role']));

@@ -15,9 +15,11 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
-        // Permanently delete trashed transactions and muzakki older than 30 days
-        $schedule->command('transactions:purge-trash --days=30')->daily();
-        $schedule->command('muzakki:purge-trash --days=30')->daily();
+        $purgeDays = (int) config('zakat.retention.purge_days', 30);
+
+        // Permanently delete trashed transactions and muzakki using the configured retention window
+        $schedule->command('transactions:purge-trash', ['--days' => $purgeDays])->daily();
+        $schedule->command('muzakki:purge-trash', ['--days' => $purgeDays])->daily();
         $schedule->command('audit-logs:purge')->daily();
     }
 

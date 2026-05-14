@@ -21,10 +21,12 @@ class GuestSummaryController extends Controller
             return response()->json(['message' => 'Parameter year tidak valid.'], 422);
         }
 
+        $defaultRefresh = (int) config('zakat.public_refresh.default_seconds', 15);
         $cacheTtlSeconds = AppSetting::normalizePublicRefreshIntervalSeconds(
-            AppSetting::getInt(AppSetting::KEY_PUBLIC_REFRESH_INTERVAL_SECONDS, 15), 15
+            AppSetting::getInt(AppSetting::KEY_PUBLIC_REFRESH_INTERVAL_SECONDS, $defaultRefresh),
+            $defaultRefresh
         );
-        $cacheKey = 'public_summary_year_' . $year;
+        $cacheKey = AppSetting::cacheKeyForPublicSummary($year);
         $wasAlreadyCached = Cache::has($cacheKey);
 
         $payload = Cache::remember($cacheKey, $cacheTtlSeconds, function () use ($year) {

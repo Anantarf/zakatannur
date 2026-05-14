@@ -248,6 +248,11 @@ class ZakatTransaction extends Model
             });
     }
 
+    public function scopeValid(Builder $query): Builder
+    {
+        return $query->where('status', self::STATUS_VALID);
+    }
+
     public function scopeOrderByEffectiveTime(Builder $query): Builder
     {
         return $query

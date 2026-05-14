@@ -30,9 +30,9 @@ class Muzakki extends Model
             return null;
         }
 
-        $purgeDays = 30;
-        $deletedAt = $this->deleted_at->timezone('Asia/Jakarta');
-        return max(0, $purgeDays - (int) $deletedAt->startOfDay()->diffInDays(now('Asia/Jakarta')->startOfDay()));
+        $purgeDays = (int) config('zakat.retention.purge_days', 30);
+        $deletedAt = $this->deleted_at->timezone(config('zakat.timezone'));
+        return max(0, $purgeDays - (int) $deletedAt->startOfDay()->diffInDays(now(config('zakat.timezone'))->startOfDay()));
     }
 
     /**
@@ -44,7 +44,7 @@ class Muzakki extends Model
             return '-';
         }
 
-        return $this->deleted_at->timezone('Asia/Jakarta')->format('d/m/Y H:i');
+        return $this->deleted_at->timezone(config('zakat.timezone'))->format('d/m/Y H:i');
     }
 
     /**

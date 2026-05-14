@@ -13,16 +13,50 @@
 
     <div class="py-4 sm:py-10">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-4 sm:space-y-8">
-            
+
+            {{-- Banner Off-Season --}}
+            @if($offSeason)
+            <div class="rounded-2xl border border-amber-200 bg-amber-50 px-4 sm:px-6 py-4 flex flex-col sm:flex-row sm:items-center gap-3">
+                <div class="flex items-center gap-3 flex-1">
+                    <div class="flex-shrink-0 w-10 h-10 rounded-full bg-amber-100 border border-amber-200 flex items-center justify-center">
+                        <svg class="h-5 w-5 text-amber-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                    </div>
+                    <div>
+                        <p class="font-bold text-amber-800 text-sm">Sistem Sedang Tidak Aktif</p>
+                        <p class="text-amber-700 text-xs mt-0.5">
+                            Periode Ramadan {{ $activeYear }} telah berakhir.
+                            @if($lastActiveDate)
+                                Transaksi terakhir tercatat pada <span class="font-bold">{{ $lastActiveDate->locale('id')->translatedFormat('d F Y') }}</span>.
+                            @endif
+                            Data rekap di bawah adalah arsip lengkap tahun {{ $activeYear }}.
+                        </p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-2 flex-shrink-0">
+                    <a href="{{ route('internal.transactions.index', ['year' => $activeYear]) }}" class="inline-flex items-center gap-1.5 rounded-xl bg-amber-600 px-3 py-2 text-xs font-bold text-white hover:bg-amber-700 transition-all shadow-sm whitespace-nowrap">
+                        Lihat Arsip
+                        <svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg>
+                    </a>
+                </div>
+            </div>
+            @endif
 
             <!-- Daily Trend Chart -->
             <div class="bg-white rounded-2xl shadow-md border border-gray-100 overflow-hidden">
                 <div class="px-4 sm:px-6 py-3 sm:py-4 border-b border-gray-50 flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4">
-                    <div class="flex items-center gap-2">
-                        <div class="w-1.5 h-5 sm:w-2 sm:h-6 bg-emerald-500 rounded-full"></div>
+                    <div class="flex items-center gap-2 flex-wrap">
+                        <div class="w-1.5 h-5 sm:w-2 sm:h-6 bg-emerald-500 rounded-full flex-shrink-0"></div>
                         <h3 class="font-bold text-sm sm:text-base text-gray-800">Grafik Transaksi Zakat</h3>
+                        @if($offSeason && $chartPeriodLabel)
+                            <span class="inline-flex items-center gap-1 rounded-full bg-amber-100 border border-amber-200 px-2.5 py-0.5 text-[10px] font-bold text-amber-700 uppercase tracking-wide whitespace-nowrap">
+                                <svg class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                                Arsip: {{ $chartPeriodLabel }}
+                            </span>
+                        @endif
                     </div>
-                    
+
                     <form method="GET" action="{{ route('dashboard') }}" class="flex items-center justify-end gap-2 w-full sm:w-auto">
                         {{-- Keep other filters --}}
                         @if(request('year')) <input type="hidden" name="year" value="{{ request('year') }}"> @endif
@@ -115,6 +149,10 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
 (function() {
+    const isOffSeason = {{ $offSeason ? 'true' : 'false' }};
+    const lineColor   = isOffSeason ? '#d97706' : '#10b981';
+    const gradFrom    = isOffSeason ? 'rgba(217, 119, 6, 0.15)' : 'rgba(16, 185, 129, 0.2)';
+
     function initChart() {
         try {
             if (typeof Chart === 'undefined') {
@@ -123,11 +161,11 @@
             }
             const canvas = document.getElementById('dailyTrendChart');
             if (!canvas) return;
-            
+
             const ctx = canvas.getContext('2d');
             const gradient = ctx.createLinearGradient(0, 0, 0, 250);
-            gradient.addColorStop(0, 'rgba(16, 185, 129, 0.2)');
-            gradient.addColorStop(1, 'rgba(16, 185, 129, 0)');
+            gradient.addColorStop(0, gradFrom);
+            gradient.addColorStop(1, 'rgba(0,0,0,0)');
 
             new Chart(ctx, {
                 type: 'line',
@@ -136,13 +174,13 @@
                     datasets: [{
                         label: 'Jumlah Transaksi',
                         data: {!! json_encode($chartData['values'] ?? []) !!},
-                        borderColor: '#10b981',
+                        borderColor: lineColor,
                         backgroundColor: gradient,
                         borderWidth: 3,
                         fill: true,
                         tension: 0.4,
                         pointBackgroundColor: '#fff',
-                        pointBorderColor: '#10b981',
+                        pointBorderColor: lineColor,
                         pointBorderWidth: 2,
                         pointRadius: 4,
                         pointHoverRadius: 6

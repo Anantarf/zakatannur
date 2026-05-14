@@ -22,16 +22,17 @@ class GuestPagesController extends Controller
             $selectedYear = $activeYear;
         }
 
-        $rawRefresh = AppSetting::getInt(AppSetting::KEY_PUBLIC_REFRESH_INTERVAL_SECONDS, 15);
-        $refreshIntervalSeconds = AppSetting::normalizePublicRefreshIntervalSeconds($rawRefresh, 15);
+        $defaultRefresh = (int) config('zakat.public_refresh.default_seconds', 15);
+        $rawRefresh = AppSetting::getInt(AppSetting::KEY_PUBLIC_REFRESH_INTERVAL_SECONDS, $defaultRefresh);
+        $refreshIntervalSeconds = AppSetting::normalizePublicRefreshIntervalSeconds($rawRefresh, $defaultRefresh);
 
         // Cache Key for Home Page Stats (Historical + Daily)
-        $cacheKey = "public_home_stats_{$selectedYear}";
+        $cacheKey = \App\Models\AppSetting::cacheKeyForPublicHomeStats($selectedYear);
         
         $stats = \Illuminate\Support\Facades\Cache::remember($cacheKey, $refreshIntervalSeconds, function() use ($selectedYear) {
             // Fetch historical data for Line Chart
             $historicalData = ZakatTransaction::select('tahun_zakat', DB::raw('SUM(nominal_uang) as total_uang'))
-                ->where('status', ZakatTransaction::STATUS_VALID)
+                ->valid()
                 ->whereNotNull('tahun_zakat')
                 ->groupBy('tahun_zakat')
                 ->orderBy('tahun_zakat', 'asc')

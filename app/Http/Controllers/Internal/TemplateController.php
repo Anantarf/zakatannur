@@ -32,7 +32,7 @@ class TemplateController extends Controller
         $user = $request->user();
 
         $validator = Validator::make($request->all(), [
-            'file' => ['required', 'file', 'mimes:pdf', 'max:10240'],
+            'file' => ['required', 'file', 'mimes:pdf', 'max:' . (int) config('zakat.validation.template_file_max_bytes', 10240)],
         ], [
             'file.mimes' => 'Template harus berupa file PDF.',
         ]);

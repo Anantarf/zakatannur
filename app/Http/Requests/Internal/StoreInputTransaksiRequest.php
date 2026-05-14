@@ -14,8 +14,8 @@ class StoreInputTransaksiRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'pembayar_nama' => ['required', 'string', 'max:255'],
-            'pembayar_alamat' => ['required', 'string', 'max:255'],
+            'pembayar_nama' => ['required', 'string', 'max:' . (int) config('zakat.validation.payer_name_max', 255)],
+            'pembayar_alamat' => ['required', 'string', 'max:' . (int) config('zakat.validation.description_max', 255)],
             'pembayar_phone' => ['nullable', 'string', 'max:20'],
             'categories' => ['required', 'array', 'min:1'],
             'categories.*' => ['in:fitrah,mal,fidyah,infaq'],

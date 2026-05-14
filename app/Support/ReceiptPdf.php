@@ -55,8 +55,8 @@ final class ReceiptPdf
         $pdf->useTemplate($tpl, 0, 0, 210, 297, true);
 
         $waktuTerima = $firstTx->waktu_terima
-            ? Carbon::parse($firstTx->waktu_terima)->timezone('Asia/Jakarta')->locale('id')
-            : now('Asia/Jakarta')->locale('id');
+            ? Carbon::parse($firstTx->waktu_terima)->timezone(config('zakat.timezone'))->locale('id')
+            : now(config('zakat.timezone'))->locale('id');
 
 
 

@@ -8,12 +8,12 @@ use Illuminate\Console\Command;
 
 class PurgeOldTrashedTransactions extends Command
 {
-    protected $signature = 'transactions:purge-trash {--days=30 : Days after soft-delete before permanent removal}';
+    protected $signature = 'transactions:purge-trash {--days= : Days after soft-delete before permanent removal}';
     protected $description = 'Permanently delete soft-deleted transactions older than the specified number of days';
 
     public function handle(): int
     {
-        $days = (int) $this->option('days');
+        $days = (int) ($this->option('days') ?: config('zakat.retention.purge_days', 30));
         $cutoff = Carbon::now()->subDays($days);
 
         // Purge Transactions

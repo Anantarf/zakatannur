@@ -30,6 +30,5 @@ class EventServiceProvider extends ServiceProvider
     public function boot()
     {
         ZakatTransaction::observe(ZakatTransactionObserver::class);
-        \App\Models\Muzakki::observe(\App\Observers\MuzakkiObserver::class);
     }
 }

@@ -30,7 +30,7 @@ final class RekapBuilder
     public static function build(?int $year = null, ?string $metode = null): array
     {
         $baseQuery = ZakatTransaction::query()
-            ->where('status', ZakatTransaction::STATUS_VALID);
+            ->valid();
 
         if ($year !== null) {
             $baseQuery->where('tahun_zakat', $year);
@@ -117,7 +117,7 @@ final class RekapBuilder
         $year = $year ?? (int) now()->year;
 
         $rows = ZakatTransaction::query()
-            ->where('status', ZakatTransaction::STATUS_VALID)
+            ->valid()
             ->whereYear('created_at', $year)
             ->select(
                 DB::raw('DATE(created_at) as day'),

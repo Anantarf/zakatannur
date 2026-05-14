@@ -402,7 +402,7 @@
                         </div>
                         
                         <!-- Realtime Info Badge -->
-                        <div class="flex justify-end hidden">
+                        <div class="justify-end hidden">
                             <span class="text-sm font-bold text-gray-500 bg-gray-100 px-3 py-1 rounded-full border border-gray-200" x-text="'Total Transaksi Dipilih: '+txs.length"></span>
                         </div>
 
@@ -414,7 +414,7 @@
                                          Kembali
                                      </a>
                                      <x-emerald-button 
-                                             :disabled="submitting || !hasChanged"
+                                             x-bind:disabled="submitting || !hasChanged"
                                              x-bind:class="{'opacity-50 cursor-not-allowed': submitting || !hasChanged}"
                                              class="flex-[2] py-4 text-base">
                                           
@@ -438,7 +438,7 @@
                                  </div>
                              @else
                                  <x-emerald-button 
-                                         :disabled="submitting"
+                                         x-bind:disabled="submitting"
                                          x-bind:class="{'opacity-50 cursor-not-allowed': submitting}"
                                          class="w-full py-4 text-base">
                                       

@@ -10,6 +10,8 @@ use Illuminate\Validation\Rule;
 
 class ProfileController extends Controller
 {
+    private const PASSWORD_MIN_LENGTH = 8;
+
     public function edit(Request $request)
     {
         return view('internal.profile.edit', [
@@ -22,16 +24,16 @@ class ProfileController extends Controller
         $user = $request->user();
 
         $data = $request->validate([
-            'name' => ['required', 'string', 'max:10'],
+            'name' => ['required', 'string', 'max:' . (int) config('zakat.validation.user_name_max', 100)],
             'username' => [
                 'required', 
                 'string', 
                 'regex:/^[a-zA-Z0-9_]+$/', 
-                'max:50', 
+                'max:' . (int) config('zakat.validation.username_max', 50), 
                 Rule::unique('users', 'username')->ignore($user->id)
             ],
             'current_password' => ['required_with:password', 'current_password'],
-            'password' => ['nullable', 'string', 'min:8', 'confirmed'],
+            'password' => ['nullable', 'string', 'min:' . self::PASSWORD_MIN_LENGTH, 'confirmed'],
         ]);
 
         $user->name = $data['name'];
