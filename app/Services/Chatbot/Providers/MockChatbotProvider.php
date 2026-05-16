@@ -8,9 +8,6 @@ class MockChatbotProvider implements ChatbotServiceInterface
 {
     public function sendMessage(string $message): string
     {
-        // Simulasi waktu proses API (misalnya 1 detik)
-        sleep(1);
-
         // Simulasi balasan cerdas sederhana
         $message = strtolower($message);
         if (str_contains($message, 'zakat') || str_contains($message, 'bayar')) {

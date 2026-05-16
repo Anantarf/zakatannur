@@ -5,12 +5,16 @@ namespace App\Services;
 use App\Models\AnnualSetting;
 use App\Models\Muzakki;
 use App\Models\ZakatTransaction;
+use App\Services\Transactions\TransactionNominalValidator;
+use App\Services\Transactions\TransactionNumberGenerator;
+use App\Services\Transactions\TransactionRowPersister;
 use Carbon\Carbon;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Database\QueryException;
-use App\Support\Format;
+use Illuminate\Validation\ValidationException;
 use App\Support\Audit;
 use App\Events\ZakatTransactionCreated;
 use Illuminate\Database\Eloquent\Collection;
@@ -18,6 +22,19 @@ use Illuminate\Database\Eloquent\Collection;
 class ZakatService
 {
     private array $annualCache = [];
+    private TransactionNumberGenerator $numberGenerator;
+    private TransactionNominalValidator $nominalValidator;
+    private TransactionRowPersister $rowPersister;
+
+    public function __construct(
+        TransactionNumberGenerator $numberGenerator,
+        TransactionNominalValidator $nominalValidator,
+        TransactionRowPersister $rowPersister,
+    ) {
+        $this->numberGenerator = $numberGenerator;
+        $this->nominalValidator = $nominalValidator;
+        $this->rowPersister = $rowPersister;
+    }
 
     public function storeTransaction(array $data, int $petugasId, ?string $noTransaksiOverride = null): array
     {
@@ -28,7 +45,9 @@ class ZakatService
     public function syncTransactions(?string $noTransaksiOverride, array $data, int $petugasId, ?Carbon $waktuTerima = null): array
     {
         $waktuTerima = $waktuTerima ?? $this->parseWaktuTerima($data['waktu_terima'] ?? null);
-        $items = isset($data['items']) && is_array($data['items']) ? $data['items'] : [$data];
+        $items = $this->extractItems($data);
+
+        $this->assertItemsBelongToEditableGroup($items, $noTransaksiOverride);
 
         $syncResult = $this->executeWithRetry(
             fn() => $this->performSync($data, $items, $petugasId, $waktuTerima, $noTransaksiOverride)
@@ -53,6 +72,44 @@ class ZakatService
         return $syncResults;
     }
 
+    private function assertItemsBelongToEditableGroup(array $items, ?string $noTransaksiOverride): void
+    {
+        if ($noTransaksiOverride === null) {
+            return;
+        }
+
+        $allowedIds = ZakatTransaction::withTrashed()
+            ->where('no_transaksi', $noTransaksiOverride)
+            ->pluck('id')
+            ->map(fn ($id) => (int) $id)
+            ->all();
+
+        if (empty($allowedIds)) {
+            return;
+        }
+
+        $errors = [];
+
+        foreach ($items as $index => $item) {
+            if (empty($item['id'])) {
+                continue;
+            }
+
+            if (!in_array((int) $item['id'], $allowedIds, true)) {
+                $errors["items.{$index}.id"][] = 'Item transaksi tidak valid untuk kelompok transaksi yang sedang diedit.';
+            }
+        }
+
+        if (!empty($errors)) {
+            throw ValidationException::withMessages($errors);
+        }
+    }
+
+    private function extractItems(array $data): array
+    {
+        return isset($data['items']) && is_array($data['items']) ? $data['items'] : [$data];
+    }
+
     /**
      * Synchronizes a batch of transactions under a daily lock.
      *
@@ -72,7 +129,7 @@ class ZakatService
                 throw new \RuntimeException("Gagal mendapatkan kunci transaksi setelah menunggu (Lock: {$lockName}). Silakan coba lagi.");
             }
 
-            $noTransaksi = $noTransaksiOverride ?? $this->generateNoTransaksi($waktuTerima);
+            $noTransaksi = $noTransaksiOverride ?? $this->numberGenerator->generate($waktuTerima);
 
             if (!$noTransaksiOverride && ZakatTransaction::where('no_transaksi', $noTransaksi)->exists()) {
                 throw new \RuntimeException("Nomor Transaksi {$noTransaksi} sudah terpakai. Sila klik simpan sekali lagi untuk mendapatkan nomor baru.");
@@ -191,19 +248,18 @@ class ZakatService
         $newIds = [];
 
         foreach ($items as $item) {
-            $category = $item['category'] ?? $data['category'] ?? null;
-            $metode = $item['metode'] ?? $data['metode'] ?? null;
-            if (!$category || !$metode) continue;
+            $itemContext = $this->resolveItemContext($item, $data, $waktuTerima);
+            if ($itemContext === null) {
+                continue;
+            }
 
-            $tahunZakat = (int) ($item['tahun_zakat'] ?? $data['tahun_zakat'] ?? $waktuTerima->year);
+            $category = $itemContext['category'];
+            $metode = $itemContext['metode'];
+            $tahunZakat = $itemContext['tahun_zakat'];
             [$defaultFitrah, $defaultFidyah, $defaultBerasKg, $defaultFidyahBeras] = $this->getAnnualDefaults($tahunZakat);
 
-            $itemForComputation = array_merge($item, ['category' => $category, 'metode' => $metode, 'tahun_zakat' => $tahunZakat]);
-            $muzakki = Muzakki::firstOrCreateNormalized([
-                'muzakki_name'    => $item['muzakki_name'] ?? $pembayarData['muzakki_name'],
-                'muzakki_phone'   => $item['muzakki_phone'] ?? $pembayarData['muzakki_phone'] ?? '',
-                'muzakki_address' => $item['muzakki_address'] ?? $pembayarData['muzakki_address'] ?? '',
-            ]);
+            $itemForComputation = $itemContext['item_for_computation'];
+            $muzakki = Muzakki::firstOrCreateNormalized($this->buildMuzakkiData($item, $pembayarData));
 
             $txData = $this->buildTransactionData(
                 $item,
@@ -223,19 +279,45 @@ class ZakatService
                 $defaultFidyahBeras
             );
 
-            $transaction = !empty($item['id']) ? ZakatTransaction::withTrashed()->find($item['id']) : null;
-            if ($transaction) {
-                if ($transaction->trashed()) $transaction->restore();
-                $transaction->update($txData);
-            } else {
-                $transaction = ZakatTransaction::create($txData);
-            }
+            $transaction = $this->rowPersister->persist($item, $txData);
 
             $newIds[] = $transaction->id;
             $results[] = $transaction;
         }
 
         return [$results, $newIds];
+    }
+
+    private function resolveItemContext(array $item, array $data, Carbon $waktuTerima): ?array
+    {
+        $category = $item['category'] ?? $data['category'] ?? null;
+        $metode = $item['metode'] ?? $data['metode'] ?? null;
+
+        if (!$category || !$metode) {
+            return null;
+        }
+
+        $tahunZakat = (int) ($item['tahun_zakat'] ?? $data['tahun_zakat'] ?? $waktuTerima->year);
+
+        return [
+            'category' => $category,
+            'metode' => $metode,
+            'tahun_zakat' => $tahunZakat,
+            'item_for_computation' => array_merge($item, [
+                'category' => $category,
+                'metode' => $metode,
+                'tahun_zakat' => $tahunZakat,
+            ]),
+        ];
+    }
+
+    private function buildMuzakkiData(array $item, array $pembayarData): array
+    {
+        return [
+            'muzakki_name' => $item['muzakki_name'] ?? $pembayarData['muzakki_name'],
+            'muzakki_phone' => $item['muzakki_phone'] ?? $pembayarData['muzakki_phone'] ?? '',
+            'muzakki_address' => $item['muzakki_address'] ?? $pembayarData['muzakki_address'] ?? '',
+        ];
     }
 
     /**
@@ -338,52 +420,11 @@ class ZakatService
     public function validateNominalDefaults(array $data): void
     {
         $tahun = (int) ($data['tahun_zakat'] ?? now()->year);
-        $items = isset($data['items']) && is_array($data['items']) ? $data['items'] : [$data];
-        
+        $items = $this->extractItems($data);
+
         [$defaultFitrah, $defaultFidyah] = $this->getAnnualDefaults($tahun);
-        $errors = [];
 
-        foreach ($items as $index => $item) {
-            $metode = $item['metode'] ?? null;
-            if (!$metode || $metode === ZakatTransaction::METHOD_BERAS) continue;
-
-            $nominal = $item['nominal_uang'] ?? null;
-            if ($nominal !== null && $nominal !== '') continue;
-
-            $category = $item['category'] ?? null;
-            $hasDefault = ($category === ZakatTransaction::CATEGORY_FITRAH) ? $defaultFitrah > 0 : ($category === ZakatTransaction::CATEGORY_FIDYAH ? $defaultFidyah > 0 : false);
-
-            if (!$hasDefault) {
-                $field = isset($data['items']) ? "items.{$index}.nominal_uang" : 'nominal_uang';
-                $errors[$field][] = 'Nominal uang wajib diisi karena tidak ada nilai default untuk tahun ' . $tahun;
-            }
-        }
-
-        if (!empty($errors)) throw \Illuminate\Validation\ValidationException::withMessages($errors);
-    }
-
-
-    /**
-     * Generates the next daily transaction number using the TRX-YYYYMMDD-#### format.
-     *
-     * The prefix resets per day and the sequence is derived from the latest matching
-     * row, including trashed rows, so restored records do not break numbering.
-     */
-    private function generateNoTransaksi(Carbon $time): string
-    {
-        $prefix = 'TRX-' . $time->format('Ymd') . '-';
-        $last = ZakatTransaction::withTrashed()
-            ->where('no_transaksi', 'like', $prefix . '%')
-            ->orderByRaw(
-                DB::getDriverName() === 'sqlite'
-                    ? 'CAST(SUBSTR(no_transaksi, 14) AS INTEGER) DESC'
-                    : 'CAST(SUBSTRING(no_transaksi, 14) AS UNSIGNED) DESC'
-            )
-            ->orderByDesc('id')
-            ->value('no_transaksi');
-            
-        $seq = ($last && preg_match('/(\d{4})$/', $last, $matches)) ? (int) $matches[1] + 1 : 1;
-        return $prefix . str_pad((string) $seq, 4, '0', STR_PAD_LEFT);
+        $this->nominalValidator->validate($data, $items, $tahun, $defaultFitrah, $defaultFidyah);
     }
 
     /**

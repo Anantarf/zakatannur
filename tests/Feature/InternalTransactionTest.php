@@ -271,6 +271,79 @@ class InternalTransactionTest extends TestCase
 
         $this->assertSame(2, Muzakki::query()->where('name', 'Ahmad')->count());
     }
+
+    public function test_update_rejects_item_ids_from_other_transaction_groups(): void
+    {
+        AppSetting::query()->create(['key' => AppSetting::KEY_ACTIVE_YEAR, 'value' => '2026']);
+        AnnualSetting::query()->create([
+            'year' => 2026,
+            'default_fitrah_cash_per_jiwa' => 50000,
+            'default_fidyah_per_hari' => 50000,
+        ]);
+
+        $staff = User::factory()->create(['role' => User::ROLE_STAFF]);
+        $muzakkiA = Muzakki::query()->create(['name' => 'Ahmad']);
+        $muzakkiB = Muzakki::query()->create(['name' => 'Budi']);
+
+        $mainTx = ZakatTransaction::query()->create([
+            'no_transaksi' => 'TRX-20260516-0001',
+            'muzakki_id' => $muzakkiA->id,
+            'pembayar_nama' => 'Pembayar A',
+            'pembayar_phone' => '0812',
+            'pembayar_alamat' => 'Jakarta',
+            'shift' => ZakatTransaction::SHIFT_PAGI,
+            'category' => ZakatTransaction::CATEGORY_MAL,
+            'tahun_zakat' => 2026,
+            'metode' => ZakatTransaction::METHOD_UANG,
+            'nominal_uang' => 100000,
+            'petugas_id' => $staff->id,
+            'status' => ZakatTransaction::STATUS_VALID,
+            'waktu_terima' => now(config('zakat.timezone')),
+        ]);
+
+        $foreignTx = ZakatTransaction::query()->create([
+            'no_transaksi' => 'TRX-20260516-0002',
+            'muzakki_id' => $muzakkiB->id,
+            'pembayar_nama' => 'Pembayar B',
+            'pembayar_phone' => '0813',
+            'pembayar_alamat' => 'Bandung',
+            'shift' => ZakatTransaction::SHIFT_PAGI,
+            'category' => ZakatTransaction::CATEGORY_MAL,
+            'tahun_zakat' => 2026,
+            'metode' => ZakatTransaction::METHOD_UANG,
+            'nominal_uang' => 200000,
+            'petugas_id' => $staff->id,
+            'status' => ZakatTransaction::STATUS_VALID,
+            'waktu_terima' => now(config('zakat.timezone')),
+        ]);
+
+        $payload = [
+            'pembayar_nama' => 'Pembayar A',
+            'pembayar_phone' => '0812',
+            'pembayar_alamat' => 'Jakarta',
+            'tahun_zakat' => 2026,
+            'shift' => ZakatTransaction::SHIFT_PAGI,
+            'items' => [
+                [
+                    'id' => $foreignTx->id,
+                    'muzakki_name' => 'Budi',
+                    'category' => ZakatTransaction::CATEGORY_MAL,
+                    'metode' => ZakatTransaction::METHOD_UANG,
+                    'nominal_uang' => 250000,
+                ],
+            ],
+        ];
+
+        $this->actingAs($staff)
+            ->from('/internal/transactions/' . $mainTx->id . '/edit')
+            ->patch('/internal/transactions/' . $mainTx->id . '/update', $payload)
+            ->assertRedirect('/internal/transactions/' . $mainTx->id . '/edit')
+            ->assertSessionHasErrors(['items.0.id']);
+
+        $foreignTx->refresh();
+        $this->assertSame('TRX-20260516-0002', $foreignTx->no_transaksi);
+        $this->assertSame(200000, $foreignTx->nominal_uang);
+    }
 }
 
 

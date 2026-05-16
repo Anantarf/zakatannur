@@ -59,7 +59,7 @@ class PeriodSettingsController extends Controller
             'public_refresh_interval_seconds' => ['required', 'integer', 'min:0', 'max:' . $publicRefreshFormMaxSeconds],
         ]);
 
-        $validator->after(function ($validator) use ($currentActiveYear) {
+        $validator->after(function ($validator) use ($currentActiveYear, $publicRefreshMinSeconds, $publicRefreshMaxSeconds) {
             $input = $validator->getData();
             $interval = (int) ($input['public_refresh_interval_seconds'] ?? 15);
             $activeYearInput = (int) ($input['active_year'] ?? 0);

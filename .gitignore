@@ -13,3 +13,7 @@ npm-debug.log
 yarn-error.log
 /.idea
 /.vscode
+/composer_out.txt
+/log_tail.txt
+/backups/*.sql
+/*.sql

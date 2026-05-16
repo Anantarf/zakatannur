@@ -1,3 +1,84 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+[x-cloak] {
+    display: none !important;
+}
+
+.marquee-container {
+    width: 100%;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+}
+
+.marquee-track {
+    display: flex;
+    width: max-content;
+    animation: marquee 90s linear infinite;
+}
+
+@keyframes marquee {
+    to {
+        transform: translateX(-50%);
+    }
+}
+
+.nav-indicator {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.footer-glow {
+    color: #38bdf8 !important;
+    text-shadow: 0 0 12px rgba(56, 189, 248, 0.4);
+    transition: all 0.3s ease;
+}
+
+.footer-item-group:hover .footer-glow {
+    color: #7dd3fc !important;
+    text-shadow: 0 0 20px rgba(56, 189, 248, 0.7);
+    transform: translateY(-1px);
+}
+
+.footer-logo {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.footer-item-group:hover .footer-logo {
+    filter: brightness(1.1) drop-shadow(0 5px 4px rgba(0, 0, 0, 0.4));
+    transform: translateY(-3px) scale(1.1);
+}
+
+@keyframes shine-text {
+    0% {
+        background-position: 200% 0;
+    }
+
+    23.33% {
+        background-position: -200% 0;
+    }
+
+    100% {
+        background-position: -200% 0;
+    }
+}
+
+.animate-shine-text {
+    background: linear-gradient(110deg, #38bdf8 48%, #f1f5f9 50%, #38bdf8 52%);
+    background-size: 300% 100%;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: shine-text 30s linear infinite;
+    display: inline-block;
+    transition: all 0.3s ease;
+}
+
+.footer-item-group:hover .animate-shine-text {
+    background: linear-gradient(110deg, #7dd3fc 48%, #f0f9ff 50%, #7dd3fc 52%);
+    background-size: 300% 100%;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    text-shadow: 0 0 15px rgba(56, 189, 248, 0.4);
+    transform: translateY(-1px);
+}

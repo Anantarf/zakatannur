@@ -5,10 +5,11 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Services\Chatbot\ChatbotServiceInterface;
+use Illuminate\Support\Facades\Log;
 
 class ChatbotController extends Controller
 {
-    protected $chatbotService;
+    protected ChatbotServiceInterface $chatbotService;
 
     public function __construct(ChatbotServiceInterface $chatbotService)
     {
@@ -30,10 +31,14 @@ class ChatbotController extends Controller
                     'reply' => $reply
                 ]
             ]);
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
+            Log::error('Chatbot request failed.', [
+                'message' => $e->getMessage(),
+            ]);
+
             return response()->json([
                 'status' => 'error',
-                'message' => 'Gagal memproses pesan: ' . $e->getMessage()
+                'message' => 'Gagal memproses pesan. Silakan coba beberapa saat lagi.'
             ], 500);
         }
     }

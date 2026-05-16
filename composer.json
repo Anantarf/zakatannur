@@ -14,7 +14,6 @@
         "phpoffice/phpspreadsheet": "1.29",
         "pusher/pusher-php-server": "^7.2",
         "setasign/fpdi": "^2.6",
-        "spatie/simple-excel": "^3.2",
         "tecnickcom/tcpdf": "^6.11"
     },
     "require-dev": {
@@ -63,6 +62,6 @@
         "preferred-install": "dist",
         "sort-packages": true
     },
-    "minimum-stability": "dev",
+    "minimum-stability": "stable",
     "prefer-stable": true
 }

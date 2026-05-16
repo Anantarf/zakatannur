@@ -2,42 +2,35 @@
 
 namespace App\Http\Controllers\Internal;
 
-use App\Http\Requests\Internal\StoreZakatTransactionRequest;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Internal\StoreZakatTransactionRequest;
+use App\Models\AnnualSetting;
 use App\Models\AppSetting;
-use App\Models\Muzakki;
 use App\Models\User;
 use App\Models\ZakatTransaction;
+use App\Services\ZakatService;
 use App\Support\ReceiptPdf;
-use App\Support\ViewOptions;
+use App\Transformers\TransactionTransformer;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Symfony\Component\HttpFoundation\Response;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\View\View;
+use Symfony\Component\HttpFoundation\Response;
 
 class ZakatTransactionController extends Controller
 {
-    public function create(Request $request): \Illuminate\View\View
+    public function create(Request $request): View
     {
         $activeYear = AppSetting::getInt(AppSetting::KEY_ACTIVE_YEAR, (int) now()->year);
 
-        return view('internal.transactions.create', array_merge(
-            $this->getAnnualDefaults($activeYear),
-            [
-                'years'      => ViewOptions::years($activeYear),
-                'activeYear' => $activeYear,
-                'categories' => ZakatTransaction::CATEGORIES,
-                'methods'    => ZakatTransaction::METHODS,
-                'shifts'     => ZakatTransaction::SHIFTS,
-                'shiftLabels'=> ZakatTransaction::SHIFT_LABELS,
-            ]
-        ));
+        return view('internal.transactions.create', $this->transactionFormViewData($activeYear));
     }
 
-    public function store(StoreZakatTransactionRequest $request, \App\Services\ZakatService $service): \Illuminate\Http\RedirectResponse
+    public function store(StoreZakatTransactionRequest $request, ZakatService $service): RedirectResponse
     {
         $data = $request->validated();
         $service->validateNominalDefaults($data);
-        
+
         $results = $service->storeTransaction($data, $request->user()->id);
 
         if (empty($results)) {
@@ -48,9 +41,13 @@ class ZakatTransactionController extends Controller
             ->with('status', 'Transaksi berhasil disimpan!');
     }
 
-    public function show(Request $request, int $transaction): \Illuminate\View\View
+    public function show(Request $request, int $transaction): View
     {
         $tx = ZakatTransaction::withTrashed()->findOrFail($transaction);
+
+        if ($tx->trashed() && !in_array($request->user()->role, [User::ROLE_ADMIN, User::ROLE_SUPER_ADMIN], true)) {
+            abort(Response::HTTP_FORBIDDEN);
+        }
 
         $transactions = ZakatTransaction::query()
             ->with(['muzakki' => fn($q) => $q->withTrashed()])
@@ -58,8 +55,6 @@ class ZakatTransactionController extends Controller
             ->orderBy('id', 'asc')
             ->get();
 
-        // Fallback: if $tx is trashed and no active siblings exist,
-        // show archived records so admin can still view historical receipts.
         if ($transactions->isEmpty()) {
             $transactions = ZakatTransaction::withTrashed()
                 ->with(['muzakki' => fn($q) => $q->withTrashed()])
@@ -72,26 +67,23 @@ class ZakatTransactionController extends Controller
         $totalCash = $totalUang - $totalTf;
         $totalBeras = $transactions->where('metode', ZakatTransaction::METHOD_BERAS)->sum('jumlah_beras_kg');
 
-        $groupedArr = $transactions->groupBy(fn($t) => $t->muzakki ? $t->muzakki->name : '-');
-
         return view('internal.transactions.show', [
             'mainTx' => $tx,
-            'groupedArr' => $groupedArr,
+            'groupedArr' => $transactions->groupBy(fn($t) => $t->muzakki ? $t->muzakki->name : '-'),
             'noTransaksi' => $tx->no_transaksi,
             'totalUang' => (int) $totalUang,
             'totalTf' => (int) $totalTf,
             'totalCash' => (int) $totalCash,
             'totalBeras' => (float) $totalBeras,
-            'shiftLabel' => $tx->shift_label
+            'shiftLabel' => $tx->shift_label,
         ]);
     }
 
-    public function receipt(Request $request, int $transaction): \Illuminate\Http\Response
+    public function receipt(Request $request, int $transaction): Response
     {
         $user = $request->user();
-
         $tx = ZakatTransaction::withTrashed()->findOrFail($transaction);
-        
+
         $transactions = ZakatTransaction::query()
             ->with(['muzakki' => fn($q) => $q->withTrashed()])
             ->where('no_transaksi', $tx->no_transaksi)
@@ -99,8 +91,6 @@ class ZakatTransactionController extends Controller
             ->orderBy('id', 'asc')
             ->get();
 
-        // Fallback: if $tx is trashed and no active siblings exist,
-        // show archived records so admin can still view/print historical receipts.
         if ($transactions->isEmpty()) {
             $transactions = ZakatTransaction::withTrashed()
                 ->with(['muzakki' => fn($q) => $q->withTrashed()])
@@ -108,7 +98,6 @@ class ZakatTransactionController extends Controller
                 ->valid()
                 ->get();
         }
-
 
         if ($tx->trashed() && !in_array($user->role, [User::ROLE_ADMIN, User::ROLE_SUPER_ADMIN], true)) {
             abort(Response::HTTP_FORBIDDEN);
@@ -128,12 +117,7 @@ class ZakatTransactionController extends Controller
         }
 
         $petugas = User::find($tx->petugas_id) ?? $user;
-
-        $pdfBytes = ReceiptPdf::renderA4Receipt(
-            $transactions,
-            $petugas,
-            $disk->path($template->storage_path)
-        );
+        $pdfBytes = ReceiptPdf::renderA4Receipt($transactions, $petugas, $disk->path($template->storage_path));
 
         return response($pdfBytes, 200, [
             'Content-Type' => 'application/pdf',
@@ -141,11 +125,9 @@ class ZakatTransactionController extends Controller
         ]);
     }
 
-    public function edit(Request $request, int $transaction): \Illuminate\View\View
+    public function edit(Request $request, int $transaction): View
     {
         $tx = ZakatTransaction::findOrFail($transaction);
-
-        // Strict Edit Regulation (Moved to Policy)
         $this->authorize('update', $tx);
 
         $all = ZakatTransaction::with(['muzakki' => fn($q) => $q->withTrashed()])
@@ -153,62 +135,63 @@ class ZakatTransactionController extends Controller
             ->orderBy('id', 'asc')
             ->get();
 
-        $persons = \App\Transformers\TransactionTransformer::toAlpinePersons($all);
-
-        return view('internal.transactions.create', array_merge(
-            $this->getAnnualDefaults($tx->tahun_zakat),
+        return view('internal.transactions.create', $this->transactionFormViewData(
+            $tx->tahun_zakat,
             [
-                'isEdit'     => true,
-                'mainTx'     => $tx,
-                'persons'    => $persons,
-                'years'      => ViewOptions::years($tx->tahun_zakat),
-                'activeYear' => $tx->tahun_zakat,
-                'categories' => ZakatTransaction::CATEGORIES,
-                'methods'    => ZakatTransaction::METHODS,
-                'shifts'     => ZakatTransaction::SHIFTS,
-                'shiftLabels'=> ZakatTransaction::SHIFT_LABELS,
-                'officers'   => User::orderBy('name')->get(['id', 'name', 'role']),
+                'isEdit' => true,
+                'mainTx' => $tx,
+                'persons' => TransactionTransformer::toAlpinePersons($all),
+                'officers' => User::orderBy('name')->get(['id', 'name', 'role']),
             ]
         ));
     }
 
-    public function update(StoreZakatTransactionRequest $request, int $transaction, \App\Services\ZakatService $service): \Illuminate\Http\RedirectResponse
+    public function update(StoreZakatTransactionRequest $request, int $transaction, ZakatService $service): RedirectResponse
     {
         $data = $request->validated();
-
         $tx = ZakatTransaction::findOrFail($transaction);
 
-        // Strict Edit Regulation (Moved to Policy)
         $this->authorize('update', $tx);
 
         $user = $request->user();
-        if ($user->role === User::ROLE_STAFF && isset($data['tahun_zakat']) && (int)$data['tahun_zakat'] !== (int)$tx->tahun_zakat) {
+        if ($user->role === User::ROLE_STAFF && isset($data['tahun_zakat']) && (int) $data['tahun_zakat'] !== (int) $tx->tahun_zakat) {
             return back()->withErrors(['tahun_zakat' => 'Tahun zakat tidak dapat diubah oleh Staff setelah transaksi tersimpan.']);
         }
 
         $service->validateNominalDefaults($data);
         $results = $service->storeTransaction($data, $request->user()->id, $tx->no_transaksi);
-
         $targetId = count($results) > 0 ? $results[0]->id : $transaction;
 
         return redirect()->route('internal.transactions.show', ['transaction' => $targetId])
             ->with('status', 'Transaksi berhasil diupdate!');
     }
 
-
     /**
      * Returns AnnualSetting-based defaults for the given year, with safe fallbacks.
-     * Single source of truth — used by both create() and edit().
+     * Single source of truth, used by both create() and edit().
      */
     private function getAnnualDefaults(int $year): array
     {
-        $s = \App\Models\AnnualSetting::where('year', $year)->first();
+        $settings = AnnualSetting::where('year', $year)->first();
 
         return [
-            'berasPerJiwa' => (float) ($s->default_fitrah_beras_per_jiwa ?? config('zakat.annual_defaults.fitrah_beras_per_jiwa', 2.5)),
-            'fitrahUang'   => (int)   ($s->default_fitrah_cash_per_jiwa  ?? config('zakat.annual_defaults.fitrah_cash_per_jiwa', 50000)),
-            'fidyahUang'   => (int)   ($s->default_fidyah_per_hari       ?? config('zakat.annual_defaults.fidyah_per_hari', 30000)),
-            'fidyahBeras'  => (float) ($s->default_fidyah_beras_per_hari ?? config('zakat.annual_defaults.fidyah_beras_per_hari', 0.75)),
+            'berasPerJiwa' => (float) ($settings->default_fitrah_beras_per_jiwa ?? config('zakat.annual_defaults.fitrah_beras_per_jiwa', 2.5)),
+            'fitrahUang' => (int) ($settings->default_fitrah_cash_per_jiwa ?? config('zakat.annual_defaults.fitrah_cash_per_jiwa', 50000)),
+            'fidyahUang' => (int) ($settings->default_fidyah_per_hari ?? config('zakat.annual_defaults.fidyah_per_hari', 30000)),
+            'fidyahBeras' => (float) ($settings->default_fidyah_beras_per_hari ?? config('zakat.annual_defaults.fidyah_beras_per_hari', 0.75)),
         ];
+    }
+
+    private function transactionFormViewData(int $year, array $overrides = []): array
+    {
+        return array_merge(
+            $this->getAnnualDefaults($year),
+            [
+                'activeYear' => $year,
+                'shifts' => ZakatTransaction::SHIFTS,
+                'shiftLabels' => ZakatTransaction::SHIFT_LABELS,
+            ],
+            $overrides
+        );
     }
 }

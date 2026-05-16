@@ -162,8 +162,9 @@
                                     </td>
                                     <td class="px-6 py-4 text-center whitespace-nowrap">
                                         @php
+                                            $actionTime = ($t->waktu_terima ?? $t->created_at)?->timezone(config('zakat.timezone'));
                                             $canModify = auth()->user()->role !== 'staff' || 
-                                                        ($t->petugas_id === auth()->id() && $t->created_at->isToday());
+                                                        ($t->petugas_id === auth()->id() && $actionTime?->isToday());
                                         @endphp
 
                                         <div class="flex items-center justify-center gap-2">
@@ -230,7 +231,7 @@
     </div>
 
     <!-- Modal Konfirmasi Pindah Sampah -->
-    <x-modal name="trash-modal" :show="$errors->deletion->isNotEmpty()" focusable>
+    <x-modal name="trash-modal" :show="$errors->has('deleted_reason')" focusable>
         <form method="POST" x-data="{ id: '', no: '' }" x-on:open-trash-modal.window="id = $event.detail.id; no = $event.detail.no; $el.action = '{{ url('/internal/transactions') }}/' + id + '/trash';" class="p-6">
             @csrf
             <h2 class="text-lg font-medium text-gray-900">
@@ -239,6 +240,17 @@
             <p class="mt-1 text-sm text-gray-600">
                 Transaksi akan otomatis dihapus permanen dari sistem setelah 30 hari.
             </p>
+            <div class="mt-4">
+                <x-input-label for="deleted_reason" :value="'Alasan Penghapusan'" />
+                <textarea
+                    id="deleted_reason"
+                    name="deleted_reason"
+                    rows="3"
+                    class="mt-1 w-full rounded-lg border-gray-300 shadow-sm focus:border-red-500 focus:ring-red-500"
+                    required
+                >{{ old('deleted_reason') }}</textarea>
+                <x-input-error :messages="$errors->get('deleted_reason')" class="mt-2" />
+            </div>
             <div class="mt-6 flex justify-end">
                 <x-secondary-button x-on:click="$dispatch('close')">
                     Batal
@@ -260,7 +272,7 @@
             </div>
             <h2 class="text-lg font-bold text-gray-900 mb-2">Akses Terbatas</h2>
             <p class="text-sm text-gray-600 mb-6 leading-relaxed">
-                Maaf, sesuai regulasi, **Staf** hanya diperbolehkan mengubah atau menghapus transaksi **milik sendiri** yang dibuat pada **hari yang sama**.
+                Maaf, sesuai regulasi, <strong>Staf</strong> hanya diperbolehkan mengubah atau menghapus transaksi <strong>milik sendiri</strong> yang dibuat pada <strong>hari yang sama</strong>.
                 <br><br>
                 Silakan hubungi Admin atau Super Admin untuk bantuan lebih lanjut.
             </p>

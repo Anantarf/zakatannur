@@ -107,4 +107,36 @@ class TransactionTrashTest extends TestCase
         $this->actingAs($staff)->get('/internal/transactions/trash')->assertForbidden();
         $this->actingAs($admin)->get('/internal/transactions/trash')->assertOk();
     }
+
+    public function test_staff_cannot_view_trashed_transaction_detail(): void
+    {
+        $staff = User::factory()->create(['role' => User::ROLE_STAFF]);
+        $admin = User::factory()->create(['role' => User::ROLE_ADMIN]);
+        $muzakki = Muzakki::query()->create(['name' => 'Ahmad']);
+
+        $trx = ZakatTransaction::query()->create([
+            'no_transaksi'   => 'TRX-20260308-0003',
+            'muzakki_id'     => $muzakki->id,
+            'pembayar_nama'  => 'Hamba Allah',
+            'pembayar_phone' => '0812',
+            'pembayar_alamat'=> 'Jakarta',
+            'shift'          => ZakatTransaction::SHIFTS[0],
+            'category'       => ZakatTransaction::CATEGORY_MAL,
+            'tahun_zakat'    => 2026,
+            'metode'         => ZakatTransaction::METHOD_UANG,
+            'nominal_uang'   => 1000,
+            'petugas_id'     => $staff->id,
+            'status'         => ZakatTransaction::STATUS_VALID,
+        ]);
+
+        $trx->delete();
+
+        $this->actingAs($staff)
+            ->get('/internal/transactions/' . $trx->id)
+            ->assertForbidden();
+
+        $this->actingAs($admin)
+            ->get('/internal/transactions/' . $trx->id)
+            ->assertOk();
+    }
 }
