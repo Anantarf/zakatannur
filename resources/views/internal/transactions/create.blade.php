@@ -1,16 +1,21 @@
 <x-app-layout>
     <x-slot name="header">
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-            <h2 class="font-bold text-xl sm:text-2xl text-emerald-800 leading-tight text-center sm:text-left">
-                {{ isset($isEdit) ? 'Edit Transaksi ' . $mainTx->no_transaksi : 'Input Transaksi' }}
-            </h2>
-            <div class="inline-flex items-center justify-center bg-emerald-100 text-emerald-800 px-3 py-1.5 rounded-xl font-black text-[10px] tracking-widest uppercase shadow-sm w-fit mx-auto sm:mx-0">
-                TAHUN: {{ $activeYear }}
+            <div class="space-y-1 text-center sm:text-left">
+                <h2 class="font-bold text-xl sm:text-2xl text-emerald-900 leading-tight">
+                    {{ isset($isEdit) ? 'Edit Transaksi ' . $mainTx->no_transaksi : 'Input Transaksi' }}
+                </h2>
+                <p class="text-sm text-slate-500">
+                    {{ isset($isEdit) ? 'Perbarui data transaksi dengan aman, lalu simpan perubahan setelah semua detail sesuai.' : 'Isi pembayar, pilih kategori zakat per jiwa, lalu simpan seluruh transaksi dalam satu proses.' }}
+                </p>
+            </div>
+            <div class="inline-flex items-center justify-center rounded-full border border-emerald-100 bg-emerald-50 px-3 py-1.5 text-[10px] font-black uppercase tracking-[0.24em] text-emerald-700 shadow-sm w-fit mx-auto sm:mx-0">
+                Periode {{ $activeYear }}
             </div>
         </div>
     </x-slot>
 
-    <div class="py-12" x-data="zakatForm()">
+    <div class="py-8 sm:py-10" x-data="zakatForm()">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             
             @if ($errors->any())
@@ -72,9 +77,16 @@
 
                     <!-- Right Column (Matrix Members) -->
                     <div class="lg:col-span-3 space-y-4 max-w-full">
-                        <div class="bg-white p-4 sm:p-5 rounded-2xl shadow-sm border border-gray-100">
-                            <h3 class="font-bold text-xl text-gray-800">Detail Pembayaran</h3>
-                            <p class="text-sm text-gray-500 mt-1">Satu baris mewakili satu jiwa/nama. Centang untuk memilih lebih dari 1 jenis zakat (Fitrah, Fidyah, Mal, dll.)</p>
+                        <div class="ui-card-strong p-4 sm:p-5">
+                            <div class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                                <div>
+                                    <h3 class="font-bold text-xl text-gray-800">Detail Pembayaran</h3>
+                                    <p class="mt-1 text-sm text-gray-500">Satu kartu mewakili satu jiwa atau nama. Aktifkan jenis zakat yang relevan, lalu isi nominal atau beratnya.</p>
+                                </div>
+                                <div class="inline-flex items-center rounded-full border border-emerald-100 bg-white px-3 py-1 text-[11px] font-semibold text-emerald-700 shadow-sm">
+                                    Input bertahap, satu keluarga dalam satu halaman
+                                </div>
+                            </div>
                         </div>
 
                         <template x-for="(person, index) in persons" :key="person.id">
@@ -127,7 +139,7 @@
         ]);
     @endphp
     <script id="transaction-form-config" type="application/json">
-        @json([
+        {!! json_encode([
             'isEdit' => isset($isEdit),
             'pembayarName' => old('pembayar_nama', $mainTx->pembayar_nama ?? ''),
             'pembayarAddress' => old('pembayar_alamat', $mainTx->pembayar_alamat ?? ''),
@@ -140,6 +152,6 @@
             'autocompleteUrl' => route('internal.muzakki.autocomplete'),
             'initialPersons' => $initialPersons,
             'oldItems' => old('items', []),
-        ])
+        ], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!}
     </script>
 </x-app-layout>

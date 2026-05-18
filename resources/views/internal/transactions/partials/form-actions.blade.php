@@ -1,8 +1,18 @@
-<div class="sticky bottom-4 z-10 pt-4 mt-6 bg-white/95 backdrop-blur-md p-4 rounded-2xl shadow-xl border border-emerald-100">
+<div class="ui-card-strong sticky bottom-4 z-10 mt-6 bg-white/95 p-4 pt-4 backdrop-blur-md">
+    <div class="mb-3 flex items-center justify-between gap-3 border-b border-slate-100 pb-3">
+        <div>
+            <p class="text-sm font-bold text-slate-900">{{ isset($isEdit) ? 'Selesaikan perubahan transaksi' : 'Simpan transaksi yang sudah diperiksa' }}</p>
+            <p class="text-xs text-slate-500">{{ isset($isEdit) ? 'Pastikan nominal, kategori, dan pembayar sudah sesuai sebelum menyimpan.' : 'Gunakan tombol ini setelah semua anggota dan kategori zakat terisi.' }}</p>
+        </div>
+        <div class="hidden rounded-full border border-emerald-100 bg-emerald-50 px-3 py-1 text-[11px] font-semibold text-emerald-700 sm:inline-flex">
+            <span x-text="submitting ? 'Sedang menyimpan' : 'Siap diproses'"></span>
+        </div>
+    </div>
+
     @if(isset($isEdit))
         <div class="flex items-stretch gap-3">
             <a href="{{ route('internal.transactions.index') }}"
-                class="flex-1 flex justify-center items-center gap-2 rounded-xl bg-slate-100 px-6 py-4 text-sm font-bold text-slate-600 hover:bg-slate-200 transition-all active:scale-[0.98]">
+                class="ui-btn flex-1 bg-slate-100 px-6 py-4 text-sm text-slate-600 hover:bg-slate-200 focus:ring-slate-300">
                 Kembali
             </a>
             <x-emerald-button
@@ -53,8 +63,8 @@
         </x-emerald-button>
     @endif
 
-    <p class="text-center text-[10px] text-gray-400 font-bold uppercase tracking-widest mt-3">
-        <span x-show="!submitting">{{ isset($isEdit) ? 'Data lama akan digantikan dengan input baru di halaman ini' : 'Satu Kali Klik untuk Menyimpan Seluruh Data Anggota' }}</span>
+    <p class="mt-3 text-center text-[11px] font-semibold text-gray-400">
+        <span x-show="!submitting">{{ isset($isEdit) ? 'Perubahan akan menggantikan data lama pada transaksi ini.' : 'Satu kali simpan akan merekam seluruh data anggota yang sedang aktif.' }}</span>
         <span x-show="submitting" class="text-emerald-600">Mohon tunggu sebentar, jangan tutup halaman ini...</span>
     </p>
 </div>

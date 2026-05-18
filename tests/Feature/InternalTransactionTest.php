@@ -95,8 +95,6 @@ class InternalTransactionTest extends TestCase
             'metode' => ZakatTransaction::METHOD_BERAS,
             'jiwa' => 3,
             // jumlah_beras_kg intentionally omitted; should be computed.
-            // nominal_uang should be ignored for beras.
-            'nominal_uang' => 12345,
         ];
 
         $response = $this->actingAs($staff)->from('/internal/transactions/create')->post('/internal/transactions/store', $payload);
@@ -176,6 +174,105 @@ class InternalTransactionTest extends TestCase
         $response->assertRedirect('/internal/transactions/create');
         $response->assertSessionHasErrors(['nominal_uang']);
         $this->assertDatabaseCount('zakat_transactions', 0);
+    }
+
+    public function test_transaction_rejects_non_active_year(): void
+    {
+        AppSetting::query()->create(['key' => AppSetting::KEY_ACTIVE_YEAR, 'value' => '2026']);
+        AnnualSetting::query()->create([
+            'year' => 2026,
+            'default_fitrah_cash_per_jiwa' => 50000,
+            'default_fidyah_per_hari' => 50000,
+        ]);
+
+        $staff = User::factory()->create(['role' => User::ROLE_STAFF]);
+
+        $payload = [
+            'muzakki_name' => 'Ahmad',
+            'tahun_zakat' => 2025,
+            'pembayar_nama' => 'Hamba Allah',
+            'pembayar_phone' => '0812',
+            'pembayar_alamat' => 'Jakarta',
+            'shift' => 'pagi',
+            'category' => ZakatTransaction::CATEGORY_FITRAH,
+            'metode' => ZakatTransaction::METHOD_UANG,
+            'jiwa' => 1,
+            'nominal_uang' => 50000,
+        ];
+
+        $response = $this->actingAs($staff)->from('/internal/transactions/create')->post('/internal/transactions/store', $payload);
+
+        $response->assertRedirect('/internal/transactions/create');
+        $response->assertSessionHasErrors(['tahun_zakat']);
+        $this->assertDatabaseCount('zakat_transactions', 0);
+    }
+
+    public function test_fitrah_cash_custom_nominal_is_allowed_and_marked_khusus(): void
+    {
+        AppSetting::query()->create(['key' => AppSetting::KEY_ACTIVE_YEAR, 'value' => '2026']);
+        AnnualSetting::query()->create([
+            'year' => 2026,
+            'default_fitrah_cash_per_jiwa' => 50000,
+            'default_fidyah_per_hari' => 50000,
+        ]);
+
+        $staff = User::factory()->create(['role' => User::ROLE_STAFF]);
+
+        $payload = [
+            'muzakki_name' => 'Ahmad',
+            'tahun_zakat' => 2026,
+            'pembayar_nama' => 'Hamba Allah',
+            'pembayar_phone' => '0812',
+            'pembayar_alamat' => 'Jakarta',
+            'shift' => 'pagi',
+            'category' => ZakatTransaction::CATEGORY_FITRAH,
+            'metode' => ZakatTransaction::METHOD_UANG,
+            'jiwa' => 2,
+            'nominal_uang' => 90000,
+        ];
+
+        $response = $this->actingAs($staff)->from('/internal/transactions/create')->post('/internal/transactions/store', $payload);
+
+        $this->assertStringContainsString('/internal/transactions/', $response->headers->get('Location'));
+        $this->assertDatabaseCount('zakat_transactions', 1);
+
+        $trx = ZakatTransaction::query()->firstOrFail();
+        $this->assertSame(90000, $trx->nominal_uang);
+        $this->assertTrue((bool) $trx->is_khusus);
+    }
+
+    public function test_fitrah_beras_custom_quantity_is_allowed_and_marked_khusus(): void
+    {
+        AppSetting::query()->create(['key' => AppSetting::KEY_ACTIVE_YEAR, 'value' => '2026']);
+        AnnualSetting::query()->create([
+            'year' => 2026,
+            'default_fitrah_cash_per_jiwa' => 50000,
+            'default_fidyah_per_hari' => 50000,
+        ]);
+
+        $staff = User::factory()->create(['role' => User::ROLE_STAFF]);
+
+        $payload = [
+            'muzakki_name' => 'Ahmad',
+            'tahun_zakat' => 2026,
+            'pembayar_nama' => 'Hamba Allah',
+            'pembayar_phone' => '0812',
+            'pembayar_alamat' => 'Jakarta',
+            'shift' => 'pagi',
+            'category' => ZakatTransaction::CATEGORY_FITRAH,
+            'metode' => ZakatTransaction::METHOD_BERAS,
+            'jiwa' => 2,
+            'jumlah_beras_kg' => 4.75,
+        ];
+
+        $response = $this->actingAs($staff)->from('/internal/transactions/create')->post('/internal/transactions/store', $payload);
+
+        $this->assertStringContainsString('/internal/transactions/', $response->headers->get('Location'));
+        $this->assertDatabaseCount('zakat_transactions', 1);
+
+        $trx = ZakatTransaction::query()->firstOrFail();
+        $this->assertSame(4.75, (float) $trx->jumlah_beras_kg);
+        $this->assertTrue((bool) $trx->is_khusus);
     }
 
     public function test_creating_transaction_restores_soft_deleted_muzakki_instead_of_creating_duplicate(): void
@@ -343,6 +440,116 @@ class InternalTransactionTest extends TestCase
         $foreignTx->refresh();
         $this->assertSame('TRX-20260516-0002', $foreignTx->no_transaksi);
         $this->assertSame(200000, $foreignTx->nominal_uang);
+    }
+
+    public function test_staff_cannot_update_transaction_after_receipt_is_printed(): void
+    {
+        AppSetting::query()->create(['key' => AppSetting::KEY_ACTIVE_YEAR, 'value' => '2026']);
+        AnnualSetting::query()->create([
+            'year' => 2026,
+            'default_fitrah_cash_per_jiwa' => 50000,
+            'default_fidyah_per_hari' => 50000,
+        ]);
+
+        $staff = User::factory()->create(['role' => User::ROLE_STAFF]);
+        $muzakki = Muzakki::query()->create(['name' => 'Budi']);
+
+        $trx = ZakatTransaction::query()->create([
+            'no_transaksi' => 'TRX-20260518-0001',
+            'muzakki_id' => $muzakki->id,
+            'pembayar_nama' => 'Pembayar Printed',
+            'pembayar_phone' => '0812',
+            'pembayar_alamat' => 'Jakarta',
+            'shift' => ZakatTransaction::SHIFT_PAGI,
+            'category' => ZakatTransaction::CATEGORY_MAL,
+            'tahun_zakat' => 2026,
+            'metode' => ZakatTransaction::METHOD_UANG,
+            'nominal_uang' => 1000,
+            'petugas_id' => $staff->id,
+            'status' => ZakatTransaction::STATUS_VALID,
+            'waktu_terima' => now(config('zakat.timezone')),
+            'receipt_printed_at' => now(config('zakat.timezone')),
+            'receipt_printed_by' => $staff->id,
+        ]);
+
+        $payload = [
+            'pembayar_nama' => 'Pembayar Printed',
+            'pembayar_phone' => '0812',
+            'pembayar_alamat' => 'Jakarta',
+            'tahun_zakat' => 2026,
+            'shift' => ZakatTransaction::SHIFT_PAGI,
+            'items' => [
+                [
+                    'id' => $trx->id,
+                    'muzakki_name' => 'Budi',
+                    'category' => ZakatTransaction::CATEGORY_MAL,
+                    'metode' => ZakatTransaction::METHOD_UANG,
+                    'nominal_uang' => 2000,
+                ],
+            ],
+        ];
+
+        $this->actingAs($staff)
+            ->patch('/internal/transactions/' . $trx->id . '/update', $payload)
+            ->assertForbidden();
+    }
+
+    public function test_admin_can_update_transaction_after_receipt_is_printed(): void
+    {
+        AppSetting::query()->create(['key' => AppSetting::KEY_ACTIVE_YEAR, 'value' => '2026']);
+        AnnualSetting::query()->create([
+            'year' => 2026,
+            'default_fitrah_cash_per_jiwa' => 50000,
+            'default_fidyah_per_hari' => 50000,
+        ]);
+
+        $staff = User::factory()->create(['role' => User::ROLE_STAFF]);
+        $admin = User::factory()->create(['role' => User::ROLE_ADMIN]);
+        $muzakki = Muzakki::query()->create(['name' => 'Budi']);
+
+        $trx = ZakatTransaction::query()->create([
+            'no_transaksi' => 'TRX-20260518-0002',
+            'muzakki_id' => $muzakki->id,
+            'pembayar_nama' => 'Pembayar Printed',
+            'pembayar_phone' => '0812',
+            'pembayar_alamat' => 'Jakarta',
+            'shift' => ZakatTransaction::SHIFT_PAGI,
+            'category' => ZakatTransaction::CATEGORY_MAL,
+            'tahun_zakat' => 2026,
+            'metode' => ZakatTransaction::METHOD_UANG,
+            'nominal_uang' => 1000,
+            'petugas_id' => $staff->id,
+            'status' => ZakatTransaction::STATUS_VALID,
+            'waktu_terima' => now(config('zakat.timezone')),
+            'receipt_printed_at' => now(config('zakat.timezone')),
+            'receipt_printed_by' => $staff->id,
+        ]);
+
+        $payload = [
+            'pembayar_nama' => 'Pembayar Printed',
+            'pembayar_phone' => '0812',
+            'pembayar_alamat' => 'Jakarta',
+            'tahun_zakat' => 2026,
+            'shift' => ZakatTransaction::SHIFT_PAGI,
+            'items' => [
+                [
+                    'id' => $trx->id,
+                    'muzakki_name' => 'Budi',
+                    'category' => ZakatTransaction::CATEGORY_MAL,
+                    'metode' => ZakatTransaction::METHOD_UANG,
+                    'nominal_uang' => 2000,
+                ],
+            ],
+        ];
+
+        $this->actingAs($admin)
+            ->patch('/internal/transactions/' . $trx->id . '/update', $payload)
+            ->assertRedirect();
+
+        $this->assertDatabaseHas('zakat_transactions', [
+            'id' => $trx->id,
+            'nominal_uang' => 2000,
+        ]);
     }
 }
 

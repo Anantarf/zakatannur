@@ -10,6 +10,8 @@ final class TransactionHistoryFilters
     public ?string $metode;
     public ?string $status;
     public ?int $petugasId;
+    public ?string $riskLevel;
+    public ?string $reviewStatus;
     public int $activeYear;
 
     public function __construct(
@@ -19,6 +21,8 @@ final class TransactionHistoryFilters
         ?string $metode,
         ?string $status,
         ?int $petugasId,
+        ?string $riskLevel,
+        ?string $reviewStatus,
         int $activeYear
     ) {
         $this->q = $q;
@@ -27,11 +31,13 @@ final class TransactionHistoryFilters
         $this->metode = $metode;
         $this->status = $status;
         $this->petugasId = $petugasId;
+        $this->riskLevel = $riskLevel;
+        $this->reviewStatus = $reviewStatus;
         $this->activeYear = $activeYear;
     }
 
     /**
-     * @param array{q:string,year:int|null,category:?string,metode:?string,status:?string,petugasId:?int,activeYear:int} $data
+     * @param array{q:string,year:int|null,category:?string,metode:?string,status:?string,petugasId:?int,riskLevel:?string,reviewStatus:?string,activeYear:int} $data
      */
     public static function fromArray(array $data): self
     {
@@ -42,12 +48,14 @@ final class TransactionHistoryFilters
             $data['metode'],
             $data['status'],
             $data['petugasId'],
+            $data['riskLevel'],
+            $data['reviewStatus'],
             $data['activeYear']
         );
     }
 
     /**
-     * @return array{q:string,year:int|null,category:?string,metode:?string,status:?string,petugasId:?int,activeYear:int}
+     * @return array{q:string,year:int|null,category:?string,metode:?string,status:?string,petugasId:?int,riskLevel:?string,reviewStatus:?string,activeYear:int}
      */
     public function toArray(): array
     {
@@ -58,6 +66,8 @@ final class TransactionHistoryFilters
             'metode' => $this->metode,
             'status' => $this->status,
             'petugasId' => $this->petugasId,
+            'riskLevel' => $this->riskLevel,
+            'reviewStatus' => $this->reviewStatus,
             'activeYear' => $this->activeYear,
         ];
     }

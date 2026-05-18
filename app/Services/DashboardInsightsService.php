@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\AppSetting;
 use App\Models\ZakatTransaction;
+use App\Support\SqlDialect;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
@@ -34,10 +35,11 @@ class DashboardInsightsService
 
         return Cache::remember($cacheKey, (int) config('zakat.cache.public_home_stats_ttl', 3600), function () use ($activeYear) {
             $purgeDays = (int) config('zakat.retention.purge_days', 30);
+            $effectiveTimestamp = SqlDialect::effectiveTimestamp();
 
             $hasRecentData = ZakatTransaction::valid()
                 ->where('tahun_zakat', $activeYear)
-                ->whereRaw('COALESCE(waktu_terima, created_at) >= ?', [now(config('zakat.timezone'))->subDays($purgeDays)->startOfDay()])
+                ->whereRaw("{$effectiveTimestamp} >= ?", [now(config('zakat.timezone'))->subDays($purgeDays)->startOfDay()])
                 ->exists();
 
             if ($hasRecentData) {
@@ -48,7 +50,7 @@ class DashboardInsightsService
                 'off_season' => true,
                 'last_date' => ZakatTransaction::valid()
                     ->where('tahun_zakat', $activeYear)
-                    ->selectRaw('MAX(COALESCE(waktu_terima, created_at)) as last_date')
+                    ->selectRaw('MAX(' . $effectiveTimestamp . ') as last_date')
                     ->value('last_date'),
             ];
         });
@@ -83,16 +85,17 @@ class DashboardInsightsService
         return Cache::remember($cacheKey, $cacheTtl, function () use ($activeYear, $activeDays, $chartEnd) {
             $endBoundary = $chartEnd ?? now(config('zakat.timezone'))->endOfDay();
             $startBoundary = $endBoundary->copy()->subDays($activeDays - 1)->startOfDay();
+            $effectiveTimestamp = SqlDialect::effectiveTimestamp();
 
             $dailyStats = ZakatTransaction::query()
                 ->select(
-                    DB::raw('DATE(COALESCE(waktu_terima, created_at)) as date'),
+                    DB::raw(SqlDialect::dateExpression($effectiveTimestamp, 'date')),
                     DB::raw('COUNT(DISTINCT no_transaksi) as count')
                 )
                 ->valid()
                 ->where('tahun_zakat', $activeYear)
-                ->whereRaw('COALESCE(waktu_terima, created_at) >= ?', [$startBoundary])
-                ->whereRaw('COALESCE(waktu_terima, created_at) <= ?', [$endBoundary])
+                ->whereRaw("{$effectiveTimestamp} >= ?", [$startBoundary])
+                ->whereRaw("{$effectiveTimestamp} <= ?", [$endBoundary])
                 ->groupBy('date')
                 ->orderBy('date', 'ASC')
                 ->get();

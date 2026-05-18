@@ -1,12 +1,26 @@
 {
   "resources/css/app.css": {
-    "file": "assets/app-d9724ac7.css",
+    "file": "assets/app-21811c37.css",
     "isEntry": true,
     "src": "resources/css/app.css"
   },
   "resources/js/app.js": {
-    "file": "assets/app-ba49740f.js",
+    "dynamicImports": [
+      "resources/js/public-home.js",
+      "resources/js/transaction-form.js"
+    ],
+    "file": "assets/app-3052f9ce.js",
     "isEntry": true,
     "src": "resources/js/app.js"
+  },
+  "resources/js/public-home.js": {
+    "file": "assets/public-home-121860b4.js",
+    "isDynamicEntry": true,
+    "src": "resources/js/public-home.js"
+  },
+  "resources/js/transaction-form.js": {
+    "file": "assets/transaction-form-3069d1f6.js",
+    "isDynamicEntry": true,
+    "src": "resources/js/transaction-form.js"
   }
 }

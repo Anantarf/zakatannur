@@ -15,7 +15,7 @@
             
             {{-- session('status') is handled globally by the app layout toast --}}
 
-            <div class="bg-white rounded-2xl shadow-lg shadow-gray-200/50 border border-emerald-100/30 overflow-hidden relative">
+            <div class="ui-card-strong overflow-hidden relative">
                 <!-- Subtle Emerald Accent -->
                 <div class="absolute inset-0 bg-gradient-to-br from-emerald-50/20 via-white to-white pointer-events-none"></div>
                 
@@ -96,7 +96,7 @@
                                                         @else
                                                             {{ \App\Support\Format::rupiah((int)$tx->nominal_uang) }}
                                                             @if($tx->is_transfer)
-                                                                <span class="ml-1 text-[9px] font-black text-emerald-600 bg-emerald-50 px-1 py-0.5 rounded border border-emerald-100 italic">TF</span>
+                                                                <x-transfer-badge class="ml-1" />
                                                             @endif
                                                         @endif
                                                     </p>
@@ -160,11 +160,11 @@
 
                         <!-- Footer Action Buttons -->
                         <div class="mt-8 pt-6 border-t border-gray-100 flex flex-col sm:flex-row gap-3 px-2 sm:px-0">
-                             <a href="{{ route('internal.transactions.receipt', ['transaction' => $mainTx->id]) }}" target="_blank" class="flex-1 flex justify-center items-center gap-2 px-6 py-4 bg-emerald-600 hover:bg-emerald-700 text-white text-base font-black rounded-xl shadow-lg shadow-emerald-200 transition-all transform hover:-translate-y-0.5 active:scale-95 sm:order-1">
+                             <a href="{{ route('internal.transactions.receipt', ['transaction' => $mainTx->id]) }}" target="_blank" class="ui-btn ui-btn-primary flex-1 px-6 py-4 text-base font-black sm:order-1">
                                  <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" /></svg>
                                  CETAK TANDA TERIMA
                              </a>
-                             <a href="{{ route('internal.transactions.create') }}" class="flex-1 flex justify-center items-center gap-2 px-6 py-4 bg-blue-600 hover:bg-blue-700 text-white text-base font-black rounded-xl shadow-lg shadow-blue-200 transition-all transform hover:-translate-y-0.5 active:scale-95 sm:order-2">
+                             <a href="{{ route('internal.transactions.create') }}" class="ui-btn flex-1 bg-blue-600 px-6 py-4 text-base font-black text-white shadow-lg shadow-blue-200 hover:-translate-y-0.5 hover:bg-blue-700 focus:ring-blue-500 sm:order-2">
                                  <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4" /></svg>
                                  INPUT BARU
                              </a>
@@ -174,12 +174,12 @@
                                  $txDate = ($mainTx->waktu_terima ?? $mainTx->created_at)->timezone('Asia/Jakarta');
                                  $canModify = $mainTx->status !== \App\Models\ZakatTransaction::STATUS_VOID && (
                                      in_array(auth()->user()->role, [\App\Models\User::ROLE_ADMIN, \App\Models\User::ROLE_SUPER_ADMIN]) ||
-                                     ((int) $mainTx->petugas_id === auth()->id() && $txDate->isToday())
+                                     ((int) $mainTx->petugas_id === auth()->id() && $txDate->isToday() && $mainTx->receipt_printed_at === null)
                                  );
                              @endphp
 
                              @if($canModify)
-                                 <a href="{{ route('internal.transactions.edit', ['transaction' => $mainTx->id]) }}" class="flex-none px-6 py-4 bg-white border border-gray-200 hover:bg-gray-50 text-gray-500 hover:text-gray-700 text-xs font-black rounded-xl transition-all shadow-sm flex items-center justify-center sm:order-3 uppercase tracking-widest">
+                                 <a href="{{ route('internal.transactions.edit', ['transaction' => $mainTx->id]) }}" class="ui-btn ui-btn-secondary flex-none px-6 py-4 text-xs font-black uppercase tracking-widest sm:order-3">
                                      <svg class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h14a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
                                      EDIT
                                  </a>

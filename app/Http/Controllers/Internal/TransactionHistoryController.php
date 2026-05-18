@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Internal;
 
 use App\Http\Controllers\Controller;
+use App\Models\User;
 use App\Models\ZakatTransaction;
 use App\Services\Transactions\TransactionGroupLifecycleService;
 use App\Services\Transactions\TransactionHistoryService;
@@ -14,12 +15,16 @@ class TransactionHistoryController extends Controller
 {
     public function index(Request $request, TransactionHistoryService $historyService): View
     {
-        $filters = $historyService->parseFilters($request);
-        $transactions = $historyService->paginatedHistory($filters, $request->query());
+        $canViewRisk = in_array($request->user()->role, [User::ROLE_ADMIN, User::ROLE_SUPER_ADMIN], true);
+        $filters = $historyService->parseFilters($request, $canViewRisk);
+        $transactions = $historyService->paginatedHistory($filters, $request->query(), $canViewRisk);
 
         return view('internal.transactions.index', array_merge(
-            $historyService->indexViewData($filters),
-            ['transactions' => $transactions]
+            $historyService->indexViewData($filters, $canViewRisk),
+            [
+                'transactions' => $transactions,
+                'canViewRisk' => $canViewRisk,
+            ]
         ));
     }
 

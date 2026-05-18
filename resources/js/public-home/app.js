@@ -1,0 +1,144 @@
+import { createDataMethods } from './data';
+import { formatCategory, joinGrammatically } from './format';
+import { createIdleMethods } from './idle';
+import { bootstrapRealtime } from './realtime';
+
+const initialState = (config) => ({
+    openLogin: config.openLogin,
+    activeTab: 'beranda',
+    selectedYear: config.selectedYear,
+    items: config.items ?? [],
+    totals: config.totals ?? {},
+    dailyChartData: config.dailyChartData ?? {},
+    isFirstLoad: true,
+    error: null,
+    lastFetchTime: 0,
+    idleTimeout: null,
+    isIdleMode: false,
+    notification: {
+        show: false,
+        message: '',
+        queue: [],
+        processing: false,
+    },
+    clock: '',
+    chartTimeouts: [],
+    carouselIndex: 0,
+    carouselImages: [
+        '/images/beranda_annur_new.webp',
+        '/images/dokumentasi_1.webp',
+    ],
+});
+
+export const createPublicHomeApp = (config, chartService) => ({
+    ...initialState(config),
+    ...createIdleMethods(),
+    ...createDataMethods(config, chartService),
+
+    updateClock() {
+        const options = { timeZone: 'Asia/Jakarta', weekday: 'long', day: '2-digit', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false };
+        const formatter = new Intl.DateTimeFormat('id-ID', options);
+        const parts = formatter.formatToParts(new Date());
+        const d = parts.reduce((acc, part) => ({ ...acc, [part.type]: part.value }), {});
+        this.clock = `${d.weekday}, ${d.day} ${d.month} ${d.year} ${d.hour}:${d.minute}:${d.second} WIB`;
+    },
+
+    formatCat(category) {
+        return formatCategory(category);
+    },
+
+    joinGrammatically(items) {
+        return joinGrammatically(items);
+    },
+
+    initTimers() {
+        this.updateClock();
+        setInterval(() => this.updateClock(), 1000);
+
+        const refreshSecs = Number(config.refreshIntervalSeconds || 0);
+        if (refreshSecs > 0) {
+            setInterval(() => {
+                this.refreshSummary();
+                this.pollLatest();
+            }, refreshSecs * 1000);
+        }
+
+        setInterval(() => {
+            this.carouselIndex = (this.carouselIndex + 1) % this.carouselImages.length;
+        }, 7000);
+    },
+
+    initWatchers() {
+        ['mousemove', 'mousedown', 'keydown', 'touchstart', 'scroll'].forEach((eventName) => {
+            window.addEventListener(eventName, () => this.resetIdle(), { passive: true });
+        });
+
+        this.$watch('openLogin', (value) => {
+            if (value) {
+                clearTimeout(this.idleTimeout);
+                this.isIdleMode = false;
+            } else {
+                this.resetIdle();
+            }
+        });
+
+        this.$watch('isIdleMode', (value) => {
+            if (value) {
+                this.startIdleCycle();
+            }
+        });
+
+        this.$watch('activeTab', (value) => {
+            if (window.chartScanTimeout) {
+                clearTimeout(window.chartScanTimeout);
+                window.chartScanTimeout = null;
+            }
+
+            if (value === 'grafik') {
+                window.scrollTo({ top: 0, behavior: 'instant' });
+                this.loadChartJs().then((success) => {
+                    if (success) {
+                        chartService.initDailyChart();
+                    }
+                });
+            }
+        });
+    },
+
+    initRealtime() {
+        const echo = bootstrapRealtime(config.realtime ?? {});
+        if (!echo) {
+            return;
+        }
+
+        echo.channel('public-transactions').listen('.transaction.created', (event) => {
+            const items = event.items || [];
+            if (items.length === 0) {
+                return;
+            }
+
+            const now = Date.now();
+            if (now - this.lastFetchTime > 2000) {
+                this.refreshSummary();
+            }
+
+            this.pushTransactionNotification(items);
+        });
+    },
+
+    init() {
+        this.initTimers();
+        this.pollLatest();
+        this.refreshSummary();
+
+        this.loadChartJs().then((success) => {
+            if (success) {
+                chartService.initHistoricalChart();
+            }
+        });
+
+        this.resetIdle();
+        this.initWatchers();
+        this.initRealtime();
+    },
+});

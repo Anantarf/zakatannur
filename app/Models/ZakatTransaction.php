@@ -2,10 +2,12 @@
 
 namespace App\Models;
 
+use App\Support\SqlDialect;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 
@@ -128,6 +130,8 @@ class ZakatTransaction extends Model
             'deleted_reason',
             'restored_at',   // Set only by TransactionHistoryController::restore()
             'restored_by',
+            'receipt_printed_at',
+            'receipt_printed_by',
         ];
 
     protected $casts = [
@@ -146,6 +150,8 @@ class ZakatTransaction extends Model
         'deleted_by' => 'integer',
         'restored_at' => 'datetime',
         'restored_by' => 'integer',
+        'receipt_printed_at' => 'datetime',
+        'receipt_printed_by' => 'integer',
     ];
 
     public function muzakki(): BelongsTo
@@ -156,6 +162,11 @@ class ZakatTransaction extends Model
     public function petugas(): BelongsTo
     {
         return $this->belongsTo(User::class, 'petugas_id');
+    }
+
+    public function riskReview(): HasOne
+    {
+        return $this->hasOne(TransactionRiskReview::class, 'zakat_transaction_id');
     }
 
     /*
@@ -256,7 +267,7 @@ class ZakatTransaction extends Model
     public function scopeOrderByEffectiveTime(Builder $query): Builder
     {
         return $query
-            ->orderByRaw('COALESCE(waktu_terima, created_at) DESC')
+            ->orderByRaw(SqlDialect::effectiveTimestampOrder())
             ->orderByDesc('id');
     }
 }

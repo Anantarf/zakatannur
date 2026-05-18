@@ -3,6 +3,7 @@
 namespace App\Services\Reporting;
 
 use App\Models\ZakatTransaction;
+use App\Support\SqlDialect;
 use Carbon\Carbon;
 use Illuminate\Http\Response;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
@@ -95,6 +96,8 @@ class TransactionExportService
 
     private function fetchDailyTransactions(Carbon $start, Carbon $end)
     {
+        $effectiveTimestamp = SqlDialect::effectiveTimestamp();
+
         return ZakatTransaction::query()
             ->selectRaw("
                 no_transaksi,
@@ -103,20 +106,21 @@ class TransactionExportService
                 MAX(keterangan) as keterangan,
                 MAX(waktu_terima) as waktu_terima,
                 MAX(created_at) as created_at,
+                MAX({$effectiveTimestamp}) as sort_time,
                 SUM(CASE WHEN category = ? THEN nominal_uang ELSE 0 END) as fitrah_uang,
                 SUM(CASE WHEN category = ? AND metode = ? THEN jumlah_beras_kg ELSE 0 END) as fitrah_beras,
-                MAX(CASE WHEN category = ? THEN is_transfer ELSE 0 END) as fitrah_has_tf,
+                MAX(" . SqlDialect::booleanAsIntegerCase('category = ?', 'is_transfer') . ") as fitrah_has_tf,
                 SUM(CASE WHEN category = ? THEN nominal_uang ELSE 0 END) as infaq_uang,
                 SUM(CASE WHEN category = ? AND metode = ? THEN jumlah_beras_kg ELSE 0 END) as infaq_beras,
-                MAX(CASE WHEN category = ? THEN is_transfer ELSE 0 END) as infaq_has_tf,
+                MAX(" . SqlDialect::booleanAsIntegerCase('category = ?', 'is_transfer') . ") as infaq_has_tf,
                 SUM(CASE WHEN category = ? THEN nominal_uang ELSE 0 END) as fidyah_uang,
-                MAX(CASE WHEN category = ? THEN is_transfer ELSE 0 END) as fidyah_has_tf,
+                MAX(" . SqlDialect::booleanAsIntegerCase('category = ?', 'is_transfer') . ") as fidyah_has_tf,
                 SUM(CASE WHEN category = ? THEN nominal_uang ELSE 0 END) as mal_uang,
-                MAX(CASE WHEN category = ? THEN is_transfer ELSE 0 END) as mal_has_tf,
+                MAX(" . SqlDialect::booleanAsIntegerCase('category = ?', 'is_transfer') . ") as mal_has_tf,
                 SUM(jiwa) as total_jiwa,
-                SUM(CASE WHEN is_transfer = 1 THEN nominal_uang ELSE 0 END) as tx_tf_uang,
-                SUM(CASE WHEN is_transfer = 0 THEN nominal_uang ELSE 0 END) as tx_cash_uang,
-                MAX(CASE WHEN metode = ? THEN is_transfer ELSE 0 END) as has_transfer
+                " . SqlDialect::sumWhenBooleanTrue('is_transfer', 'nominal_uang', 'tx_tf_uang') . ",
+                " . SqlDialect::sumWhenBooleanFalse('is_transfer', 'nominal_uang', 'tx_cash_uang') . ",
+                MAX(" . SqlDialect::booleanAsIntegerCase('metode = ?', 'is_transfer') . ") as has_transfer
             ", [
                 ZakatTransaction::CATEGORY_FITRAH,
                 ZakatTransaction::CATEGORY_FITRAH, ZakatTransaction::METHOD_BERAS,
@@ -131,19 +135,21 @@ class TransactionExportService
                 ZakatTransaction::METHOD_UANG,
             ])
             ->valid()
-            ->whereRaw('COALESCE(waktu_terima, created_at) >= ?', [$start])
-            ->whereRaw('COALESCE(waktu_terima, created_at) <= ?', [$end])
+            ->whereRaw("{$effectiveTimestamp} >= ?", [$start])
+            ->whereRaw("{$effectiveTimestamp} <= ?", [$end])
             ->groupBy('no_transaksi')
-            ->orderBy('waktu_terima', 'asc')
+            ->orderBy('sort_time', 'asc')
             ->get();
     }
 
     private function fetchYearlySummary(int $year)
     {
+        $effectiveTimestamp = SqlDialect::effectiveTimestamp();
+
         return ZakatTransaction::valid()
             ->where('tahun_zakat', $year)
             ->selectRaw("
-                DATE(CONVERT_TZ(COALESCE(waktu_terima, created_at), '+00:00', '+07:00')) as date,
+                " . SqlDialect::yearlyLocalDateExpression($effectiveTimestamp, 'date') . ",
                 shift,
                 SUM(CASE WHEN category = ? THEN nominal_uang ELSE 0 END) as fitrah_uang,
                 SUM(CASE WHEN category = ? AND metode = ? THEN jumlah_beras_kg ELSE 0 END) as fitrah_beras,
@@ -151,8 +157,8 @@ class TransactionExportService
                 SUM(CASE WHEN category = ? THEN nominal_uang ELSE 0 END) as mal_uang,
                 SUM(CASE WHEN category = ? THEN nominal_uang ELSE 0 END) as infaq_uang,
                 SUM(CASE WHEN category = ? THEN nominal_uang ELSE 0 END) as fidyah_uang,
-                SUM(CASE WHEN is_transfer = 1 THEN nominal_uang ELSE 0 END) as tf_total,
-                SUM(CASE WHEN is_transfer = 0 THEN nominal_uang ELSE 0 END) as cash_total
+                " . SqlDialect::sumWhenBooleanTrue('is_transfer', 'nominal_uang', 'tf_total') . ",
+                " . SqlDialect::sumWhenBooleanFalse('is_transfer', 'nominal_uang', 'cash_total') . "
             ", [
                 ZakatTransaction::CATEGORY_FITRAH,
                 ZakatTransaction::CATEGORY_FITRAH, ZakatTransaction::METHOD_BERAS,

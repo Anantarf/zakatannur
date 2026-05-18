@@ -11,6 +11,11 @@ use Symfony\Component\HttpFoundation\Response;
 
 class TransactionGroupLifecycleService
 {
+    public function __construct(
+        private TransactionReviewAssistantService $reviewAssistantService,
+    ) {
+    }
+
     public function authorizeDeletion(User $user, ZakatTransaction $transaction): void
     {
         if ($user->role === User::ROLE_SUPER_ADMIN || $user->role === User::ROLE_ADMIN) {
@@ -19,6 +24,10 @@ class TransactionGroupLifecycleService
 
         if ((int) $transaction->petugas_id !== (int) $user->id) {
             abort(Response::HTTP_FORBIDDEN, 'Anda hanya dapat menghapus transaksi yang Anda layani sendiri.');
+        }
+
+        if ($transaction->receipt_printed_at !== null) {
+            abort(Response::HTTP_FORBIDDEN, 'Transaksi yang kwitansinya sudah dicetak hanya dapat dihapus oleh Admin.');
         }
 
         $transactionDate = ($transaction->waktu_terima ?? $transaction->created_at)->timezone(config('zakat.timezone'));
@@ -91,6 +100,19 @@ class TransactionGroupLifecycleService
                 'restored_by' => $user->id,
             ]);
         });
+
+        $restoredTransactions = ZakatTransaction::query()
+            ->where('no_transaksi', $noTransaksi)
+            ->orderBy('id')
+            ->get();
+
+        foreach ($restoredTransactions as $restoredTransaction) {
+            $restoredTransaction->setAttribute('anomaly_context', [
+                'restored_after_delete' => true,
+            ]);
+        }
+
+        $this->reviewAssistantService->syncForTransactions($restoredTransactions);
 
         return [
             'restored' => true,

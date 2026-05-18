@@ -31,6 +31,10 @@ class ZakatTransactionPolicy
             return Response::deny('Anda hanya dapat mengedit transaksi yang Anda layani sendiri.');
         }
 
+        if ($zakatTransaction->receipt_printed_at !== null) {
+            return Response::deny('Transaksi yang kwitansinya sudah dicetak hanya dapat diubah oleh Admin.');
+        }
+
         // 2. Can only edit today's transactions (within same calendar date)
         $txDate = ($zakatTransaction->waktu_terima ?? $zakatTransaction->created_at)->timezone(config('zakat.timezone'));
         if (!$txDate->isToday()) {

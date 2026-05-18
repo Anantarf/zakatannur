@@ -41,7 +41,7 @@ return [
             ],
             'client_options' => [
                 'curl' => [
-                    CURLOPT_SSL_VERIFYPEER => false,
+                    CURLOPT_SSL_VERIFYPEER => env('PUSHER_VERIFY_TLS', true),
                     CURLOPT_TIMEOUT => 30,
                 ],
             ],

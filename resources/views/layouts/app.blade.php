@@ -7,14 +7,6 @@
 
                 <title>{{ config('app.name', 'Zakat Annur') }}</title>
         <link rel="icon" type="image/png" href="{{ asset('images/logo_zakatannur.png') }}">
-
-        <!-- Alpine Toast Style -->
-        <style>
-            [x-cloak] { display: none !important; }
-            @keyframes slideInRight { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
-            .toast-enter { animation: slideInRight 0.4s ease-out forwards; }
-        </style>
-
         <!-- Preconnect & DNS-Prefetch for Speed -->
         <link rel="preconnect" href="https://fonts.bunny.net" crossorigin>
         <link rel="dns-prefetch" href="https://fonts.bunny.net">
@@ -27,7 +19,7 @@
         <!-- Scripts -->
         @vite(['resources/css/app.css', 'resources/js/app.js'])
     </head>
-    <body class="font-sans antialiased">
+    <body class="ui-shell font-sans antialiased text-slate-900">
         <div class="fixed top-4 right-4 z-[9999] w-full max-w-lg pointer-events-none">
             @if (session('status'))
                 <div x-data="{ show: true }" 
@@ -59,20 +51,22 @@
             @endif
         </div>
 
-        <div class="min-h-screen bg-gray-100">
+        <div class="ui-shell-main">
             @include('layouts.navigation')
 
             <!-- Page Heading -->
             @if (isset($header))
-                <header class="bg-white shadow">
-                    <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
-                        {{ $header }}
+                <header class="pt-5 sm:pt-6">
+                    <div class="ui-page-header">
+                        <div class="ui-page-header-card">
+                            {{ $header }}
+                        </div>
                     </div>
                 </header>
             @endif
 
             <!-- Page Content -->
-            <main>
+            <main class="pb-10">
                 {{ $slot }}
             </main>
         </div>

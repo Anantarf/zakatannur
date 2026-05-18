@@ -3,8 +3,8 @@
 namespace App\Services\Transactions;
 
 use App\Models\ZakatTransaction;
+use App\Support\SqlDialect;
 use Carbon\Carbon;
-use Illuminate\Support\Facades\DB;
 
 class TransactionNumberGenerator
 {
@@ -13,11 +13,7 @@ class TransactionNumberGenerator
         $prefix = 'TRX-' . $time->format('Ymd') . '-';
         $last = ZakatTransaction::withTrashed()
             ->where('no_transaksi', 'like', $prefix . '%')
-            ->orderByRaw(
-                DB::getDriverName() === 'sqlite'
-                    ? 'CAST(SUBSTR(no_transaksi, 14) AS INTEGER) DESC'
-                    : 'CAST(SUBSTRING(no_transaksi, 14) AS UNSIGNED) DESC'
-            )
+            ->orderByRaw(SqlDialect::transactionNumberOrderExpression())
             ->orderByDesc('id')
             ->value('no_transaksi');
 

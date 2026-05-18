@@ -7,6 +7,7 @@ use App\Models\Muzakki;
 use App\Models\ZakatTransaction;
 use App\Services\Transactions\TransactionNominalValidator;
 use App\Services\Transactions\TransactionNumberGenerator;
+use App\Services\Transactions\TransactionReviewAssistantService;
 use App\Services\Transactions\TransactionRowPersister;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -25,15 +26,18 @@ class ZakatService
     private TransactionNumberGenerator $numberGenerator;
     private TransactionNominalValidator $nominalValidator;
     private TransactionRowPersister $rowPersister;
+    private TransactionReviewAssistantService $reviewAssistantService;
 
     public function __construct(
         TransactionNumberGenerator $numberGenerator,
         TransactionNominalValidator $nominalValidator,
         TransactionRowPersister $rowPersister,
+        TransactionReviewAssistantService $reviewAssistantService,
     ) {
         $this->numberGenerator = $numberGenerator;
         $this->nominalValidator = $nominalValidator;
         $this->rowPersister = $rowPersister;
+        $this->reviewAssistantService = $reviewAssistantService;
     }
 
     public function storeTransaction(array $data, int $petugasId, ?string $noTransaksiOverride = null): array
@@ -56,10 +60,23 @@ class ZakatService
         $syncResults = $syncResult['results'];
         $oldUang = $syncResult['oldUang'];
         $oldBeras = $syncResult['oldBeras'];
-
         $newUang = collect($syncResults)->sum('nominal_uang');
         $newBeras = collect($syncResults)->sum('jumlah_beras_kg');
         $isNominalChanged = (int)$oldUang !== (int)$newUang || abs((float)$oldBeras - (float)$newBeras) > 0.001;
+        $hasSignificantNominalChange = $this->hasSignificantNominalChange((int) $oldUang, (int) $newUang, (float) $oldBeras, (float) $newBeras);
+
+        foreach ($syncResults as $transaction) {
+            $transaction->setAttribute('anomaly_context', [
+                'updated_after_receipt_printed' => (bool) ($syncResult['wasReceiptPrinted'] && $noTransaksiOverride !== null),
+                'significant_nominal_change' => (bool) ($noTransaksiOverride !== null && $hasSignificantNominalChange),
+                'old_total_uang' => (int) $oldUang,
+                'new_total_uang' => (int) $newUang,
+                'old_total_beras' => (float) $oldBeras,
+                'new_total_beras' => (float) $newBeras,
+            ]);
+        }
+
+        $this->reviewAssistantService->syncForTransactions($syncResults);
 
         if (count($syncResults) > 0 && ($noTransaksiOverride === null || $isNominalChanged)) {
             try {
@@ -130,6 +147,10 @@ class ZakatService
             }
 
             $noTransaksi = $noTransaksiOverride ?? $this->numberGenerator->generate($waktuTerima);
+            $wasReceiptPrinted = ZakatTransaction::withTrashed()
+                ->where('no_transaksi', $noTransaksi)
+                ->whereNotNull('receipt_printed_at')
+                ->exists();
 
             if (!$noTransaksiOverride && ZakatTransaction::where('no_transaksi', $noTransaksi)->exists()) {
                 throw new \RuntimeException("Nomor Transaksi {$noTransaksi} sudah terpakai. Sila klik simpan sekali lagi untuk mendapatkan nomor baru.");
@@ -152,10 +173,16 @@ class ZakatService
                 $summary,
                 $oldTotals,
                 $results,
-                $noTransaksiOverride !== null
+                $noTransaksiOverride !== null,
+                $wasReceiptPrinted
             );
 
-            return ['results' => $results, 'oldUang' => (int) $oldTotals['uang'], 'oldBeras' => (float) $oldTotals['beras']];
+            return [
+                'results' => $results,
+                'oldUang' => (int) $oldTotals['uang'],
+                'oldBeras' => (float) $oldTotals['beras'],
+                'wasReceiptPrinted' => $wasReceiptPrinted,
+            ];
         } finally {
             if (isset($lock)) $lock->release();
         }
@@ -221,17 +248,30 @@ class ZakatService
      * @param array{uang:int,beras:float} $oldTotals
      * @param array<int, ZakatTransaction> $results
      */
-    private function logSyncAudit(Request $request, string $noTransaksi, string $pembayarName, array $summary, array $oldTotals, array $results, bool $isUpdate): void
+    private function logSyncAudit(Request $request, string $noTransaksi, string $pembayarName, array $summary, array $oldTotals, array $results, bool $isUpdate, bool $wasReceiptPrinted): void
     {
         Audit::log($request, $isUpdate ? 'Updated.Transaction' : 'Created.Transaction', null, [
             'no_transaksi' => $noTransaksi,
             'pembayar'     => $pembayarName,
             'summary'      => $summary,
+            'after_receipt_printed' => $wasReceiptPrinted,
             'totals'       => [
                 'old' => ['uang' => $oldTotals['uang'], 'beras' => $oldTotals['beras']],
                 'new' => ['uang' => (int) collect($results)->sum('nominal_uang'), 'beras' => (float) collect($results)->sum('jumlah_beras_kg')],
             ],
         ]);
+
+        if ($isUpdate && $wasReceiptPrinted && count($results) > 0) {
+            Audit::log($request, 'transaction.updated_after_receipt_printed', $results[0], [
+                'no_transaksi' => $noTransaksi,
+                'pembayar' => $pembayarName,
+                'summary' => $summary,
+                'totals' => [
+                    'old' => ['uang' => $oldTotals['uang'], 'beras' => $oldTotals['beras']],
+                    'new' => ['uang' => (int) collect($results)->sum('nominal_uang'), 'beras' => (float) collect($results)->sum('jumlah_beras_kg')],
+                ],
+            ]);
+        }
     }
 
     /**
@@ -422,9 +462,17 @@ class ZakatService
         $tahun = (int) ($data['tahun_zakat'] ?? now()->year);
         $items = $this->extractItems($data);
 
-        [$defaultFitrah, $defaultFidyah] = $this->getAnnualDefaults($tahun);
+        [$defaultFitrah, $defaultFidyah, $defaultFitrahBeras, $defaultFidyahBeras] = $this->getAnnualDefaults($tahun);
 
-        $this->nominalValidator->validate($data, $items, $tahun, $defaultFitrah, $defaultFidyah);
+        $this->nominalValidator->validate(
+            $data,
+            $items,
+            $tahun,
+            $defaultFitrah,
+            $defaultFidyah,
+            $defaultFitrahBeras,
+            $defaultFidyahBeras
+        );
     }
 
     /**
@@ -477,5 +525,16 @@ class ZakatService
             }
         }
         throw new \RuntimeException("Gagal memproses transaksi setelah beberapa kali percobaan karena kepadatan trafik. Silakan klik simpan sekali lagi.");
+    }
+
+    private function hasSignificantNominalChange(int $oldUang, int $newUang, float $oldBeras, float $newBeras): bool
+    {
+        $uangDelta = abs($newUang - $oldUang);
+        $berasDelta = abs($newBeras - $oldBeras);
+
+        $uangThreshold = max(50000, (int) round(max($oldUang, $newUang) * 0.5));
+        $berasThreshold = max(2.5, max($oldBeras, $newBeras) * 0.5);
+
+        return $uangDelta >= $uangThreshold || $berasDelta >= $berasThreshold;
     }
 }

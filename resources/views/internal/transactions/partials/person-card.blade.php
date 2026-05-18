@@ -132,26 +132,26 @@
             </div>
         </div>
 
-        <div class="rounded-xl border p-3 transition-colors" :class="person.zakat.infaq.active ? 'border-purple-400 bg-purple-50/30 ring-1 ring-purple-400' : 'border-gray-200 bg-gray-50/50'">
+        <div class="rounded-xl border p-3 transition-colors" :class="person.zakat.infaq.active ? 'border-cyan-400 bg-cyan-50/40 ring-1 ring-cyan-400' : 'border-gray-200 bg-gray-50/50'">
             <label class="flex items-center gap-2 cursor-pointer font-bold text-gray-800 text-sm">
-                <input type="checkbox" x-model="person.zakat.infaq.active" class="h-4 w-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500">
+                <input type="checkbox" x-model="person.zakat.infaq.active" class="h-4 w-4 text-cyan-600 border-gray-300 rounded focus:ring-cyan-500">
                 Infaq Sedekah
             </label>
             <div x-show="person.zakat.infaq.active" class="mt-3 space-y-2" x-collapse>
                 <div class="space-y-1">
                     <label class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Bentuk Infaq Sedekah</label>
-                    <select x-model="person.zakat.infaq.metode" class="w-full text-xs rounded-lg border-gray-300 shadow-sm focus:border-purple-500 focus:ring-purple-500">
+                    <select x-model="person.zakat.infaq.metode" class="w-full text-xs rounded-lg border-gray-300 shadow-sm focus:border-cyan-500 focus:ring-cyan-500">
                         <option value="uang">Uang (Rp)</option>
                         <option value="beras">Beras (Kg)</option>
                     </select>
                 </div>
                 <div class="flex items-center w-full rounded-lg border overflow-hidden shadow-sm focus-within:ring-1 bg-white mt-1.5 transition-all"
-                    :class="isBelowStandard(person, 'infaq') ? 'border-red-500 focus-within:ring-red-500 focus-within:border-red-500' : 'border-purple-300 focus-within:ring-purple-500 focus-within:border-purple-500'">
-                    <div x-show="person.zakat.infaq.metode !== 'beras'" class="px-2.5 py-1.5 text-purple-700 font-black text-[10px] border-r shrink-0" :class="isBelowStandard(person, 'infaq') ? 'bg-red-50 border-red-100' : 'bg-purple-50 border-purple-100'">Rp</div>
+                    :class="isBelowStandard(person, 'infaq') ? 'border-red-500 focus-within:ring-red-500 focus-within:border-red-500' : 'border-cyan-300 focus-within:ring-cyan-500 focus-within:border-cyan-500'">
+                    <div x-show="person.zakat.infaq.metode !== 'beras'" class="px-2.5 py-1.5 text-cyan-700 font-black text-[10px] border-r shrink-0" :class="isBelowStandard(person, 'infaq') ? 'bg-red-50 border-red-100' : 'bg-cyan-50 border-cyan-100'">Rp</div>
                     <input type="text" :inputmode="person.zakat.infaq.metode === 'beras' ? 'decimal' : 'numeric'" x-model="person.zakat.infaq.nominal"
                         @input="person.zakat.infaq.metode !== 'beras' ? person.zakat.infaq.nominal = formatCurrency($event.target.value) : person.zakat.infaq.nominal = formatBeras($event.target.value)"
                         :placeholder="person.zakat.infaq.metode === 'beras' ? '0.00' : '0'" class="flex-1 w-full text-xs border-0 focus:ring-0 py-1.5 px-3 bg-transparent" :required="person.zakat.infaq.active">
-                    <div x-show="person.zakat.infaq.metode === 'beras'" class="px-2.5 py-1.5 text-purple-700 font-black text-[10px] border-l shrink-0" :class="isBelowStandard(person, 'infaq') ? 'bg-red-50 border-red-100' : 'bg-purple-50 border-purple-100'">Kg</div>
+                    <div x-show="person.zakat.infaq.metode === 'beras'" class="px-2.5 py-1.5 text-cyan-700 font-black text-[10px] border-l shrink-0" :class="isBelowStandard(person, 'infaq') ? 'bg-red-50 border-red-100' : 'bg-cyan-50 border-cyan-100'">Kg</div>
                 </div>
             </div>
         </div>

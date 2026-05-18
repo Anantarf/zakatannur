@@ -1,7 +1,11 @@
-<header class="text-center py-3 sm:py-5">
-    <h1 class="text-2xl sm:text-4xl font-black text-slate-900 leading-snug sm:leading-tight">
-        Sistem Informasi Penerimaan Zakat<br>
-        <span class="text-emerald-700">Masjid An-Nur</span>
-        <span class="text-[12px] sm:text-[14.5px] text-slate-600 font-black mt-0.5 block tracking-[0.4em] uppercase">Komplek BPK V Gandul</span>
-    </h1>
+<header class="public-header mx-auto max-w-4xl text-center">
+    <p class="text-[10px] sm:text-[11px] text-emerald-700 font-semibold tracking-[0.32em] uppercase">
+        Sistem Informasi Penerimaan Zakat
+    </p>
+    <div class="mt-2 text-[1.55rem] sm:text-[2rem] font-black text-slate-900 leading-none tracking-[-0.03em]">
+        Masjid An-Nur
+    </div>
+    <div class="mt-2 text-[11px] sm:text-[12px] text-slate-500 font-medium tracking-[0.22em] uppercase">
+        Komplek BPK V Gandul
+    </div>
 </header>

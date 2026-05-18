@@ -5,7 +5,7 @@ namespace App\Http\Controllers\Guest;
 use App\Http\Controllers\Controller;
 use App\Models\AppSetting;
 use App\Models\ZakatTransaction;
-use Illuminate\Http\Request;
+use App\Support\SqlDialect;
 
 class GuestLatestController extends Controller
 {
@@ -14,9 +14,11 @@ class GuestLatestController extends Controller
         $activeYear = AppSetting::getInt(AppSetting::KEY_ACTIVE_YEAR, (int) now()->year);
 
         // Fetch 5 latest validated transactions within the current active year
+        $effectiveTimestamp = SqlDialect::effectiveTimestamp();
+
         $latest = ZakatTransaction::valid()
             ->where('tahun_zakat', $activeYear)
-            ->orderByRaw('COALESCE(waktu_terima, created_at) DESC')
+            ->orderByRaw("{$effectiveTimestamp} DESC")
             ->limit(5)
             ->get()
             ->map(function ($tx) {

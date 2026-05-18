@@ -237,21 +237,6 @@ if (transactionFormConfig) {
                 return true;
             }
 
-            if (category === 'fitrah') {
-                const standard = isBeras ? this.standards.beras : this.standards.fitrahUang;
-                return value <= standard;
-            }
-
-            if (category === 'fidyah') {
-                const hari = parseInt(zakat.hari, 10) || 0;
-                if (hari <= 0) {
-                    return true;
-                }
-
-                const standardPerHari = isBeras ? this.standards.fidyahBeras : this.standards.fidyahUang;
-                return value <= (standardPerHari * hari);
-            }
-
             return false;
         },
         handleTfGlobalChange() {
@@ -443,7 +428,7 @@ if (transactionFormConfig) {
             if (hasInvalidCustom) {
                 event.preventDefault();
                 const invalidField = document.querySelector('.border-red-500 input');
-                this.showFormNotice('Masih ada nominal khusus yang belum valid atau belum melebihi standar. Field yang perlu diperbaiki sudah ditandai merah.', invalidField);
+                this.showFormNotice('Masih ada nominal atau takaran custom yang belum valid. Pastikan nilainya terisi dan lebih dari 0.', invalidField);
                 return;
             }
 

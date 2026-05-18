@@ -8,6 +8,7 @@ use App\Models\AnnualSetting;
 use App\Models\AppSetting;
 use App\Models\User;
 use App\Models\ZakatTransaction;
+use App\Services\Transactions\TransactionReceiptLifecycleService;
 use App\Services\ZakatService;
 use App\Support\ReceiptPdf;
 use App\Transformers\TransactionTransformer;
@@ -79,7 +80,7 @@ class ZakatTransactionController extends Controller
         ]);
     }
 
-    public function receipt(Request $request, int $transaction): Response
+    public function receipt(Request $request, int $transaction, TransactionReceiptLifecycleService $receiptLifecycleService): Response
     {
         $user = $request->user();
         $tx = ZakatTransaction::withTrashed()->findOrFail($transaction);
@@ -118,6 +119,7 @@ class ZakatTransactionController extends Controller
 
         $petugas = User::find($tx->petugas_id) ?? $user;
         $pdfBytes = ReceiptPdf::renderA4Receipt($transactions, $petugas, $disk->path($template->storage_path));
+        $receiptLifecycleService->markGroupAsPrinted($request, $tx);
 
         return response($pdfBytes, 200, [
             'Content-Type' => 'application/pdf',

@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\AppSetting;
+use App\Models\TransactionRiskReview;
 use App\Models\Muzakki;
 use App\Models\Template;
 use App\Models\User;
@@ -72,6 +73,7 @@ class AuditLogTest extends TestCase
     public function test_template_upload_and_activation_write_audit_logs(): void
     {
         Storage::fake('local');
+        Storage::disk('local')->makeDirectory('templates/letterhead');
 
         $super = User::factory()->create(['role' => User::ROLE_SUPER_ADMIN]);
         $file  = UploadedFile::fake()->create('kop.pdf', 200, 'application/pdf');
@@ -124,6 +126,168 @@ class AuditLogTest extends TestCase
             'actor_user_id'=> $superAdmin->id,
             'subject_type' => User::class,
             'subject_id'   => $created->id,
+        ]);
+    }
+
+    public function test_updating_risk_review_status_writes_audit_log_when_status_changes(): void
+    {
+        $admin = User::factory()->create(['role' => User::ROLE_ADMIN]);
+        $muzakki = Muzakki::query()->create(['name' => 'Muzakki Review']);
+
+        $tx = ZakatTransaction::query()->create([
+            'no_transaksi'   => 'TRX-20260517-0099',
+            'muzakki_id'     => $muzakki->id,
+            'pembayar_nama'  => 'Pembayar Review',
+            'pembayar_phone' => '08123',
+            'pembayar_alamat'=> 'Jakarta',
+            'shift'          => ZakatTransaction::SHIFTS[0],
+            'category'       => ZakatTransaction::CATEGORY_FITRAH,
+            'tahun_zakat'    => 2026,
+            'metode'         => ZakatTransaction::METHOD_UANG,
+            'nominal_uang'   => 50000,
+            'jiwa'           => 1,
+            'petugas_id'     => $admin->id,
+            'status'         => ZakatTransaction::STATUS_VALID,
+        ]);
+
+        TransactionRiskReview::query()->create([
+            'zakat_transaction_id' => $tx->id,
+            'group_no_transaksi' => $tx->no_transaksi,
+            'risk_level' => TransactionRiskReview::LEVEL_WARNING,
+            'risk_score' => 25,
+            'risk_flags' => ['fitrah_cash_mismatch'],
+            'reasons' => ['Butuh cek ulang.'],
+            'duplicate_candidates' => [],
+            'detector_version' => 'v1',
+            'review_status' => TransactionRiskReview::REVIEW_BELUM_DITINJAU,
+            'checked_at' => now(config('zakat.timezone')),
+        ]);
+
+        $this->actingAs($admin)
+            ->patch('/internal/anomalies/' . $tx->no_transaksi . '/review-status', [
+                'review_status' => TransactionRiskReview::REVIEW_AMAN,
+            ])
+            ->assertRedirect('/internal/anomalies/' . $tx->no_transaksi);
+
+        $this->assertDatabaseHas('audit_logs', [
+            'action' => 'transaction.risk_review_status_updated',
+            'actor_user_id' => $admin->id,
+            'subject_type' => ZakatTransaction::class,
+            'subject_id' => $tx->id,
+        ]);
+
+        $log = \App\Models\AuditLog::where('action', 'transaction.risk_review_status_updated')->first();
+        $this->assertNotNull($log);
+        $this->assertEquals($tx->no_transaksi, $log->metadata['no_transaksi']);
+        $this->assertEquals(TransactionRiskReview::REVIEW_BELUM_DITINJAU, $log->metadata['previous_review_status']);
+        $this->assertEquals(TransactionRiskReview::REVIEW_AMAN, $log->metadata['new_review_status']);
+    }
+
+    public function test_first_receipt_print_writes_audit_log(): void
+    {
+        Storage::fake('local');
+        Storage::disk('local')->makeDirectory('templates/letterhead');
+
+        $tcpdf = new \TCPDF('P', 'mm', 'A4', true, 'UTF-8', false);
+        $tcpdf->setPrintHeader(false);
+        $tcpdf->setPrintFooter(false);
+        $tcpdf->AddPage();
+        $letterheadBytes = $tcpdf->Output('', 'S');
+
+        $storagePath = 'templates/letterhead/test_letterhead.pdf';
+        Storage::disk('local')->put($storagePath, $letterheadBytes);
+
+        $superAdmin = User::factory()->create(['role' => User::ROLE_SUPER_ADMIN]);
+        Template::query()->create([
+            'template_type' => Template::TYPE_LETTERHEAD,
+            'version' => 1,
+            'is_active' => true,
+            'storage_path' => $storagePath,
+            'original_filename' => 'kop.pdf',
+            'mime_type' => 'application/pdf',
+            'file_size_bytes' => strlen($letterheadBytes),
+            'uploaded_by' => $superAdmin->id,
+        ]);
+
+        $staff = User::factory()->create(['role' => User::ROLE_STAFF]);
+        $muzakki = Muzakki::query()->create(['name' => 'Muzakki Print']);
+
+        $tx = ZakatTransaction::query()->create([
+            'no_transaksi' => 'TRX-20260518-0099',
+            'muzakki_id' => $muzakki->id,
+            'pembayar_nama' => 'Pembayar Print',
+            'pembayar_phone' => '08123',
+            'pembayar_alamat' => 'Jakarta',
+            'shift' => ZakatTransaction::SHIFTS[0],
+            'category' => ZakatTransaction::CATEGORY_FITRAH,
+            'tahun_zakat' => 2026,
+            'metode' => ZakatTransaction::METHOD_UANG,
+            'nominal_uang' => 50000,
+            'jiwa' => 1,
+            'petugas_id' => $staff->id,
+            'status' => ZakatTransaction::STATUS_VALID,
+        ]);
+
+        $this->actingAs($staff)
+            ->get('/internal/transactions/' . $tx->id . '/receipt')
+            ->assertOk();
+
+        $this->assertDatabaseHas('audit_logs', [
+            'action' => 'transaction.receipt_printed',
+            'actor_user_id' => $staff->id,
+            'subject_type' => ZakatTransaction::class,
+            'subject_id' => $tx->id,
+        ]);
+    }
+
+    public function test_admin_update_after_receipt_print_writes_audit_log(): void
+    {
+        AppSetting::query()->create(['key' => AppSetting::KEY_ACTIVE_YEAR, 'value' => '2026']);
+        $admin = User::factory()->create(['role' => User::ROLE_ADMIN]);
+        $staff = User::factory()->create(['role' => User::ROLE_STAFF]);
+        $muzakki = Muzakki::query()->create(['name' => 'Muzakki Update']);
+
+        $tx = ZakatTransaction::query()->create([
+            'no_transaksi' => 'TRX-20260518-0100',
+            'muzakki_id' => $muzakki->id,
+            'pembayar_nama' => 'Pembayar Update',
+            'pembayar_phone' => '08123',
+            'pembayar_alamat' => 'Jakarta',
+            'shift' => ZakatTransaction::SHIFTS[0],
+            'category' => ZakatTransaction::CATEGORY_MAL,
+            'tahun_zakat' => 2026,
+            'metode' => ZakatTransaction::METHOD_UANG,
+            'nominal_uang' => 1000,
+            'petugas_id' => $staff->id,
+            'status' => ZakatTransaction::STATUS_VALID,
+            'receipt_printed_at' => now(config('zakat.timezone')),
+            'receipt_printed_by' => $staff->id,
+        ]);
+
+        $this->actingAs($admin)
+            ->patch('/internal/transactions/' . $tx->id . '/update', [
+                'pembayar_nama' => 'Pembayar Update',
+                'pembayar_phone' => '08123',
+                'pembayar_alamat' => 'Jakarta',
+                'tahun_zakat' => 2026,
+                'shift' => ZakatTransaction::SHIFT_PAGI,
+                'items' => [
+                    [
+                        'id' => $tx->id,
+                        'muzakki_name' => 'Muzakki Update',
+                        'category' => ZakatTransaction::CATEGORY_MAL,
+                        'metode' => ZakatTransaction::METHOD_UANG,
+                        'nominal_uang' => 2000,
+                    ],
+                ],
+            ])
+            ->assertRedirect('/internal/transactions/' . $tx->id);
+
+        $this->assertDatabaseHas('audit_logs', [
+            'action' => 'transaction.updated_after_receipt_printed',
+            'actor_user_id' => $admin->id,
+            'subject_type' => ZakatTransaction::class,
+            'subject_id' => $tx->id,
         ]);
     }
 }

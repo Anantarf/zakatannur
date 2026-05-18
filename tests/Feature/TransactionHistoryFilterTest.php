@@ -171,4 +171,53 @@ class TransactionHistoryFilterTest extends TestCase
             ->assertSee('TRX-20260308-0900')
             ->assertDontSee('TRX-20260308-0901');
     }
+
+    public function test_history_grouped_transaction_keeps_multiple_categories_and_methods_visible(): void
+    {
+        AppSetting::query()->create(['key' => AppSetting::KEY_ACTIVE_YEAR, 'value' => '2026']);
+
+        $staff   = User::factory()->create(['role' => User::ROLE_STAFF]);
+        $petugas = User::factory()->create(['role' => User::ROLE_STAFF]);
+        $muzakkiA = Muzakki::query()->create(['name' => 'Ahmad']);
+        $muzakkiB = Muzakki::query()->create(['name' => 'Budi']);
+
+        ZakatTransaction::query()->create([
+            'no_transaksi'   => 'TRX-20260308-0999',
+            'muzakki_id'     => $muzakkiA->id,
+            'pembayar_nama'  => 'Pembayar Gabungan',
+            'pembayar_phone' => '0812',
+            'pembayar_alamat'=> 'Jakarta',
+            'shift'          => ZakatTransaction::SHIFTS[0],
+            'category'       => ZakatTransaction::CATEGORY_MAL,
+            'tahun_zakat'    => 2026,
+            'metode'         => ZakatTransaction::METHOD_UANG,
+            'nominal_uang'   => 10000,
+            'petugas_id'     => $petugas->id,
+            'status'         => ZakatTransaction::STATUS_VALID,
+        ]);
+
+        ZakatTransaction::query()->create([
+            'no_transaksi'    => 'TRX-20260308-0999',
+            'muzakki_id'      => $muzakkiB->id,
+            'pembayar_nama'   => 'Pembayar Gabungan',
+            'pembayar_phone'  => '0812',
+            'pembayar_alamat' => 'Jakarta',
+            'shift'           => ZakatTransaction::SHIFTS[0],
+            'category'        => ZakatTransaction::CATEGORY_INFAK,
+            'tahun_zakat'     => 2026,
+            'metode'          => ZakatTransaction::METHOD_BERAS,
+            'jumlah_beras_kg' => 2.5,
+            'petugas_id'      => $petugas->id,
+            'status'          => ZakatTransaction::STATUS_VALID,
+        ]);
+
+        $this->actingAs($staff)
+            ->get('/internal/history?q=Pembayar%20Gabungan')
+            ->assertOk()
+            ->assertSee('TRX-20260308-0999')
+            ->assertSee('Zakat Mal')
+            ->assertSee('Infaq Shodaqoh')
+            ->assertSee('Uang')
+            ->assertSee('Beras');
+    }
 }

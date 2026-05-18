@@ -4,6 +4,7 @@ namespace App\Support;
 
 use App\Models\ZakatTransaction;
 use Carbon\Carbon;
+use App\Support\SqlDialect;
 use Illuminate\Support\Facades\DB;
 
 final class RekapBuilder
@@ -120,7 +121,7 @@ final class RekapBuilder
             ->valid()
             ->whereYear('created_at', $year)
             ->select(
-                DB::raw('DATE(created_at) as day'),
+                DB::raw(SqlDialect::dateExpression('created_at', 'day')),
                 DB::raw('COALESCE(SUM(nominal_uang), 0) as total_uang'),
                 DB::raw('COALESCE(SUM(jumlah_beras_kg), 0) as total_beras')
             )

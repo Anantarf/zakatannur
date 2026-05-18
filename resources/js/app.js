@@ -1,12 +1,26 @@
 import './bootstrap';
 import './chatbot-widget';
-import './public-home';
-import './transaction-form';
 
 import Alpine from 'alpinejs';
 import collapse from '@alpinejs/collapse'
  
 Alpine.plugin(collapse)
 window.Alpine = Alpine;
- 
-Alpine.start();
+
+const bootPageModules = async () => {
+    const imports = [];
+
+    if (document.getElementById('public-home-config')) {
+        imports.push(import('./public-home'));
+    }
+
+    if (document.getElementById('transaction-form-config')) {
+        imports.push(import('./transaction-form'));
+    }
+
+    await Promise.all(imports);
+};
+
+bootPageModules().finally(() => {
+    Alpine.start();
+});

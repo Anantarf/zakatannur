@@ -4,10 +4,10 @@ use App\Http\Controllers\Internal\DashboardController;
 use App\Http\Controllers\Internal\PeriodSettingsController;
 use App\Http\Controllers\Internal\TemplateController;
 use App\Http\Controllers\Internal\AuditLogController;
+use App\Http\Controllers\Internal\TransactionAnomalyController;
 use App\Http\Controllers\Internal\TransactionHistoryController;
 use App\Http\Controllers\Internal\UserManagementController;
 use App\Http\Controllers\Internal\MuzakkiController;
-use App\Http\Controllers\Internal\MustahikController;
 use App\Http\Controllers\Internal\ZakatTransactionController;
 use App\Http\Controllers\Internal\ExportController;
 use App\Http\Controllers\Internal\ProfileController;
@@ -33,6 +33,9 @@ Route::middleware(['auth', 'role:staff,admin,super_admin'])
             Route::post('/transactions/{transaction}/trash', [TransactionHistoryController::class, 'destroy'])->name('transactions.destroy');
             Route::post('/transactions/{transactionId}/restore', [TransactionHistoryController::class, 'restore'])->name('transactions.restore');
             Route::delete('/transactions/{transactionId}/force-delete', [TransactionHistoryController::class, 'forceDelete'])->name('transactions.forceDelete');
+            Route::get('/anomalies', [TransactionAnomalyController::class, 'index'])->name('anomalies.index');
+            Route::get('/anomalies/{noTransaksi}', [TransactionAnomalyController::class, 'show'])->name('anomalies.show');
+            Route::patch('/anomalies/{noTransaksi}/review-status', [TransactionAnomalyController::class, 'updateReviewStatus'])->name('anomalies.review_status');
 
             Route::get('/muzakki/trash', [MuzakkiController::class, 'trash'])->name('muzakki.trash');
             Route::post('/muzakki/{muzakki}/restore', [MuzakkiController::class, 'restore'])->name('muzakki.restore');
@@ -45,7 +48,6 @@ Route::middleware(['auth', 'role:staff,admin,super_admin'])
 
         Route::resource('muzakki', MuzakkiController::class)->names('muzakki');
         Route::get('/muzakki-autocomplete', [MuzakkiController::class, 'autocomplete'])->name('muzakki.autocomplete');
-        Route::get('/mustahik', [MustahikController::class, 'index'])->name('mustahik.index');
         Route::get('/history', [TransactionHistoryController::class, 'index'])->name('transactions.index');
         
         // Internal transactions

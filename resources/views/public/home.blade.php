@@ -25,21 +25,22 @@
         ], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!}
     </script>
 </head>
-<body class="pb-20 sm:pb-24 min-h-screen bg-slate-100 text-slate-800 flex flex-col font-sans antialiased relative"
+<body class="pb-20 sm:pb-24 min-h-screen bg-[#f4f8f2] text-slate-800 flex flex-col font-sans antialiased relative overflow-x-hidden"
     x-data="zakatApp()"
     :class="{ 'overflow-hidden': openLogin }">
-    <div class="absolute inset-0 bg-gradient-to-tr from-emerald-500/10 via-transparent to-emerald-500/10 pointer-events-none"></div>
+    <div class="absolute inset-0 pointer-events-none bg-[linear-gradient(180deg,#f8fbf5_0%,#eff7ef_42%,#f8fafc_100%)]"></div>
+    <div class="absolute inset-0 pointer-events-none opacity-[0.32] [background-image:linear-gradient(rgba(15,118,110,0.08)_1px,transparent_1px),linear-gradient(90deg,rgba(15,118,110,0.08)_1px,transparent_1px)] [background-size:44px_44px]"></div>
 
     @include('public.partials.notification')
     @include('public._login_modal')
     @include('public.partials.nav')
 
-    <main class="flex-1 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+    <main class="public-shell-gap flex-1 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         <div x-show="activeTab !== 'grafik'" x-collapse.duration.500ms>
             @include('public.partials.header')
         </div>
 
-        <div class="transition-all duration-500 mb-6 relative z-10">
+        <div class="transition-all duration-500 mb-5 sm:mb-6 relative z-10">
             <div>
                 @include('public.partials.beranda-tab')
                 @include('public.partials.laporan-tab')

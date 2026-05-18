@@ -112,6 +112,11 @@ class ReceiptPrintTest extends TestCase
         $response->assertHeader('Content-Type', 'application/pdf');
         $this->assertIsString($response->getContent());
         $this->assertStringStartsWith('%PDF', $response->getContent());
+        $this->assertDatabaseHas('zakat_transactions', [
+            'id' => $trx->id,
+            'receipt_printed_by' => $staff->id,
+        ]);
+        $this->assertNotNull($trx->fresh()->receipt_printed_at);
     }
 
     public function test_printing_trashed_transaction_is_forbidden_for_staff_but_allowed_for_admin(): void
