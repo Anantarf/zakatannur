@@ -2,8 +2,8 @@
     <x-slot name="header">
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div class="space-y-1 text-center sm:text-left">
-                <h2 class="font-bold text-xl sm:text-2xl text-emerald-900 leading-tight flex items-center justify-center sm:justify-start gap-2">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7 text-emerald-600 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <h2 class="ui-page-title">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="ui-page-title-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
                     </svg>
                     Riwayat Transaksi
@@ -35,19 +35,7 @@
     <div class="py-6 sm:py-10">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-6">
             @if ($errors->any())
-                <div class="rounded-xl border border-red-200 bg-red-50 p-4 text-red-900 shadow-sm">
-                    <div class="flex items-center gap-2 font-bold text-red-700 mb-2">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                            <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
-                        </svg>
-                        Mohon Perbaiki Kesalahan Berikut:
-                    </div>
-                    <ul class="list-disc pl-10 space-y-1 text-sm">
-                        @foreach ($errors->all() as $error)
-                            <li>{{ $error }}</li>
-                        @endforeach
-                    </ul>
-                </div>
+                <x-form-errors />
             @endif
             {{-- Transactions Table --}}
             <div class="ui-card overflow-hidden shadow-md">
@@ -62,7 +50,126 @@
 
                     @include('internal.transactions.partials.history-filters')
                 </div>
-                <div class="overflow-x-auto w-full">
+                <div class="space-y-3 px-4 pb-4 pt-4 md:hidden">
+                    @if (count($transactions) > 0)
+                        @foreach ($transactions as $t)
+                            <article class="ui-mobile-card">
+                                <div class="flex items-start justify-between gap-3">
+                                    <div class="min-w-0">
+                                        <span class="inline-flex rounded-md bg-blue-50 px-2 py-1 font-mono text-[11px] font-semibold text-blue-600">{!! \App\Support\Format::highlight($t->no_transaksi, $q) !!}</span>
+                                        <div class="mt-2 text-sm font-semibold leading-tight text-gray-800">{!! \App\Support\Format::highlight($t->pembayar_nama, $q) !!}</div>
+                                        @if($t->muzakki_total > 1)
+                                            <div class="mt-1 text-[11px] text-gray-500">+ {{ $t->muzakki_total - 1 }} muzakki lainnya</div>
+                                        @endif
+                                    </div>
+                                    <div class="shrink-0 text-right">
+                                        @if ($t->waktu_terima)
+                                            <div class="text-[11px] font-semibold text-gray-500">{{ $t->waktu_terima->timezone('Asia/Jakarta')->format('d/m/Y') }}</div>
+                                            <div class="mt-1 text-xs font-bold text-slate-700">{{ $t->waktu_terima->timezone('Asia/Jakarta')->format('H:i') }}</div>
+                                        @else
+                                            <div class="text-[11px] font-semibold text-gray-500">{{ $t->created_at->timezone('Asia/Jakarta')->format('d/m/Y') }}</div>
+                                            <div class="mt-1 text-xs font-bold text-slate-700">{{ $t->created_at->timezone('Asia/Jakarta')->format('H:i') }}</div>
+                                        @endif
+                                    </div>
+                                </div>
+
+                                <div class="ui-mobile-card-muted space-y-3">
+                                    <div class="flex items-start justify-between gap-3">
+                                        <span class="text-[10px] font-black uppercase tracking-widest text-gray-400">Kategori</span>
+                                        <div class="max-w-[65%]">
+                                            <x-zakat-category-tags :categories="$t->categories_list" />
+                                        </div>
+                                    </div>
+                                    <div class="flex items-start justify-between gap-3">
+                                        <span class="text-[10px] font-black uppercase tracking-widest text-gray-400">Bentuk</span>
+                                        <div class="max-w-[65%]">
+                                            <x-transaction-method-tags :methods="$t->methods_list" class="justify-end" />
+                                        </div>
+                                    </div>
+                                    <div class="flex items-start justify-between gap-3">
+                                        <span class="text-[10px] font-black uppercase tracking-widest text-gray-400">Nominal</span>
+                                        <div class="text-right">
+                                            @if($t->total_uang > 0)
+                                                <div class="flex items-center justify-end gap-1">
+                                                    <span class="text-sm font-semibold text-gray-800">{{ $t->total_uang_display }}</span>
+                                                    @if($t->has_transfer)
+                                                        <x-transfer-badge />
+                                                    @endif
+                                                </div>
+                                            @endif
+                                            @if($t->total_beras > 0)
+                                                <div class="mt-1 text-sm font-semibold text-gray-800">{{ $t->total_beras_display }}</div>
+                                            @endif
+                                        </div>
+                                    </div>
+                                    @if ($canViewRisk)
+                                        <div class="flex items-start justify-between gap-3">
+                                            <span class="text-[10px] font-black uppercase tracking-widest text-gray-400">Risiko</span>
+                                            @if (in_array($t->risk_level, [\App\Models\TransactionRiskReview::LEVEL_WARNING, \App\Models\TransactionRiskReview::LEVEL_SUSPICIOUS], true))
+                                                <a href="{{ route('internal.anomalies.show', ['noTransaksi' => $t->no_transaksi]) }}" class="flex flex-col items-end gap-1">
+                                                    <x-risk-level-badge :level="$t->risk_level" />
+                                                    <x-review-status-badge :status="$t->review_status" />
+                                                </a>
+                                            @else
+                                                <div class="flex flex-col items-end gap-1">
+                                                    <x-risk-level-badge :level="$t->risk_level" />
+                                                    <x-review-status-badge :status="$t->review_status" />
+                                                </div>
+                                            @endif
+                                        </div>
+                                    @endif
+                                    <div class="flex items-start justify-between gap-3">
+                                        <span class="text-[10px] font-black uppercase tracking-widest text-gray-400">Petugas</span>
+                                        <div class="text-right">
+                                            <div class="font-medium text-gray-700">{{ $t->petugas?->name ?? '-' }}</div>
+                                            <span class="mt-1 inline-flex items-center justify-center rounded px-2 py-0.5 text-[11px] font-bold uppercase bg-emerald-50 text-emerald-700 border border-emerald-100 whitespace-nowrap leading-tight text-center">
+                                                {{ $t->shift_label }}
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="mt-4 grid grid-cols-2 gap-2">
+                                    <a class="ui-btn ui-btn-secondary px-3 py-3 text-xs" href="{{ route('internal.transactions.show', ['transaction' => $t->id]) }}">
+                                        Lihat
+                                    </a>
+                                    <a class="ui-btn ui-btn-accent px-3 py-3 text-xs" href="{{ route('internal.transactions.receipt', ['transaction' => $t->id]) }}" target="_blank" rel="noopener">
+                                        Cetak
+                                    </a>
+
+                                    @can('update', $t)
+                                        <a class="ui-btn ui-btn-secondary px-3 py-3 text-xs border-amber-200 text-amber-700 hover:bg-amber-50" href="{{ route('internal.transactions.edit', ['transaction' => $t->id]) }}">
+                                            Edit
+                                        </a>
+                                        <button type="button" x-data x-on:click="$dispatch('open-modal', 'trash-modal'); $dispatch('open-trash-modal', { id: {{ $t->id }}, no: '{{ $t->no_transaksi }}' })" class="ui-btn ui-btn-danger px-3 py-3 text-xs">
+                                            Hapus
+                                        </button>
+                                    @else
+                                        <button type="button" x-data x-on:click="$dispatch('open-modal', 'restricted-modal')" class="ui-btn ui-btn-secondary px-3 py-3 text-xs text-gray-400">
+                                            Edit
+                                        </button>
+                                        <button type="button" x-data x-on:click="$dispatch('open-modal', 'restricted-modal')" class="ui-btn ui-btn-secondary px-3 py-3 text-xs text-gray-400">
+                                            Hapus
+                                        </button>
+                                    @endcan
+                                </div>
+                            </article>
+                        @endforeach
+                    @else
+                        <div class="ui-empty-state">
+                            <div class="flex flex-col items-center">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 text-gray-200 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                </svg>
+                                <span class="ui-empty-state-copy">
+                                    {{ ($q || $year || $category) ? 'Data tidak ditemukan.' : 'Belum ada transaksi ditemukan.' }}
+                                </span>
+                            </div>
+                        </div>
+                    @endif
+                </div>
+
+                <div class="hidden overflow-x-auto w-full md:block">
                     <table class="min-w-full text-sm">
                         <thead>
                             <tr class="bg-gray-50 text-left text-[11px] sm:text-xs font-bold text-gray-400 uppercase tracking-widest border-b border-gray-100">
@@ -150,19 +257,13 @@
                                         </div>
                                     </td>
                                     <td class="px-3 py-4 text-center whitespace-nowrap">
-                                        @php
-                                            $actionTime = ($t->waktu_terima ?? $t->created_at)?->timezone(config('zakat.timezone'));
-                                            $canModify = auth()->user()->role !== 'staff' || 
-                                                        ($t->petugas_id === auth()->id() && $actionTime?->isToday() && $t->receipt_printed_at === null);
-                                        @endphp
-
                                         <div class="flex items-center justify-center gap-1.5">
                                             <a class="ui-icon-button ui-icon-button-neutral px-2" href="{{ route('internal.transactions.show', ['transaction' => $t->id]) }}" title="Lihat" aria-label="Lihat transaksi">
                                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
                                                 <span class="ui-table-action-label">Lihat</span>
                                             </a>
                                             
-                                            @if($canModify)
+                                            @can('update', $t)
                                                 <a class="ui-icon-button ui-icon-button-amber px-2" href="{{ route('internal.transactions.edit', ['transaction' => $t->id]) }}" title="Edit" aria-label="Edit transaksi">
                                                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
                                                     <span class="ui-table-action-label">Edit</span>
@@ -172,14 +273,14 @@
                                                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
                                                     <span class="ui-table-action-label">Edit</span>
                                                 </button>
-                                            @endif
+                                            @endcan
 
                                             <a class="ui-icon-button ui-icon-button-blue px-2" href="{{ route('internal.transactions.receipt', ['transaction' => $t->id]) }}" target="_blank" rel="noopener" title="Cetak Tanda Terima" aria-label="Cetak tanda terima">
                                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" /></svg>
                                                 <span class="ui-table-action-label">Cetak</span>
                                             </a>
 
-                                            @if($canModify)
+                                            @can('update', $t)
                                                 <button type="button" x-data x-on:click="$dispatch('open-modal', 'trash-modal'); $dispatch('open-trash-modal', { id: {{ $t->id }}, no: '{{ $t->no_transaksi }}' })" class="ui-icon-button ui-icon-button-danger px-2" title="Hapus" aria-label="Hapus transaksi">
                                                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
@@ -193,7 +294,7 @@
                                                     </svg>
                                                     <span class="ui-table-action-label">Hapus</span>
                                                 </button>
-                                            @endif
+                                            @endcan
                                         </div>
                                     </td>
                                 </tr>
@@ -293,7 +394,7 @@
             <div class="mb-6">
                 <x-input-label for="daily_date" :value="'Tanggal Transaksi'" class="mb-2" />
                 @if(isset($availableDates) && count($availableDates) > 0)
-                        <select id="daily_date" name="date" required class="border-gray-300 focus:border-emerald-500 focus:ring-emerald-500 rounded-lg shadow-sm w-full py-2.5 px-4 text-sm font-medium text-gray-700 cursor-pointer">
+                        <select id="daily_date" name="date" required class="ui-select w-full bg-white">
                             <option value="">-- Pilih Tanggal --</option>
                             @foreach ($availableDates as $rawDate => $formattedDate)
                                 <option value="{{ $rawDate }}">{{ $formattedDate }}</option>
@@ -309,7 +410,7 @@
             <div class="flex flex-col sm:flex-row justify-end items-stretch sm:items-center gap-3">
                 <x-secondary-button x-on:click="$dispatch('close')" class="justify-center">Batal</x-secondary-button>
                 @if(isset($availableDates) && count($availableDates) > 0)
-                    <button type="submit" class="inline-flex justify-center items-center gap-2 rounded-lg bg-emerald-600 px-4 py-2 text-sm font-semibold text-white shadow-md hover:bg-emerald-700 transition-all" x-on:click="setTimeout(() => $dispatch('close'), 1500)">
+                    <button type="submit" class="ui-btn ui-btn-primary" x-on:click="setTimeout(() => $dispatch('close'), 1500)">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
                         Download Excel
                     </button>
@@ -332,7 +433,7 @@
             <div class="mb-6">
                 <x-input-label for="yearly_year" :value="'Tahun Zakat'" class="mb-2" />
                 @if(isset($availableYears) && count($availableYears) > 0)
-                        <select id="yearly_year" name="year" required class="border-gray-300 focus:border-blue-500 focus:ring-blue-500 rounded-lg shadow-sm w-full py-2.5 px-4 text-sm font-medium text-gray-700 cursor-pointer">
+                        <select id="yearly_year" name="year" required class="ui-select w-full bg-white focus:border-blue-500 focus:ring-blue-500">
                             <option value="">-- Pilih Tahun --</option>
                             @foreach ($availableYears as $optYear)
                                 <option value="{{ $optYear }}">{{ $optYear }}</option>
@@ -348,7 +449,7 @@
             <div class="flex flex-col sm:flex-row justify-end items-stretch sm:items-center gap-3">
                 <x-secondary-button x-on:click="$dispatch('close')" class="justify-center">Batal</x-secondary-button>
                 @if(isset($availableYears) && count($availableYears) > 0)
-                    <button type="submit" class="inline-flex justify-center items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white shadow-md hover:bg-blue-700 transition-all" x-on:click="setTimeout(() => $dispatch('close'), 1500)">
+                    <button type="submit" class="ui-btn ui-btn-accent" x-on:click="setTimeout(() => $dispatch('close'), 1500)">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
                         Download Excel
                     </button>

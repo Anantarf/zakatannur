@@ -16,6 +16,9 @@ class ProfileController extends Controller
     {
         return view('internal.profile.edit', [
             'user' => $request->user(),
+            'nameMax' => (int) config('zakat.validation.user_name_max', 100),
+            'usernameMax' => (int) config('zakat.validation.username_max', 50),
+            'passwordMin' => self::PASSWORD_MIN_LENGTH,
         ]);
     }
 

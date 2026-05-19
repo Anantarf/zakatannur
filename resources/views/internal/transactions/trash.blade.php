@@ -1,13 +1,13 @@
 <x-app-layout>
     <x-slot name="header">
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-            <h2 class="font-bold text-xl sm:text-2xl text-emerald-800 leading-tight flex items-center justify-center sm:justify-start gap-2 text-center sm:text-left">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7 text-red-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <h2 class="ui-page-title">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7 shrink-0 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                 </svg>
                 Sampah Transaksi
             </h2>
-            <a href="{{ route('internal.transactions.index') }}" class="inline-flex justify-center items-center gap-2 rounded-xl bg-white border border-gray-100 px-4 py-3 sm:py-2 text-sm font-bold text-gray-500 hover:text-emerald-700 hover:bg-emerald-50 transition-all w-full sm:w-auto shadow-sm">
+            <a href="{{ route('internal.transactions.index') }}" class="ui-header-link">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
                 </svg>
@@ -19,8 +19,8 @@
     <div class="py-10">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-6">
             {{-- Warning Banner --}}
-            <div class="flex items-center gap-3 rounded-xl border border-amber-200 bg-amber-50 p-4 text-amber-800 shadow-sm">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-amber-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <div class="ui-alert ui-alert-warning">
+                <svg xmlns="http://www.w3.org/2000/svg" class="ui-alert-icon text-amber-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z" />
                 </svg>
                 <div>
@@ -30,8 +30,8 @@
             </div>
 
             @if (session('status'))
-                <div class="flex items-center gap-3 rounded-xl border border-emerald-200 bg-emerald-50 p-4 text-emerald-900 shadow-sm">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-emerald-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <div class="ui-alert ui-alert-success">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="ui-alert-icon text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
                     </svg>
                     <span class="font-medium">{{ session('status') }}</span>
@@ -39,28 +39,131 @@
             @endif
 
             @if ($errors->any())
-                <div class="rounded-xl border border-red-200 bg-red-50 p-4 text-red-900 shadow-sm">
-                    <div class="flex items-center gap-2 font-bold text-red-700 mb-2">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                <div class="ui-alert ui-alert-error">
+                    <div class="w-full">
+                        <div class="ui-alert-title text-red-700">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="ui-alert-icon" viewBox="0 0 20 20" fill="currentColor">
                             <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
-                        </svg>
-                        Mohon Periksa:
+                            </svg>
+                            Mohon Periksa:
+                        </div>
+                        <ul class="list-disc pl-10 space-y-1 text-sm">
+                            @foreach ($errors->all() as $error)
+                                <li>{{ $error }}</li>
+                            @endforeach
+                        </ul>
                     </div>
-                    <ul class="list-disc pl-10 space-y-1 text-sm">
-                        @foreach ($errors->all() as $error)
-                            <li>{{ $error }}</li>
-                        @endforeach
-                    </ul>
                 </div>
             @endif
 
             {{-- Trash Table --}}
-            <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-                <div class="px-6 py-4 border-b border-gray-50 flex items-center gap-2">
-                    <div class="w-2 h-6 bg-red-400 rounded-full"></div>
+            <div class="ui-card overflow-hidden">
+                <div class="ui-card-header ui-card-header-neutral">
+                    <div class="h-6 w-2 rounded-full bg-red-400"></div>
                     <h3 class="font-bold text-gray-800">Transaksi Terhapus</h3>
                 </div>
-                <div class="overflow-x-auto w-full">
+                <div class="space-y-3 p-4 md:hidden">
+                    @if (count($transactions) > 0)
+                        @foreach ($transactions as $t)
+                            <article class="ui-mobile-card">
+                                <div class="flex items-start justify-between gap-3">
+                                    <div class="min-w-0">
+                                        <span class="inline-flex rounded-md bg-red-50 px-2 py-1 font-mono text-[11px] font-bold text-red-500">{!! \App\Support\Format::highlight($t->no_transaksi, $q) !!}</span>
+                                        <div class="mt-2 text-sm font-semibold leading-tight text-gray-800">{!! \App\Support\Format::highlight($t->pembayar_nama, $q) !!}</div>
+                                        @if($t->muzakki_total > 1)
+                                            <div class="mt-1 text-[11px] text-gray-500">+ {{ $t->muzakki_total - 1 }} muzakki lainnya</div>
+                                        @endif
+                                    </div>
+                                    <div class="shrink-0 text-right">
+                                        <div class="text-[11px] font-semibold text-gray-500">{{ $t->deleted_at_formatted }}</div>
+                                        @if($t->days_left !== null)
+                                            <div class="mt-1 text-[10px] font-bold {{ $t->days_left <= 7 ? 'text-red-500' : 'text-gray-400' }}">
+                                                {{ $t->days_left > 0 ? $t->days_left . ' hari lagi' : 'Hari ini' }}
+                                            </div>
+                                        @endif
+                                    </div>
+                                </div>
+
+                                <div class="ui-mobile-card-muted space-y-3">
+                                    <div class="flex items-start justify-between gap-3">
+                                        <span class="text-[10px] font-black uppercase tracking-widest text-gray-400">Kategori</span>
+                                        <div class="max-w-[65%]">
+                                            <x-zakat-category-tags :categories="$t->categories_list" />
+                                        </div>
+                                    </div>
+                                    <div class="flex items-start justify-between gap-3">
+                                        <span class="text-[10px] font-black uppercase tracking-widest text-gray-400">Bentuk</span>
+                                        <div class="flex max-w-[65%] flex-wrap justify-end gap-1">
+                                            @foreach(explode(',', $t->methods_list ?? '') as $met)
+                                                @php $met = trim($met); @endphp
+                                                @if($met)
+                                                    <span class="inline-flex items-center justify-center rounded px-2 py-0.5 text-[9px] font-semibold uppercase bg-amber-50 text-amber-700 border border-amber-100 whitespace-nowrap leading-tight text-center">{{ \App\Models\ZakatTransaction::METHOD_LABELS[$met] ?? strtoupper($met) }}</span>
+                                                @endif
+                                            @endforeach
+                                        </div>
+                                    </div>
+                                    <div class="flex items-start justify-between gap-3">
+                                        <span class="text-[10px] font-black uppercase tracking-widest text-gray-400">Nominal</span>
+                                        <div class="text-right">
+                                            @if($t->total_uang > 0)
+                                                <div class="flex items-center justify-end gap-1.5">
+                                                    <div class="text-sm font-bold text-gray-800">{{ $t->total_uang_display }}</div>
+                                                    @if($t->has_transfer)
+                                                        <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[9px] font-black bg-emerald-100 text-emerald-700 border border-emerald-200 uppercase">TF</span>
+                                                    @endif
+                                                </div>
+                                            @endif
+                                            @if($t->total_beras > 0)
+                                                <div class="mt-1 text-sm font-bold text-gray-800">{{ $t->total_beras_display }}</div>
+                                            @endif
+                                        </div>
+                                    </div>
+                                    <div class="flex items-start justify-between gap-3">
+                                        <span class="text-[10px] font-black uppercase tracking-widest text-gray-400">Petugas</span>
+                                        <div class="text-right">
+                                            <div class="font-medium text-gray-700">{{ $t->petugas?->name ?? '-' }}</div>
+                                            <span class="mt-1 inline-flex items-center justify-center rounded px-2 py-0.5 text-[9px] font-bold uppercase bg-emerald-50 text-emerald-700 border border-emerald-100 whitespace-nowrap leading-tight text-center">
+                                                {{ $t->shift_label }}
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="mt-4 grid grid-cols-3 gap-2">
+                                    <a class="ui-btn ui-btn-secondary px-3 py-3 text-xs" href="{{ route('internal.transactions.show', ['transaction' => $t->id]) }}">
+                                        Lihat
+                                    </a>
+                                    <form method="POST" action="{{ route('internal.transactions.restore', ['transactionId' => $t->id]) }}">
+                                        @csrf
+                                        <button type="submit" class="ui-btn ui-btn-primary w-full px-3 py-3 text-xs">
+                                            Pulihkan
+                                        </button>
+                                    </form>
+                                    @if(in_array(auth()->user()->role, ['admin', 'super_admin']))
+                                        <button type="button" x-data x-on:click="$dispatch('open-modal', 'force-delete-modal'); $dispatch('open-force-delete-modal', { id: {{ $t->id }}, no: '{{ $t->no_transaksi }}' })" class="ui-btn ui-btn-danger w-full px-3 py-3 text-xs">
+                                            Hapus
+                                        </button>
+                                    @else
+                                        <div></div>
+                                    @endif
+                                </div>
+                            </article>
+                        @endforeach
+                    @else
+                        <div class="ui-empty-state">
+                            <div class="flex flex-col items-center">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 text-gray-200 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                                </svg>
+                                <span class="ui-empty-state-copy">
+                                    {{ ($q ?? '') ? 'Data tidak ditemukan.' : 'Sampah kosong - semua transaksi aman.' }}
+                                </span>
+                            </div>
+                        </div>
+                    @endif
+                </div>
+
+                <div class="hidden overflow-x-auto w-full md:block">
                     <table class="min-w-full text-sm">
                         <thead>
                             <tr class="bg-gray-50 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider border-b border-gray-100">

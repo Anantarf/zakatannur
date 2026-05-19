@@ -25,25 +25,31 @@ class DashboardController extends Controller
 
         $filters = DashboardRekapFilters::fromRequest($request);
         $year = $filters->year;
+        $periodId = $filters->periodId;
         $metode = $filters->metode;
         $activeDays = $this->resolveActiveDays($request);
 
         $yearKey = $year ?? 'all';
+        $periodKey = $periodId ?? 'all';
         $metodeKey = $metode ?? 'all';
         $payload = Cache::remember(
-            AppSetting::cacheKeyForDashboardRekap($yearKey, $metodeKey),
+            AppSetting::cacheKeyForDashboardRekap($yearKey . '_period_' . $periodKey, $metodeKey),
             (int) config('zakat.cache.public_summary_ttl', 300),
-            fn() => RekapBuilder::build($year, $metode)
+            fn() => RekapBuilder::build($year, $metode, $periodId)
         );
 
-        $latestTransactions = $groupedQueryService->latestValid($year, $metode, 10);
-        $insights = $dashboardInsightsService->buildInsights($activeYear, $activeDays);
+        $latestTransactions = $groupedQueryService->latestValid($year, $metode, 10, $periodId);
+        $chartYear = $year ?? $activeYear;
+        $insights = $dashboardInsightsService->buildInsights($chartYear, $activeDays);
 
         return view('dashboard', [
             'activeYear' => $activeYear,
+            'chartYear' => $chartYear,
             'year' => $year,
+            'periodId' => $periodId,
             'metode' => $metode,
             'years' => ViewOptions::years($activeYear),
+            'periods' => ViewOptions::periods(),
             'methods' => ZakatTransaction::METHODS,
             'payload' => $payload,
             'latestTransactions' => $latestTransactions,

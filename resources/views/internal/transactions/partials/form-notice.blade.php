@@ -3,7 +3,7 @@
     x-show="formNotice"
     x-cloak
     x-transition.opacity
-    class="mb-6 rounded-xl border border-amber-200 bg-amber-50 p-4 text-amber-900 shadow-sm"
+    class="ui-alert ui-alert-warning mb-6"
     role="alert"
     aria-live="assertive"
 >

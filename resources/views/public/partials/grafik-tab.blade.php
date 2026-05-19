@@ -11,6 +11,7 @@
                 </div>
                 <h2 class="text-lg sm:text-xl font-black text-slate-900">Grafik Penerimaan Harian</h2>
             </div>
+            <span class="hidden rounded-full border border-emerald-100 bg-emerald-50 px-3 py-1 text-[10px] font-black uppercase tracking-wide text-emerald-700 sm:inline-flex" x-text="dailyChartData.range?.label || ''"></span>
         </div>
 
         <div class="grid grid-cols-2 gap-3 mb-4">

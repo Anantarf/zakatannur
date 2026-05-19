@@ -22,19 +22,23 @@ class ExportController extends Controller
 
     public function exportYearly(Request $request, TransactionExportService $exportService)
     {
-        $year = $this->validateYearlyExportRequest($request);
-        return $exportService->exportYearly($year);
+        [$year, $periodId] = $this->validateYearlyExportRequest($request);
+        return $exportService->exportYearly($year, $periodId);
     }
 
-    private function validateYearlyExportRequest(Request $request): int
+    private function validateYearlyExportRequest(Request $request): array
     {
         $yearMin = (int) config('zakat.year_bounds.min', 2000);
         $yearMax = (int) config('zakat.year_bounds.max', 2100);
 
         $validated = $request->validate([
             'year' => ['required', 'integer', 'min:' . $yearMin, 'max:' . $yearMax],
+            'period_id' => ['nullable', 'integer', 'exists:zakat_periods,id'],
         ]);
 
-        return (int) $validated['year'];
+        return [
+            (int) $validated['year'],
+            isset($validated['period_id']) ? (int) $validated['period_id'] : null,
+        ];
     }
 }

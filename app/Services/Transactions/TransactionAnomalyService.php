@@ -40,6 +40,7 @@ class TransactionAnomalyService
         $validated = Validator::make($request->query(), [
             'q' => ['nullable', 'string', 'max:' . (int) config('zakat.validation.search_query_max', 100)],
             'year' => ['nullable', 'integer', 'min:' . (int) config('zakat.year_bounds.min', 2000), 'max:' . (int) config('zakat.year_bounds.max', 2100)],
+            'period_id' => ['nullable', 'integer', 'exists:zakat_periods,id'],
             'scope' => ['nullable', 'string', Rule::in(['active', 'archived'])],
             'risk_level' => ['nullable', 'string', Rule::in(TransactionRiskReview::LEVELS)],
             'review_status' => ['nullable', 'string', Rule::in(TransactionRiskReview::REVIEW_STATUSES)],
@@ -47,11 +48,19 @@ class TransactionAnomalyService
             'petugas_id' => ['nullable', 'integer', 'exists:users,id'],
         ])->validate();
 
+        $periodId = isset($validated['period_id']) ? (int) $validated['period_id'] : null;
+        $year = array_key_exists('year', $validated)
+            ? ($validated['year'] !== null ? (int) $validated['year'] : null)
+            : $activeYear;
+
+        if ($periodId !== null && !array_key_exists('year', $validated)) {
+            $year = null;
+        }
+
         return [
             'q' => isset($validated['q']) ? trim((string) $validated['q']) : '',
-            'year' => array_key_exists('year', $validated)
-                ? ($validated['year'] !== null ? (int) $validated['year'] : null)
-                : $activeYear,
+            'year' => $year,
+            'periodId' => $periodId,
             'scope' => $validated['scope'] ?? 'active',
             'risk_level' => $validated['risk_level'] ?? null,
             'review_status' => $validated['review_status'] ?? null,
@@ -70,6 +79,7 @@ class TransactionAnomalyService
             'flagOptions' => self::FLAG_LABELS,
             'petugasOptions' => ViewOptions::petugasOptions(),
             'years' => ViewOptions::years($filters['activeYear']),
+            'periods' => ViewOptions::periods(),
         ]);
     }
 
@@ -158,10 +168,9 @@ class TransactionAnomalyService
         $matchingGroupNos = null;
 
         if ($filters['flag_type'] ?? null) {
+            $flagNeedle = '%"' . str_replace(['\\', '%'], ['\\\\', '\\%'], $filters['flag_type']) . '"%';
             $matchingGroupNos = TransactionRiskReview::query()
-                ->select(['group_no_transaksi', 'risk_flags'])
-                ->get()
-                ->filter(fn (TransactionRiskReview $review) => in_array($filters['flag_type'], $review->risk_flags ?? [], true))
+                ->where('risk_flags', 'like', $flagNeedle)
                 ->pluck('group_no_transaksi')
                 ->unique()
                 ->values()

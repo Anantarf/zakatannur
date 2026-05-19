@@ -9,6 +9,11 @@
         \App\Models\User::ROLE_SUPER_ADMIN => 'Super Admin',
     ];
     $userMeta = $user?->username ? '@' . $user->username : ($roleLabels[$user?->role] ?? 'Pengguna Sistem');
+    $isAdminAreaActive = request()->routeIs('internal.users.*')
+        || request()->routeIs('internal.audit_logs.*')
+        || request()->routeIs('internal.anomalies.*')
+        || request()->routeIs('internal.settings.period.*')
+        || request()->routeIs('internal.templates.*');
 @endphp
 
 <nav x-data="{ open: false }" class="ui-topbar px-4 pt-4 sm:px-6 lg:px-8">
@@ -23,6 +28,38 @@
             <div class="hidden flex-1 justify-center xl:flex">
                 <div class="flex items-center gap-2 rounded-full border border-emerald-100/70 bg-slate-50/85 p-1.5">
                     @include('layouts.partials.internal-nav-links', ['mobile' => false, 'user' => $user, 'canInputTransaksi' => $canInputTransaksi, 'isAdmin' => $isAdmin])
+                    @if ($isAdmin)
+                        <x-dropdown align="right" width="48">
+                            <x-slot name="trigger">
+                                <button class="{{ $isAdminAreaActive ? 'ui-nav-link ui-nav-link-active' : 'ui-nav-link ui-nav-link-inactive' }}">
+                                    {{ __('Pengaturan Admin') }}
+                                </button>
+                            </x-slot>
+
+                            <x-slot name="content">
+                                <div class="border-b border-slate-50 px-4 py-2 text-[10px] font-bold uppercase tracking-widest text-slate-400">Pengaturan Admin</div>
+                                <x-dropdown-link :href="route('internal.users.index')">
+                                    {{ __('Manajemen Pengguna') }}
+                                </x-dropdown-link>
+                                <x-dropdown-link :href="route('internal.audit_logs.index')">
+                                    {{ __('Audit Logs') }}
+                                </x-dropdown-link>
+                                <x-dropdown-link :href="route('internal.anomalies.index')">
+                                    {{ __('Review Anomali') }}
+                                </x-dropdown-link>
+
+                                @if ($user->isSuperAdmin())
+                                    <div class="mt-1 border-y border-slate-50 px-4 py-2 text-[10px] font-bold uppercase tracking-widest text-slate-400">Khusus Super Admin</div>
+                                    <x-dropdown-link :href="route('internal.settings.period.edit')">
+                                        {{ __('Konfigurasi Periode') }}
+                                    </x-dropdown-link>
+                                    <x-dropdown-link :href="route('internal.templates.letterhead')">
+                                        {{ __('Template Kop Surat') }}
+                                    </x-dropdown-link>
+                                @endif
+                            </x-slot>
+                        </x-dropdown>
+                    @endif
                 </div>
             </div>
 
@@ -46,32 +83,7 @@
                     </x-slot>
 
                     <x-slot name="content">
-                        @if ($isAdmin)
-                            <div class="border-b border-slate-50 px-4 py-2 text-[10px] font-bold uppercase tracking-widest text-slate-400">Pengaturan Admin</div>
-                            <x-dropdown-link :href="route('internal.users.index')">
-                                {{ __('Manajemen Pengguna') }}
-                            </x-dropdown-link>
-                            <x-dropdown-link :href="route('internal.audit_logs.index')">
-                                {{ __('Audit Logs') }}
-                            </x-dropdown-link>
-                            <x-dropdown-link :href="route('internal.anomalies.index')">
-                                {{ __('Review Anomali') }}
-                            </x-dropdown-link>
-
-                            @if ($user->isSuperAdmin())
-                                <div class="mt-1 border-y border-slate-50 px-4 py-2 text-[10px] font-bold uppercase tracking-widest text-slate-400">Khusus Super Admin</div>
-                                <x-dropdown-link :href="route('internal.settings.period.edit')">
-                                    {{ __('Konfigurasi Periode') }}
-                                </x-dropdown-link>
-                                <x-dropdown-link :href="route('internal.templates.letterhead')">
-                                    {{ __('Template Kop Surat') }}
-                                </x-dropdown-link>
-                            @endif
-                        @endif
-
-                        @if ($isAdmin)
-                            <div class="mt-1 border-t border-slate-50 px-4 py-2 text-[10px] font-bold uppercase tracking-widest text-slate-400">Akun</div>
-                        @endif
+                        <div class="border-b border-slate-50 px-4 py-2 text-[10px] font-bold uppercase tracking-widest text-slate-400">Akun</div>
                         <x-dropdown-link :href="route('internal.profile.edit')">
                             {{ __('Pengaturan Akun') }}
                         </x-dropdown-link>

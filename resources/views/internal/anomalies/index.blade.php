@@ -2,7 +2,7 @@
     <x-slot name="header">
         <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <div class="space-y-1 text-center sm:text-left">
-                <h2 class="flex items-center justify-center gap-2 text-xl font-bold leading-tight text-emerald-900 sm:justify-start sm:text-2xl">
+                <h2 class="ui-page-title">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7 shrink-0 text-amber-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01M5.07 19h13.86c1.54 0 2.5-1.67 1.73-3L13.73 4c-.77-1.33-2.69-1.33-3.46 0L3.34 16c-.77 1.33.19 3 1.73 3z" />
                     </svg>
@@ -85,6 +85,20 @@
                             </div>
                         </div>
 
+                        <div class="relative w-full sm:min-w-[210px] sm:flex-[1_1_210px] xl:max-w-[240px]">
+                            <select name="period_id" class="ui-select w-full appearance-none pr-10">
+                                <option value="">Semua Periode</option>
+                                @foreach ($periods ?? [] as $period)
+                                    <option value="{{ $period->id }}" @selected((string) ($periodId ?? '') === (string) $period->id)>
+                                        {{ $period->display_label }}{{ $period->sequence > 1 ? ' #' . $period->sequence : '' }}
+                                    </option>
+                                @endforeach
+                            </select>
+                            <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-gray-400">
+                                <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                            </div>
+                        </div>
+
                         <div class="relative w-full sm:min-w-[160px] sm:flex-[1_1_160px] xl:max-w-[180px]">
                             <select name="flag_type" class="ui-select w-full appearance-none pr-10">
                                 <option value="">Semua Flag</option>
@@ -128,13 +142,83 @@
                             Terapkan
                         </button>
 
-                        @if (($q ?? null) || ($year ?? null) || ($flag_type ?? null) || ($risk_level ?? null) || ($review_status ?? null))
+                        @if (($q ?? null) || ($year ?? null) || ($periodId ?? null) || ($flag_type ?? null) || ($risk_level ?? null) || ($review_status ?? null))
                             <a href="{{ route('internal.anomalies.index', ['scope' => $scope ?? 'active']) }}" class="ui-btn ui-btn-secondary w-full sm:w-auto sm:flex-none">Reset</a>
                         @endif
                     </form>
                 </div>
 
-                <div class="overflow-x-auto">
+                <div class="space-y-4 p-4 md:hidden">
+                    @forelse ($groups as $group)
+                        @php
+                            $groupTime = ($group->waktu_terima ?? $group->created_at)?->timezone('Asia/Jakarta');
+                            $primaryFlagLabel = $group->primary_flag
+                                ? (\App\Services\Transactions\TransactionAnomalyService::flagLabels()[$group->primary_flag] ?? str_replace('_', ' ', $group->primary_flag))
+                                : '-';
+                        @endphp
+                        <article class="ui-mobile-card border-amber-100">
+                            <div class="flex items-start justify-between gap-3">
+                                <div class="space-y-1">
+                                    <span class="inline-flex rounded-md bg-blue-50 px-2 py-1 font-mono text-xs font-semibold text-blue-600">{{ $group->no_transaksi }}</span>
+                                    <h4 class="text-sm font-bold leading-tight text-slate-900">{{ $group->pembayar_nama }}</h4>
+                                    <p class="text-xs text-slate-500">
+                                        {{ $groupTime?->format('d/m/Y H:i') ?? '-' }}
+                                        @if($group->flags_count > 1)
+                                            <span class="ml-1">+ {{ $group->flags_count - 1 }} flag lain</span>
+                                        @endif
+                                    </p>
+                                </div>
+                                <x-risk-level-badge :level="$group->risk_level" />
+                            </div>
+
+                            <div class="ui-mobile-card-muted grid grid-cols-1 gap-3 text-sm sm:grid-cols-2">
+                                <div class="space-y-1">
+                                    <p class="text-[11px] font-semibold uppercase tracking-wide text-slate-400">Kategori</p>
+                                    <x-zakat-category-tags :categories="$group->categories_list" />
+                                </div>
+                                <div class="space-y-1">
+                                    <p class="text-[11px] font-semibold uppercase tracking-wide text-slate-400">Review</p>
+                                    <x-review-status-badge :status="$group->review_status" />
+                                </div>
+                                <div class="space-y-1">
+                                    <p class="text-[11px] font-semibold uppercase tracking-wide text-slate-400">Flag Utama</p>
+                                    <p class="text-sm leading-5 text-slate-600">{{ $primaryFlagLabel }}</p>
+                                </div>
+                                <div class="space-y-1">
+                                    <p class="text-[11px] font-semibold uppercase tracking-wide text-slate-400">Petugas</p>
+                                    <div class="space-y-1">
+                                        <p class="font-semibold text-slate-700">{{ $group->petugas?->name ?? '-' }}</p>
+                                        <span class="inline-flex items-center rounded-md border border-emerald-100 bg-emerald-50 px-2 py-1 text-[11px] font-bold uppercase text-emerald-700">
+                                            {{ $group->shift_label }}
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <a href="{{ route('internal.anomalies.show', ['noTransaksi' => $group->no_transaksi]) }}" class="ui-btn ui-btn-secondary mt-4 w-full justify-center border-amber-200 text-amber-700 hover:bg-amber-50">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                </svg>
+                                Buka Review
+                            </a>
+                        </article>
+                    @empty
+                        <div class="ui-empty-state-box">
+                            <div class="flex flex-col items-center">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="mb-2 h-10 w-10 text-gray-200" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                </svg>
+                                <span class="text-sm font-medium text-gray-400">
+                                    {{ ($scope ?? 'active') === 'archived'
+                                        ? 'Belum ada kasus aman di riwayat review untuk filter ini.'
+                                        : 'Belum ada kasus anomali aktif untuk filter ini.' }}
+                                </span>
+                            </div>
+                        </div>
+                    @endforelse
+                </div>
+
+                <div class="hidden overflow-x-auto md:block">
                     <table class="min-w-full text-sm">
                         <thead>
                             <tr class="border-b border-gray-100 bg-gray-50 text-left text-[11px] font-bold uppercase tracking-widest text-gray-400 sm:text-xs">

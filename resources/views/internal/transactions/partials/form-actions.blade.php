@@ -1,24 +1,24 @@
 <div class="ui-card-strong sticky bottom-4 z-10 mt-6 bg-white/95 p-4 pt-4 backdrop-blur-md">
-    <div class="mb-3 flex items-center justify-between gap-3 border-b border-slate-100 pb-3">
+    <div class="mb-3 flex flex-col gap-3 border-b border-slate-100 pb-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
             <p class="text-sm font-bold text-slate-900">{{ isset($isEdit) ? 'Selesaikan perubahan transaksi' : 'Simpan transaksi yang sudah diperiksa' }}</p>
             <p class="text-xs text-slate-500">{{ isset($isEdit) ? 'Pastikan nominal, kategori, dan pembayar sudah sesuai sebelum menyimpan.' : 'Gunakan tombol ini setelah semua anggota dan kategori zakat terisi.' }}</p>
         </div>
-        <div class="hidden rounded-full border border-emerald-100 bg-emerald-50 px-3 py-1 text-[11px] font-semibold text-emerald-700 sm:inline-flex">
+        <div class="inline-flex w-full justify-center rounded-full border border-emerald-100 bg-emerald-50 px-3 py-1 text-[11px] font-semibold text-emerald-700 sm:w-auto">
             <span x-text="submitting ? 'Sedang menyimpan' : 'Siap diproses'"></span>
         </div>
     </div>
 
     @if(isset($isEdit))
-        <div class="flex items-stretch gap-3">
+        <div class="flex flex-col items-stretch gap-3 sm:flex-row">
             <a href="{{ route('internal.transactions.index') }}"
-                class="ui-btn flex-1 bg-slate-100 px-6 py-4 text-sm text-slate-600 hover:bg-slate-200 focus:ring-slate-300">
+                class="ui-btn w-full bg-slate-100 px-6 py-4 text-sm text-slate-600 hover:bg-slate-200 focus:ring-slate-300 sm:flex-1">
                 Kembali
             </a>
             <x-emerald-button
                 x-bind:disabled="submitting || !hasChanged"
                 x-bind:class="{'opacity-50 cursor-not-allowed': submitting || !hasChanged}"
-                class="flex-[2] py-4 text-base">
+                class="w-full py-4 text-base sm:flex-[2]">
                 <template x-if="submitting">
                     <div class="flex items-center gap-2">
                         <svg class="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">

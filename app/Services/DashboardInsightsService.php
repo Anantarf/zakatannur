@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\AppSetting;
 use App\Models\ZakatTransaction;
+use App\Services\Charts\ChartRangeResolver;
 use App\Support\SqlDialect;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Cache;
@@ -11,21 +12,28 @@ use Illuminate\Support\Facades\DB;
 
 class DashboardInsightsService
 {
-    public function buildInsights(int $activeYear, int $activeDays): array
+    private ChartRangeResolver $chartRangeResolver;
+
+    public function __construct(ChartRangeResolver $chartRangeResolver)
     {
-        $offSeasonData = $this->offSeasonData($activeYear);
+        $this->chartRangeResolver = $chartRangeResolver;
+    }
+
+    public function buildInsights(int $year, int $activeDays): array
+    {
+        $offSeasonData = $this->offSeasonData($year);
         $offSeason = $offSeasonData['off_season'];
         $lastActiveDate = $offSeasonData['last_date']
             ? Carbon::parse($offSeasonData['last_date'])->timezone(config('zakat.timezone'))
             : null;
 
-        $chartContext = $this->chartContext($activeYear, $activeDays, $offSeason, $lastActiveDate);
+        $range = $this->chartRangeResolver->resolveForYear($year);
 
         return [
             'offSeason' => $offSeason,
             'lastActiveDate' => $lastActiveDate,
-            'chartPeriodLabel' => $chartContext['chartPeriodLabel'],
-            'chartData' => $this->chartData($activeYear, $activeDays, $chartContext['chartEnd'], $offSeason, $chartContext['chartCacheKey']),
+            'chartPeriodLabel' => $range['label'],
+            'chartData' => $this->chartData($year, $range, $offSeason),
         ];
     }
 
@@ -56,35 +64,16 @@ class DashboardInsightsService
         });
     }
 
-    private function chartContext(int $activeYear, int $activeDays, bool $offSeason, ?Carbon $lastActiveDate): array
+    private function chartData(int $year, array $range, bool $offSeason): array
     {
-        if ($offSeason && $lastActiveDate) {
-            $chartEnd = $lastActiveDate->copy()->endOfDay();
-            $chartStart = $chartEnd->copy()->subDays($activeDays - 1)->startOfDay();
-
-            return [
-                'chartEnd' => $chartEnd,
-                'chartPeriodLabel' => $chartStart->locale('id')->translatedFormat('d M') . ' - ' . $chartEnd->locale('id')->translatedFormat('d M Y'),
-                'chartCacheKey' => "dashboard_chart_historical_{$activeYear}_{$activeDays}_{$chartEnd->toDateString()}",
-            ];
-        }
-
-        return [
-            'chartEnd' => null,
-            'chartPeriodLabel' => null,
-            'chartCacheKey' => "dashboard_chart_{$activeYear}_{$activeDays}",
-        ];
-    }
-
-    private function chartData(int $activeYear, int $activeDays, ?Carbon $chartEnd, bool $offSeason, string $cacheKey): array
-    {
+        $cacheKey = "dashboard_chart_{$year}_{$range['source']}_{$range['starts_at']}_{$range['ends_at']}";
         $cacheTtl = $offSeason
             ? (int) config('zakat.cache.public_home_stats_ttl', 3600)
             : (int) config('zakat.cache.public_summary_ttl', 300);
 
-        return Cache::remember($cacheKey, $cacheTtl, function () use ($activeYear, $activeDays, $chartEnd) {
-            $endBoundary = $chartEnd ?? now(config('zakat.timezone'))->endOfDay();
-            $startBoundary = $endBoundary->copy()->subDays($activeDays - 1)->startOfDay();
+        return Cache::remember($cacheKey, $cacheTtl, function () use ($year, $range) {
+            $startBoundary = Carbon::parse($range['starts_at'])->startOfDay();
+            $endBoundary = Carbon::parse($range['ends_at'])->endOfDay();
             $effectiveTimestamp = SqlDialect::effectiveTimestamp();
 
             $dailyStats = ZakatTransaction::query()
@@ -93,7 +82,7 @@ class DashboardInsightsService
                     DB::raw('COUNT(DISTINCT no_transaksi) as count')
                 )
                 ->valid()
-                ->where('tahun_zakat', $activeYear)
+                ->where('tahun_zakat', $year)
                 ->whereRaw("{$effectiveTimestamp} >= ?", [$startBoundary])
                 ->whereRaw("{$effectiveTimestamp} <= ?", [$endBoundary])
                 ->groupBy('date')
@@ -104,14 +93,32 @@ class DashboardInsightsService
             $labels = [];
             $values = [];
 
-            for ($i = $activeDays - 1; $i >= 0; $i--) {
-                $currentDate = $endBoundary->copy()->subDays($i)->startOfDay();
+            for ($currentDate = $startBoundary->copy(); $currentDate->lte($endBoundary); $currentDate->addDay()) {
                 $dateStr = $currentDate->format('Y-m-d');
                 $labels[] = $currentDate->locale('id')->translatedFormat('d M');
                 $values[] = (int) ($statsMap[$dateStr] ?? 0);
             }
 
-            return ['labels' => $labels, 'values' => $values];
+            return [
+                'labels' => $labels,
+                'values' => $values,
+                'datasets' => [
+                    [
+                        'key' => 'transactions',
+                        'label' => 'Jumlah Transaksi',
+                        'unit' => 'count',
+                        'values' => $values,
+                        'colorRole' => $range['source'] === 'configured' ? 'emerald' : 'amber',
+                    ],
+                ],
+                'range' => [
+                    'starts_at' => $range['starts_at'],
+                    'ends_at' => $range['ends_at'],
+                    'label' => $range['label'],
+                    'source' => $range['source'],
+                ],
+                'empty_state' => ! collect($values)->contains(fn($value) => $value > 0),
+            ];
         });
     }
 }

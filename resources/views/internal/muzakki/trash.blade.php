@@ -1,13 +1,13 @@
 <x-app-layout>
     <x-slot name="header">
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-            <h2 class="font-bold text-xl sm:text-2xl text-emerald-800 leading-tight flex items-center justify-center sm:justify-start gap-2 text-center sm:text-left">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7 text-amber-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <h2 class="ui-page-title">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7 shrink-0 text-amber-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                 </svg>
                 Tempat Sampah Muzakki
             </h2>
-            <a href="{{ route('internal.muzakki.index') }}" class="inline-flex justify-center items-center gap-2 rounded-xl bg-white border border-gray-100 px-4 py-3 sm:py-2 text-sm font-bold text-gray-500 hover:text-emerald-700 hover:bg-emerald-50 transition-all w-full sm:w-auto shadow-sm">
+            <a href="{{ route('internal.muzakki.index') }}" class="ui-header-link">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
                 </svg>
@@ -18,8 +18,8 @@
 
     <div class="py-10">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-6">
-            <div class="flex items-center gap-3 rounded-xl border border-amber-200 bg-amber-50 p-4 text-amber-800 shadow-sm">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-amber-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <div class="ui-alert ui-alert-warning">
+                <svg xmlns="http://www.w3.org/2000/svg" class="ui-alert-icon text-amber-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z" />
                 </svg>
                 <div>
@@ -28,8 +28,8 @@
                 </div>
             </div>
             @if (session('status'))
-                <div class="flex items-center gap-3 rounded-xl border border-emerald-200 bg-emerald-50 p-4 text-emerald-900 shadow-sm">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-emerald-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <div class="ui-alert ui-alert-success">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="ui-alert-icon text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
                     </svg>
                     <span class="font-medium">{{ session('status') }}</span>
@@ -37,34 +37,36 @@
             @endif
 
             @if ($errors->any())
-                <div class="rounded-xl border border-red-200 bg-red-50 p-4 text-red-900 shadow-sm">
-                    <div class="flex items-center gap-2 font-bold text-red-700 mb-2">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                <div class="ui-alert ui-alert-error">
+                    <div class="w-full">
+                        <div class="ui-alert-title text-red-700">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="ui-alert-icon" viewBox="0 0 20 20" fill="currentColor">
                             <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
-                        </svg>
-                        Mohon Perbaiki Kesalahan Berikut:
+                            </svg>
+                            Mohon Perbaiki Kesalahan Berikut:
+                        </div>
+                        <ul class="list-disc pl-10 space-y-1 text-sm">
+                            @foreach ($errors->all() as $error)
+                                <li>{{ $error }}</li>
+                            @endforeach
+                        </ul>
                     </div>
-                    <ul class="list-disc pl-10 space-y-1 text-sm">
-                        @foreach ($errors->all() as $error)
-                            <li>{{ $error }}</li>
-                        @endforeach
-                    </ul>
                 </div>
             @endif
 
 
             {{-- Table --}}
-            <div class="bg-white rounded-2xl shadow-md border border-gray-100 overflow-hidden">
-                <div class="px-6 py-4 border-b border-gray-50 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div class="ui-card overflow-hidden shadow-md">
+                <div class="ui-toolbar">
                     <div class="flex items-center gap-2">
-                        <div class="w-2 h-6 bg-amber-500 rounded-full"></div>
+                        <div class="h-6 w-2 rounded-full bg-amber-500"></div>
                         <h3 class="font-bold text-gray-800">Daftar Tempat Sampah</h3>
                     </div>
 
-                    <form method="GET" action="{{ route('internal.muzakki.trash') }}" class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 mt-3 sm:mt-0 w-full sm:w-auto">
-                        <input type="text" name="q" value="{{ $q }}" placeholder="Cari nama/alamat..." class="rounded-xl border-gray-200 bg-gray-50 px-4 py-2 text-xs font-bold text-gray-600 focus:border-emerald-500 focus:ring-emerald-500 w-full sm:min-w-[200px]" />
+                    <form method="GET" action="{{ route('internal.muzakki.trash') }}" class="flex w-full flex-col items-stretch gap-2 sm:w-auto sm:flex-row sm:items-center">
+                        <input type="text" name="q" value="{{ $q }}" placeholder="Cari nama/alamat..." class="ui-input w-full sm:min-w-[200px]" />
                         <div class="flex items-center justify-end gap-2 shrink-0">
-                            <button type="submit" class="p-2 bg-gray-800 text-white rounded-xl hover:bg-gray-900 transition-all flex-1 sm:flex-none flex justify-center items-center">
+                            <button type="submit" class="ui-btn ui-btn-secondary px-3 py-2.5 text-slate-600">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                                 </svg>
@@ -79,7 +81,74 @@
                         </div>
                     </form>
                 </div>
-                <div class="overflow-x-auto w-full">
+                <div class="space-y-4 p-4 md:hidden">
+                    @forelse ($muzakki as $m)
+                        <article class="ui-mobile-card">
+                            <div class="flex items-start justify-between gap-3">
+                                <div class="space-y-1">
+                                    <h4 class="text-sm font-bold text-slate-900">{!! \App\Support\Format::highlight($m->name, $q) !!}</h4>
+                                    <p class="text-xs font-medium text-slate-500">HP: {{ $m->phone ?? '-' }}</p>
+                                </div>
+                                @if($m->days_left !== null)
+                                    <span class="inline-flex items-center rounded-md px-2 py-1 text-[11px] font-bold {{ $m->days_left <= 7 ? 'bg-red-50 text-red-600' : 'bg-gray-50 text-gray-600' }}">
+                                        {{ $m->days_left > 0 ? $m->days_left . ' Hari Lagi' : 'Hapus Hari Ini' }}
+                                    </span>
+                                @endif
+                            </div>
+
+                            <div class="ui-mobile-card-muted space-y-3 text-sm">
+                                <div class="space-y-1">
+                                    <p class="text-[11px] font-semibold uppercase tracking-wide text-slate-400">Alamat</p>
+                                    <p class="text-sm leading-5 text-slate-600">{!! \App\Support\Format::highlight($m->address ?? '-', $q) !!}</p>
+                                </div>
+                                <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                                    <div class="space-y-1">
+                                        <p class="text-[11px] font-semibold uppercase tracking-wide text-slate-400">Waktu Hapus</p>
+                                        <p class="text-sm font-medium text-slate-700">{{ $m->deleted_at_formatted }}</p>
+                                    </div>
+                                    <div class="space-y-1">
+                                        <p class="text-[11px] font-semibold uppercase tracking-wide text-slate-400">Status</p>
+                                        <p class="text-sm font-medium text-slate-700">
+                                            {{ $m->days_left === null ? 'Countdown belum tersedia' : ($m->days_left > 0 ? 'Menunggu auto-delete' : 'Siap dihapus hari ini') }}
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2">
+                                <form method="POST" action="{{ route('internal.muzakki.restore', $m->id) }}">
+                                    @csrf
+                                    <button type="submit" class="ui-btn ui-btn-primary w-full px-4 py-3">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                                        </svg>
+                                        Pulihkan
+                                    </button>
+                                </form>
+
+                                <button type="button" x-data x-on:click="$dispatch('open-modal', 'force-delete-muzakki-modal'); $dispatch('open-force-delete-modal', { id: {{ $m->id }}, name: '{{ addslashes($m->name) }}' })" class="ui-btn ui-btn-danger w-full px-4 py-3">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                    </svg>
+                                    Hapus Permanen
+                                </button>
+                            </div>
+                        </article>
+                    @empty
+                        <div class="ui-empty-state-box">
+                            <div class="flex flex-col items-center">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="mb-2 h-10 w-10 text-gray-200" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+                                </svg>
+                                <span class="ui-empty-state-copy font-bold">
+                                    {{ ($q ?? '') ? 'Data tidak ditemukan.' : 'Belum ada data muzakki di sampah.' }}
+                                </span>
+                            </div>
+                        </div>
+                    @endforelse
+                </div>
+
+                <div class="hidden overflow-x-auto w-full md:block">
                     <table class="min-w-full text-sm">
                         <thead>
                             <tr class="bg-gray-50 text-left text-xs font-bold text-gray-400 uppercase tracking-widest border-b border-gray-100">

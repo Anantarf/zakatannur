@@ -38,6 +38,7 @@ Route::middleware(['auth', 'role:staff,admin,super_admin'])
             Route::patch('/anomalies/{noTransaksi}/review-status', [TransactionAnomalyController::class, 'updateReviewStatus'])->name('anomalies.review_status');
 
             Route::get('/muzakki/trash', [MuzakkiController::class, 'trash'])->name('muzakki.trash');
+            Route::post('/muzakki/{muzakki}/merge', [MuzakkiController::class, 'merge'])->name('muzakki.merge');
             Route::post('/muzakki/{muzakki}/restore', [MuzakkiController::class, 'restore'])->name('muzakki.restore');
             Route::delete('/muzakki/{muzakki}/force-delete', [MuzakkiController::class, 'forceDelete'])->name('muzakki.forceDelete');
 
@@ -81,8 +82,6 @@ Route::middleware(['auth', 'role:staff,admin,super_admin'])
             Route::post('/templates/{template}/activate', [TemplateController::class, 'activate'])->name('templates.activate');
             Route::get('/templates/{template}/preview', [TemplateController::class, 'preview'])->name('templates.preview');
             Route::delete('/templates/{template}', [TemplateController::class, 'destroy'])->name('templates.destroy');
-            
-            Route::post('/audit-logs/cleanup-transactions', [AuditLogController::class, 'bulkDeleteTransactions'])->name('audit_logs.cleanup_transactions');
         });
     });
 

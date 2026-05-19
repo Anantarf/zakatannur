@@ -6,6 +6,7 @@ use App\Models\AnnualSetting;
 use App\Models\AppSetting;
 use App\Models\Muzakki;
 use App\Models\User;
+use App\Models\ZakatPeriod;
 use App\Models\ZakatTransaction;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -13,6 +14,13 @@ use Tests\TestCase;
 class InternalTransactionTest extends TestCase
 {
     use RefreshDatabase;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        AppSetting::clearCache();
+    }
 
     public function test_internal_create_requires_auth(): void
     {
@@ -205,6 +213,61 @@ class InternalTransactionTest extends TestCase
         $response->assertRedirect('/internal/transactions/create');
         $response->assertSessionHasErrors(['tahun_zakat']);
         $this->assertDatabaseCount('zakat_transactions', 0);
+    }
+
+    public function test_transaction_uses_active_zakat_period_snapshot(): void
+    {
+        AppSetting::query()->create(['key' => AppSetting::KEY_ACTIVE_YEAR, 'value' => '2030']);
+        AnnualSetting::query()->create([
+            'year' => 2030,
+            'default_fitrah_cash_per_jiwa' => 55000,
+            'default_fidyah_per_hari' => 60000,
+        ]);
+
+        $period = ZakatPeriod::query()->create([
+            'code' => 'ramadan-2030-2',
+            'label' => 'Ramadan 1452 H',
+            'gregorian_year' => 2030,
+            'hijri_year' => 1452,
+            'hijri_month' => 9,
+            'sequence' => 2,
+            'is_active' => true,
+            'default_fitrah_cash_per_jiwa' => 55000,
+            'default_fitrah_beras_per_jiwa' => 2.5,
+            'default_fidyah_per_hari' => 60000,
+            'default_fidyah_beras_per_hari' => 0.75,
+        ]);
+
+        AppSetting::query()->create([
+            'key' => AppSetting::KEY_ACTIVE_ZAKAT_PERIOD_ID,
+            'value' => (string) $period->id,
+        ]);
+        AppSetting::clearCache();
+
+        $staff = User::factory()->create(['role' => User::ROLE_STAFF]);
+
+        $payload = [
+            'muzakki_name' => 'Ahmad',
+            'tahun_zakat' => 2030,
+            'pembayar_nama' => 'Hamba Allah',
+            'pembayar_phone' => '0812',
+            'pembayar_alamat' => 'Jakarta',
+            'shift' => 'pagi',
+            'category' => ZakatTransaction::CATEGORY_FITRAH,
+            'metode' => ZakatTransaction::METHOD_UANG,
+            'jiwa' => 1,
+            'nominal_uang' => null,
+        ];
+
+        $response = $this->actingAs($staff)->from('/internal/transactions/create')->post('/internal/transactions/store', $payload);
+
+        $this->assertStringContainsString('/internal/transactions/', $response->headers->get('Location'));
+
+        $trx = ZakatTransaction::query()->firstOrFail();
+        $this->assertSame($period->id, $trx->zakat_period_id);
+        $this->assertSame(1452, $trx->hijri_year);
+        $this->assertSame(9, $trx->hijri_month);
+        $this->assertSame(55000, $trx->nominal_uang);
     }
 
     public function test_fitrah_cash_custom_nominal_is_allowed_and_marked_khusus(): void

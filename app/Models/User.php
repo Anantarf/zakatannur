@@ -13,6 +13,12 @@ class User extends Authenticatable
     public const ROLE_ADMIN = 'admin';
     public const ROLE_STAFF = 'staff';
 
+    public const ROLE_LABELS = [
+        self::ROLE_SUPER_ADMIN => 'Super Admin',
+        self::ROLE_ADMIN => 'Admin',
+        self::ROLE_STAFF => 'Petugas',
+    ];
+
     /**
      * The attributes that are mass assignable.
      *
@@ -58,5 +64,22 @@ class User extends Authenticatable
     public function canInputTransactions(): bool
     {
         return in_array($this->role, [self::ROLE_STAFF, self::ROLE_ADMIN, self::ROLE_SUPER_ADMIN], true);
+    }
+
+    public function canManageUser(User $target): bool
+    {
+        if ($this->isSuperAdmin()) {
+            return true;
+        }
+
+        if ($this->isAdmin()) {
+            if ($this->id === $target->id) {
+                return true;
+            }
+
+            return $target->role === self::ROLE_STAFF;
+        }
+
+        return false;
     }
 }

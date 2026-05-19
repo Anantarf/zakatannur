@@ -103,6 +103,9 @@ class ZakatTransaction extends Model
             'muzakki_id',
             'category',
             'tahun_zakat',
+            'zakat_period_id',
+            'hijri_year',
+            'hijri_month',
             'metode',
             'nominal_uang',
             'jumlah_beras_kg',
@@ -136,6 +139,9 @@ class ZakatTransaction extends Model
 
     protected $casts = [
         'tahun_zakat' => 'integer',
+        'zakat_period_id' => 'integer',
+        'hijri_year' => 'integer',
+        'hijri_month' => 'integer',
         'is_transfer' => 'boolean',
         'nominal_uang' => 'integer',
         'jumlah_beras_kg' => 'decimal:2',
@@ -162,6 +168,11 @@ class ZakatTransaction extends Model
     public function petugas(): BelongsTo
     {
         return $this->belongsTo(User::class, 'petugas_id');
+    }
+
+    public function zakatPeriod(): BelongsTo
+    {
+        return $this->belongsTo(ZakatPeriod::class, 'zakat_period_id');
     }
 
     public function riskReview(): HasOne
@@ -239,6 +250,7 @@ class ZakatTransaction extends Model
     public function scopeFilter(Builder $query, array $filters): Builder
     {
         return $query
+            ->when($filters['periodId'] ?? null, fn($q, $periodId) => $q->where('zakat_period_id', $periodId))
             ->when($filters['year'] ?? null, fn($q, $year) => $q->where('tahun_zakat', $year))
             ->when($filters['category'] ?? null, fn($q, $cat) => $q->where('category', $cat))
             ->when($filters['metode'] ?? null, fn($q, $metode) => $q->where('metode', $metode))
@@ -262,6 +274,13 @@ class ZakatTransaction extends Model
     public function scopeValid(Builder $query): Builder
     {
         return $query->where('status', self::STATUS_VALID);
+    }
+
+    public function scopeForPeriodOrYear(Builder $query, ?int $periodId = null, ?int $year = null): Builder
+    {
+        return $query
+            ->when($periodId !== null, fn (Builder $q) => $q->where('zakat_period_id', $periodId))
+            ->when($periodId === null && $year !== null, fn (Builder $q) => $q->where('tahun_zakat', $year));
     }
 
     public function scopeOrderByEffectiveTime(Builder $query): Builder

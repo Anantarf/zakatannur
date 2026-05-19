@@ -4,10 +4,10 @@ namespace App\Http\Controllers\Internal;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Internal\StoreZakatTransactionRequest;
-use App\Models\AnnualSetting;
 use App\Models\AppSetting;
 use App\Models\User;
 use App\Models\ZakatTransaction;
+use App\Services\Transactions\AnnualZakatDefaultsResolver;
 use App\Services\Transactions\TransactionReceiptLifecycleService;
 use App\Services\ZakatService;
 use App\Support\ReceiptPdf;
@@ -20,6 +20,13 @@ use Symfony\Component\HttpFoundation\Response;
 
 class ZakatTransactionController extends Controller
 {
+    private AnnualZakatDefaultsResolver $defaultsResolver;
+
+    public function __construct(AnnualZakatDefaultsResolver $defaultsResolver)
+    {
+        $this->defaultsResolver = $defaultsResolver;
+    }
+
     public function create(Request $request): View
     {
         $activeYear = AppSetting::getInt(AppSetting::KEY_ACTIVE_YEAR, (int) now()->year);
@@ -174,13 +181,13 @@ class ZakatTransactionController extends Controller
      */
     private function getAnnualDefaults(int $year): array
     {
-        $settings = AnnualSetting::where('year', $year)->first();
+        $defaults = $this->defaultsResolver->resolve($year);
 
         return [
-            'berasPerJiwa' => (float) ($settings->default_fitrah_beras_per_jiwa ?? config('zakat.annual_defaults.fitrah_beras_per_jiwa', 2.5)),
-            'fitrahUang' => (int) ($settings->default_fitrah_cash_per_jiwa ?? config('zakat.annual_defaults.fitrah_cash_per_jiwa', 50000)),
-            'fidyahUang' => (int) ($settings->default_fidyah_per_hari ?? config('zakat.annual_defaults.fidyah_per_hari', 30000)),
-            'fidyahBeras' => (float) ($settings->default_fidyah_beras_per_hari ?? config('zakat.annual_defaults.fidyah_beras_per_hari', 0.75)),
+            'berasPerJiwa' => $defaults->fitrahBerasPerJiwa,
+            'fitrahUang' => $defaults->fitrahCashPerJiwa,
+            'fidyahUang' => $defaults->fidyahPerHari,
+            'fidyahBeras' => $defaults->fidyahBerasPerHari,
         ];
     }
 

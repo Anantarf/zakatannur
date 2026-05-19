@@ -2,7 +2,7 @@
     <x-slot name="header">
         <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <div class="space-y-1 text-center sm:text-left">
-                <h2 class="flex items-center justify-center gap-2 text-xl font-bold leading-tight text-emerald-900 sm:justify-start sm:text-2xl">
+                <h2 class="ui-page-title">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7 shrink-0 text-amber-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01M5.07 19h13.86c1.54 0 2.5-1.67 1.73-3L13.73 4c-.77-1.33-2.69-1.33-3.46 0L3.34 16c-.77 1.33.19 3 1.73 3z" />
                     </svg>
@@ -23,6 +23,17 @@
 
     <div class="py-8">
         <div class="mx-auto max-w-6xl space-y-6 sm:px-6 lg:px-8">
+            @if (session('status'))
+                <div class="ui-alert ui-alert-success">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="ui-alert-icon text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                    </svg>
+                    <span class="font-medium">{{ session('status') }}</span>
+                </div>
+            @endif
+
+            <x-form-errors />
+
             <div class="grid grid-cols-1 gap-6 xl:grid-cols-[minmax(0,1.3fr)_minmax(320px,0.7fr)]">
                 <div class="space-y-6">
                     <div class="ui-card-strong overflow-hidden">
@@ -92,7 +103,62 @@
                                 <span class="h-5 w-1 rounded-full bg-emerald-500"></span>
                                 <h4 class="text-sm font-bold uppercase tracking-wide text-gray-800">Rincian Pembayaran</h4>
                             </div>
-                            <div class="overflow-x-auto rounded-xl border border-gray-100 bg-white shadow-sm">
+                            <div class="space-y-3 md:hidden">
+                                @php $rowNo = 1; @endphp
+                                @foreach ($groupedArr as $muzakkiName => $txsArr)
+                                    @foreach ($txsArr as $tx)
+                                            <article class="ui-mobile-card">
+                                            <div class="flex items-start justify-between gap-3">
+                                                <div class="min-w-0">
+                                                    <div class="text-[10px] font-black uppercase tracking-widest text-gray-400">Muzakki {{ $rowNo++ }}</div>
+                                                    <p class="mt-1 text-sm font-bold leading-tight text-gray-900">{{ $muzakkiName }}</p>
+                                                </div>
+                                                <span class="inline-flex items-center rounded px-2.5 py-1 text-[11px] font-bold uppercase tracking-wider {{ $tx->metode === 'beras' ? 'bg-amber-100 text-amber-700' : 'bg-emerald-100 text-emerald-700' }}">
+                                                    {{ $tx->metode_label }}
+                                                </span>
+                                            </div>
+
+                                            <div class="ui-mobile-card-muted space-y-3">
+                                                <div class="flex items-start justify-between gap-3">
+                                                    <span class="text-[10px] font-black uppercase tracking-widest text-gray-400">Kategori</span>
+                                                    <div class="max-w-[65%]">
+                                                        <x-zakat-category-tags :categories="[$tx->category]" />
+                                                    </div>
+                                                </div>
+                                                <div class="flex items-start justify-between gap-3">
+                                                    <span class="text-[10px] font-black uppercase tracking-widest text-gray-400">Keterangan</span>
+                                                    <div class="text-right text-xs font-medium text-gray-500">
+                                                        @if($tx->category === 'fitrah' && $tx->jiwa)
+                                                            <span class="rounded-md border border-gray-100 bg-white px-2 py-1 font-bold text-gray-600">{{ $tx->jiwa }} Jiwa</span>
+                                                        @elseif($tx->category === 'fidyah' && $tx->hari)
+                                                            <span class="rounded-md border border-gray-100 bg-white px-2 py-1 font-bold text-gray-600">{{ $tx->hari }} Hari</span>
+                                                        @else
+                                                            -
+                                                        @endif
+                                                    </div>
+                                                </div>
+                                                <div class="flex items-start justify-between gap-3">
+                                                    <span class="text-[10px] font-black uppercase tracking-widest text-gray-400">Nominal</span>
+                                                    <div class="text-right">
+                                                        <p class="text-sm font-bold text-gray-900">
+                                                            @if($tx->metode === 'beras')
+                                                                {{ rtrim(rtrim(number_format($tx->jumlah_beras_kg, 2, ',', '.'), '0'), ',') }} <span class="ml-0.5 text-[9px] font-bold text-gray-400">kg</span>
+                                                            @else
+                                                                {{ \App\Support\Format::rupiah((int) $tx->nominal_uang) }}
+                                                                @if($tx->is_transfer)
+                                                                    <x-transfer-badge class="ml-1" />
+                                                                @endif
+                                                            @endif
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </article>
+                                    @endforeach
+                                @endforeach
+                            </div>
+
+                            <div class="hidden overflow-x-auto rounded-xl border border-gray-100 bg-white shadow-sm md:block">
                                 <table class="min-w-full text-sm">
                                     <thead>
                                         <tr class="border-b border-gray-100 bg-gray-50 text-left text-[11px] font-semibold uppercase tracking-wider text-gray-400 sm:text-xs">

@@ -2,42 +2,57 @@
 
 namespace App\Services;
 
-use App\Models\AnnualSetting;
-use App\Models\Muzakki;
 use App\Models\ZakatTransaction;
+use App\Services\Periods\ZakatPeriodResolver;
+use App\Services\Transactions\AnnualZakatDefaultsResolver;
+use App\Services\Transactions\MuzakkiResolver;
+use App\Services\Transactions\TransactionAuditLogger;
 use App\Services\Transactions\TransactionNominalValidator;
 use App\Services\Transactions\TransactionNumberGenerator;
+use App\Services\Transactions\TransactionPayloadBuilder;
 use App\Services\Transactions\TransactionReviewAssistantService;
 use App\Services\Transactions\TransactionRowPersister;
 use Carbon\Carbon;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Database\QueryException;
 use Illuminate\Validation\ValidationException;
-use App\Support\Audit;
 use App\Events\ZakatTransactionCreated;
 use Illuminate\Database\Eloquent\Collection;
 
 class ZakatService
 {
-    private array $annualCache = [];
     private TransactionNumberGenerator $numberGenerator;
     private TransactionNominalValidator $nominalValidator;
     private TransactionRowPersister $rowPersister;
     private TransactionReviewAssistantService $reviewAssistantService;
+    private AnnualZakatDefaultsResolver $defaultsResolver;
+    private MuzakkiResolver $muzakkiResolver;
+    private TransactionPayloadBuilder $payloadBuilder;
+    private TransactionAuditLogger $auditLogger;
+    private ZakatPeriodResolver $periodResolver;
 
     public function __construct(
         TransactionNumberGenerator $numberGenerator,
         TransactionNominalValidator $nominalValidator,
         TransactionRowPersister $rowPersister,
         TransactionReviewAssistantService $reviewAssistantService,
+        AnnualZakatDefaultsResolver $defaultsResolver,
+        MuzakkiResolver $muzakkiResolver,
+        TransactionPayloadBuilder $payloadBuilder,
+        TransactionAuditLogger $auditLogger,
+        ZakatPeriodResolver $periodResolver,
     ) {
         $this->numberGenerator = $numberGenerator;
         $this->nominalValidator = $nominalValidator;
         $this->rowPersister = $rowPersister;
         $this->reviewAssistantService = $reviewAssistantService;
+        $this->defaultsResolver = $defaultsResolver;
+        $this->muzakkiResolver = $muzakkiResolver;
+        $this->payloadBuilder = $payloadBuilder;
+        $this->auditLogger = $auditLogger;
+        $this->periodResolver = $periodResolver;
     }
 
     public function storeTransaction(array $data, int $petugasId, ?string $noTransaksiOverride = null): array
@@ -157,8 +172,8 @@ class ZakatService
             }
 
             $oldTotals = $this->getExistingTransactionTotals($noTransaksi);
-            $pembayarData = $this->buildPayerData($data);
-            Muzakki::firstOrCreateNormalized($pembayarData);
+            $pembayarData = $this->muzakkiResolver->payerData($data);
+            $this->muzakkiResolver->resolvePayer($data);
 
             $existingIds = ZakatTransaction::where('no_transaksi', $noTransaksi)->pluck('id')->toArray();
             [$results, $newIds] = $this->processItems($items, $data, $pembayarData, $petugasId, $waktuTerima, $noTransaksi);
@@ -166,7 +181,7 @@ class ZakatService
             $idsToDelete = $this->deleteRemovedTransactions($existingIds, $newIds);
             $summary = $this->buildSyncSummary($existingIds, $newIds, $idsToDelete);
 
-            $this->logSyncAudit(
+            $this->auditLogger->logSync(
                 request(),
                 $noTransaksi,
                 $pembayarData['muzakki_name'],
@@ -203,15 +218,6 @@ class ZakatService
         ];
     }
 
-    private function buildPayerData(array $data): array
-    {
-        return [
-            'muzakki_name'    => $data['pembayar_nama'],
-            'muzakki_phone'   => $data['pembayar_phone'] ?? '',
-            'muzakki_address' => $data['pembayar_alamat'],
-        ];
-    }
-
     /**
      * @param array<int, int> $existingIds
      * @param array<int, int> $newIds
@@ -245,36 +251,6 @@ class ZakatService
     }
 
     /**
-     * @param array{uang:int,beras:float} $oldTotals
-     * @param array<int, ZakatTransaction> $results
-     */
-    private function logSyncAudit(Request $request, string $noTransaksi, string $pembayarName, array $summary, array $oldTotals, array $results, bool $isUpdate, bool $wasReceiptPrinted): void
-    {
-        Audit::log($request, $isUpdate ? 'Updated.Transaction' : 'Created.Transaction', null, [
-            'no_transaksi' => $noTransaksi,
-            'pembayar'     => $pembayarName,
-            'summary'      => $summary,
-            'after_receipt_printed' => $wasReceiptPrinted,
-            'totals'       => [
-                'old' => ['uang' => $oldTotals['uang'], 'beras' => $oldTotals['beras']],
-                'new' => ['uang' => (int) collect($results)->sum('nominal_uang'), 'beras' => (float) collect($results)->sum('jumlah_beras_kg')],
-            ],
-        ]);
-
-        if ($isUpdate && $wasReceiptPrinted && count($results) > 0) {
-            Audit::log($request, 'transaction.updated_after_receipt_printed', $results[0], [
-                'no_transaksi' => $noTransaksi,
-                'pembayar' => $pembayarName,
-                'summary' => $summary,
-                'totals' => [
-                    'old' => ['uang' => $oldTotals['uang'], 'beras' => $oldTotals['beras']],
-                    'new' => ['uang' => (int) collect($results)->sum('nominal_uang'), 'beras' => (float) collect($results)->sum('jumlah_beras_kg')],
-                ],
-            ]);
-        }
-    }
-
-    /**
      * Converts one request payload or batch item set into persisted transaksi rows.
      *
      * Each item can override category, metode, tahun zakat, and payer identity.
@@ -296,12 +272,13 @@ class ZakatService
             $category = $itemContext['category'];
             $metode = $itemContext['metode'];
             $tahunZakat = $itemContext['tahun_zakat'];
-            [$defaultFitrah, $defaultFidyah, $defaultBerasKg, $defaultFidyahBeras] = $this->getAnnualDefaults($tahunZakat);
+            $period = $this->periodResolver->ensureForYear($tahunZakat);
+            $defaults = $this->defaultsResolver->resolve($tahunZakat);
 
             $itemForComputation = $itemContext['item_for_computation'];
-            $muzakki = Muzakki::firstOrCreateNormalized($this->buildMuzakkiData($item, $pembayarData));
+            $muzakki = $this->muzakkiResolver->resolveItem($item, $pembayarData);
 
-            $txData = $this->buildTransactionData(
+            $txData = $this->payloadBuilder->build(
                 $item,
                 $data,
                 $pembayarData,
@@ -313,10 +290,8 @@ class ZakatService
                 $metode,
                 $tahunZakat,
                 $itemForComputation,
-                $defaultFitrah,
-                $defaultFidyah,
-                $defaultBerasKg,
-                $defaultFidyahBeras
+                $defaults,
+                $period
             );
 
             $transaction = $this->rowPersister->persist($item, $txData);
@@ -351,60 +326,6 @@ class ZakatService
         ];
     }
 
-    private function buildMuzakkiData(array $item, array $pembayarData): array
-    {
-        return [
-            'muzakki_name' => $item['muzakki_name'] ?? $pembayarData['muzakki_name'],
-            'muzakki_phone' => $item['muzakki_phone'] ?? $pembayarData['muzakki_phone'] ?? '',
-            'muzakki_address' => $item['muzakki_address'] ?? $pembayarData['muzakki_address'] ?? '',
-        ];
-    }
-
-    /**
-     * Builds the persisted transaction payload for a single item.
-     */
-    private function buildTransactionData(
-        array $item,
-        array $data,
-        array $pembayarData,
-        int $petugasId,
-        Carbon $waktuTerima,
-        string $noTransaksi,
-        int $muzakkiId,
-        string $category,
-        string $metode,
-        int $tahunZakat,
-        array $itemForComputation,
-        int $defaultFitrah,
-        int $defaultFidyah,
-        float $defaultBerasKg,
-        float $defaultFidyahBeras
-    ): array {
-        return [
-            'no_transaksi'                      => $noTransaksi,
-            'muzakki_id'                        => $muzakkiId,
-            'category'                          => $category,
-            'tahun_zakat'                       => $tahunZakat,
-            'metode'                            => $metode,
-            'nominal_uang'                      => ZakatTransaction::computeNominalUang($itemForComputation, $defaultFitrah, $defaultFidyah),
-            'jumlah_beras_kg'                   => ZakatTransaction::computeJumlahBerasKg($itemForComputation, $defaultBerasKg, $defaultFidyahBeras),
-            'jiwa'                              => $item['jiwa'] ?? $data['jiwa'] ?? null,
-            'hari'                              => $item['hari'] ?? $data['hari'] ?? null,
-            'is_khusus'                         => $this->determineIsKhusus($itemForComputation, $defaultFitrah, $defaultFidyah, $defaultBerasKg, $defaultFidyahBeras),
-            'default_fitrah_cash_per_jiwa_used' => $defaultFitrah > 0 ? $defaultFitrah : null,
-            'default_fidyah_per_hari_used'      => $defaultFidyah > 0 ? $defaultFidyah : null,
-            'petugas_id'                        => $petugasId,
-            'waktu_terima'                      => $waktuTerima,
-            'shift'                             => $data['shift'] ?? ZakatTransaction::SHIFT_PAGI,
-            'keterangan'                        => $data['keterangan'] ?? null,
-            'is_transfer'                       => ($metode === ZakatTransaction::METHOD_UANG) ? ($item['is_transfer'] ?? false) : false,
-            'status'                            => ZakatTransaction::STATUS_VALID,
-            'pembayar_nama'                     => $pembayarData['muzakki_name'],
-            'pembayar_alamat'                   => $pembayarData['muzakki_address'],
-            'pembayar_phone'                    => $pembayarData['muzakki_phone'],
-        ];
-    }
-
     /**
      * Normalizes waktu terima from request input or reuses the existing group timestamp.
      *
@@ -427,29 +348,6 @@ class ZakatService
     }
 
     /**
-     * Loads annual defaults for a given zakat year and caches them per service instance.
-     *
-     * The values are used for nominal calculations and fallback display defaults.
-     *
-     * @return array{0:int,1:int,2:float,3:float}
-     */
-    private function getAnnualDefaults(int $year): array
-    {
-        if (isset($this->annualCache[$year])) return $this->annualCache[$year];
-
-        $annual = AnnualSetting::where('year', $year)->first();
-        $defaults = [
-            (int) ($annual?->default_fitrah_cash_per_jiwa ?? config('zakat.annual_defaults.fitrah_cash_per_jiwa', 50000)),
-            (int) ($annual?->default_fidyah_per_hari ?? config('zakat.annual_defaults.fidyah_per_hari', 30000)),
-            (float) ($annual?->default_fitrah_beras_per_jiwa ?? config('zakat.annual_defaults.fitrah_beras_per_jiwa', 2.5)),
-            (float) ($annual?->default_fidyah_beras_per_hari ?? config('zakat.annual_defaults.fidyah_beras_per_hari', 0.75))
-        ];
-
-        $this->annualCache[$year] = $defaults;
-        return $defaults;
-    }
-
-    /**
      * Ensures uang-based transactions have a usable nominal before save.
      *
      * This guards cases where the UI leaves nominal empty but annual defaults
@@ -462,7 +360,9 @@ class ZakatService
         $tahun = (int) ($data['tahun_zakat'] ?? now()->year);
         $items = $this->extractItems($data);
 
-        [$defaultFitrah, $defaultFidyah, $defaultFitrahBeras, $defaultFidyahBeras] = $this->getAnnualDefaults($tahun);
+        [$defaultFitrah, $defaultFidyah, $defaultFitrahBeras, $defaultFidyahBeras] = $this->defaultsResolver
+            ->resolve($tahun)
+            ->toTuple();
 
         $this->nominalValidator->validate(
             $data,
@@ -473,35 +373,6 @@ class ZakatService
             $defaultFitrahBeras,
             $defaultFidyahBeras
         );
-    }
-
-    /**
-     * Determines whether a row should be marked as khsus based on computed defaults.
-     *
-     * This keeps the persisted flag aligned with the same calculation rules used for
-     * nominal and beras generation.
-     */
-    private function determineIsKhusus(array $data, int $defaultFitrah, int $defaultFidyah, float $defaultBerasKg, float $defaultFidyahBeras): bool
-    {
-        $category = $data['category'];
-        if ($data['metode'] === ZakatTransaction::METHOD_BERAS) {
-            $val = $data['jumlah_beras_kg'] ?? null;
-            if ($val === null || $val === '') return false;
-            
-            if ($category === ZakatTransaction::CATEGORY_FITRAH && $defaultBerasKg > 0) {
-                return abs((float)$val - (((int)($data['jiwa']??1)) * $defaultBerasKg)) > 0.001;
-            }
-            if ($category === ZakatTransaction::CATEGORY_FIDYAH && $defaultFidyahBeras > 0) {
-                return abs((float)$val - (((int)($data['hari']??0)) * $defaultFidyahBeras)) > 0.001;
-            }
-            return false;
-        }
-
-        $val = $data['nominal_uang'] ?? null;
-        if ($val === null || $val === '') return false;
-        if ($category === ZakatTransaction::CATEGORY_FITRAH && $defaultFitrah > 0) return (int)$val !== (((int)($data['jiwa']??1)) * $defaultFitrah);
-        if ($category === ZakatTransaction::CATEGORY_FIDYAH && $defaultFidyah > 0) return (int)$val !== (((int)($data['hari']??0)) * $defaultFidyah);
-        return false;
     }
 
     private function executeWithRetry(\Closure $callback)

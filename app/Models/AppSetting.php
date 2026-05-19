@@ -11,6 +11,7 @@ class AppSetting extends Model
     use HasFactory;
 
     public const KEY_ACTIVE_YEAR = 'active_year';
+    public const KEY_ACTIVE_ZAKAT_PERIOD_ID = 'active_zakat_period_id';
     public const KEY_PUBLIC_REFRESH_INTERVAL_SECONDS = 'public_refresh_interval_seconds';
 
     protected $fillable = [
@@ -45,6 +46,7 @@ class AppSetting extends Model
                 Cache::forget(self::cacheKeyForSetting($k));
             }
             Cache::forget(self::cacheKeyForSetting(self::KEY_ACTIVE_YEAR));
+            Cache::forget(self::cacheKeyForSetting(self::KEY_ACTIVE_ZAKAT_PERIOD_ID));
             Cache::forget(self::cacheKeyForSetting(self::KEY_PUBLIC_REFRESH_INTERVAL_SECONDS));
             self::$settingCache = [];
         }

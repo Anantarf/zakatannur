@@ -37,10 +37,10 @@ class TransactionExportService
         return $this->downloadSpreadsheet($spreadsheet, 'Rekap_Zakat_' . $date . '.xlsx');
     }
 
-    public function exportYearly(int $year)
+    public function exportYearly(int $year, ?int $periodId = null)
     {
         $this->prepareYearlyExportEnvironment();
-        $summaryData = $this->fetchYearlySummary($year);
+        $summaryData = $this->fetchYearlySummary($year, $periodId);
 
         $spreadsheet = new Spreadsheet();
         $sheet = $spreadsheet->getActiveSheet();
@@ -79,7 +79,9 @@ class TransactionExportService
             $sheet->getColumnDimension($column)->setAutoSize(true);
         }
 
-        return $this->downloadSpreadsheet($spreadsheet, 'Rekap_Tahunan_' . $year . '.xlsx');
+        $fileSuffix = $periodId ? 'Periode_' . $periodId : 'Tahunan_' . $year;
+
+        return $this->downloadSpreadsheet($spreadsheet, 'Rekap_' . $fileSuffix . '.xlsx');
     }
 
     private function prepareDailyExportEnvironment(): void
@@ -142,12 +144,12 @@ class TransactionExportService
             ->get();
     }
 
-    private function fetchYearlySummary(int $year)
+    private function fetchYearlySummary(int $year, ?int $periodId = null)
     {
         $effectiveTimestamp = SqlDialect::effectiveTimestamp();
 
         return ZakatTransaction::valid()
-            ->where('tahun_zakat', $year)
+            ->forPeriodOrYear($periodId, $year)
             ->selectRaw("
                 " . SqlDialect::yearlyLocalDateExpression($effectiveTimestamp, 'date') . ",
                 shift,

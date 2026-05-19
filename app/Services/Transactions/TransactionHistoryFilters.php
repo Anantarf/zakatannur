@@ -6,6 +6,7 @@ final class TransactionHistoryFilters
 {
     public string $q;
     public ?int $year;
+    public ?int $periodId;
     public ?string $category;
     public ?string $metode;
     public ?string $status;
@@ -17,6 +18,7 @@ final class TransactionHistoryFilters
     public function __construct(
         string $q,
         ?int $year,
+        ?int $periodId,
         ?string $category,
         ?string $metode,
         ?string $status,
@@ -27,6 +29,7 @@ final class TransactionHistoryFilters
     ) {
         $this->q = $q;
         $this->year = $year;
+        $this->periodId = $periodId;
         $this->category = $category;
         $this->metode = $metode;
         $this->status = $status;
@@ -37,13 +40,14 @@ final class TransactionHistoryFilters
     }
 
     /**
-     * @param array{q:string,year:int|null,category:?string,metode:?string,status:?string,petugasId:?int,riskLevel:?string,reviewStatus:?string,activeYear:int} $data
+     * @param array{q:string,year:int|null,periodId:int|null,category:?string,metode:?string,status:?string,petugasId:?int,riskLevel:?string,reviewStatus:?string,activeYear:int} $data
      */
     public static function fromArray(array $data): self
     {
         return new self(
             $data['q'],
             $data['year'],
+            $data['periodId'],
             $data['category'],
             $data['metode'],
             $data['status'],
@@ -55,13 +59,14 @@ final class TransactionHistoryFilters
     }
 
     /**
-     * @return array{q:string,year:int|null,category:?string,metode:?string,status:?string,petugasId:?int,riskLevel:?string,reviewStatus:?string,activeYear:int}
+     * @return array{q:string,year:int|null,periodId:int|null,category:?string,metode:?string,status:?string,petugasId:?int,riskLevel:?string,reviewStatus:?string,activeYear:int}
      */
     public function toArray(): array
     {
         return [
             'q' => $this->q,
             'year' => $this->year,
+            'periodId' => $this->periodId,
             'category' => $this->category,
             'metode' => $this->metode,
             'status' => $this->status,

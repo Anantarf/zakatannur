@@ -61,6 +61,7 @@ class AuditLogTest extends TestCase
             ->post('/internal/settings/period/start-new', [
                 'new_year'         => 2027,
                 'backup_confirmed' => 1,
+                'new_year_confirmation' => '2027',
             ])
             ->assertRedirect(route('internal.settings.period.edit'));
 

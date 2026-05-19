@@ -22,6 +22,7 @@ class GroupedTransactionQueryService
             DB::raw('SUM(jumlah_beras_kg) as total_beras'),
             DB::raw('MAX(pembayar_nama) as pembayar_nama'),
             DB::raw('MAX(petugas_id) as petugas_id'),
+            DB::raw('MAX(zakat_period_id) as zakat_period_id'),
             DB::raw('MAX(shift) as shift'),
             DB::raw(SqlDialect::stringAggregateDistinct('category', 'categories_list')),
             DB::raw(SqlDialect::stringAggregateDistinct('metode', 'methods_list')),
@@ -31,12 +32,12 @@ class GroupedTransactionQueryService
         ]);
     }
 
-    public function latestValid(?int $year = null, ?string $metode = null, int $limit = 10)
+    public function latestValid(?int $year = null, ?string $metode = null, int $limit = 10, ?int $periodId = null)
     {
         return $this->make()
             ->with(['petugas'])
             ->valid()
-            ->when($year !== null, fn ($query) => $query->where('tahun_zakat', $year))
+            ->forPeriodOrYear($periodId, $year)
             ->when($metode !== null && $metode !== '', fn ($query) => $query->where('metode', $metode))
             ->groupBy('no_transaksi')
             ->orderByRaw(SqlDialect::maxEffectiveTimestampOrder())

@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Models\AnnualSetting;
 use App\Models\Muzakki;
 use App\Models\User;
 use App\Models\ZakatTransaction;
@@ -122,5 +123,80 @@ class PublicSummaryApiTest extends TestCase
         $this->assertSame('Rp 10.000',             $fitrah['total_uang_display']);
         $this->assertSame('2,50 Kg',               $fitrah['total_beras_kg_display']);
         $this->assertSame('Rp 10.000 + 2,50 Kg',  $fitrah['total_display']);
+    }
+
+    public function test_public_daily_chart_uses_configured_admin_range_and_effective_transaction_date(): void
+    {
+        AnnualSetting::query()->create([
+            'year' => 2026,
+            'chart_starts_at' => '2026-03-10',
+            'chart_ends_at' => '2026-03-12',
+            'chart_fallback_buffer_days' => 2,
+        ]);
+
+        $petugas = User::factory()->create(['role' => User::ROLE_STAFF]);
+        $muzakki = Muzakki::query()->create(['name' => 'Ahmad']);
+
+        ZakatTransaction::query()->create([
+            'no_transaksi' => 'TRX-20260311-0001',
+            'muzakki_id' => $muzakki->id,
+            'pembayar_nama' => 'Hamba Allah',
+            'pembayar_phone' => '0812',
+            'pembayar_alamat' => 'Jakarta',
+            'shift' => ZakatTransaction::SHIFTS[0],
+            'category' => ZakatTransaction::CATEGORY_FITRAH,
+            'tahun_zakat' => 2026,
+            'metode' => ZakatTransaction::METHOD_UANG,
+            'nominal_uang' => 25000,
+            'jiwa' => 1,
+            'petugas_id' => $petugas->id,
+            'status' => ZakatTransaction::STATUS_VALID,
+            'waktu_terima' => '2026-03-11 09:00:00',
+            'created_at' => '2026-01-01 09:00:00',
+        ]);
+
+        $response = $this->getJson('/api/public/summary?year=2026');
+
+        $response->assertOk();
+        $response->assertJsonPath('data.dailyChartData.range.starts_at', '2026-03-10');
+        $response->assertJsonPath('data.dailyChartData.range.ends_at', '2026-03-12');
+        $this->assertSame(['10 Mar', '11 Mar', '12 Mar'], $response->json('data.dailyChartData.labels'));
+        $this->assertSame([0, 25000, 0], $response->json('data.dailyChartData.uang'));
+        $this->assertSame([0, 25000, 0], $response->json('data.dailyChartData.datasets.0.values'));
+    }
+
+    public function test_public_daily_chart_falls_back_to_transaction_window_with_buffer(): void
+    {
+        AnnualSetting::query()->create([
+            'year' => 2026,
+            'chart_fallback_buffer_days' => 1,
+        ]);
+
+        $petugas = User::factory()->create(['role' => User::ROLE_STAFF]);
+        $muzakki = Muzakki::query()->create(['name' => 'Ahmad']);
+
+        ZakatTransaction::query()->create([
+            'no_transaksi' => 'TRX-20260320-0001',
+            'muzakki_id' => $muzakki->id,
+            'pembayar_nama' => 'Hamba Allah',
+            'pembayar_phone' => '0812',
+            'pembayar_alamat' => 'Jakarta',
+            'shift' => ZakatTransaction::SHIFTS[0],
+            'category' => ZakatTransaction::CATEGORY_FITRAH,
+            'tahun_zakat' => 2026,
+            'metode' => ZakatTransaction::METHOD_BERAS,
+            'jumlah_beras_kg' => 2.5,
+            'jiwa' => 1,
+            'petugas_id' => $petugas->id,
+            'status' => ZakatTransaction::STATUS_VALID,
+            'waktu_terima' => '2026-03-20 09:00:00',
+        ]);
+
+        $response = $this->getJson('/api/public/summary?year=2026');
+
+        $response->assertOk();
+        $response->assertJsonPath('data.dailyChartData.range.starts_at', '2026-03-19');
+        $response->assertJsonPath('data.dailyChartData.range.ends_at', '2026-03-21');
+        $this->assertSame([0, 2.5, 0], $response->json('data.dailyChartData.beras'));
     }
 }

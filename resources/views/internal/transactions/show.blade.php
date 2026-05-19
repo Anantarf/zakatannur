@@ -1,8 +1,8 @@
 <x-app-layout>
     <x-slot name="header">
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-            <h2 class="font-bold text-xl sm:text-2xl text-emerald-800 leading-tight flex items-center justify-center sm:justify-start gap-2 text-center sm:text-left">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7 text-emerald-600 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <h2 class="ui-page-title">
+                <svg xmlns="http://www.w3.org/2000/svg" class="ui-page-title-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
                 Ringkasan Transaksi
@@ -45,7 +45,62 @@
                             <span class="w-1 h-5 bg-emerald-500 rounded-full"></span>
                             <h4 class="text-sm font-bold text-gray-800 uppercase tracking-wide">Rincian Pembayaran</h4>
                         </div>
-                        <div class="overflow-x-auto w-full border border-gray-100 rounded-xl bg-white shadow-sm">
+                        <div class="space-y-3 md:hidden">
+                            @php $rowNo = 1; @endphp
+                            @foreach ($groupedArr as $muzakkiName => $txsArr)
+                                @foreach ($txsArr as $tx)
+                                    <article class="ui-mobile-card">
+                                        <div class="flex items-start justify-between gap-3">
+                                            <div class="min-w-0">
+                                                <div class="text-[10px] font-black uppercase tracking-widest text-gray-400">Muzakki {{ $rowNo++ }}</div>
+                                                <p class="mt-1 text-sm font-bold leading-tight text-gray-900">{{ $muzakkiName }}</p>
+                                            </div>
+                                            <span class="inline-flex items-center px-2.5 py-1 rounded text-[11px] font-bold uppercase tracking-wider {{ $tx->metode === 'beras' ? 'bg-amber-100 text-amber-700' : 'bg-emerald-100 text-emerald-700' }}">
+                                                {{ $tx->metode_label }}
+                                            </span>
+                                        </div>
+
+                                        <div class="ui-mobile-card-muted space-y-3">
+                                            <div class="flex items-start justify-between gap-3">
+                                                <span class="text-[10px] font-black uppercase tracking-widest text-gray-400">Kategori</span>
+                                                <div class="max-w-[65%]">
+                                                    <x-zakat-category-tags :categories="[$tx->category]" />
+                                                </div>
+                                            </div>
+                                            <div class="flex items-start justify-between gap-3">
+                                                <span class="text-[10px] font-black uppercase tracking-widest text-gray-400">Keterangan</span>
+                                                <div class="text-right text-xs font-medium text-gray-500">
+                                                    @if($tx->category === 'fitrah' && $tx->jiwa)
+                                                        <span class="px-2 py-1 bg-white rounded-md border border-gray-100 font-bold text-gray-600">{{ $tx->jiwa }} Jiwa</span>
+                                                    @elseif($tx->category === 'fidyah' && $tx->hari)
+                                                        <span class="px-2 py-1 bg-white rounded-md border border-gray-100 font-bold text-gray-600">{{ $tx->hari }} Hari</span>
+                                                    @else
+                                                        -
+                                                    @endif
+                                                </div>
+                                            </div>
+                                            <div class="flex items-start justify-between gap-3">
+                                                <span class="text-[10px] font-black uppercase tracking-widest text-gray-400">Nominal</span>
+                                                <div class="text-right">
+                                                    <p class="text-sm font-bold tabular-nums text-gray-900">
+                                                        @if($tx->metode === 'beras')
+                                                            {{ rtrim(rtrim(number_format($tx->jumlah_beras_kg, 2, ',', '.'), '0'), ',') }} <span class="ml-0.5 text-[10px] font-bold text-gray-400">kg</span>
+                                                        @else
+                                                            {{ \App\Support\Format::rupiah((int)$tx->nominal_uang) }}
+                                                            @if($tx->is_transfer)
+                                                                <x-transfer-badge class="ml-1" />
+                                                            @endif
+                                                        @endif
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </article>
+                                @endforeach
+                            @endforeach
+                        </div>
+
+                        <div class="hidden overflow-x-auto w-full border border-gray-100 rounded-xl bg-white shadow-sm md:block">
                             <table class="min-w-full text-sm">
                                 <thead>
                                     <tr class="bg-gray-50 border-b border-gray-100 text-left text-[11px] sm:text-xs font-semibold text-gray-400 uppercase tracking-wider">
@@ -164,26 +219,16 @@
                                  <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" /></svg>
                                  CETAK TANDA TERIMA
                              </a>
-                             <a href="{{ route('internal.transactions.create') }}" class="ui-btn flex-1 bg-blue-600 px-6 py-4 text-base font-black text-white shadow-lg shadow-blue-200 hover:-translate-y-0.5 hover:bg-blue-700 focus:ring-blue-500 sm:order-2">
+                             <a href="{{ route('internal.transactions.create') }}" class="ui-btn ui-btn-accent flex-1 px-6 py-4 text-base font-black sm:order-2">
                                  <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4" /></svg>
                                  INPUT BARU
                              </a>
-                             @php
-                                 // Mirror authorizeEdit() logic: use waktu_terima ?? created_at, same as the controller.
-                                 // Also hide Edit button if transaction is void.
-                                 $txDate = ($mainTx->waktu_terima ?? $mainTx->created_at)->timezone('Asia/Jakarta');
-                                 $canModify = $mainTx->status !== \App\Models\ZakatTransaction::STATUS_VOID && (
-                                     in_array(auth()->user()->role, [\App\Models\User::ROLE_ADMIN, \App\Models\User::ROLE_SUPER_ADMIN]) ||
-                                     ((int) $mainTx->petugas_id === auth()->id() && $txDate->isToday() && $mainTx->receipt_printed_at === null)
-                                 );
-                             @endphp
-
-                             @if($canModify)
+                             @can('update', $mainTx)
                                  <a href="{{ route('internal.transactions.edit', ['transaction' => $mainTx->id]) }}" class="ui-btn ui-btn-secondary flex-none px-6 py-4 text-xs font-black uppercase tracking-widest sm:order-3">
                                      <svg class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h14a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
                                      EDIT
                                  </a>
-                             @endif
+                             @endcan
                         </div>
                     </div>
                 </div>

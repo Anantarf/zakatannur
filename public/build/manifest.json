@@ -1,26 +1,33 @@
 {
   "resources/css/app.css": {
-    "file": "assets/app-21811c37.css",
-    "isEntry": true,
-    "src": "resources/css/app.css"
+    "file": "assets/app-wyQur5M-.css",
+    "name": "app",
+    "names": [
+      "app.css"
+    ],
+    "src": "resources/css/app.css",
+    "isEntry": true
   },
   "resources/js/app.js": {
+    "file": "assets/app-Dnn-7ot9.js",
+    "name": "app",
+    "src": "resources/js/app.js",
+    "isEntry": true,
     "dynamicImports": [
       "resources/js/public-home.js",
       "resources/js/transaction-form.js"
-    ],
-    "file": "assets/app-3052f9ce.js",
-    "isEntry": true,
-    "src": "resources/js/app.js"
+    ]
   },
   "resources/js/public-home.js": {
-    "file": "assets/public-home-121860b4.js",
-    "isDynamicEntry": true,
-    "src": "resources/js/public-home.js"
+    "file": "assets/public-home-BF0UaBWf.js",
+    "name": "public-home",
+    "src": "resources/js/public-home.js",
+    "isDynamicEntry": true
   },
   "resources/js/transaction-form.js": {
-    "file": "assets/transaction-form-3069d1f6.js",
-    "isDynamicEntry": true,
-    "src": "resources/js/transaction-form.js"
+    "file": "assets/transaction-form-IovfWrAS.js",
+    "name": "transaction-form",
+    "src": "resources/js/transaction-form.js",
+    "isDynamicEntry": true
   }
 }

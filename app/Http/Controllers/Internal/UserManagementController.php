@@ -27,6 +27,7 @@ class UserManagementController extends Controller
 
         return view('internal.users.index', [
             'users' => $users,
+            'roleLabels' => User::ROLE_LABELS,
         ]);
     }
 
@@ -38,6 +39,10 @@ class UserManagementController extends Controller
         return view('internal.users.form', [
             'user' => null,
             'allowedRoles' => $this->allowedRolesForActor($actor),
+            'roleLabels' => User::ROLE_LABELS,
+            'nameMax' => self::NAME_MAX_LENGTH,
+            'usernameMax' => self::USERNAME_MAX_LENGTH,
+            'passwordMin' => self::PASSWORD_MIN_LENGTH,
         ]);
     }
 
@@ -68,7 +73,7 @@ class UserManagementController extends Controller
             'role' => $user->role,
         ]);
 
-        if (!$this->canManageUser($actor, $user)) {
+        if (!$actor->canManageUser($user)) {
              return redirect()->route('internal.users.index')
                 ->with('status', 'User berhasil dibuat.');
         }
@@ -82,13 +87,17 @@ class UserManagementController extends Controller
         /** @var User $actor */
         $actor = $request->user();
 
-        if (!$this->canManageUser($actor, $user)) {
+        if (!$actor->canManageUser($user)) {
             abort(Response::HTTP_FORBIDDEN);
         }
 
         return view('internal.users.form', [
             'user' => $user,
             'allowedRoles' => $this->allowedRolesForActor($actor, $user),
+            'roleLabels' => User::ROLE_LABELS,
+            'nameMax' => self::NAME_MAX_LENGTH,
+            'usernameMax' => self::USERNAME_MAX_LENGTH,
+            'passwordMin' => self::PASSWORD_MIN_LENGTH,
         ]);
     }
 
@@ -97,7 +106,7 @@ class UserManagementController extends Controller
         /** @var User $actor */
         $actor = $request->user();
 
-        if (!$this->canManageUser($actor, $user)) {
+        if (!$actor->canManageUser($user)) {
             abort(Response::HTTP_FORBIDDEN);
         }
 
@@ -154,22 +163,4 @@ class UserManagementController extends Controller
         return [];
     }
 
-    public function canManageUser(User $actor, User $target): bool
-    {
-        if ($actor->isSuperAdmin()) {
-            return true;
-        }
-
-        if ($actor->isAdmin()) {
-            // Admin can edit themselves
-            if ($actor->id === $target->id) {
-                return true;
-            }
-
-            // Admin can only edit staff
-            return $target->role === User::ROLE_STAFF;
-        }
-
-        return false;
-    }
 }

@@ -1,10 +1,10 @@
-<div class="bg-white border sm:rounded-2xl p-4 sm:p-5 shadow-sm border-gray-200 relative mb-4 transition-all hover:border-emerald-200">
+<div class="ui-card relative mb-4 border-gray-200 p-4 transition-all hover:border-emerald-200 sm:rounded-2xl sm:p-5">
     <div class="flex flex-col sm:flex-row sm:items-center justify-between xl:justify-start gap-3 mb-4">
         <div class="flex items-center gap-2 flex-1 w-full lg:max-w-sm">
             <div class="h-6 w-6 sm:h-7 sm:w-7 bg-emerald-500 text-white rounded-full flex justify-center items-center text-xs font-bold shadow-sm shrink-0" x-text="index + 1"></div>
-            <input type="text" x-model="person.name" class="muzakki-name-input w-full text-sm rounded-lg border-gray-300 shadow-sm focus:border-emerald-500 focus:ring-emerald-500" placeholder="Nama..." required>
+            <input type="text" x-model="person.name" class="muzakki-name-input ui-input w-full text-sm" placeholder="Nama..." required>
         </div>
-        <button type="button" @click="removePerson(index)" x-show="persons.length > 1" class="w-full sm:w-auto text-red-400 hover:text-red-600 bg-red-50 sm:px-3 py-2 sm:py-1.5 rounded-lg text-xs font-bold transition-colors border border-transparent hover:border-red-100 text-center">
+        <button type="button" @click="removePerson(index)" x-show="persons.length > 1" class="ui-btn ui-btn-secondary w-full border-red-100 bg-red-50 py-2 text-xs text-red-500 hover:bg-red-50 hover:text-red-600 sm:w-auto sm:px-3 sm:py-1.5">
             Hapus Baris
         </button>
     </div>

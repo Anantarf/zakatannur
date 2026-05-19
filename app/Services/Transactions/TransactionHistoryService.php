@@ -33,6 +33,7 @@ class TransactionHistoryService
         $validated = Validator::make($request->query(), [
             'q' => ['nullable', 'string', 'max:' . (int) config('zakat.validation.search_query_max', 100)],
             'year' => ['nullable', 'integer', 'min:' . (int) config('zakat.year_bounds.min', 2000), 'max:' . (int) config('zakat.year_bounds.max', 2100)],
+            'period_id' => ['nullable', 'integer', 'exists:zakat_periods,id'],
             'category' => ['nullable', 'string', Rule::in(ZakatTransaction::CATEGORIES)],
             'metode' => ['nullable', 'string', Rule::in(ZakatTransaction::METHODS)],
             'status' => ['nullable', 'string', Rule::in(ZakatTransaction::STATUSES)],
@@ -45,10 +46,16 @@ class TransactionHistoryService
         $year = array_key_exists('year', $validated)
             ? ($validated['year'] !== null ? (int) $validated['year'] : null)
             : $activeYear;
+        $periodId = isset($validated['period_id']) ? (int) $validated['period_id'] : null;
+
+        if ($periodId !== null && !array_key_exists('year', $validated)) {
+            $year = null;
+        }
 
         return TransactionHistoryFilters::fromArray([
             'q' => $q,
             'year' => $year,
+            'periodId' => $periodId,
             'category' => $validated['category'] ?? null,
             'metode' => $validated['metode'] ?? null,
             'status' => $validated['status'] ?? null,
@@ -153,6 +160,7 @@ class TransactionHistoryService
         return array_merge($filters->toArray(), [
             'historyOverview' => $this->historyOverview($filters, $canViewRisk),
             'years' => ViewOptions::years($filters->activeYear),
+            'periods' => ViewOptions::periods(),
             'categories' => ZakatTransaction::CATEGORIES,
             'methods' => ZakatTransaction::METHODS,
             'statuses' => ZakatTransaction::STATUSES,

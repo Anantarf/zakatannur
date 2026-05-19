@@ -4,6 +4,7 @@ namespace App\Support;
 
 use App\Models\AnnualSetting;
 use App\Models\User;
+use App\Models\ZakatPeriod;
 
 final class ViewOptions
 {
@@ -17,6 +18,17 @@ final class ViewOptions
         rsort($years);
 
         return !empty($years) ? $years : [$activeYear];
+    }
+
+    /**
+     * @return \Illuminate\Support\Collection<int,\App\Models\ZakatPeriod>
+     */
+    public static function periods()
+    {
+        return ZakatPeriod::query()
+            ->orderByDesc('gregorian_year')
+            ->orderByDesc('sequence')
+            ->get(['id', 'label', 'gregorian_year', 'hijri_year', 'sequence', 'is_active']);
     }
 
     /**

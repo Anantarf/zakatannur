@@ -45,6 +45,7 @@ export const createDataMethods = (config, chartService) => ({
             this.totals = data.totals || {};
 
             if (data.dailyChartData) {
+                this.dailyChartData = data.dailyChartData;
                 chartService.updateDailyChart(data.dailyChartData);
             }
 

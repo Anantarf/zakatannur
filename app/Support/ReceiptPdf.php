@@ -62,7 +62,9 @@ final class ReceiptPdf
 
         $pdf->SetFont('helvetica', 'B', 12);
         $pdf->SetY(55);
-        $hijriYear = (int) floor(($firstTx->tahun_zakat - 622) * 1.030684);
+        $hijriYear = $firstTx->hijri_year
+            ?? $firstTx->zakatPeriod?->hijri_year
+            ?? (int) floor(($firstTx->tahun_zakat - 622) * 1.030684);
         $title = 'TANDA TERIMA PEMBAYARAN ZAKAT ' . $firstTx->tahun_zakat . ' (' . $hijriYear . ' H)';
         
         $pdf->Cell(0, 8, $title, 0, 1, 'C');

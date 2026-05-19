@@ -26,16 +26,16 @@
                     <div>
                         <p class="font-bold text-amber-800 text-sm">Sistem Sedang Tidak Aktif</p>
                         <p class="text-amber-700 text-xs mt-0.5">
-                            Periode Ramadan {{ $activeYear }} telah berakhir.
+                            Periode Ramadan {{ $chartYear ?? $activeYear }} telah berakhir.
                             @if($lastActiveDate)
                                 Transaksi terakhir tercatat pada <span class="font-bold">{{ $lastActiveDate->locale('id')->translatedFormat('d F Y') }}</span>.
                             @endif
-                            Data rekap di bawah adalah arsip lengkap tahun {{ $activeYear }}.
+                            Data rekap di bawah adalah arsip lengkap tahun {{ $chartYear ?? $activeYear }}.
                         </p>
                     </div>
                 </div>
                 <div class="flex items-center gap-2 flex-shrink-0">
-                    <a href="{{ route('internal.transactions.index', ['year' => $activeYear]) }}" class="inline-flex items-center gap-1.5 rounded-xl bg-amber-600 px-3 py-2 text-xs font-bold text-white hover:bg-amber-700 transition-all shadow-sm whitespace-nowrap">
+                    <a href="{{ route('internal.transactions.index', ['year' => $chartYear ?? $activeYear]) }}" class="inline-flex items-center gap-1.5 rounded-xl bg-amber-600 px-3 py-2 text-xs font-bold text-white hover:bg-amber-700 transition-all shadow-sm whitespace-nowrap">
                         Lihat Arsip
                         <svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg>
                     </a>
@@ -49,10 +49,10 @@
                     <div class="flex items-center gap-2 flex-wrap">
                         <div class="w-1.5 h-5 sm:w-2 sm:h-6 bg-emerald-500 rounded-full flex-shrink-0"></div>
                         <h3 class="font-bold text-sm sm:text-base text-gray-800">Grafik Transaksi Zakat</h3>
-                        @if($offSeason && $chartPeriodLabel)
+                        @if($chartPeriodLabel)
                             <span class="inline-flex items-center gap-1 rounded-full bg-amber-100 border border-amber-200 px-2.5 py-0.5 text-[10px] font-bold text-amber-700 uppercase tracking-wide whitespace-nowrap">
                                 <svg class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-                                Arsip: {{ $chartPeriodLabel }}
+                                Range: {{ $chartPeriodLabel }}
                             </span>
                         @endif
                     </div>
@@ -60,6 +60,7 @@
                     <form method="GET" action="{{ route('dashboard') }}" class="flex items-center justify-end gap-2 w-full sm:w-auto">
                         {{-- Keep other filters --}}
                         @if(request('year')) <input type="hidden" name="year" value="{{ request('year') }}"> @endif
+                        @if(request('period_id')) <input type="hidden" name="period_id" value="{{ request('period_id') }}"> @endif
                         @if(request('metode')) <input type="hidden" name="metode" value="{{ request('metode') }}"> @endif
                         
                         <select name="days" onchange="this.form.submit()" class="appearance-none rounded-lg border-gray-200 bg-gray-50 pl-3 pr-8 py-1.5 text-[11px] sm:text-xs font-black text-gray-500 uppercase tracking-widest focus:border-emerald-500 focus:ring-emerald-500 transition-all cursor-pointer">
@@ -96,6 +97,17 @@
 
                         </div>
 
+                        <div class="relative w-full sm:w-auto sm:min-w-[190px]">
+                            <select name="period_id" onchange="this.form.submit()" class="w-full appearance-none rounded-lg border-gray-200 bg-gray-50 pl-3 pr-8 py-2 text-sm font-bold text-gray-600 focus:border-emerald-500 focus:ring-emerald-500 transition-all cursor-pointer">
+                                <option value="">Semua Periode</option>
+                                @foreach ($periods ?? [] as $period)
+                                    <option value="{{ $period->id }}" @selected((string) ($periodId ?? '') === (string) $period->id)>
+                                        {{ $period->display_label }}{{ $period->sequence > 1 ? ' #' . $period->sequence : '' }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
+
                         <!-- Filter Bentuk Zakat -->
                         <div class="relative w-full sm:w-auto sm:min-w-[140px]">
                             <select name="metode" onchange="this.form.submit()" class="w-full appearance-none rounded-lg border-gray-200 bg-gray-50 pl-3 pr-8 py-2 text-sm font-bold text-gray-600 focus:border-emerald-500 focus:ring-emerald-500 transition-all cursor-pointer">
@@ -109,7 +121,7 @@
 
                         @if(request('days')) <input type="hidden" name="days" value="{{ request('days') }}"> @endif
                         
-                        @if($year || $metode)
+                        @if($year || $periodId || $metode)
                             <a href="{{ route('dashboard') }}" class="flex items-center justify-center p-1.5 text-gray-400 hover:text-emerald-600 rounded-lg transition-all" title="Reset Filters">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
@@ -130,7 +142,7 @@
                         <div class="w-1.5 h-5 sm:w-2 sm:h-6 bg-blue-500 rounded-full"></div>
                         <h3 class="font-bold text-sm sm:text-base text-gray-800">10 Transaksi Terakhir</h3>
                     </div>
-                    <a href="{{ route('internal.transactions.index', ['year' => $activeYear]) }}" class="text-xs sm:text-sm font-bold text-blue-600 hover:text-blue-700 transition-colors flex items-center gap-1">
+                    <a href="{{ route('internal.transactions.index', array_filter(['year' => $chartYear ?? $activeYear, 'period_id' => $periodId ?? null])) }}" class="text-xs sm:text-sm font-bold text-blue-600 hover:text-blue-700 transition-colors flex items-center gap-1">
                         Lengkap
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
@@ -172,8 +184,8 @@
                 data: {
                     labels: {!! json_encode($chartData['labels'] ?? []) !!},
                     datasets: [{
-                        label: 'Jumlah Transaksi',
-                        data: {!! json_encode($chartData['values'] ?? []) !!},
+                        label: {!! json_encode($chartData['datasets'][0]['label'] ?? 'Jumlah Transaksi') !!},
+                        data: {!! json_encode($chartData['datasets'][0]['values'] ?? $chartData['values'] ?? []) !!},
                         borderColor: lineColor,
                         backgroundColor: gradient,
                         borderWidth: 3,

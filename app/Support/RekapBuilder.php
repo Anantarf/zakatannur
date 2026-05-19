@@ -2,9 +2,9 @@
 
 namespace App\Support;
 
+use App\Services\Charts\ChartRangeResolver;
 use App\Models\ZakatTransaction;
 use Carbon\Carbon;
-use App\Support\SqlDialect;
 use Illuminate\Support\Facades\DB;
 
 final class RekapBuilder
@@ -28,14 +28,12 @@ final class RekapBuilder
      *   }
      * }
      */
-    public static function build(?int $year = null, ?string $metode = null): array
+    public static function build(?int $year = null, ?string $metode = null, ?int $periodId = null): array
     {
         $baseQuery = ZakatTransaction::query()
             ->valid();
 
-        if ($year !== null) {
-            $baseQuery->where('tahun_zakat', $year);
-        }
+        $baseQuery->forPeriodOrYear($periodId, $year);
 
         if ($metode !== null && $metode !== '') {
             $baseQuery->where('metode', $metode);
@@ -101,27 +99,25 @@ final class RekapBuilder
     }
 
     /**
-     * Build daily chart data for the given year.
+     * Build daily chart data for the configured chart window.
      *
-     * Returns an array with three parallel arrays keyed by:
-     *   - 'labels' : string[]  — e.g. ['1 Jan', '2 Jan', ...]
-     *   - 'uang'   : int[]    — daily SUM(nominal_uang)
-     *   - 'beras'  : float[]  — daily SUM(jumlah_beras_kg)
-     *
-     * Every day from Jan 1 to min(today, Dec 31) of $year is included,
-     * with 0 for days that have no transactions.
-     *
-     * @return array{labels: string[], uang: int[], beras: float[]}
+     * @return array{labels: string[], uang: int[], beras: float[], datasets: array<int, array<string, mixed>>, range: array<string, mixed>, empty_state: bool}
      */
-    public static function buildDailyChartData(?int $year = null): array
+    public static function buildDailyChartData(?int $year = null, ?array $range = null, ?int $periodId = null): array
     {
         $year = $year ?? (int) now()->year;
+        $range = $range ?? app(ChartRangeResolver::class)->resolveForYear($year);
+        $start = Carbon::parse($range['starts_at'])->startOfDay();
+        $end = Carbon::parse($range['ends_at'])->endOfDay();
+        $effectiveTimestamp = SqlDialect::effectiveTimestamp();
 
         $rows = ZakatTransaction::query()
             ->valid()
-            ->whereYear('created_at', $year)
+            ->forPeriodOrYear($periodId ?? ($range['period_id'] ?? null), $year)
+            ->whereRaw("{$effectiveTimestamp} >= ?", [$start])
+            ->whereRaw("{$effectiveTimestamp} <= ?", [$end])
             ->select(
-                DB::raw(SqlDialect::dateExpression('created_at', 'day')),
+                DB::raw(SqlDialect::dateExpression($effectiveTimestamp, 'day')),
                 DB::raw('COALESCE(SUM(nominal_uang), 0) as total_uang'),
                 DB::raw('COALESCE(SUM(jumlah_beras_kg), 0) as total_beras')
             )
@@ -129,12 +125,6 @@ final class RekapBuilder
             ->orderBy('day')
             ->get()
             ->keyBy('day');
-
-        $start = Carbon::create($year, 1, 1)->startOfDay();
-        $end   = Carbon::create($year, 12, 31)->endOfDay();
-        if ($end->isFuture()) {
-            $end = now()->startOfDay();
-        }
 
         $labels = [];
         $uang   = [];
@@ -148,6 +138,34 @@ final class RekapBuilder
             $beras[]  = $row ? (float) $row->total_beras : 0.0;
         }
 
-        return compact('labels', 'uang', 'beras');
+        return [
+            'labels' => $labels,
+            'uang' => $uang,
+            'beras' => $beras,
+            'datasets' => [
+                [
+                    'key' => 'uang',
+                    'label' => 'Uang Zakat',
+                    'unit' => 'rupiah',
+                    'values' => $uang,
+                    'colorRole' => 'emerald',
+                ],
+                [
+                    'key' => 'beras',
+                    'label' => 'Beras Zakat',
+                    'unit' => 'kg',
+                    'values' => $beras,
+                    'colorRole' => 'amber',
+                ],
+            ],
+            'range' => [
+                'starts_at' => $range['starts_at'],
+                'ends_at' => $range['ends_at'],
+                'label' => $range['label'],
+                'source' => $range['source'],
+            ],
+            'empty_state' => ! collect($uang)->contains(fn($value) => $value > 0)
+                && ! collect($beras)->contains(fn($value) => $value > 0),
+        ];
     }
 }

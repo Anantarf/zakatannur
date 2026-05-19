@@ -1,6 +1,10 @@
 const dailySuggestedMax = (values, floor, step) => {
     const max = Math.max(...values, 0);
 
+    if (max === 0) {
+        return floor;
+    }
+
     return Math.max(floor, Math.ceil((max * 1.1) / step) * step);
 };
 
@@ -11,17 +15,28 @@ const chartHasDataAtIndex = (chart, index) => {
     return uang > 0 || beras > 0;
 };
 
+const dailyDatasetValues = (data, key) => {
+    const dataset = data?.datasets?.find((item) => item.key === key);
+
+    return dataset?.values ?? data?.[key] ?? [];
+};
+
+const dailyLabels = (data) => data?.labels ?? [];
+
 export const createChartService = (config) => ({
     updateDailyChart(newData) {
         if (!window.myDailyChart || !newData) {
             return;
         }
 
-        window.myDailyChart.data.labels = newData.labels;
-        window.myDailyChart.data.datasets[0].data = newData.uang;
-        window.myDailyChart.data.datasets[1].data = newData.beras;
-        window.myDailyChart.options.scales.y.suggestedMax = dailySuggestedMax(newData.uang, 350000000, 100000000);
-        window.myDailyChart.options.scales.y1.suggestedMax = dailySuggestedMax(newData.beras, 1300, 250);
+        const uangData = dailyDatasetValues(newData, 'uang');
+        const berasData = dailyDatasetValues(newData, 'beras');
+
+        window.myDailyChart.data.labels = dailyLabels(newData);
+        window.myDailyChart.data.datasets[0].data = uangData;
+        window.myDailyChart.data.datasets[1].data = berasData;
+        window.myDailyChart.options.scales.y.suggestedMax = dailySuggestedMax(uangData, 1, 1000000);
+        window.myDailyChart.options.scales.y1.suggestedMax = dailySuggestedMax(berasData, 1, 25);
         window.myDailyChart.update('none');
     },
 
@@ -38,8 +53,8 @@ export const createChartService = (config) => ({
             return;
         }
 
-        const uangData = config.dailyChartData?.uang ?? [];
-        const berasData = config.dailyChartData?.beras ?? [];
+        const uangData = dailyDatasetValues(config.dailyChartData, 'uang');
+        const berasData = dailyDatasetValues(config.dailyChartData, 'beras');
         const uangGradient = dailyCtx.createLinearGradient(0, 0, 0, 400);
         const berasGradient = dailyCtx.createLinearGradient(0, 0, 0, 400);
 
@@ -51,7 +66,7 @@ export const createChartService = (config) => ({
         window.myDailyChart = new Chart(dailyCtx, {
             type: 'line',
             data: {
-                labels: config.dailyChartData?.labels ?? [],
+                labels: dailyLabels(config.dailyChartData),
                 datasets: [
                     { label: 'Uang Zakat', data: uangData, borderColor: '#10b981', borderWidth: 6, backgroundColor: uangGradient, fill: true, tension: 0, pointBackgroundColor: '#ffffff', pointBorderColor: '#10b981', pointBorderWidth: 4, pointRadius: 6, yAxisID: 'y' },
                     { label: 'Beras Zakat', data: berasData, borderColor: '#f59e0b', borderWidth: 6, backgroundColor: berasGradient, fill: true, tension: 0, pointBackgroundColor: '#ffffff', pointBorderColor: '#f59e0b', pointBorderWidth: 4, pointRadius: 6, yAxisID: 'y1' },
@@ -62,8 +77,8 @@ export const createChartService = (config) => ({
                 maintainAspectRatio: false,
                 animations: { y: { type: 'number', duration: 1000, easing: 'easeOutQuart', from: (ctx) => ctx.type === 'data' ? ctx.chart.scales.y.bottom : null, delay: (ctx) => ctx.datasetIndex * 300 }, x: { duration: 0 } },
                 scales: {
-                    y: { position: 'left', beginAtZero: true, suggestedMax: dailySuggestedMax(uangData, 350000000, 100000000), grid: { color: 'rgba(241, 245, 249, 1)', drawBorder: false }, ticks: { font: { family: 'Outfit, sans-serif', weight: 'bold', size: 12 }, color: '#64748b', callback: (v) => v >= 1000000 ? 'Rp ' + (v / 1000000) + 'jt' : 'Rp ' + v } },
-                    y1: { position: 'right', beginAtZero: true, suggestedMax: dailySuggestedMax(berasData, 1300, 250), grid: { drawOnChartArea: false }, ticks: { font: { family: 'Outfit, sans-serif', weight: 'bold', size: 12 }, color: '#f59e0b', callback: (v) => v + ' kg' } },
+                    y: { position: 'left', beginAtZero: true, suggestedMax: dailySuggestedMax(uangData, 1, 1000000), grid: { color: 'rgba(241, 245, 249, 1)', drawBorder: false }, ticks: { font: { family: 'Outfit, sans-serif', weight: 'bold', size: 12 }, color: '#64748b', callback: (v) => v >= 1000000 ? 'Rp ' + (v / 1000000) + 'jt' : 'Rp ' + v } },
+                    y1: { position: 'right', beginAtZero: true, suggestedMax: dailySuggestedMax(berasData, 1, 25), grid: { drawOnChartArea: false }, ticks: { font: { family: 'Outfit, sans-serif', weight: 'bold', size: 12 }, color: '#f59e0b', callback: (v) => v + ' kg' } },
                     x: { grid: { display: false }, ticks: { font: { family: 'Outfit, sans-serif', weight: 'bold', size: 12 }, color: '#64748b' } },
                 },
                 plugins: {
@@ -137,8 +152,8 @@ export const createChartService = (config) => ({
             return;
         }
 
-        const hData = config.historicalChartData?.data ?? [12000000, 19000000, 15000000, 25000000, 22000000];
-        const hLabels = config.historicalChartData?.labels ?? ['2021', '2022', '2023', '2024', '2025'];
+        const hData = config.historicalChartData?.data ?? [];
+        const hLabels = config.historicalChartData?.labels ?? [];
         const grad = hCtx.createLinearGradient(0, 0, 0, 400);
 
         grad.addColorStop(0, 'rgba(16, 185, 129, 0.9)');

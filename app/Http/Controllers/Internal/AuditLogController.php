@@ -4,10 +4,7 @@ namespace App\Http\Controllers\Internal;
 
 use App\Http\Controllers\Controller;
 use App\Models\AuditLog;
-use App\Models\ZakatTransaction;
-use App\Support\Audit;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 
 class AuditLogController extends Controller
 {
@@ -29,49 +26,9 @@ class AuditLogController extends Controller
         }
 
         $logs = $query->paginate(50)->appends($request->query());
+        $totalLogs = AuditLog::query()->count();
+        $latestLog = AuditLog::query()->latest('created_at')->first();
 
-        return view('internal.audit_logs.index', compact('logs', 'sortBy', 'sortDir'));
-    }
-
-    public function bulkDeleteTransactions(Request $request)
-    {
-        // Fitur ini dinonaktifkan sementara untuk mencegah penghapusan data secara tidak sengaja
-        abort(403, 'Fitur Pembersihan Data sedang dinonaktifkan sementara.');
-
-        $request->validate([
-            'start_date' => 'required|date',
-            'end_date' => 'required|date|after_or_equal:start_date',
-        ]);
-
-        $start = $request->start_date . ' 00:00:00';
-        $end = $request->end_date . ' 23:59:59';
-
-        $count = DB::transaction(function() use ($start, $end, $request) {
-            $query = ZakatTransaction::withTrashed()
-                ->where(function($q) use ($start, $end) {
-                    $q->whereBetween('waktu_terima', [$start, $end])
-                      ->orWhereBetween('created_at', [$start, $end]);
-                });
-
-            $affectedCount = $query->count();
-            
-            if ($affectedCount > 0) {
-                $query->forceDelete();
-
-                Audit::log($request, 'system.bulk_transaction_cleanup', null, [
-                    'start_date' => $request->start_date,
-                    'end_date' => $request->end_date,
-                    'count' => $affectedCount
-                ]);
-            }
-
-            return $affectedCount;
-        });
-
-        if ($count === 0) {
-            return back()->with('error', 'Tidak ditemukan transaksi pada rentang tanggal tersebut.');
-        }
-
-        return back()->with('status', "Pembersihan database berhasil. {$count} transaksi telah dihapus secara permanen.");
+        return view('internal.audit_logs.index', compact('logs', 'sortBy', 'sortDir', 'totalLogs', 'latestLog'));
     }
 }

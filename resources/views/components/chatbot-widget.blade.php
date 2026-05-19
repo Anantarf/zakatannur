@@ -1,7 +1,7 @@
 <div
     x-data="chatbotWidget({ endpoint: '{{ url('/api/chatbot/message') }}' })"
     x-cloak
-    class="fixed bottom-6 right-6 z-50 font-sans"
+    class="fixed bottom-4 right-4 z-50 font-sans sm:bottom-6 sm:right-6"
 >
     <button
         type="button"
@@ -24,8 +24,8 @@
         x-transition:leave-start="translate-y-0 scale-100 opacity-100"
         x-transition:leave-end="translate-y-10 scale-95 opacity-0"
         @keydown.escape.window="closeChat()"
-        class="flex w-80 origin-bottom-right flex-col overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-2xl sm:w-96"
-        style="display: none; height: 500px; max-height: 80vh;"
+        class="flex w-[calc(100vw-1.5rem)] max-w-[24rem] origin-bottom-right flex-col overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-2xl sm:w-96"
+        style="display: none; height: min(500px, 78vh); max-height: 78vh;"
     >
         <div class="z-10 flex items-center justify-between bg-emerald-600 p-4 text-white shadow-md">
             <div class="flex items-center space-x-3">
