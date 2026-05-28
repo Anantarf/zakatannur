@@ -198,18 +198,6 @@ return [
     ],
 
     /**
-     * Anomaly Detection
-     */
-    'anomaly' => [
-        'infaq_outlier' => [
-            'min_sample_size' => 10,
-            'robust_z_threshold' => 6.0,
-            'zero_mad_upper_ratio' => 5.0,
-            'zero_mad_lower_ratio' => 0.2,
-        ],
-    ],
-
-    /**
      * Validation String Length Limits
      */
     'validation' => [

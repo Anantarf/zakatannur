@@ -13,6 +13,12 @@ class AppSetting extends Model
     public const KEY_ACTIVE_YEAR = 'active_year';
     public const KEY_ACTIVE_ZAKAT_PERIOD_ID = 'active_zakat_period_id';
     public const KEY_PUBLIC_REFRESH_INTERVAL_SECONDS = 'public_refresh_interval_seconds';
+    public const KEY_DASHBOARD_CHART_MODE = 'dashboard_chart_mode';
+    public const KEY_DASHBOARD_CHART_PERIOD_ID = 'dashboard_chart_period_id';
+    public const KEY_DASHBOARD_CHART_STARTS_AT = 'dashboard_chart_starts_at';
+    public const KEY_DASHBOARD_CHART_ENDS_AT = 'dashboard_chart_ends_at';
+    public const KEY_DASHBOARD_CHART_SHOW_OFFSEASON_ARCHIVE = 'dashboard_chart_show_offseason_archive';
+    public const KEY_DASHBOARD_CHART_AUTO_SWITCH_ON_NEW_ACTIVE_PERIOD = 'dashboard_chart_auto_switch_on_new_active_period';
 
     protected $fillable = [
         'key',
@@ -48,6 +54,12 @@ class AppSetting extends Model
             Cache::forget(self::cacheKeyForSetting(self::KEY_ACTIVE_YEAR));
             Cache::forget(self::cacheKeyForSetting(self::KEY_ACTIVE_ZAKAT_PERIOD_ID));
             Cache::forget(self::cacheKeyForSetting(self::KEY_PUBLIC_REFRESH_INTERVAL_SECONDS));
+            Cache::forget(self::cacheKeyForSetting(self::KEY_DASHBOARD_CHART_MODE));
+            Cache::forget(self::cacheKeyForSetting(self::KEY_DASHBOARD_CHART_PERIOD_ID));
+            Cache::forget(self::cacheKeyForSetting(self::KEY_DASHBOARD_CHART_STARTS_AT));
+            Cache::forget(self::cacheKeyForSetting(self::KEY_DASHBOARD_CHART_ENDS_AT));
+            Cache::forget(self::cacheKeyForSetting(self::KEY_DASHBOARD_CHART_SHOW_OFFSEASON_ARCHIVE));
+            Cache::forget(self::cacheKeyForSetting(self::KEY_DASHBOARD_CHART_AUTO_SWITCH_ON_NEW_ACTIVE_PERIOD));
             self::$settingCache = [];
         }
     }
@@ -64,6 +76,16 @@ class AppSetting extends Model
         }
 
         return (int) $value;
+    }
+
+    public static function getBool(string $key, bool $default = false): bool
+    {
+        $value = self::getString($key);
+        if ($value === null) {
+            return $default;
+        }
+
+        return in_array(strtolower((string) $value), ['1', 'true', 'yes', 'on'], true);
     }
 
     public static function normalizePublicRefreshIntervalSeconds(?int $value, int $default = null): int

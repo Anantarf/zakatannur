@@ -91,40 +91,40 @@
 <div class="hidden overflow-x-auto md:block">
     <table class="min-w-full text-[10px] sm:text-sm">
         <thead>
-            <tr class="bg-gray-50 text-left text-[11px] sm:text-xs font-semibold text-gray-400 uppercase tracking-wider border-b border-gray-100">
-                <th class="px-2 sm:px-6 py-4">No. Transaksi</th>
-                <th class="px-2 sm:px-6 py-4">Waktu</th>
-                <th class="px-2 sm:px-6 py-4">Pembayar</th>
-                <th class="px-2 sm:px-6 py-4 text-center">Kategori</th>
-                <th class="px-2 sm:px-6 py-4 text-center">Bentuk</th>
-                <th class="px-2 sm:px-6 py-4 text-right">Total Nominal</th>
-                <th class="px-2 sm:px-6 py-4 text-center">Petugas</th>
+            <tr class="border-b border-gray-100 bg-slate-50 text-left text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-400 sm:text-xs">
+                <th class="px-3 py-4 sm:px-6">No. Transaksi</th>
+                <th class="px-3 py-4 sm:px-6">Waktu</th>
+                <th class="px-3 py-4 sm:px-6">Pembayar</th>
+                <th class="px-3 py-4 sm:px-6 text-center">Kategori</th>
+                <th class="px-3 py-4 sm:px-6 text-center">Bentuk</th>
+                <th class="px-3 py-4 sm:px-6 text-right">Total Nominal</th>
+                <th class="px-3 py-4 sm:px-6 text-center">Petugas</th>
             </tr>
         </thead>
-        <tbody class="divide-y divide-gray-50">
+        <tbody class="divide-y divide-slate-100">
             @if (count($items) > 0)
                 @foreach ($items as $t)
-                <tr class="hover:bg-gray-50 transition-colors">
-                    <td class="px-2 sm:px-5 py-3 whitespace-nowrap">
+                <tr class="transition-colors hover:bg-emerald-50/30">
+                    <td class="whitespace-nowrap px-3 py-3 sm:px-5">
                         <span class="font-mono text-xs font-semibold text-blue-600 bg-blue-50 px-1.5 py-1 rounded-md">{{ $t->no_transaksi }}</span>
                     </td>
-                    <td class="px-2 py-3 text-gray-500 text-xs sm:text-sm whitespace-nowrap">
+                    <td class="whitespace-nowrap px-3 py-3 text-xs text-slate-500 sm:text-sm">
                         @if ($t->waktu_terima)
                             {{ $t->waktu_terima->timezone('Asia/Jakarta')->format('d/m/Y H:i') }}
                         @else
                             {{ $t->created_at->timezone('Asia/Jakarta')->format('d/m/Y H:i') }}
                         @endif
                     </td>
-                    <td class="px-2 sm:px-5 py-3 whitespace-nowrap">
-                        <div class="text-xs sm:text-sm font-semibold text-gray-700">{{ $t->pembayar_nama }}</div>
+                    <td class="whitespace-nowrap px-3 py-3 sm:px-5">
+                        <div class="text-xs font-semibold text-slate-700 sm:text-sm">{{ $t->pembayar_nama }}</div>
                         @if($t->muzakki_total > 1)
-                            <div class="text-[9px] text-gray-500 mt-0.5">+ {{ $t->muzakki_total - 1 }} Muzakki Lainnya</div>
+                            <div class="mt-0.5 text-[10px] text-slate-500">+ {{ $t->muzakki_total - 1 }} Muzakki Lainnya</div>
                         @endif
                     </td>
-                    <td class="px-2 py-3">
+                    <td class="px-3 py-3">
                         <x-zakat-category-tags :categories="$t->categories_list" />
                     </td>
-                    <td class="px-2 py-3">
+                    <td class="px-3 py-3">
                         <div class="flex flex-wrap gap-1 justify-center max-w-[100px] mx-auto">
                             @foreach(explode(',', $t->methods_list ?? '') as $met)
                                 @php $met = trim($met); @endphp
@@ -134,24 +134,24 @@
                             @endforeach
                         </div>
                     </td>
-                    <td class="px-2 py-3 text-right whitespace-nowrap">
+                    <td class="whitespace-nowrap px-3 py-3 text-right">
                         <div class="space-y-1">
                                 @if($t->total_uang > 0)
                                     <div class="flex items-center justify-end gap-1.5">
-                                        <div class="font-bold text-gray-800 text-xs sm:text-sm">{{ $t->total_uang_display }}</div>
+                                        <div class="text-xs font-bold text-slate-800 sm:text-sm">{{ $t->total_uang_display }}</div>
                                         @if($t->has_transfer)
                                             <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-black bg-emerald-100 text-emerald-700 border border-emerald-200 uppercase">TF</span>
                                         @endif
                                     </div>
                                 @endif
                                 @if($t->total_beras > 0)
-                                    <div class="font-bold text-gray-800 text-xs sm:text-sm">{{ $t->total_beras_display }}</div>
+                                    <div class="text-xs font-bold text-slate-800 sm:text-sm">{{ $t->total_beras_display }}</div>
                                 @endif
                         </div>
                     </td>
-                    <td class="px-2 py-3 text-center text-gray-500 text-[10px] sm:text-sm whitespace-nowrap">
+                    <td class="whitespace-nowrap px-3 py-3 text-center text-[10px] text-slate-500 sm:text-sm">
                         <div class="flex flex-col items-center gap-1 mx-auto w-fit">
-                            <span class="font-medium font-sans text-gray-700 text-center">{{ $t->petugas?->name ?? '-' }}</span>
+                            <span class="text-center font-medium font-sans text-slate-700">{{ $t->petugas?->name ?? '-' }}</span>
                             <span class="inline-flex items-center justify-center rounded px-2 py-0.5 text-[10px] font-bold uppercase bg-emerald-50 text-emerald-700 border border-emerald-100 whitespace-nowrap leading-tight text-center">
                                 {{ $t->shift_label }}
                             </span>

@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Support\SqlDialect;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasOne;
@@ -276,6 +277,11 @@ class ZakatTransaction extends Model
         return $query->where('status', self::STATUS_VALID);
     }
 
+    public function scopeForTransactionGroup(Builder $query, string $groupNumber): Builder
+    {
+        return $query->where('no_transaksi', $groupNumber);
+    }
+
     public function scopeForPeriodOrYear(Builder $query, ?int $periodId = null, ?int $year = null): Builder
     {
         return $query
@@ -288,5 +294,22 @@ class ZakatTransaction extends Model
         return $query
             ->orderByRaw(SqlDialect::effectiveTimestampOrder())
             ->orderByDesc('id');
+    }
+
+    public static function transactionGroupItems(
+        string $groupNumber,
+        bool $withTrashed = false,
+        array $relations = []
+    ): Collection {
+        $query = $withTrashed ? static::withTrashed() : static::query();
+
+        if ($relations !== []) {
+            $query->with($relations);
+        }
+
+        return $query
+            ->forTransactionGroup($groupNumber)
+            ->orderBy('id', 'asc')
+            ->get();
     }
 }

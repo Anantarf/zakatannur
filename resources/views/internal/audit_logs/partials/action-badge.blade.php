@@ -12,5 +12,5 @@
     };
 @endphp
 <span class="px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-wider {{ $actionClass }}">
-    {{ $log->action }}
+    {{ $log->action_label }}
 </span>

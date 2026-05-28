@@ -156,8 +156,8 @@ class AuditLogTest extends TestCase
             'group_no_transaksi' => $tx->no_transaksi,
             'risk_level' => TransactionRiskReview::LEVEL_WARNING,
             'risk_score' => 25,
-            'risk_flags' => ['fitrah_cash_mismatch'],
-            'reasons' => ['Butuh cek ulang.'],
+            'risk_flags' => ['updated_after_receipt_printed'],
+            'reasons' => ['Transaksi diubah setelah kwitansi pernah dicetak dan perlu verifikasi ulang.'],
             'duplicate_candidates' => [],
             'detector_version' => 'v1',
             'review_status' => TransactionRiskReview::REVIEW_BELUM_DITINJAU,
@@ -167,6 +167,7 @@ class AuditLogTest extends TestCase
         $this->actingAs($admin)
             ->patch('/internal/anomalies/' . $tx->no_transaksi . '/review-status', [
                 'review_status' => TransactionRiskReview::REVIEW_AMAN,
+                'review_note' => 'Operator sudah cek bukti transfer dan data sesuai.',
             ])
             ->assertRedirect('/internal/anomalies/' . $tx->no_transaksi);
 
@@ -182,6 +183,8 @@ class AuditLogTest extends TestCase
         $this->assertEquals($tx->no_transaksi, $log->metadata['no_transaksi']);
         $this->assertEquals(TransactionRiskReview::REVIEW_BELUM_DITINJAU, $log->metadata['previous_review_status']);
         $this->assertEquals(TransactionRiskReview::REVIEW_AMAN, $log->metadata['new_review_status']);
+        $this->assertNull($log->metadata['previous_review_note']);
+        $this->assertEquals('Operator sudah cek bukti transfer dan data sesuai.', $log->metadata['new_review_note']);
     }
 
     public function test_first_receipt_print_writes_audit_log(): void

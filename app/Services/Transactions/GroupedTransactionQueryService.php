@@ -9,7 +9,11 @@ use Illuminate\Support\Facades\DB;
 
 class GroupedTransactionQueryService
 {
-    public function make(bool $onlyTrashed = false): Builder
+    /**
+     * Builds one row per transaction group, where a group is all rows sharing
+     * the same `no_transaksi`.
+     */
+    public function makeGroupSummaries(bool $onlyTrashed = false): Builder
     {
         $query = $onlyTrashed ? ZakatTransaction::onlyTrashed() : ZakatTransaction::query();
 
@@ -32,9 +36,14 @@ class GroupedTransactionQueryService
         ]);
     }
 
-    public function latestValid(?int $year = null, ?string $metode = null, int $limit = 10, ?int $periodId = null)
+    public function make(bool $onlyTrashed = false): Builder
     {
-        return $this->make()
+        return $this->makeGroupSummaries($onlyTrashed);
+    }
+
+    public function latestValidGroups(?int $year = null, ?string $metode = null, int $limit = 10, ?int $periodId = null)
+    {
+        return $this->makeGroupSummaries()
             ->with(['petugas'])
             ->valid()
             ->forPeriodOrYear($periodId, $year)
@@ -44,5 +53,10 @@ class GroupedTransactionQueryService
             ->orderByDesc('no_transaksi')
             ->limit($limit)
             ->get();
+    }
+
+    public function latestValid(?int $year = null, ?string $metode = null, int $limit = 10, ?int $periodId = null)
+    {
+        return $this->latestValidGroups($year, $metode, $limit, $periodId);
     }
 }

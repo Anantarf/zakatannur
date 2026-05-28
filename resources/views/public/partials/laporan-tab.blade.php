@@ -2,10 +2,10 @@
     x-transition:enter="transition ease-out duration-500"
     x-transition:enter-start="opacity-0 translate-y-4"
     x-transition:enter-end="opacity-100 translate-y-0">
-    <div class="flex justify-center mb-3 sm:mb-5">
-        <div class="inline-flex items-center gap-3 rounded-2xl border border-white/70 bg-white/[0.85] px-5 py-2.5 shadow-lg shadow-emerald-900/5 ring-1 ring-emerald-900/5 backdrop-blur">
+    <div class="flex justify-center mb-3 sm:mb-4">
+        <div class="inline-flex items-center gap-2.5 rounded-[1.15rem] border border-white/70 bg-white/[0.85] px-4 py-2 shadow-lg shadow-emerald-900/5 ring-1 ring-emerald-900/5 backdrop-blur">
             <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-            <span x-text="clock" class="text-sm sm:text-lg font-bold text-slate-900 tabular-nums"></span>
+            <span x-text="clock" class="text-sm sm:text-base font-bold text-slate-900 tabular-nums"></span>
         </div>
     </div>
 
@@ -45,25 +45,25 @@
         <p x-show="items.length === 0" class="rounded-2xl border border-slate-200 bg-white px-6 py-10 text-center text-sm font-bold text-slate-400">Belum ada data penerimaan masuk tahun ini.</p>
     </div>
 
-    <div class="hidden md:block overflow-x-auto custom-scrollbar rounded-[1.75rem] border border-white/80 shadow-[0_24px_70px_-24px_rgba(6,78,59,0.35)] ring-1 ring-emerald-900/5 mx-1 sm:mx-0 bg-white/95 backdrop-blur">
+    <div class="public-panel mx-1 hidden overflow-x-auto custom-scrollbar sm:mx-0 md:block !p-0">
         <table class="w-full border-collapse bg-white">
             <thead class="sticky top-0 z-20 shadow-md shadow-emerald-900/5">
                 <tr class="bg-emerald-900 border-b border-emerald-800">
-                    <th class="pl-4 py-4 sm:pl-10 text-left text-[13px] sm:text-[15px] font-bold text-emerald-50 uppercase tracking-wide">Kategori Zakat</th>
-                    <th class="px-2 py-4 sm:px-4 text-center text-[13px] sm:text-[15px] font-bold text-emerald-50 uppercase tracking-wide">Jiwa</th>
-                    <th class="px-2 py-4 sm:px-4 text-center text-[13px] sm:text-[15px] font-bold text-emerald-50 uppercase tracking-wide">Total Uang</th>
-                    <th class="px-2 py-4 sm:px-4 text-center text-[13px] sm:text-[15px] font-bold text-emerald-50 uppercase tracking-wide">Total Beras</th>
+                    <th class="pl-4 py-3 sm:pl-8 text-left text-[12px] sm:text-[14px] font-bold text-emerald-50 uppercase tracking-wide">Kategori Zakat</th>
+                    <th class="px-2 py-3 sm:px-3 text-center text-[12px] sm:text-[14px] font-bold text-emerald-50 uppercase tracking-wide">Jiwa</th>
+                    <th class="px-2 py-3 sm:px-3 text-center text-[12px] sm:text-[14px] font-bold text-emerald-50 uppercase tracking-wide">Total Uang</th>
+                    <th class="px-2 py-3 sm:px-3 text-center text-[12px] sm:text-[14px] font-bold text-emerald-50 uppercase tracking-wide">Total Beras</th>
                 </tr>
             </thead>
             <tbody class="divide-y divide-slate-50">
                 <template x-for="(item, index) in items" :key="item.category">
                     <tr :class="index % 2 !== 0 ? 'bg-emerald-50/30' : 'bg-white'" class="transition-colors hover:bg-emerald-50/60">
-                        <td class="pl-4 py-5 sm:pl-10 text-base sm:text-xl font-bold text-slate-900 uppercase">
+                        <td class="pl-4 py-3.5 sm:pl-8 text-base sm:text-[1.55rem] font-bold text-slate-900 uppercase">
                             <span class="whitespace-nowrap" x-text="formatCat(item.category)"></span>
                         </td>
-                        <td class="px-2 py-5 sm:px-4 text-center text-[15px] sm:text-2xl text-slate-900 font-bold tabular-nums" x-text="item.total_jiwa.toLocaleString('id-ID') + ' Jiwa'"></td>
-                        <td class="px-2 py-5 sm:px-4 text-center text-[13px] sm:text-2xl text-emerald-600 font-bold tabular-nums" x-text="'Rp ' + (item.total_uang || 0).toLocaleString('id-ID')"></td>
-                        <td class="px-2 py-5 sm:px-4 text-center text-[13px] sm:text-2xl text-amber-600 font-bold tabular-nums" x-text="(item.total_beras_kg || 0).toFixed(2).replace('.', ',') + ' Kg'"></td>
+                        <td class="px-2 py-3.5 sm:px-3 text-center text-[15px] sm:text-[1.8rem] text-slate-900 font-bold tabular-nums" x-text="item.total_jiwa.toLocaleString('id-ID') + ' Jiwa'"></td>
+                        <td class="px-2 py-3.5 sm:px-3 text-center text-[13px] sm:text-[1.8rem] text-emerald-600 font-bold tabular-nums" x-text="'Rp ' + (item.total_uang || 0).toLocaleString('id-ID')"></td>
+                        <td class="px-2 py-3.5 sm:px-3 text-center text-[13px] sm:text-[1.8rem] text-amber-600 font-bold tabular-nums" x-text="(item.total_beras_kg || 0).toFixed(2).replace('.', ',') + ' Kg'"></td>
                     </tr>
                 </template>
                 <template x-if="items.length === 0">
@@ -74,14 +74,14 @@
             </tbody>
             <tfoot x-show="items.length > 0" class="border-t-4 border-emerald-600/20">
                 <tr class="bg-emerald-950 text-center">
-                    <td class="pl-4 py-4 sm:pl-10 text-[13px] sm:text-[18px] font-bold tracking-wide uppercase text-emerald-100 text-left">TOTAL</td>
-                    <td class="px-2 py-4 sm:px-4 text-slate-900 text-[15px] sm:text-2xl font-bold tabular-nums whitespace-nowrap">
+                    <td class="pl-4 py-3 sm:pl-8 text-[12px] sm:text-[16px] font-bold tracking-wide uppercase text-emerald-100 text-left">TOTAL</td>
+                    <td class="px-2 py-3 sm:px-3 text-slate-900 text-[15px] sm:text-[1.8rem] font-bold tabular-nums whitespace-nowrap">
                         <span id="totalJiwa" class="text-emerald-50" x-text="(totals.total_jiwa || 0).toLocaleString('id-ID') + ' Jiwa'"></span>
                     </td>
-                    <td class="px-2 py-4 sm:px-4 text-emerald-600 text-[15px] sm:text-2xl font-bold tabular-nums whitespace-nowrap">
+                    <td class="px-2 py-3 sm:px-3 text-emerald-600 text-[15px] sm:text-[1.8rem] font-bold tabular-nums whitespace-nowrap">
                         <span id="totalUang" class="text-emerald-100" x-text="'Rp ' + (totals.total_uang || 0).toLocaleString('id-ID')"></span>
                     </td>
-                    <td class="px-2 py-4 sm:px-4 text-amber-600 text-[15px] sm:text-2xl font-bold tabular-nums whitespace-nowrap">
+                    <td class="px-2 py-3 sm:px-3 text-amber-600 text-[15px] sm:text-[1.8rem] font-bold tabular-nums whitespace-nowrap">
                         <span id="totalBeras" class="text-amber-200" x-text="(totals.total_beras_kg || 0).toFixed(2).replace('.', ',') + ' Kg'"></span>
                     </td>
                 </tr>

@@ -1,12 +1,12 @@
 @php
     $tabs = [
         ['key' => 'beranda', 'label' => 'BERANDA', 'mobile_label' => 'BERANDA'],
-        ['key' => 'laporan', 'label' => 'LAPORAN PENERIMAAN ZAKAT', 'mobile_label' => 'LAPORAN', 'title' => 'Laporan Penerimaan Zakat'],
-        ['key' => 'grafik', 'label' => 'GRAFIK PENERIMAAN ZAKAT', 'mobile_label' => 'GRAFIK', 'title' => 'Grafik Penerimaan Zakat'],
+        ['key' => 'laporan', 'label' => 'RINGKASAN PENERIMAAN', 'mobile_label' => 'RINGKASAN', 'title' => 'Ringkasan Penerimaan Zakat'],
+        ['key' => 'grafik', 'label' => 'GRAFIK HARIAN', 'mobile_label' => 'GRAFIK', 'title' => 'Grafik Penerimaan Harian'],
     ];
 @endphp
 
-<nav class="sticky top-2 z-[100] px-3 sm:px-4">
+<nav class="relative z-[100] px-3 sm:px-4">
     <div class="mx-auto max-w-7xl rounded-[1.5rem] border border-white/[0.85] bg-white/[0.85] px-3 py-2.5 shadow-lg shadow-emerald-900/5 ring-1 ring-emerald-900/5 backdrop-blur-xl relative sm:px-4">
         <div class="grid grid-cols-[minmax(132px,1fr)_auto_minmax(132px,1fr)] items-center gap-2 sm:grid-cols-[minmax(180px,1fr)_auto_minmax(180px,1fr)] sm:gap-3">
             <div class="flex justify-start min-w-0">

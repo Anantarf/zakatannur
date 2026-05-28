@@ -1,15 +1,9 @@
 @props(['level' => null])
 
 @php
-    $label = match($level) {
-        'suspicious' => 'Suspicious',
-        'warning' => 'Warning',
-        'normal' => 'Normal',
-        default => 'Belum Analisis',
-    };
+    $label = \App\Models\TransactionRiskReview::levelLabel($level);
 
     $classes = match($level) {
-        'suspicious' => 'ui-badge-risk-suspicious',
         'warning' => 'ui-badge-risk-warning',
         'normal' => 'ui-badge-risk-normal',
         default => 'ui-badge-risk-empty',

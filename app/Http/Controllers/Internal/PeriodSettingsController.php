@@ -19,7 +19,7 @@ class PeriodSettingsController extends Controller
     {
         $activeYear = AppSetting::getInt(AppSetting::KEY_ACTIVE_YEAR, (int) now()->year);
 
-        $annual = AnnualSetting::query()->firstOrCreate(
+        AnnualSetting::query()->firstOrCreate(
             ['year' => $activeYear],
             [
                 'default_fitrah_cash_per_jiwa' => (int) config('zakat.annual_defaults.fitrah_cash_per_jiwa', 50000),
@@ -32,11 +32,11 @@ class PeriodSettingsController extends Controller
 
         $publicRefreshIntervalSecondsRaw = AppSetting::getInt(AppSetting::KEY_PUBLIC_REFRESH_INTERVAL_SECONDS, 15);
         $publicRefreshIntervalSeconds = AppSetting::normalizePublicRefreshIntervalSeconds($publicRefreshIntervalSecondsRaw, 15);
-
-        $years = ViewOptions::years($activeYear);
+        $dashboardChartMode = AppSetting::getString(AppSetting::KEY_DASHBOARD_CHART_MODE, ChartRangeResolver::DASHBOARD_MODE_ACTIVE_PERIOD)
+            ?? ChartRangeResolver::DASHBOARD_MODE_ACTIVE_PERIOD;
 
         return view('internal.settings.period', [
-            'years' => $years,
+            'years' => ViewOptions::years($activeYear),
             'activeYear' => $activeYear,
             'activePeriod' => $period,
             'chartRange' => $chartRangeResolver->resolveForYear($activeYear),
@@ -48,6 +48,15 @@ class PeriodSettingsController extends Controller
             'chartEndsAt' => optional($period->chart_ends_at)->toDateString(),
             'chartFallbackBufferDays' => (int) ($period->chart_fallback_buffer_days ?? 2),
             'publicRefreshIntervalSeconds' => $publicRefreshIntervalSeconds,
+            'dashboardChartRange' => $chartRangeResolver->resolveForDashboard(),
+            'dashboardChartModes' => ChartRangeResolver::dashboardModes(),
+            'dashboardChartMode' => $dashboardChartMode,
+            'dashboardChartPeriodId' => AppSetting::getInt(AppSetting::KEY_DASHBOARD_CHART_PERIOD_ID),
+            'dashboardChartStartsAt' => AppSetting::getString(AppSetting::KEY_DASHBOARD_CHART_STARTS_AT),
+            'dashboardChartEndsAt' => AppSetting::getString(AppSetting::KEY_DASHBOARD_CHART_ENDS_AT),
+            'dashboardChartShowOffseasonArchive' => AppSetting::getBool(AppSetting::KEY_DASHBOARD_CHART_SHOW_OFFSEASON_ARCHIVE, true),
+            'dashboardChartAutoSwitchOnNewActivePeriod' => AppSetting::getBool(AppSetting::KEY_DASHBOARD_CHART_AUTO_SWITCH_ON_NEW_ACTIVE_PERIOD, false),
+            'dashboardChartPeriods' => ViewOptions::periods(),
         ]);
     }
 
@@ -73,19 +82,28 @@ class PeriodSettingsController extends Controller
             'chart_ends_at' => ['nullable', 'date'],
             'chart_fallback_buffer_days' => ['required', 'integer', 'min:0', 'max:14'],
             'public_refresh_interval_seconds' => ['required', 'integer', 'min:0', 'max:' . $publicRefreshFormMaxSeconds],
+            'dashboard_chart_mode' => ['nullable', 'string'],
+            'dashboard_chart_period_id' => ['nullable', 'integer', 'exists:zakat_periods,id'],
+            'dashboard_chart_starts_at' => ['nullable', 'date'],
+            'dashboard_chart_ends_at' => ['nullable', 'date'],
+            'dashboard_chart_show_offseason_archive' => ['nullable', 'boolean'],
+            'dashboard_chart_auto_switch_on_new_active_period' => ['nullable', 'boolean'],
         ]);
 
         $validator->after(function ($validator) use ($currentActiveYear, $publicRefreshMinSeconds, $publicRefreshMaxSeconds) {
             $input = $validator->getData();
             $interval = (int) ($input['public_refresh_interval_seconds'] ?? 15);
             $activeYearInput = (int) ($input['active_year'] ?? 0);
+            $dashboardChartMode = (string) ($input['dashboard_chart_mode'] ?? ChartRangeResolver::DASHBOARD_MODE_ACTIVE_PERIOD);
 
-            // Keputusan: 0 = off; selain itu 10–60 detik.
-            if ($interval !== 0 && ($interval < $publicRefreshMinSeconds || $interval > $publicRefreshMaxSeconds)) {
-                $validator->errors()->add('public_refresh_interval_seconds', 'Interval refresh publik harus 0 (mati) atau ' . $publicRefreshMinSeconds . '–' . $publicRefreshMaxSeconds . ' detik.');
+            if (!array_key_exists($dashboardChartMode, ChartRangeResolver::dashboardModes())) {
+                $validator->errors()->add('dashboard_chart_mode', 'Mode grafik dashboard tidak valid.');
             }
 
-            // Antisipasi: perubahan Tahun Aktif hanya via flow "Mulai Periode Baru".
+            if ($interval !== 0 && ($interval < $publicRefreshMinSeconds || $interval > $publicRefreshMaxSeconds)) {
+                $validator->errors()->add('public_refresh_interval_seconds', 'Interval refresh publik harus 0 (mati) atau ' . $publicRefreshMinSeconds . '-' . $publicRefreshMaxSeconds . ' detik.');
+            }
+
             if ($activeYearInput !== $currentActiveYear) {
                 $validator->errors()->add('active_year', 'Perubahan Tahun Aktif hanya bisa lewat "Mulai Periode Baru".');
             }
@@ -94,6 +112,16 @@ class PeriodSettingsController extends Controller
             $chartEndsAt = $input['chart_ends_at'] ?? null;
             if ($chartStartsAt && $chartEndsAt && $chartEndsAt < $chartStartsAt) {
                 $validator->errors()->add('chart_ends_at', 'Selesai Grafik tidak boleh lebih awal dari Mulai Grafik.');
+            }
+
+            $dashboardChartStartsAt = $input['dashboard_chart_starts_at'] ?? null;
+            $dashboardChartEndsAt = $input['dashboard_chart_ends_at'] ?? null;
+            if ($dashboardChartStartsAt && $dashboardChartEndsAt && $dashboardChartEndsAt < $dashboardChartStartsAt) {
+                $validator->errors()->add('dashboard_chart_ends_at', 'Selesai Grafik Dashboard tidak boleh lebih awal dari Mulai Grafik Dashboard.');
+            }
+
+            if ($dashboardChartMode === ChartRangeResolver::DASHBOARD_MODE_MANUAL_PERIOD && empty($input['dashboard_chart_period_id'])) {
+                $validator->errors()->add('dashboard_chart_period_id', 'Pilih periode grafik saat mode manual digunakan.');
             }
 
             $periodStartsAt = $input['period_starts_at'] ?? null;
@@ -108,7 +136,7 @@ class PeriodSettingsController extends Controller
         $activeYear = $currentActiveYear;
         $periodLabel = trim((string) ($data['period_label'] ?? '')) ?: 'Ramadan ' . $activeYear;
         $hijriYear = $data['hijri_year'] ?? null;
-        $hijriMonth = $data['hijri_month'] ?? null;
+        $hijriMonth = isset($data['hijri_month']) ? (int) $data['hijri_month'] : (int) ($periodResolver->ensureForYear($activeYear)->hijri_month ?? 9);
         $periodStartsAt = $data['period_starts_at'] ?? null;
         $periodEndsAt = $data['period_ends_at'] ?? null;
         $defaultFitrah = (int) $data['default_fitrah_cash_per_jiwa'];
@@ -119,9 +147,14 @@ class PeriodSettingsController extends Controller
         $chartEndsAt = $data['chart_ends_at'] ?? null;
         $chartFallbackBufferDays = (int) $data['chart_fallback_buffer_days'];
         $publicRefreshIntervalSeconds = (int) $data['public_refresh_interval_seconds'];
+        $dashboardChartMode = (string) ($data['dashboard_chart_mode'] ?? ChartRangeResolver::DASHBOARD_MODE_ACTIVE_PERIOD);
+        $dashboardChartPeriodId = isset($data['dashboard_chart_period_id']) ? (int) $data['dashboard_chart_period_id'] : null;
+        $dashboardChartStartsAt = $data['dashboard_chart_starts_at'] ?? null;
+        $dashboardChartEndsAt = $data['dashboard_chart_ends_at'] ?? null;
+        $dashboardChartShowOffseasonArchive = $request->boolean('dashboard_chart_show_offseason_archive');
+        $dashboardChartAutoSwitchOnNewActivePeriod = $request->boolean('dashboard_chart_auto_switch_on_new_active_period');
 
-        DB::transaction(function () use ($periodResolver, $activeYear, $periodLabel, $hijriYear, $hijriMonth, $periodStartsAt, $periodEndsAt, $defaultFitrah, $defaultFitrahBeras, $defaultFidyah, $defaultFidyahBeras, $chartStartsAt, $chartEndsAt, $chartFallbackBufferDays, $publicRefreshIntervalSeconds) {
-            // Persist active year value (unchanged) so the setting always exists.
+        DB::transaction(function () use ($periodResolver, $activeYear, $periodLabel, $hijriYear, $hijriMonth, $periodStartsAt, $periodEndsAt, $defaultFitrah, $defaultFitrahBeras, $defaultFidyah, $defaultFidyahBeras, $chartStartsAt, $chartEndsAt, $chartFallbackBufferDays, $publicRefreshIntervalSeconds, $dashboardChartMode, $dashboardChartPeriodId, $dashboardChartStartsAt, $dashboardChartEndsAt, $dashboardChartShowOffseasonArchive, $dashboardChartAutoSwitchOnNewActivePeriod) {
             AppSetting::query()->updateOrCreate(
                 ['key' => AppSetting::KEY_ACTIVE_YEAR],
                 ['value' => (string) $activeYear]
@@ -130,6 +163,31 @@ class PeriodSettingsController extends Controller
             AppSetting::query()->updateOrCreate(
                 ['key' => AppSetting::KEY_PUBLIC_REFRESH_INTERVAL_SECONDS],
                 ['value' => (string) $publicRefreshIntervalSeconds]
+            );
+
+            AppSetting::query()->updateOrCreate(
+                ['key' => AppSetting::KEY_DASHBOARD_CHART_MODE],
+                ['value' => $dashboardChartMode]
+            );
+            AppSetting::query()->updateOrCreate(
+                ['key' => AppSetting::KEY_DASHBOARD_CHART_PERIOD_ID],
+                ['value' => $dashboardChartPeriodId !== null ? (string) $dashboardChartPeriodId : '']
+            );
+            AppSetting::query()->updateOrCreate(
+                ['key' => AppSetting::KEY_DASHBOARD_CHART_STARTS_AT],
+                ['value' => (string) ($dashboardChartStartsAt ?? '')]
+            );
+            AppSetting::query()->updateOrCreate(
+                ['key' => AppSetting::KEY_DASHBOARD_CHART_ENDS_AT],
+                ['value' => (string) ($dashboardChartEndsAt ?? '')]
+            );
+            AppSetting::query()->updateOrCreate(
+                ['key' => AppSetting::KEY_DASHBOARD_CHART_SHOW_OFFSEASON_ARCHIVE],
+                ['value' => $dashboardChartShowOffseasonArchive ? '1' : '0']
+            );
+            AppSetting::query()->updateOrCreate(
+                ['key' => AppSetting::KEY_DASHBOARD_CHART_AUTO_SWITCH_ON_NEW_ACTIVE_PERIOD],
+                ['value' => $dashboardChartAutoSwitchOnNewActivePeriod ? '1' : '0']
             );
 
             AnnualSetting::query()->updateOrCreate(
@@ -183,6 +241,12 @@ class PeriodSettingsController extends Controller
             'chart_ends_at' => $chartEndsAt,
             'chart_fallback_buffer_days' => $chartFallbackBufferDays,
             'public_refresh_interval_seconds' => $publicRefreshIntervalSeconds,
+            'dashboard_chart_mode' => $dashboardChartMode,
+            'dashboard_chart_period_id' => $dashboardChartPeriodId,
+            'dashboard_chart_starts_at' => $dashboardChartStartsAt,
+            'dashboard_chart_ends_at' => $dashboardChartEndsAt,
+            'dashboard_chart_show_offseason_archive' => $dashboardChartShowOffseasonArchive,
+            'dashboard_chart_auto_switch_on_new_active_period' => $dashboardChartAutoSwitchOnNewActivePeriod,
         ]);
 
         return redirect()->route('internal.settings.period.edit')->with('status', 'Pengaturan periode tersimpan.');
@@ -212,7 +276,6 @@ class PeriodSettingsController extends Controller
         });
 
         $data = $validator->validate();
-
         $newYear = (int) $data['new_year'];
 
         $newPeriod = null;
@@ -241,6 +304,25 @@ class PeriodSettingsController extends Controller
             $sourcePeriod = $periodResolver->activeForYear($activeYear);
             $newPeriod = $periodResolver->createNextForYear($newYear, $sourcePeriod);
             $periodResolver->activate($newPeriod);
+
+            if (AppSetting::getBool(AppSetting::KEY_DASHBOARD_CHART_AUTO_SWITCH_ON_NEW_ACTIVE_PERIOD, false)) {
+                AppSetting::query()->updateOrCreate(
+                    ['key' => AppSetting::KEY_DASHBOARD_CHART_MODE],
+                    ['value' => ChartRangeResolver::DASHBOARD_MODE_ACTIVE_PERIOD]
+                );
+                AppSetting::query()->updateOrCreate(
+                    ['key' => AppSetting::KEY_DASHBOARD_CHART_PERIOD_ID],
+                    ['value' => '']
+                );
+                AppSetting::query()->updateOrCreate(
+                    ['key' => AppSetting::KEY_DASHBOARD_CHART_STARTS_AT],
+                    ['value' => '']
+                );
+                AppSetting::query()->updateOrCreate(
+                    ['key' => AppSetting::KEY_DASHBOARD_CHART_ENDS_AT],
+                    ['value' => '']
+                );
+            }
         });
 
         AppSetting::clearCache();

@@ -54,17 +54,20 @@
             @endif
 
             <div class="grid grid-cols-1 gap-3 sm:grid-cols-3">
-                <div class="rounded-2xl border border-emerald-100 bg-emerald-50/70 p-4">
-                    <div class="text-xs font-black uppercase tracking-[0.18em] text-emerald-700">Total Akun</div>
-                    <div class="mt-1 text-2xl font-black text-emerald-950">{{ $totalUsers }}</div>
+                <div class="ui-stat-card ui-stat-card-default">
+                    <div class="ui-stat-eyebrow text-emerald-700">Total Akun</div>
+                    <div class="ui-stat-value text-emerald-950">{{ $totalUsers }}</div>
+                    <div class="ui-stat-description text-emerald-700">Jumlah akun yang tampil di daftar saat ini.</div>
                 </div>
-                <div class="rounded-2xl border border-blue-100 bg-blue-50/70 p-4">
-                    <div class="text-xs font-black uppercase tracking-[0.18em] text-blue-700">Akses Anda</div>
-                    <div class="mt-1 text-lg font-black text-blue-950">{{ $roleLabels[$currentUser->role] ?? ucfirst($currentUser->role) }}</div>
+                <div class="ui-stat-card ui-stat-card-info">
+                    <div class="ui-stat-eyebrow text-blue-700">Akses Anda</div>
+                    <div class="mt-2 text-lg font-black text-blue-950">{{ $roleLabels[$currentUser->role] ?? ucfirst($currentUser->role) }}</div>
+                    <div class="ui-stat-description text-blue-700">Hak kelola mengikuti role yang sedang Anda pakai.</div>
                 </div>
-                <div class="rounded-2xl border border-slate-100 bg-white p-4 shadow-sm">
-                    <div class="text-xs font-black uppercase tracking-[0.18em] text-slate-500">Catatan</div>
-                    <div class="mt-1 text-sm font-semibold text-slate-700">Admin hanya boleh mengelola petugas.</div>
+                <div class="ui-stat-card ui-stat-card-muted">
+                    <div class="ui-stat-eyebrow text-slate-500">Catatan</div>
+                    <div class="mt-2 text-sm font-semibold text-slate-800">Admin hanya boleh mengelola petugas.</div>
+                    <div class="ui-stat-description text-slate-500">Akun admin dan super admin lain tetap terlindungi.</div>
                 </div>
             </div>
 

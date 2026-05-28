@@ -68,17 +68,17 @@ class TransactionHistoryService
 
     public function paginatedHistory(TransactionHistoryFilters $filters, array $queryParams, bool $canViewRisk): LengthAwarePaginator
     {
-        $transactions = $this->baseHistoryQuery($filters, $canViewRisk)
+        $groupSummaries = $this->baseHistoryQuery($filters, $canViewRisk)
             ->orderByRaw(SqlDialect::maxEffectiveTimestampOrder())
             ->orderByDesc('no_transaksi')
             ->paginate(20)
             ->appends($queryParams);
 
         if ($canViewRisk) {
-            $this->reviewAssistantService->attachHistorySummaries($transactions);
+            $this->reviewAssistantService->attachHistorySummaries($groupSummaries);
         }
 
-        return $transactions;
+        return $groupSummaries;
     }
 
     public function historyOverview(TransactionHistoryFilters $filters, bool $canViewRisk): array
@@ -87,7 +87,6 @@ class TransactionHistoryService
             return [
                 'totalGroups' => 0,
                 'riskyGroups' => 0,
-                'suspiciousGroups' => 0,
                 'pendingReviewGroups' => 0,
                 'safeReviewGroups' => 0,
             ];
@@ -97,7 +96,6 @@ class TransactionHistoryService
             ->fromSub($this->baseHistoryQuery($filters, true), 'history_rows')
             ->selectRaw('COUNT(*) as total_groups')
             ->selectRaw('SUM(CASE WHEN risk_severity >= 2 THEN 1 ELSE 0 END) as risky_groups')
-            ->selectRaw('SUM(CASE WHEN risk_severity = 3 THEN 1 ELSE 0 END) as suspicious_groups')
             ->selectRaw('SUM(CASE WHEN review_severity = 1 THEN 1 ELSE 0 END) as pending_review_groups')
             ->selectRaw('SUM(CASE WHEN review_severity = 2 THEN 1 ELSE 0 END) as safe_review_groups')
             ->first();
@@ -105,7 +103,6 @@ class TransactionHistoryService
         return [
             'totalGroups' => (int) ($summary->total_groups ?? 0),
             'riskyGroups' => (int) ($summary->risky_groups ?? 0),
-            'suspiciousGroups' => (int) ($summary->suspicious_groups ?? 0),
             'pendingReviewGroups' => (int) ($summary->pending_review_groups ?? 0),
             'safeReviewGroups' => (int) ($summary->safe_review_groups ?? 0),
         ];
@@ -113,7 +110,7 @@ class TransactionHistoryService
 
     public function paginatedTrash(string $query, array $queryParams): LengthAwarePaginator
     {
-        $transactions = $this->groupedQueryService->make(true)
+        $groupSummaries = $this->groupedQueryService->makeGroupSummaries(true)
             ->with(['petugas'])
             ->when($query !== '', function (Builder $builder) use ($query) {
                 $like = '%' . str_replace('%', '\\%', $query) . '%';
@@ -129,20 +126,20 @@ class TransactionHistoryService
 
         $purgeDays = (int) config('zakat.retention.purge_days', 30);
 
-        $transactions->getCollection()->transform(function ($transaction) use ($purgeDays) {
-            $deletedAt = $transaction->deleted_at
-                ? Carbon::parse($transaction->deleted_at)->setTimezone(config('zakat.timezone'))
+        $groupSummaries->getCollection()->transform(function ($groupSummary) use ($purgeDays) {
+            $deletedAt = $groupSummary->deleted_at
+                ? Carbon::parse($groupSummary->deleted_at)->setTimezone(config('zakat.timezone'))
                 : null;
 
-            $transaction->days_left = $deletedAt
+            $groupSummary->days_left = $deletedAt
                 ? max(0, $purgeDays - (int) $deletedAt->startOfDay()->diffInDays(now(config('zakat.timezone'))->startOfDay()))
                 : null;
-            $transaction->deleted_at_formatted = $deletedAt ? $deletedAt->format('d/m/Y H:i') : '-';
+            $groupSummary->deleted_at_formatted = $deletedAt ? $deletedAt->format('d/m/Y H:i') : '-';
 
-            return $transaction;
+            return $groupSummary;
         });
 
-        return $transactions;
+        return $groupSummaries;
     }
 
     public function indexViewData(TransactionHistoryFilters $filters, bool $canViewRisk): array
@@ -177,7 +174,7 @@ class TransactionHistoryService
 
     private function baseHistoryQuery(TransactionHistoryFilters $filters, bool $canViewRisk): Builder
     {
-        $query = $this->groupedQueryService->make()
+        $query = $this->groupedQueryService->makeGroupSummaries()
             ->with(['petugas'])
             ->filter($filters->toArray());
 

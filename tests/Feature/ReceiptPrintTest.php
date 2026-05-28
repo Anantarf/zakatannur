@@ -8,6 +8,7 @@ use App\Models\User;
 use App\Models\ZakatTransaction;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 use Tests\TestCase;
 
 class ReceiptPrintTest extends TestCase
@@ -24,8 +25,9 @@ class ReceiptPrintTest extends TestCase
         $tcpdf->AddPage();
         $letterheadBytes = $tcpdf->Output('', 'S');
 
-        $storagePath = 'templates/letterhead/test_letterhead.pdf';
+        $storagePath = 'templates/letterhead/test_letterhead_' . Str::uuid() . '.pdf';
         Storage::disk('local')->put($storagePath, $letterheadBytes);
+        Storage::disk('local')->assertExists($storagePath);
 
         Template::query()->create([
             'template_type'    => Template::TYPE_LETTERHEAD,

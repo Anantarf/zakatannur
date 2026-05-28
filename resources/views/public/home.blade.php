@@ -36,7 +36,8 @@
     @include('public.partials.nav')
 
     <main class="public-shell-gap flex-1 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-        <div x-show="activeTab !== 'grafik'" x-collapse.duration.500ms>
+        <div x-show="activeTab !== 'grafik'" x-collapse.duration.500ms
+            :class="activeTab === 'laporan' ? 'mb-3 sm:mb-4' : ''">
             @include('public.partials.header')
         </div>
 

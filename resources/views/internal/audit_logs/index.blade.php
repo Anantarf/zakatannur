@@ -5,7 +5,7 @@
                 <svg xmlns="http://www.w3.org/2000/svg" class="ui-page-title-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414A1 1 0 0119 9.414V19a2 2 0 01-2 2z" />
                 </svg>
-                Audit Logs
+                Log Audit
             </h2>
             <p class="ui-page-title-copy">Riwayat aktivitas penting untuk membantu pelacakan dan akuntabilitas sistem.</p>
         </div>
@@ -14,19 +14,22 @@
     <div class="py-6 sm:py-10">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
             <div class="grid grid-cols-1 gap-3 sm:grid-cols-3">
-                <div class="rounded-2xl border border-emerald-100 bg-emerald-50/70 p-4">
-                    <div class="text-xs font-black uppercase tracking-[0.18em] text-emerald-700">Total Log</div>
-                    <div class="mt-1 text-2xl font-black text-emerald-950">{{ $totalLogs }}</div>
+                <div class="ui-stat-card ui-stat-card-default">
+                    <div class="ui-stat-eyebrow text-emerald-700">Total Log</div>
+                    <div class="ui-stat-value text-emerald-950">{{ $totalLogs }}</div>
+                    <div class="ui-stat-description text-emerald-700">Total aktivitas yang tercatat di tabel audit.</div>
                 </div>
-                <div class="rounded-2xl border border-slate-100 bg-white p-4 shadow-sm">
-                    <div class="text-xs font-black uppercase tracking-[0.18em] text-slate-500">Log Terbaru</div>
-                    <div class="mt-1 text-sm font-black text-slate-800">
+                <div class="ui-stat-card ui-stat-card-muted">
+                    <div class="ui-stat-eyebrow text-slate-500">Log Terbaru</div>
+                    <div class="mt-2 text-sm font-black text-slate-800">
                         {{ $latestLog?->created_at?->timezone('Asia/Jakarta')->format('d/m/Y H:i') ?? '-' }}
                     </div>
+                    <div class="ui-stat-description text-slate-500">Waktu catatan terakhir yang masuk ke audit log.</div>
                 </div>
-                <div class="rounded-2xl border border-blue-100 bg-blue-50/70 p-4">
-                    <div class="text-xs font-black uppercase tracking-[0.18em] text-blue-700">Akses</div>
-                    <div class="mt-1 text-sm font-black text-blue-950">Super Admin Only</div>
+                <div class="ui-stat-card ui-stat-card-info">
+                    <div class="ui-stat-eyebrow text-blue-700">Akses</div>
+                    <div class="mt-2 text-sm font-black text-blue-950">Khusus Super Admin</div>
+                    <div class="ui-stat-description text-blue-700">Area ini dibatasi untuk kontrol dan pelacakan tingkat tinggi.</div>
                 </div>
             </div>
 
@@ -48,7 +51,7 @@
                     <div class="space-y-3 md:hidden">
                         @if (count($logs) > 0)
                             @foreach ($logs as $log)
-                                <article class="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+                                <article class="ui-mobile-card">
                                     <div class="flex items-start justify-between gap-3">
                                         <div class="min-w-0">
                                             <div class="font-mono text-[11px] text-slate-500">{{ $log->created_at->format('d/m/Y H:i:s') }}</div>
@@ -60,13 +63,13 @@
                                         </div>
                                     </div>
 
-                                    <div class="mt-3 space-y-2 rounded-xl bg-slate-50 px-3 py-3 text-sm">
-                                        <div class="flex items-start justify-between gap-3">
-                                            <span class="text-[10px] font-black uppercase tracking-widest text-slate-400">Tabel</span>
+                                    <div class="ui-mobile-meta-grid">
+                                        <div class="ui-mobile-meta-item">
+                                            <p class="ui-mobile-meta-label">Tabel</p>
                                             <span class="font-semibold text-slate-700">{{ class_basename($log->subject_type) }}</span>
                                         </div>
-                                        <div class="flex items-start justify-between gap-3">
-                                            <span class="text-[10px] font-black uppercase tracking-widest text-slate-400">ID</span>
+                                        <div class="ui-mobile-meta-item">
+                                            <p class="ui-mobile-meta-label">ID</p>
                                             <span class="font-mono text-xs text-slate-500">#{{ substr($log->subject_id, 0, 8) }}...</span>
                                         </div>
                                     </div>
@@ -77,7 +80,7 @@
                                 </article>
                             @endforeach
                         @else
-                            <div class="rounded-2xl border border-dashed border-slate-200 bg-slate-50 px-6 py-12 text-center text-slate-500">
+                            <div class="ui-empty-state-box text-slate-500">
                                 Belum ada aktivitas yang tercatat.
                             </div>
                         @endif
@@ -147,7 +150,7 @@
                                 @else
                                     <tr>
                                         <td colspan="6" class="px-6 py-12 text-center text-slate-500">
-                                            <div class="rounded-2xl border border-dashed border-slate-200 bg-slate-50 p-5">Belum ada aktivitas yang tercatat.</div>
+                                            <div class="ui-empty-state-box py-5">Belum ada aktivitas yang tercatat.</div>
                                         </td>
                                     </tr>
                                 @endif

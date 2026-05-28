@@ -1,11 +1,9 @@
 @props(['status' => null])
 
 @php
-    $label = match($status) {
-        'perlu_tindak_lanjut' => 'Tindak Lanjut',
-        'aman' => 'Aman',
-        'belum_ditinjau' => 'Belum Review',
-        default => 'Belum Review',
+    $label = match ($status) {
+        \App\Models\TransactionRiskReview::REVIEW_BELUM_DITINJAU => 'Belum Review',
+        default => \App\Models\TransactionRiskReview::reviewStatusLabel($status),
     };
 
     $classes = match($status) {

@@ -9,7 +9,7 @@ use App\Models\ZakatTransaction;
 use App\Support\SqlDialect;
 use App\Support\ViewOptions;
 use Carbon\Carbon;
-use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
@@ -19,12 +19,27 @@ use Illuminate\Validation\Rule;
 
 class TransactionAnomalyService
 {
-    private const FLAG_LABELS = [
-        'exact_duplicate' => 'Potensi transaksi ganda',
-        'updated_after_receipt_printed' => 'Diubah setelah kwitansi tercetak',
-        'restored_after_delete' => 'Direstore setelah dihapus',
-        'significant_nominal_change' => 'Perubahan nominal signifikan',
-        'infaq_outlier' => 'Nominal infaq tidak biasa',
+    private const FLAG_META = [
+        'exact_duplicate' => [
+            'label' => 'Potensi transaksi ganda',
+            'summary' => 'Sistem menemukan transaksi lain yang sangat mirip dalam waktu berdekatan.',
+            'next_step' => 'Cek apakah ini transaksi dobel atau memang pembayaran terpisah.',
+        ],
+        'updated_after_receipt_printed' => [
+            'label' => 'Diubah setelah kwitansi tercetak',
+            'summary' => 'Data transaksi berubah setelah bukti cetak pernah keluar.',
+            'next_step' => 'Pastikan perubahan sah dan tidak menimbulkan selisih dengan bukti yang sudah beredar.',
+        ],
+        'restored_after_delete' => [
+            'label' => 'Direstore setelah dihapus',
+            'summary' => 'Transaksi sempat dihapus lalu dikembalikan ke riwayat aktif.',
+            'next_step' => 'Pastikan alasan restore jelas dan transaksi memang perlu diaktifkan kembali.',
+        ],
+        'significant_nominal_change' => [
+            'label' => 'Perubahan nominal signifikan',
+            'summary' => 'Total uang atau beras pada grup transaksi berubah cukup besar.',
+            'next_step' => 'Bandingkan nilai lama dan baru, lalu pastikan perubahan sesuai kebutuhan lapangan.',
+        ],
     ];
 
     public function __construct(
@@ -44,7 +59,7 @@ class TransactionAnomalyService
             'scope' => ['nullable', 'string', Rule::in(['active', 'archived'])],
             'risk_level' => ['nullable', 'string', Rule::in(TransactionRiskReview::LEVELS)],
             'review_status' => ['nullable', 'string', Rule::in(TransactionRiskReview::REVIEW_STATUSES)],
-            'flag_type' => ['nullable', 'string', Rule::in(array_keys(self::FLAG_LABELS))],
+            'flag_type' => ['nullable', 'string', Rule::in(array_keys(self::FLAG_META))],
             'petugas_id' => ['nullable', 'integer', 'exists:users,id'],
         ])->validate();
 
@@ -76,7 +91,7 @@ class TransactionAnomalyService
             'overview' => $this->overview($filters),
             'riskLevels' => TransactionRiskReview::LEVELS,
             'reviewStatuses' => TransactionRiskReview::REVIEW_STATUSES,
-            'flagOptions' => self::FLAG_LABELS,
+            'flagOptions' => self::flagLabels(),
             'petugasOptions' => ViewOptions::petugasOptions(),
             'years' => ViewOptions::years($filters['activeYear']),
             'periods' => ViewOptions::periods(),
@@ -85,15 +100,19 @@ class TransactionAnomalyService
 
     public function paginatedGroups(array $filters, array $queryParams): LengthAwarePaginator
     {
-        $groups = $this->baseQuery($filters)
+        $groupSummaries = $this->baseQuery($filters)
+            ->when(($filters['scope'] ?? 'active') === 'active', function ($query) {
+                $query->orderBy('review_severity', 'asc')
+                    ->orderByDesc('risk_score_max');
+            })
             ->orderByRaw(SqlDialect::maxEffectiveTimestampOrder())
             ->orderByDesc('no_transaksi')
             ->paginate(20)
             ->appends($queryParams);
 
-        $this->attachListSummaries($groups);
+        $this->attachListSummaries($groupSummaries);
 
-        return $groups;
+        return $groupSummaries;
     }
 
     public function detailViewData(string $noTransaksi): array
@@ -109,11 +128,13 @@ class TransactionAnomalyService
         }
 
         $mainTx = $transactions->first();
+        $groupNumber = $mainTx->no_transaksi;
         $riskReview = $this->reviewAssistantService->detailReviewForGroup($noTransaksi);
-        $riskMeta = $this->groupRiskMeta(collect([$noTransaksi]))[$noTransaksi] ?? [
+        $riskMeta = $this->groupRiskMeta(collect([$groupNumber]))[$groupNumber] ?? [
             'primary_flag' => null,
             'flag_labels' => [],
             'flags_count' => 0,
+            'flag_keys' => [],
         ];
 
         $receiptPrintedAt = $transactions->pluck('receipt_printed_at')->filter()->max();
@@ -123,12 +144,14 @@ class TransactionAnomalyService
             'mainTx' => $mainTx,
             'transactions' => $transactions,
             'groupedArr' => $transactions->groupBy(fn ($transaction) => $transaction->muzakki?->name ?? '-'),
+            'groupNumber' => $groupNumber,
             'noTransaksi' => $noTransaksi,
             'totalUang' => (int) $transactions->where('metode', '!=', ZakatTransaction::METHOD_BERAS)->sum('nominal_uang'),
             'totalTf' => (int) $transactions->where('metode', ZakatTransaction::METHOD_UANG)->where('is_transfer', true)->sum('nominal_uang'),
             'totalBeras' => (float) $transactions->where('metode', ZakatTransaction::METHOD_BERAS)->sum('jumlah_beras_kg'),
             'riskReview' => $riskReview,
             'riskMeta' => $riskMeta,
+            'flagMeta' => self::FLAG_META,
             'reviewStatuses' => TransactionRiskReview::REVIEW_STATUSES,
             'receiptPrintedAt' => $receiptPrintedAt ? Carbon::parse($receiptPrintedAt) : null,
             'receiptPrintedByName' => $receiptPrintedBy ? User::query()->find($receiptPrintedBy)?->name : null,
@@ -137,7 +160,14 @@ class TransactionAnomalyService
 
     public static function flagLabels(): array
     {
-        return self::FLAG_LABELS;
+        return collect(self::FLAG_META)
+            ->mapWithKeys(fn (array $meta, string $flag) => [$flag => $meta['label']])
+            ->all();
+    }
+
+    public static function flagMeta(): array
+    {
+        return self::FLAG_META;
     }
 
     private function overview(array $filters): array
@@ -145,7 +175,6 @@ class TransactionAnomalyService
         $summary = DB::query()
             ->fromSub($this->baseQuery($filters), 'anomaly_rows')
             ->selectRaw('COUNT(*) as total_groups')
-            ->selectRaw('SUM(CASE WHEN risk_severity = 3 THEN 1 ELSE 0 END) as suspicious_groups')
             ->selectRaw('SUM(CASE WHEN risk_severity = 2 THEN 1 ELSE 0 END) as warning_groups')
             ->selectRaw('SUM(CASE WHEN review_severity = 1 THEN 1 ELSE 0 END) as pending_review_groups')
             ->selectRaw('SUM(CASE WHEN review_severity = 2 THEN 1 ELSE 0 END) as safe_review_groups')
@@ -154,7 +183,6 @@ class TransactionAnomalyService
 
         return [
             'totalGroups' => (int) ($summary->total_groups ?? 0),
-            'suspiciousGroups' => (int) ($summary->suspicious_groups ?? 0),
             'warningGroups' => (int) ($summary->warning_groups ?? 0),
             'pendingReviewGroups' => (int) ($summary->pending_review_groups ?? 0),
             'safeReviewGroups' => (int) ($summary->safe_review_groups ?? 0),
@@ -169,9 +197,9 @@ class TransactionAnomalyService
 
         if ($filters['flag_type'] ?? null) {
             $flagNeedle = '%"' . str_replace(['\\', '%'], ['\\\\', '\\%'], $filters['flag_type']) . '"%';
-            $matchingGroupNos = TransactionRiskReview::query()
+            $matchingGroupNos = $this->reviewAssistantService->activeReviewsQuery()
                 ->where('risk_flags', 'like', $flagNeedle)
-                ->pluck('group_no_transaksi')
+                ->pluck('transaction_risk_reviews.group_no_transaksi')
                 ->unique()
                 ->values()
                 ->all();
@@ -184,6 +212,7 @@ class TransactionAnomalyService
                 $join->on('zakat_transactions.no_transaksi', '=', 'risk_reviews.group_no_transaksi');
             })
             ->selectRaw('MAX(COALESCE(risk_reviews.risk_severity, 0)) as risk_severity')
+            ->selectRaw('MAX(COALESCE(risk_reviews.risk_score_max, 0)) as risk_score_max')
             ->selectRaw('MAX(COALESCE(risk_reviews.review_severity, 0)) as review_severity')
             ->where('risk_reviews.risk_severity', '>=', 2)
             ->when(($filters['scope'] ?? 'active') === 'active', function (Builder $query) {
@@ -217,11 +246,14 @@ class TransactionAnomalyService
         $groups->getCollection()->transform(function ($group) use ($riskMeta) {
             $meta = $riskMeta[$group->no_transaksi] ?? [
                 'primary_flag' => null,
+                'primary_flag_label' => '-',
                 'flag_labels' => [],
                 'flags_count' => 0,
+                'flag_keys' => [],
             ];
 
             $group->primary_flag = $meta['primary_flag'];
+            $group->primary_flag_label = $meta['primary_flag_label'];
             $group->flag_labels = $meta['flag_labels'];
             $group->flags_count = $meta['flags_count'];
 
@@ -231,8 +263,8 @@ class TransactionAnomalyService
 
     private function groupRiskMeta(Collection $groupNos): array
     {
-        return TransactionRiskReview::query()
-            ->select(['group_no_transaksi', 'risk_flags'])
+        return $this->reviewAssistantService->activeReviewsQuery()
+            ->select(['transaction_risk_reviews.group_no_transaksi', 'transaction_risk_reviews.risk_flags'])
             ->whereIn('group_no_transaksi', $groupNos->all())
             ->get()
             ->groupBy('group_no_transaksi')
@@ -248,10 +280,14 @@ class TransactionAnomalyService
 
                 return [
                     'primary_flag' => $primaryFlag,
+                    'primary_flag_label' => $primaryFlag
+                        ? (self::flagLabels()[$primaryFlag] ?? str_replace('_', ' ', $primaryFlag))
+                        : '-',
                     'flag_labels' => $uniqueFlags
-                        ->map(fn (string $flag) => self::FLAG_LABELS[$flag] ?? str_replace('_', ' ', $flag))
+                        ->map(fn (string $flag) => self::flagLabels()[$flag] ?? str_replace('_', ' ', $flag))
                         ->all(),
                     'flags_count' => $uniqueFlags->count(),
+                    'flag_keys' => $uniqueFlags->all(),
                 ];
             })
             ->all();

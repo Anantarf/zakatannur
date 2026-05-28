@@ -38,6 +38,13 @@
         }
     },
     "scripts": {
+        "test": [
+            "@php artisan test"
+        ],
+        "verify": [
+            "@php artisan test",
+            "@php artisan view:cache --ansi"
+        ],
         "post-autoload-dump": [
             "Illuminate\\Foundation\\ComposerScripts::postAutoloadDump",
             "@php artisan package:discover --ansi"

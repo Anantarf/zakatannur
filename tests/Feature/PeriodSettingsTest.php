@@ -94,6 +94,7 @@ class PeriodSettingsTest extends TestCase
         $this->assertDatabaseHas('zakat_periods', [
             'gregorian_year' => 2026,
             'label' => 'Ramadan 2026',
+            'hijri_month' => 9,
             'default_fitrah_cash_per_jiwa' => 55000,
             'chart_starts_at' => '2026-03-10 00:00:00',
             'chart_ends_at' => '2026-03-25 00:00:00',

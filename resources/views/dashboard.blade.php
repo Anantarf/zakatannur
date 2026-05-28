@@ -13,35 +13,59 @@
 
     <div class="py-4 sm:py-10">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-4 sm:space-y-8">
-
-            {{-- Banner Off-Season --}}
-            @if($offSeason)
-            <div class="rounded-2xl border border-amber-200 bg-amber-50 px-4 sm:px-6 py-4 flex flex-col sm:flex-row sm:items-center gap-3">
-                <div class="flex items-center gap-3 flex-1">
-                    <div class="flex-shrink-0 w-10 h-10 rounded-full bg-amber-100 border border-amber-200 flex items-center justify-center">
-                        <svg class="h-5 w-5 text-amber-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                        </svg>
+            <div class="grid grid-cols-1 gap-4 xl:grid-cols-[minmax(0,1.2fr)_minmax(300px,0.8fr)]">
+                <div class="ui-card-strong p-5 sm:p-6">
+                    <div class="flex flex-col gap-5 sm:flex-row sm:items-start sm:justify-between">
+                        <div class="space-y-2">
+                            <p class="text-[11px] font-black uppercase tracking-[0.24em] text-emerald-700">Workspace Dashboard</p>
+                            <h3 class="text-xl font-black leading-tight text-slate-950 sm:text-[1.7rem]">Dashboard kerja yang lebih tenang dan fokus.</h3>
+                            <p class="max-w-2xl text-sm leading-6 text-slate-500">Pantau ringkasan transaksi, baca ritme kerja hari ini, lalu masuk ke halaman operasional tanpa harus memilah terlalu banyak distraksi.</p>
+                        </div>
+                        <div class="flex flex-wrap gap-2">
+                            <a href="{{ route('internal.transactions.create') }}" class="ui-btn ui-btn-primary w-full sm:w-auto">Input Transaksi</a>
+                            <a href="{{ route('internal.transactions.index', array_filter(['year' => $year, 'period_id' => $periodId, 'metode' => $metode])) }}" class="ui-btn ui-btn-secondary w-full sm:w-auto">Buka Riwayat</a>
+                        </div>
                     </div>
-                    <div>
-                        <p class="font-bold text-amber-800 text-sm">Sistem Sedang Tidak Aktif</p>
-                        <p class="text-amber-700 text-xs mt-0.5">
-                            Periode Ramadan {{ $chartYear ?? $activeYear }} telah berakhir.
-                            @if($lastActiveDate)
-                                Transaksi terakhir tercatat pada <span class="font-bold">{{ $lastActiveDate->locale('id')->translatedFormat('d F Y') }}</span>.
-                            @endif
-                            Data rekap di bawah adalah arsip lengkap tahun {{ $chartYear ?? $activeYear }}.
-                        </p>
+
+                    <div class="mt-5 grid grid-cols-1 gap-3 sm:grid-cols-3">
+                        <div class="ui-kpi-card">
+                            <p class="ui-kpi-label">Total Transaksi</p>
+                            <p class="ui-kpi-value">{{ number_format($payload['totals']['jumlah_transaksi'] ?? 0, 0, ',', '.') }}</p>
+                            <p class="ui-kpi-note">Jumlah transaksi yang tampil di ringkasan dashboard.</p>
+                        </div>
+                        <div class="ui-kpi-card">
+                            <p class="ui-kpi-label">Transaksi Hari Ini</p>
+                            <p class="ui-kpi-value">{{ number_format($workspace['today_count'] ?? 0, 0, ',', '.') }}</p>
+                            <p class="ui-kpi-note">Transaksi valid yang tercatat hari ini.</p>
+                        </div>
+                        <div class="ui-kpi-card">
+                            <p class="ui-kpi-label">Transaksi Terakhir</p>
+                            <p class="mt-2 text-lg font-black tracking-[-0.02em] text-slate-900">
+                                {{ ($workspace['latest_transaction_at'] ?? null)?->format('d/m/Y H:i') ?? '-' }}
+                            </p>
+                            <p class="ui-kpi-note">Waktu transaksi terbaru yang tercatat di sistem.</p>
+                        </div>
                     </div>
                 </div>
-                <div class="flex items-center gap-2 flex-shrink-0">
-                    <a href="{{ route('internal.transactions.index', ['year' => $chartYear ?? $activeYear]) }}" class="inline-flex items-center gap-1.5 rounded-xl bg-amber-600 px-3 py-2 text-xs font-bold text-white hover:bg-amber-700 transition-all shadow-sm whitespace-nowrap">
-                        Lihat Arsip
-                        <svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg>
-                    </a>
+
+                <div class="ui-card p-5 sm:p-6">
+                    <p class="text-[11px] font-black uppercase tracking-[0.24em] text-slate-400">Aksi Cepat</p>
+                    <div class="mt-4 grid grid-cols-1 gap-3">
+                        <a href="{{ route('internal.transactions.index', array_filter(['year' => $year, 'period_id' => $periodId, 'metode' => $metode])) }}" class="ui-action-tile">
+                            <p class="text-sm font-black text-slate-900">Riwayat Transaksi</p>
+                            <p class="mt-1 text-sm leading-6 text-slate-600">Telusuri transaksi lengkap sesuai filter dashboard saat ini.</p>
+                        </a>
+                        <a href="{{ route('internal.muzakki.index') }}" class="ui-action-tile ui-action-tile-accent">
+                            <p class="text-sm font-black text-emerald-900">Data Muzakki</p>
+                            <p class="mt-1 text-sm leading-6 text-emerald-800">Cari data muzakki dan lihat riwayat yang sudah tercatat.</p>
+                        </a>
+                        <a href="{{ route('internal.transactions.trash') }}" class="ui-action-tile ui-action-tile-info">
+                            <p class="text-sm font-black text-blue-900">Trash Transaksi</p>
+                            <p class="mt-1 text-sm leading-6 text-blue-800">Cek transaksi yang pernah dihapus dan masih tersimpan di trash.</p>
+                        </a>
+                    </div>
                 </div>
             </div>
-            @endif
 
             <!-- Daily Trend Chart -->
             <div class="bg-white rounded-2xl shadow-md border border-gray-100 overflow-hidden">
@@ -71,7 +95,95 @@
                     </form>
                 </div>
                 <div class="p-4 sm:p-6">
-                    <div class="relative h-[200px] sm:h-[250px] w-full">
+                    <p class="mb-4 text-sm leading-6 text-slate-500">Gunakan grafik ini untuk membaca ritme transaksi pada window aktif. Arsip lengkap tetap lebih cocok dibuka dari rekap dan riwayat.</p>
+                    @if (!empty($dashboardChartSourceNote))
+                        <div class="mb-4 rounded-2xl border border-sky-100 bg-sky-50 px-4 py-3 text-xs leading-relaxed text-sky-800">
+                            {{ $dashboardChartSourceNote }}
+                        </div>
+                    @endif
+                    @if (!empty($dashboardChartRange['fallback_note']))
+                        <div class="mb-4 rounded-2xl border border-amber-100 bg-amber-50 px-4 py-3 text-xs leading-relaxed text-amber-800">
+                            {{ $dashboardChartRange['fallback_note'] }}
+                        </div>
+                    @endif
+                    @php
+                        $chartValues = $chartData['datasets'][0]['values'] ?? $chartData['values'] ?? [];
+                        $chartLabels = $chartData['labels'] ?? [];
+                        $chartMax = max(1, (int) max($chartValues ?: [0]));
+                        $chartMin = min(0, (int) min($chartValues ?: [0]));
+                        $svgWidth = 960;
+                        $svgHeight = 250;
+                        $paddingX = 28;
+                        $paddingTop = 20;
+                        $paddingBottom = 34;
+                        $plotWidth = $svgWidth - ($paddingX * 2);
+                        $plotHeight = $svgHeight - $paddingTop - $paddingBottom;
+                        $pointCount = max(count($chartValues), 1);
+                        $stepX = $pointCount > 1 ? ($plotWidth / ($pointCount - 1)) : 0;
+                        $rangeValue = max(1, $chartMax - $chartMin);
+                        $points = [];
+
+                        foreach ($chartValues as $index => $value) {
+                            $x = $paddingX + ($stepX * $index);
+                            $normalized = ($value - $chartMin) / $rangeValue;
+                            $y = $paddingTop + ($plotHeight - ($normalized * $plotHeight));
+                            $points[] = ['x' => round($x, 2), 'y' => round($y, 2)];
+                        }
+
+                        $linePath = '';
+                        $areaPath = '';
+                        if (!empty($points)) {
+                            $linePath = 'M ' . $points[0]['x'] . ' ' . $points[0]['y'];
+                            for ($i = 1; $i < count($points); $i++) {
+                                $previous = $points[$i - 1];
+                                $current = $points[$i];
+                                $controlX = round(($previous['x'] + $current['x']) / 2, 2);
+                                $linePath .= ' C ' . $controlX . ' ' . $previous['y'] . ', ' . $controlX . ' ' . $current['y'] . ', ' . $current['x'] . ' ' . $current['y'];
+                            }
+
+                            $baselineY = $paddingTop + $plotHeight;
+                            $lastPoint = $points[count($points) - 1];
+                            $areaPath = $linePath
+                                . ' L ' . $lastPoint['x'] . ' ' . $baselineY
+                                . ' L ' . $points[0]['x'] . ' ' . $baselineY
+                                . ' Z';
+                        }
+                    @endphp
+                    <div id="dashboardChartFallback" class="rounded-2xl border border-slate-100 bg-slate-50/70 p-4">
+                        <div class="relative h-[200px] sm:h-[250px]">
+                            <svg viewBox="0 0 {{ $svgWidth }} {{ $svgHeight }}" class="h-full w-full" preserveAspectRatio="none" aria-hidden="true">
+                                <defs>
+                                    <linearGradient id="dashboardChartArea" x1="0" y1="0" x2="0" y2="1">
+                                        <stop offset="0%" stop-color="#f59e0b" stop-opacity="0.28" />
+                                        <stop offset="100%" stop-color="#f59e0b" stop-opacity="0.04" />
+                                    </linearGradient>
+                                </defs>
+
+                                @for ($i = 0; $i < 4; $i++)
+                                    @php
+                                        $gridY = $paddingTop + (($plotHeight / 3) * $i);
+                                    @endphp
+                                    <line x1="{{ $paddingX }}" y1="{{ $gridY }}" x2="{{ $svgWidth - $paddingX }}" y2="{{ $gridY }}" stroke="#e2e8f0" stroke-width="1" />
+                                @endfor
+
+                                @if ($areaPath !== '')
+                                    <path d="{{ $areaPath }}" fill="url(#dashboardChartArea)" />
+                                    <path d="{{ $linePath }}" fill="none" stroke="#d97706" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" />
+                                @endif
+
+                                @foreach ($points as $point)
+                                    <circle cx="{{ $point['x'] }}" cy="{{ $point['y'] }}" r="4.5" fill="#ffffff" stroke="#d97706" stroke-width="3" />
+                                @endforeach
+                            </svg>
+
+                            <div class="pointer-events-none absolute inset-x-0 bottom-0 grid gap-2 text-[10px] font-bold leading-tight text-slate-400" style="grid-template-columns: repeat({{ max(count($chartLabels), 1) }}, minmax(0, 1fr));">
+                                @foreach ($chartLabels as $label)
+                                    <div class="text-center">{{ $label }}</div>
+                                @endforeach
+                            </div>
+                        </div>
+                    </div>
+                    <div id="dashboardChartCanvasWrap" class="relative hidden h-[200px] w-full sm:h-[250px]">
                         <canvas id="dailyTrendChart"></canvas>
                     </div>
                 </div>
@@ -122,10 +234,11 @@
                         @if(request('days')) <input type="hidden" name="days" value="{{ request('days') }}"> @endif
                         
                         @if($year || $periodId || $metode)
-                            <a href="{{ route('dashboard') }}" class="flex items-center justify-center p-1.5 text-gray-400 hover:text-emerald-600 rounded-lg transition-all" title="Reset Filters">
+                            <a href="{{ route('dashboard') }}" class="inline-flex items-center justify-center gap-2 rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-semibold text-slate-500 transition-all hover:border-emerald-200 hover:text-emerald-700" title="Reset Filters">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
                                 </svg>
+                                Reset
                             </a>
                         @endif
                     </form>
@@ -172,6 +285,8 @@
                 return;
             }
             const canvas = document.getElementById('dailyTrendChart');
+            const canvasWrap = document.getElementById('dashboardChartCanvasWrap');
+            const fallback = document.getElementById('dashboardChartFallback');
             if (!canvas) return;
 
             const ctx = canvas.getContext('2d');
@@ -236,9 +351,11 @@
                     }
                 }
             });
+
+            canvasWrap?.classList.remove('hidden');
+            fallback?.classList.add('hidden');
         } catch (e) {
             console.error("Chart Error: ", e);
-            alert("Gagal memuat grafik: " + e.message);
         }
     }
 

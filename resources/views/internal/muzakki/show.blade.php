@@ -45,11 +45,11 @@
                             <p class="mt-1 text-2xl font-black text-slate-950">{{ $muzakki->name }}</p>
                         </div>
                         <div class="grid grid-cols-1 gap-3 text-sm">
-                            <div class="rounded-2xl border border-slate-100 bg-slate-50 px-4 py-3">
+                            <div class="ui-card-muted px-4 py-3">
                                 <p class="text-xs font-bold text-slate-500">No HP</p>
                                 <p class="mt-1 font-bold text-slate-800">{{ $muzakki->phone ?: '-' }}</p>
                             </div>
-                            <div class="rounded-2xl border border-slate-100 bg-slate-50 px-4 py-3">
+                            <div class="ui-card-muted px-4 py-3">
                                 <p class="text-xs font-bold text-slate-500">Alamat</p>
                                 <p class="mt-1 leading-relaxed text-slate-800">{{ $muzakki->address ?: '-' }}</p>
                             </div>
@@ -129,7 +129,7 @@
                         </thead>
                         <tbody class="divide-y divide-slate-100">
                             @forelse ($periods as $period)
-                                <tr>
+                                <tr class="transition-colors hover:bg-slate-50/70">
                                     <td class="px-6 py-4 font-bold text-slate-800">{{ $period['label'] }}</td>
                                     <td class="px-6 py-4 text-slate-600">{{ $period['count'] }}</td>
                                     <td class="px-6 py-4 text-slate-600">{{ $period['total_uang_display'] }}</td>

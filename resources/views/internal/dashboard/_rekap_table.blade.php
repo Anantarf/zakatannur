@@ -44,31 +44,31 @@
 <div class="hidden overflow-x-auto md:block">
     <table class="min-w-full text-[10px] sm:text-sm">
         <thead>
-            <tr class="bg-gray-50 text-left text-[11px] sm:text-xs font-bold text-gray-400 uppercase tracking-widest border-b border-gray-100">
-                <th class="px-2 sm:px-6 py-3 sm:py-4 text-left">Kategori</th>
-                <th class="px-2 sm:px-6 py-3 sm:py-4 text-center">Total Transaksi</th>
-                <th class="px-2 sm:px-6 py-3 sm:py-4 text-right">Total Uang</th>
-                <th class="px-2 sm:px-6 py-3 sm:py-4 text-right">Total Beras</th>
+            <tr class="border-b border-gray-100 bg-slate-50 text-left text-[11px] font-bold uppercase tracking-[0.18em] text-slate-400 sm:text-xs">
+                <th class="px-3 py-4 sm:px-6 sm:py-4 text-left">Kategori</th>
+                <th class="px-3 py-4 sm:px-6 sm:py-4 text-center">Total Transaksi</th>
+                <th class="px-3 py-4 sm:px-6 sm:py-4 text-right">Total Uang</th>
+                <th class="px-3 py-4 sm:px-6 sm:py-4 text-right">Total Beras</th>
             </tr>
         </thead>
-        <tbody class="divide-y divide-gray-50 font-medium text-gray-600">
+        <tbody class="divide-y divide-slate-100 font-medium text-slate-600">
             @foreach ($payload['items'] as $item)
-                <tr class="hover:bg-gray-50 transition-colors">
-                    <td class="px-2 sm:px-6 py-3 sm:py-4 font-bold text-gray-900 uppercase">
+                <tr class="transition-colors hover:bg-emerald-50/30">
+                    <td class="px-3 py-4 font-bold uppercase text-slate-900 sm:px-6">
                         {{ \App\Models\ZakatTransaction::CATEGORY_LABELS[$item['category']] ?? strtoupper($item['category']) }}
                     </td>
-                    <td class="px-2 sm:px-6 py-3 sm:py-4 text-center">{{ number_format($item['jumlah_transaksi']) }}</td>
-                    <td class="px-2 sm:px-6 py-3 sm:py-4 text-right text-emerald-700 whitespace-nowrap">{{ $item['total_uang_display'] }}</td>
-                    <td class="px-2 sm:px-6 py-3 sm:py-4 text-right text-amber-700 whitespace-nowrap">{{ $item['total_beras_kg_display'] }}</td>
+                    <td class="px-3 py-4 text-center sm:px-6">{{ number_format($item['jumlah_transaksi']) }}</td>
+                    <td class="whitespace-nowrap px-3 py-4 text-right font-semibold text-emerald-700 sm:px-6">{{ $item['total_uang_display'] }}</td>
+                    <td class="whitespace-nowrap px-3 py-4 text-right font-semibold text-amber-700 sm:px-6">{{ $item['total_beras_kg_display'] }}</td>
                 </tr>
             @endforeach
         </tbody>
         <tfoot>
-            <tr class="bg-emerald-50/50 border-t-2 border-emerald-100">
-                <td class="px-2 sm:px-6 py-4 sm:py-5 text-[13px] sm:text-sm font-black text-emerald-900">GRAND TOTAL</td>
-                <td class="px-2 sm:px-6 py-4 sm:py-5 text-center font-black text-emerald-900">{{ number_format($payload['totals']['jumlah_transaksi']) }}</td>
-                <td class="px-2 sm:px-6 py-4 sm:py-5 text-right font-black text-emerald-900 whitespace-nowrap">{{ $payload['totals']['total_uang_display'] }}</td>
-                <td class="px-2 sm:px-6 py-4 sm:py-5 text-right font-black text-emerald-900 whitespace-nowrap">{{ $payload['totals']['total_beras_kg_display'] }}</td>
+            <tr class="border-t-2 border-emerald-100 bg-emerald-50/60">
+                <td class="px-3 py-5 text-[13px] font-black text-emerald-900 sm:px-6 sm:text-sm">GRAND TOTAL</td>
+                <td class="px-3 py-5 text-center font-black text-emerald-900 sm:px-6">{{ number_format($payload['totals']['jumlah_transaksi']) }}</td>
+                <td class="whitespace-nowrap px-3 py-5 text-right font-black text-emerald-900 sm:px-6">{{ $payload['totals']['total_uang_display'] }}</td>
+                <td class="whitespace-nowrap px-3 py-5 text-right font-black text-emerald-900 sm:px-6">{{ $payload['totals']['total_beras_kg_display'] }}</td>
             </tr>
         </tfoot>
     </table>

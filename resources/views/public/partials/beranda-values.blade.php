@@ -1,5 +1,4 @@
 <section class="grid grid-cols-1 gap-4 md:grid-cols-3">
-    @include('public.partials.beranda-quote')
     @include('public.partials.beranda-feature-card', [
         'title' => 'Manajemen Muzakki',
         'description' => 'Pencatatan data jamaah muzakki yang rapi dan amanah.',

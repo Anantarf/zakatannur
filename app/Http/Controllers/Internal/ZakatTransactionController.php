@@ -52,33 +52,32 @@ class ZakatTransactionController extends Controller
     public function show(Request $request, int $transaction): View
     {
         $tx = ZakatTransaction::withTrashed()->findOrFail($transaction);
+        $groupNumber = $tx->no_transaksi;
 
         if ($tx->trashed() && !in_array($request->user()->role, [User::ROLE_ADMIN, User::ROLE_SUPER_ADMIN], true)) {
             abort(Response::HTTP_FORBIDDEN);
         }
 
-        $transactions = ZakatTransaction::query()
-            ->with(['muzakki' => fn($q) => $q->withTrashed()])
-            ->where('no_transaksi', $tx->no_transaksi)
-            ->orderBy('id', 'asc')
-            ->get();
+        $groupItems = ZakatTransaction::transactionGroupItems($groupNumber, false, [
+            'muzakki' => fn($q) => $q->withTrashed(),
+        ]);
 
-        if ($transactions->isEmpty()) {
-            $transactions = ZakatTransaction::withTrashed()
-                ->with(['muzakki' => fn($q) => $q->withTrashed()])
-                ->where('no_transaksi', $tx->no_transaksi)
-                ->get();
+        if ($groupItems->isEmpty()) {
+            $groupItems = ZakatTransaction::transactionGroupItems($groupNumber, true, [
+                'muzakki' => fn($q) => $q->withTrashed(),
+            ]);
         }
 
-        $totalUang = $transactions->where('metode', '!=', ZakatTransaction::METHOD_BERAS)->sum('nominal_uang');
-        $totalTf = $transactions->where('metode', ZakatTransaction::METHOD_UANG)->where('is_transfer', true)->sum('nominal_uang');
+        $totalUang = $groupItems->where('metode', '!=', ZakatTransaction::METHOD_BERAS)->sum('nominal_uang');
+        $totalTf = $groupItems->where('metode', ZakatTransaction::METHOD_UANG)->where('is_transfer', true)->sum('nominal_uang');
         $totalCash = $totalUang - $totalTf;
-        $totalBeras = $transactions->where('metode', ZakatTransaction::METHOD_BERAS)->sum('jumlah_beras_kg');
+        $totalBeras = $groupItems->where('metode', ZakatTransaction::METHOD_BERAS)->sum('jumlah_beras_kg');
 
         return view('internal.transactions.show', [
             'mainTx' => $tx,
-            'groupedArr' => $transactions->groupBy(fn($t) => $t->muzakki ? $t->muzakki->name : '-'),
-            'noTransaksi' => $tx->no_transaksi,
+            'groupedArr' => $groupItems->groupBy(fn($t) => $t->muzakki ? $t->muzakki->name : '-'),
+            'groupNumber' => $groupNumber,
+            'noTransaksi' => $groupNumber,
             'totalUang' => (int) $totalUang,
             'totalTf' => (int) $totalTf,
             'totalCash' => (int) $totalCash,
@@ -91,19 +90,21 @@ class ZakatTransactionController extends Controller
     {
         $user = $request->user();
         $tx = ZakatTransaction::withTrashed()->findOrFail($transaction);
+        $groupNumber = $tx->no_transaksi;
 
-        $transactions = ZakatTransaction::query()
+        $groupItems = ZakatTransaction::query()
             ->with(['muzakki' => fn($q) => $q->withTrashed()])
-            ->where('no_transaksi', $tx->no_transaksi)
+            ->forTransactionGroup($groupNumber)
             ->valid()
             ->orderBy('id', 'asc')
             ->get();
 
-        if ($transactions->isEmpty()) {
-            $transactions = ZakatTransaction::withTrashed()
+        if ($groupItems->isEmpty()) {
+            $groupItems = ZakatTransaction::withTrashed()
                 ->with(['muzakki' => fn($q) => $q->withTrashed()])
-                ->where('no_transaksi', $tx->no_transaksi)
+                ->forTransactionGroup($groupNumber)
                 ->valid()
+                ->orderBy('id', 'asc')
                 ->get();
         }
 
@@ -125,12 +126,12 @@ class ZakatTransactionController extends Controller
         }
 
         $petugas = User::find($tx->petugas_id) ?? $user;
-        $pdfBytes = ReceiptPdf::renderA4Receipt($transactions, $petugas, $disk->path($template->storage_path));
+        $pdfBytes = ReceiptPdf::renderA4Receipt($groupItems, $petugas, $disk->path($template->storage_path));
         $receiptLifecycleService->markGroupAsPrinted($request, $tx);
 
         return response($pdfBytes, 200, [
             'Content-Type' => 'application/pdf',
-            'Content-Disposition' => 'inline; filename="tanda-terima-' . $tx->no_transaksi . '.pdf"',
+            'Content-Disposition' => 'inline; filename="tanda-terima-' . $groupNumber . '.pdf"',
         ]);
     }
 
@@ -139,17 +140,16 @@ class ZakatTransactionController extends Controller
         $tx = ZakatTransaction::findOrFail($transaction);
         $this->authorize('update', $tx);
 
-        $all = ZakatTransaction::with(['muzakki' => fn($q) => $q->withTrashed()])
-            ->where('no_transaksi', $tx->no_transaksi)
-            ->orderBy('id', 'asc')
-            ->get();
+        $groupItems = ZakatTransaction::transactionGroupItems($tx->no_transaksi, false, [
+            'muzakki' => fn($q) => $q->withTrashed(),
+        ]);
 
         return view('internal.transactions.create', $this->transactionFormViewData(
             $tx->tahun_zakat,
             [
                 'isEdit' => true,
                 'mainTx' => $tx,
-                'persons' => TransactionTransformer::toAlpinePersons($all),
+                'persons' => TransactionTransformer::toAlpinePersons($groupItems),
                 'officers' => User::orderBy('name')->get(['id', 'name', 'role']),
             ]
         ));

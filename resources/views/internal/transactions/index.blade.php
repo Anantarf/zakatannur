@@ -21,7 +21,7 @@
                     <div class="flex items-center gap-1.5 w-full sm:w-auto">
                         <button type="button" x-data x-on:click="$dispatch('open-modal', 'export-daily-modal')" class="ui-btn ui-btn-secondary flex-1 px-3 py-2.5 text-xs text-emerald-700 hover:text-emerald-700 sm:flex-none sm:py-2">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
-                            Export
+                            Ekspor
                         </button>
                         <a href="{{ route('internal.transactions.trash') }}" class="ui-btn ui-btn-secondary flex-none px-3 py-2.5 text-gray-400 hover:text-red-600 sm:px-2.5 sm:py-2" title="Sampah">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
@@ -39,7 +39,7 @@
             @endif
             {{-- Transactions Table --}}
             <div class="ui-card overflow-hidden shadow-md">
-                <div class="ui-toolbar lg:flex-col xl:flex-row xl:items-start">
+                <div class="ui-toolbar-soft xl:flex-row xl:items-start">
                     <div class="max-w-full space-y-1 xl:max-w-[260px] xl:flex-none">
                         <div class="ui-section-title">
                             <div class="h-6 w-2 rounded-full bg-emerald-500"></div>
@@ -73,22 +73,29 @@
                                     </div>
                                 </div>
 
-                                <div class="ui-mobile-card-muted space-y-3">
-                                    <div class="flex items-start justify-between gap-3">
-                                        <span class="text-[10px] font-black uppercase tracking-widest text-gray-400">Kategori</span>
-                                        <div class="max-w-[65%]">
+                                <div class="ui-mobile-meta-grid">
+                                    <div class="ui-mobile-meta-item col-span-2">
+                                        <p class="ui-mobile-meta-label">Kategori</p>
+                                        <div class="mt-1">
                                             <x-zakat-category-tags :categories="$t->categories_list" />
                                         </div>
                                     </div>
-                                    <div class="flex items-start justify-between gap-3">
-                                        <span class="text-[10px] font-black uppercase tracking-widest text-gray-400">Bentuk</span>
-                                        <div class="max-w-[65%]">
-                                            <x-transaction-method-tags :methods="$t->methods_list" class="justify-end" />
+                                    <div class="ui-mobile-meta-item">
+                                        <p class="ui-mobile-meta-label">Bentuk</p>
+                                        <div class="mt-1">
+                                            <x-transaction-method-tags :methods="$t->methods_list" />
                                         </div>
                                     </div>
-                                    <div class="flex items-start justify-between gap-3">
-                                        <span class="text-[10px] font-black uppercase tracking-widest text-gray-400">Nominal</span>
-                                        <div class="text-right">
+                                    <div class="ui-mobile-meta-item">
+                                        <p class="ui-mobile-meta-label">Petugas</p>
+                                        <div class="ui-mobile-meta-value">{{ $t->petugas?->name ?? '-' }}</div>
+                                        <span class="mt-1 inline-flex items-center justify-center rounded px-2 py-0.5 text-[11px] font-bold uppercase bg-emerald-50 text-emerald-700 border border-emerald-100 whitespace-nowrap leading-tight text-center">
+                                            {{ $t->shift_label }}
+                                        </span>
+                                    </div>
+                                    <div class="ui-mobile-meta-item col-span-2">
+                                        <p class="ui-mobile-meta-label">Nominal</p>
+                                        <div class="mt-1 text-right">
                                             @if($t->total_uang > 0)
                                                 <div class="flex items-center justify-end gap-1">
                                                     <span class="text-sm font-semibold text-gray-800">{{ $t->total_uang_display }}</span>
@@ -103,30 +110,26 @@
                                         </div>
                                     </div>
                                     @if ($canViewRisk)
-                                        <div class="flex items-start justify-between gap-3">
-                                            <span class="text-[10px] font-black uppercase tracking-widest text-gray-400">Risiko</span>
-                                            @if (in_array($t->risk_level, [\App\Models\TransactionRiskReview::LEVEL_WARNING, \App\Models\TransactionRiskReview::LEVEL_SUSPICIOUS], true))
-                                                <a href="{{ route('internal.anomalies.show', ['noTransaksi' => $t->no_transaksi]) }}" class="flex flex-col items-end gap-1">
-                                                    <x-risk-level-badge :level="$t->risk_level" />
-                                                    <x-review-status-badge :status="$t->review_status" />
-                                                </a>
-                                            @else
-                                                <div class="flex flex-col items-end gap-1">
-                                                    <x-risk-level-badge :level="$t->risk_level" />
-                                                    <x-review-status-badge :status="$t->review_status" />
+                                        <div class="ui-mobile-meta-item col-span-2">
+                                            <div class="flex items-start justify-between gap-3">
+                                                <div>
+                                                    <p class="ui-mobile-meta-label">Risiko</p>
+                                                    <p class="mt-1 text-xs leading-5 text-slate-500">Buka detail review untuk melihat alasan dan tindak lanjut.</p>
                                                 </div>
-                                            @endif
+                                                @if ($t->risk_level === \App\Models\TransactionRiskReview::LEVEL_WARNING || $t->risk_level === \App\Models\TransactionRiskReview::LEVEL_SUSPICIOUS)
+                                                    <a href="{{ route('internal.anomalies.show', ['noTransaksi' => $t->no_transaksi]) }}" class="flex flex-col items-end gap-1">
+                                                        <x-risk-level-badge :level="$t->risk_level" />
+                                                        <x-review-status-badge :status="$t->review_status" />
+                                                    </a>
+                                                @else
+                                                    <div class="flex flex-col items-end gap-1">
+                                                        <x-risk-level-badge :level="$t->risk_level" />
+                                                        <x-review-status-badge :status="$t->review_status" />
+                                                    </div>
+                                                @endif
+                                            </div>
                                         </div>
                                     @endif
-                                    <div class="flex items-start justify-between gap-3">
-                                        <span class="text-[10px] font-black uppercase tracking-widest text-gray-400">Petugas</span>
-                                        <div class="text-right">
-                                            <div class="font-medium text-gray-700">{{ $t->petugas?->name ?? '-' }}</div>
-                                            <span class="mt-1 inline-flex items-center justify-center rounded px-2 py-0.5 text-[11px] font-bold uppercase bg-emerald-50 text-emerald-700 border border-emerald-100 whitespace-nowrap leading-tight text-center">
-                                                {{ $t->shift_label }}
-                                            </span>
-                                        </div>
-                                    </div>
                                 </div>
 
                                 <div class="mt-4 grid grid-cols-2 gap-2">
@@ -139,14 +142,14 @@
 
                                     @can('update', $t)
                                         <a class="ui-btn ui-btn-secondary px-3 py-3 text-xs border-amber-200 text-amber-700 hover:bg-amber-50" href="{{ route('internal.transactions.edit', ['transaction' => $t->id]) }}">
-                                            Edit
+                                            Ubah
                                         </a>
                                         <button type="button" x-data x-on:click="$dispatch('open-modal', 'trash-modal'); $dispatch('open-trash-modal', { id: {{ $t->id }}, no: '{{ $t->no_transaksi }}' })" class="ui-btn ui-btn-danger px-3 py-3 text-xs">
                                             Hapus
                                         </button>
                                     @else
                                         <button type="button" x-data x-on:click="$dispatch('open-modal', 'restricted-modal')" class="ui-btn ui-btn-secondary px-3 py-3 text-xs text-gray-400">
-                                            Edit
+                                            Ubah
                                         </button>
                                         <button type="button" x-data x-on:click="$dispatch('open-modal', 'restricted-modal')" class="ui-btn ui-btn-secondary px-3 py-3 text-xs text-gray-400">
                                             Hapus
@@ -235,7 +238,7 @@
                                     </td>
                                     @if ($canViewRisk)
                                         <td class="px-2 sm:px-4 py-4 text-center whitespace-nowrap">
-                                            @if (in_array($t->risk_level, [\App\Models\TransactionRiskReview::LEVEL_WARNING, \App\Models\TransactionRiskReview::LEVEL_SUSPICIOUS], true))
+                                            @if ($t->risk_level === \App\Models\TransactionRiskReview::LEVEL_WARNING || $t->risk_level === \App\Models\TransactionRiskReview::LEVEL_SUSPICIOUS)
                                                 <a href="{{ route('internal.anomalies.show', ['noTransaksi' => $t->no_transaksi]) }}" class="flex flex-col items-center gap-1">
                                                     <x-risk-level-badge :level="$t->risk_level" />
                                                     <x-review-status-badge :status="$t->review_status" />
@@ -264,14 +267,14 @@
                                             </a>
                                             
                                             @can('update', $t)
-                                                <a class="ui-icon-button ui-icon-button-amber px-2" href="{{ route('internal.transactions.edit', ['transaction' => $t->id]) }}" title="Edit" aria-label="Edit transaksi">
+                                                <a class="ui-icon-button ui-icon-button-amber px-2" href="{{ route('internal.transactions.edit', ['transaction' => $t->id]) }}" title="Ubah" aria-label="Ubah transaksi">
                                                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
-                                                    <span class="ui-table-action-label">Edit</span>
+                                                    <span class="ui-table-action-label">Ubah</span>
                                                 </a>
                                             @else
-                                                <button type="button" x-data x-on:click="$dispatch('open-modal', 'restricted-modal')" class="ui-icon-button ui-icon-button-disabled px-2" title="Edit Terbatas" aria-label="Edit terbatas">
+                                                <button type="button" x-data x-on:click="$dispatch('open-modal', 'restricted-modal')" class="ui-icon-button ui-icon-button-disabled px-2" title="Ubah Terbatas" aria-label="Ubah terbatas">
                                                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
-                                                    <span class="ui-table-action-label">Edit</span>
+                                                    <span class="ui-table-action-label">Ubah</span>
                                                 </button>
                                             @endcan
 

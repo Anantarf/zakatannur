@@ -38,13 +38,19 @@ class DashboardController extends Controller
             fn() => RekapBuilder::build($year, $metode, $periodId)
         );
 
-        $latestTransactions = $groupedQueryService->latestValid($year, $metode, 10, $periodId);
-        $chartYear = $year ?? $activeYear;
-        $insights = $dashboardInsightsService->buildInsights($chartYear, $activeDays);
+        $latestTransactions = $groupedQueryService->latestValidGroups($year, $metode, 10, $periodId);
+        $insights = $dashboardInsightsService->buildInsights($year, $activeDays, $periodId, $metode);
+        $chartYear = (int) ($insights['chartRange']['year'] ?? $activeYear);
+        $chartPeriodId = $insights['chartRange']['period_id'] ?? null;
+        $selectedPeriod = collect(ViewOptions::periods())->firstWhere('id', $periodId);
+        $dashboardScopeLabel = $selectedPeriod
+            ? $selectedPeriod->display_label . ($selectedPeriod->sequence > 1 ? ' #' . $selectedPeriod->sequence : '')
+            : ($year ? 'Tahun ' . $year : 'Semua Waktu');
 
         return view('dashboard', [
             'activeYear' => $activeYear,
             'chartYear' => $chartYear,
+            'chartPeriodId' => $chartPeriodId,
             'year' => $year,
             'periodId' => $periodId,
             'metode' => $metode,
@@ -58,6 +64,10 @@ class DashboardController extends Controller
             'offSeason' => $insights['offSeason'],
             'lastActiveDate' => $insights['lastActiveDate'],
             'chartPeriodLabel' => $insights['chartPeriodLabel'],
+            'workspace' => $insights['workspace'],
+            'dashboardScopeLabel' => $dashboardScopeLabel,
+            'dashboardChartRange' => $insights['chartRange'],
+            'dashboardChartSourceNote' => $this->describeChartSource($insights['chartRange']),
         ]);
     }
 
@@ -72,5 +82,21 @@ class DashboardController extends Controller
         }
 
         return $activeDays;
+    }
+
+    private function describeChartSource(array $range): ?string
+    {
+        $source = (string) ($range['source'] ?? '');
+
+        return match ($source) {
+            'dashboard_manual_period' => 'Grafik ini sedang memakai periode pilihan manual dari Pengaturan Admin.',
+            'dashboard_active_period' => 'Grafik ini sedang mengikuti periode aktif yang dipakai sistem saat ini.',
+            'dashboard_last_completed_period' => 'Grafik ini sedang memakai periode terakhir yang sudah selesai.',
+            'dashboard_last_completed_period_fallback_active' => 'Belum ada periode yang selesai, jadi grafik sementara memakai periode aktif.',
+            'dashboard_last_completed_period_fallback_year' => 'Belum ada periode yang selesai, jadi grafik sementara memakai tahun aktif.',
+            'requested_period' => 'Grafik ini sedang mengikuti periode yang diminta langsung dari halaman.',
+            'configured' => 'Grafik ini sedang memakai range tanggal yang diatur manual.',
+            default => null,
+        };
     }
 }

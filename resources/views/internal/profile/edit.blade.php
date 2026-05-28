@@ -12,7 +12,7 @@
     </x-slot>
 
     <div class="py-6 sm:py-10">
-        <div class="max-w-3xl mx-auto sm:px-6 lg:px-8">
+        <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
             @if (session('status'))
                 <div class="ui-alert ui-alert-success mb-6">
                     <svg xmlns="http://www.w3.org/2000/svg" class="ui-alert-icon text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -23,7 +23,7 @@
             @endif
 
             <div class="ui-card overflow-hidden shadow-md">
-                <div class="border-b border-emerald-50 bg-gradient-to-br from-white via-emerald-50/30 to-white px-6 py-5 sm:px-8">
+                <div class="ui-inline-note rounded-none border-b border-emerald-100/70 sm:px-8">
                     <div class="text-xs font-black uppercase tracking-[0.18em] text-emerald-700">Akun Aktif</div>
                     <div class="mt-1 text-lg font-black text-slate-900">{{ $user->name }}</div>
                     <div class="mt-0.5 text-sm font-semibold text-emerald-700">{{ '@' . $user->username }}</div>
@@ -33,12 +33,12 @@
                         @csrf
                         @method('PATCH')
 
-                        <div class="rounded-[1.35rem] border border-slate-100 bg-slate-50/60 p-4 sm:p-5">
-                            <div class="mb-4 flex items-center gap-2">
+                        <div class="ui-settings-panel ui-settings-panel-muted">
+                            <div class="ui-settings-section-head">
                                 <span class="h-5 w-1 rounded-full bg-emerald-500"></span>
                                 <div>
-                                    <h3 class="text-sm font-black text-slate-900">Identitas Login</h3>
-                                    <p class="text-xs text-slate-500">Informasi ini tampil di menu dan dipakai saat login.</p>
+                                    <h3 class="ui-settings-section-title">Identitas Login</h3>
+                                    <p class="ui-settings-section-copy">Informasi ini tampil di menu dan dipakai saat login.</p>
                                 </div>
                             </div>
 
@@ -59,11 +59,11 @@
                             </div>
                         </div>
 
-                        <div class="rounded-[1.35rem] border border-amber-100 bg-amber-50/70 p-4 sm:p-5">
-                            <div class="mb-4 flex items-center gap-2">
+                        <div class="ui-settings-panel ui-settings-panel-amber">
+                            <div class="ui-settings-section-head">
                                 <span class="h-5 w-1 rounded-full bg-amber-500"></span>
                                 <div>
-                                    <h3 class="text-sm font-black text-amber-900">Ubah Password</h3>
+                                    <h3 class="ui-settings-section-title text-amber-900">Ubah Password</h3>
                                     <p class="text-xs text-amber-700">Kosongkan bagian ini jika tidak ingin mengubah password.</p>
                                 </div>
                             </div>
@@ -80,7 +80,7 @@
                                     <x-input-label for="password" :value="__('Password Baru')" class="ui-form-label" />
                                     <div class="relative">
                                         <x-text-input id="password" name="password" ::type="show ? 'text' : 'password'" class="block w-full pr-10" autocomplete="new-password" />
-                                        <button type="button" @click="show = !show" class="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-400 hover:text-gray-600 transition-colors">
+                                        <button type="button" @click="show = !show" class="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-400 transition-colors hover:text-gray-600 focus:outline-none focus:ring-2 focus:ring-emerald-200 focus:ring-offset-1 rounded-lg">
                                             <svg x-show="!show" xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
                                             <svg x-show="show" x-cloak xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.878 9.878L6.59 6.59m7.532 7.532l3.29 3.29M3 3l18 18" /></svg>
                                         </button>
@@ -93,7 +93,7 @@
                                     <x-input-label for="password_confirmation" :value="__('Konfirmasi Password Baru')" class="ui-form-label" />
                                     <div class="relative">
                                         <x-text-input id="password_confirmation" name="password_confirmation" ::type="show ? 'text' : 'password'" class="block w-full pr-10" autocomplete="new-password" />
-                                        <button type="button" @click="show = !show" class="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-400 hover:text-gray-600 transition-colors">
+                                        <button type="button" @click="show = !show" class="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-400 transition-colors hover:text-gray-600 focus:outline-none focus:ring-2 focus:ring-emerald-200 focus:ring-offset-1 rounded-lg">
                                             <svg x-show="!show" xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
                                             <svg x-show="show" x-cloak xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.878 9.878L6.59 6.59m7.532 7.532l3.29 3.29M3 3l18 18" /></svg>
                                         </button>
@@ -103,8 +103,8 @@
                             </div>
                         </div>
 
-                        <div class="sticky bottom-3 z-10 -mx-2 rounded-2xl border border-emerald-100 bg-white/90 p-3 shadow-xl shadow-slate-900/10 backdrop-blur sm:static sm:mx-0 sm:flex sm:items-center sm:justify-between sm:shadow-none sm:backdrop-blur-0">
-                            <p class="mb-3 hidden text-xs font-semibold text-slate-500 sm:mb-0 sm:block">Simpan hanya jika ada perubahan akun.</p>
+                        <div class="ui-settings-panel ui-settings-panel-muted sm:flex sm:items-center sm:justify-between">
+                            <p class="mb-3 text-xs font-semibold text-slate-500 sm:mb-0">Simpan hanya jika ada perubahan akun.</p>
                             <button type="submit" class="ui-btn ui-btn-primary w-full px-8 py-3 sm:w-auto">
                                 {{ __('Simpan Perubahan') }}
                             </button>

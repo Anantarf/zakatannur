@@ -3,7 +3,7 @@
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div class="space-y-1 text-center sm:text-left">
                 <h2 class="font-bold text-xl sm:text-2xl text-emerald-900 leading-tight">
-                    {{ isset($isEdit) ? 'Edit Transaksi ' . $mainTx->no_transaksi : 'Input Transaksi' }}
+                    {{ isset($isEdit) ? 'Ubah Transaksi ' . $mainTx->no_transaksi : 'Input Transaksi' }}
                 </h2>
                 <p class="text-sm text-slate-500">
                     {{ isset($isEdit) ? 'Perbarui data transaksi dengan aman, lalu simpan perubahan setelah semua detail sesuai.' : 'Isi pembayar, pilih kategori zakat per jiwa, lalu simpan seluruh transaksi dalam satu proses.' }}

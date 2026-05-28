@@ -93,8 +93,74 @@ class TransactionRiskReviewTest extends TestCase
             ->assertRedirect();
 
         $review = TransactionRiskReview::query()->where('zakat_transaction_id', $transaction->id)->firstOrFail();
-        $this->assertSame(TransactionRiskReview::LEVEL_SUSPICIOUS, $review->risk_level);
+        $this->assertSame(TransactionRiskReview::LEVEL_WARNING, $review->risk_level);
         $this->assertContains('exact_duplicate', $review->risk_flags ?? []);
+    }
+
+    public function test_reanalysis_preserves_operator_review_decision(): void
+    {
+        AppSetting::query()->create(['key' => AppSetting::KEY_ACTIVE_YEAR, 'value' => '2026']);
+        $staff = User::factory()->create(['role' => User::ROLE_STAFF]);
+        $admin = User::factory()->create(['role' => User::ROLE_ADMIN]);
+        $muzakki = Muzakki::query()->create(['name' => 'Muzakki Persist']);
+
+        $transaction = ZakatTransaction::query()->create([
+            'no_transaksi' => 'TRX-20260518-2010',
+            'muzakki_id' => $muzakki->id,
+            'pembayar_nama' => 'Pembayar Persist',
+            'pembayar_phone' => '08120001',
+            'pembayar_alamat' => 'Jakarta',
+            'shift' => ZakatTransaction::SHIFT_PAGI,
+            'category' => ZakatTransaction::CATEGORY_MAL,
+            'tahun_zakat' => 2026,
+            'metode' => ZakatTransaction::METHOD_UANG,
+            'nominal_uang' => 100000,
+            'petugas_id' => $staff->id,
+            'status' => ZakatTransaction::STATUS_VALID,
+            'waktu_terima' => now(config('zakat.timezone')),
+        ]);
+
+        TransactionRiskReview::query()->create([
+            'zakat_transaction_id' => $transaction->id,
+            'group_no_transaksi' => $transaction->no_transaksi,
+            'risk_level' => TransactionRiskReview::LEVEL_WARNING,
+            'risk_score' => 25,
+            'risk_flags' => ['updated_after_receipt_printed'],
+            'reasons' => ['Review lama'],
+            'duplicate_candidates' => [],
+            'detector_version' => 'v1',
+            'review_status' => TransactionRiskReview::REVIEW_AMAN,
+            'reviewed_by' => $admin->id,
+            'reviewed_at' => now(config('zakat.timezone'))->subMinute(),
+            'checked_at' => now(config('zakat.timezone'))->subMinute(),
+        ]);
+
+        $this->actingAs($admin)
+            ->patch('/internal/transactions/' . $transaction->id . '/update', [
+                'pembayar_nama' => 'Pembayar Persist',
+                'pembayar_phone' => '08120001',
+                'pembayar_alamat' => 'Jakarta',
+                'tahun_zakat' => 2026,
+                'shift' => ZakatTransaction::SHIFT_PAGI,
+                'items' => [
+                    [
+                        'id' => $transaction->id,
+                        'muzakki_name' => 'Muzakki Persist',
+                        'category' => ZakatTransaction::CATEGORY_MAL,
+                        'metode' => ZakatTransaction::METHOD_UANG,
+                        'nominal_uang' => 250000,
+                    ],
+                ],
+            ])
+            ->assertRedirect();
+
+        $review = TransactionRiskReview::query()->where('zakat_transaction_id', $transaction->id)->firstOrFail();
+
+        $this->assertSame(TransactionRiskReview::REVIEW_AMAN, $review->review_status);
+        $this->assertSame($admin->id, $review->reviewed_by);
+        $this->assertNotNull($review->reviewed_at);
+        $this->assertSame(TransactionRiskReview::LEVEL_WARNING, $review->risk_level);
+        $this->assertContains('significant_nominal_change', $review->risk_flags ?? []);
     }
 
     public function test_duplicate_detection_ignores_transactions_from_different_years(): void
@@ -132,7 +198,7 @@ class TransactionRiskReviewTest extends TestCase
         $this->assertSame(TransactionRiskReview::LEVEL_NORMAL, $review->risk_level);
     }
 
-    public function test_same_payer_different_beneficiary_is_not_marked_suspicious(): void
+    public function test_same_payer_different_beneficiary_is_not_marked_warning(): void
     {
         $staff = $this->seedDefaultsAndStaff();
 
@@ -151,7 +217,7 @@ class TransactionRiskReviewTest extends TestCase
         $transaction = ZakatTransaction::query()->latest('id')->firstOrFail();
         $review = TransactionRiskReview::query()->where('zakat_transaction_id', $transaction->id)->firstOrFail();
 
-        $this->assertNotSame(TransactionRiskReview::LEVEL_SUSPICIOUS, $review->risk_level);
+        $this->assertSame(TransactionRiskReview::LEVEL_NORMAL, $review->risk_level);
     }
 
     public function test_update_after_receipt_printed_creates_warning_review(): void
@@ -287,7 +353,7 @@ class TransactionRiskReviewTest extends TestCase
         $this->assertContains('significant_nominal_change', $review->risk_flags ?? []);
     }
 
-    public function test_infaq_outlier_creates_warning_when_history_is_sufficient(): void
+    public function test_infaq_transaction_does_not_create_warning_from_histori_pattern(): void
     {
         AppSetting::query()->create(['key' => AppSetting::KEY_ACTIVE_YEAR, 'value' => '2026']);
         $staff = User::factory()->create(['role' => User::ROLE_STAFF]);
@@ -328,11 +394,11 @@ class TransactionRiskReviewTest extends TestCase
         $transaction = ZakatTransaction::query()->latest('id')->firstOrFail();
         $review = TransactionRiskReview::query()->where('zakat_transaction_id', $transaction->id)->firstOrFail();
 
-        $this->assertSame(TransactionRiskReview::LEVEL_WARNING, $review->risk_level);
-        $this->assertContains('infaq_outlier', $review->risk_flags ?? []);
+        $this->assertSame(TransactionRiskReview::LEVEL_NORMAL, $review->risk_level);
+        $this->assertNotContains('infaq_outlier', $review->risk_flags ?? []);
     }
 
-    public function test_infaq_outlier_is_ignored_when_history_is_insufficient(): void
+    public function test_infaq_transaction_stays_normal_without_histori_pattern_rule(): void
     {
         AppSetting::query()->create(['key' => AppSetting::KEY_ACTIVE_YEAR, 'value' => '2026']);
         $staff = User::factory()->create(['role' => User::ROLE_STAFF]);
@@ -386,7 +452,7 @@ class TransactionRiskReviewTest extends TestCase
         TransactionRiskReview::query()->create([
             'zakat_transaction_id' => $txA->id,
             'group_no_transaksi' => $txA->no_transaksi,
-            'risk_level' => TransactionRiskReview::LEVEL_SUSPICIOUS,
+            'risk_level' => TransactionRiskReview::LEVEL_WARNING,
             'risk_score' => 80,
             'risk_flags' => ['exact_duplicate'],
             'reasons' => ['Kandidat duplikasi kuat.'],
@@ -412,11 +478,11 @@ class TransactionRiskReviewTest extends TestCase
         $this->actingAs($admin)
             ->get('/internal/history')
             ->assertOk()
-            ->assertSee('Suspicious')
+            ->assertSee('Warning')
             ->assertSee('Tindak Lanjut');
 
         $this->actingAs($admin)
-            ->get('/internal/history?risk_level=suspicious')
+            ->get('/internal/history?risk_level=warning')
             ->assertOk()
             ->assertSee('Pembayar A')
             ->assertDontSee('Pembayar B');
@@ -438,8 +504,8 @@ class TransactionRiskReviewTest extends TestCase
             'group_no_transaksi' => $tx->no_transaksi,
             'risk_level' => TransactionRiskReview::LEVEL_WARNING,
             'risk_score' => 25,
-            'risk_flags' => ['fitrah_cash_mismatch'],
-            'reasons' => ['Nominal fitrah tidak sesuai standar 1 jiwa pada tahun 2026.'],
+            'risk_flags' => ['updated_after_receipt_printed'],
+            'reasons' => ['Transaksi diubah setelah kwitansi pernah dicetak dan perlu verifikasi ulang.'],
             'duplicate_candidates' => [
                 [
                     'transaction_id' => 999,
@@ -459,19 +525,54 @@ class TransactionRiskReviewTest extends TestCase
             ->get('/internal/anomalies/' . $tx->no_transaksi)
             ->assertOk()
             ->assertSee('Detail Review Anomali')
-            ->assertSee('Nominal fitrah tidak sesuai standar 1 jiwa pada tahun 2026.')
+            ->assertSee('Transaksi diubah setelah kwitansi pernah dicetak dan perlu verifikasi ulang.')
             ->assertSee('TRX-20260516-0099');
 
         $this->actingAs($admin)
             ->patch('/internal/anomalies/' . $tx->no_transaksi . '/review-status', [
                 'review_status' => TransactionRiskReview::REVIEW_AMAN,
+                'review_note' => 'Sudah dicek ulang dan tidak ditemukan masalah.',
             ])
             ->assertRedirect('/internal/anomalies/' . $tx->no_transaksi);
 
         $this->assertDatabaseHas('transaction_risk_reviews', [
             'zakat_transaction_id' => $tx->id,
             'review_status' => TransactionRiskReview::REVIEW_AMAN,
+            'review_note' => 'Sudah dicek ulang dan tidak ditemukan masalah.',
             'reviewed_by' => $admin->id,
+        ]);
+    }
+
+    public function test_follow_up_review_requires_operator_note(): void
+    {
+        $admin = User::factory()->create(['role' => User::ROLE_ADMIN]);
+        $tx = $this->makeTransaction('TRX-20260516-0109', 'Pembayar Follow Up', 100000, $admin->id);
+
+        TransactionRiskReview::query()->create([
+            'zakat_transaction_id' => $tx->id,
+            'group_no_transaksi' => $tx->no_transaksi,
+            'risk_level' => TransactionRiskReview::LEVEL_WARNING,
+            'risk_score' => 55,
+            'risk_flags' => ['exact_duplicate'],
+            'reasons' => ['Butuh klarifikasi tambahan dari operator.'],
+            'duplicate_candidates' => [],
+            'detector_version' => 'v1',
+            'review_status' => TransactionRiskReview::REVIEW_BELUM_DITINJAU,
+            'checked_at' => now(config('zakat.timezone')),
+        ]);
+
+        $this->from('/internal/anomalies/' . $tx->no_transaksi)
+            ->actingAs($admin)
+            ->patch('/internal/anomalies/' . $tx->no_transaksi . '/review-status', [
+                'review_status' => TransactionRiskReview::REVIEW_PERLU_TINDAK_LANJUT,
+                'review_note' => '',
+            ])
+            ->assertRedirect('/internal/anomalies/' . $tx->no_transaksi)
+            ->assertSessionHasErrors('review_note');
+
+        $this->assertDatabaseHas('transaction_risk_reviews', [
+            'zakat_transaction_id' => $tx->id,
+            'review_status' => TransactionRiskReview::REVIEW_BELUM_DITINJAU,
         ]);
     }
 
@@ -484,7 +585,7 @@ class TransactionRiskReviewTest extends TestCase
         TransactionRiskReview::query()->create([
             'zakat_transaction_id' => $txA->id,
             'group_no_transaksi' => $txA->no_transaksi,
-            'risk_level' => TransactionRiskReview::LEVEL_SUSPICIOUS,
+            'risk_level' => TransactionRiskReview::LEVEL_WARNING,
             'risk_score' => 80,
             'risk_flags' => ['exact_duplicate'],
             'reasons' => ['Kandidat duplikasi kuat.'],
@@ -499,8 +600,8 @@ class TransactionRiskReviewTest extends TestCase
             'group_no_transaksi' => $txB->no_transaksi,
             'risk_level' => TransactionRiskReview::LEVEL_WARNING,
             'risk_score' => 25,
-            'risk_flags' => ['infaq_outlier'],
-            'reasons' => ['Nominal infaq jauh dari pola biasa.'],
+            'risk_flags' => ['updated_after_receipt_printed'],
+            'reasons' => ['Transaksi diubah setelah kwitansi pernah dicetak dan perlu verifikasi ulang.'],
             'duplicate_candidates' => [],
             'detector_version' => 'v1',
             'review_status' => TransactionRiskReview::REVIEW_AMAN,
@@ -531,6 +632,182 @@ class TransactionRiskReviewTest extends TestCase
             ->assertDontSee('Pembayar Anomali B');
     }
 
+    public function test_mixed_group_review_status_stays_pending_across_history_and_anomaly_views(): void
+    {
+        $admin = User::factory()->create(['role' => User::ROLE_ADMIN]);
+        $muzakkiA = Muzakki::query()->create(['name' => 'Muzakki Mixed A']);
+        $muzakkiB = Muzakki::query()->create(['name' => 'Muzakki Mixed B']);
+
+        $txA = ZakatTransaction::query()->create([
+            'no_transaksi' => 'TRX-20260527-0901',
+            'muzakki_id' => $muzakkiA->id,
+            'pembayar_nama' => 'Pembayar Mixed',
+            'pembayar_phone' => '08120001',
+            'pembayar_alamat' => 'Jakarta',
+            'shift' => ZakatTransaction::SHIFT_PAGI,
+            'category' => ZakatTransaction::CATEGORY_MAL,
+            'tahun_zakat' => 2026,
+            'metode' => ZakatTransaction::METHOD_UANG,
+            'nominal_uang' => 100000,
+            'petugas_id' => $admin->id,
+            'status' => ZakatTransaction::STATUS_VALID,
+            'waktu_terima' => now(config('zakat.timezone')),
+        ]);
+
+        $txB = ZakatTransaction::query()->create([
+            'no_transaksi' => 'TRX-20260527-0901',
+            'muzakki_id' => $muzakkiB->id,
+            'pembayar_nama' => 'Pembayar Mixed',
+            'pembayar_phone' => '08120001',
+            'pembayar_alamat' => 'Jakarta',
+            'shift' => ZakatTransaction::SHIFT_PAGI,
+            'category' => ZakatTransaction::CATEGORY_MAL,
+            'tahun_zakat' => 2026,
+            'metode' => ZakatTransaction::METHOD_UANG,
+            'nominal_uang' => 150000,
+            'petugas_id' => $admin->id,
+            'status' => ZakatTransaction::STATUS_VALID,
+            'waktu_terima' => now(config('zakat.timezone'))->addMinute(),
+        ]);
+
+        TransactionRiskReview::query()->create([
+            'zakat_transaction_id' => $txA->id,
+            'group_no_transaksi' => $txA->no_transaksi,
+            'risk_level' => TransactionRiskReview::LEVEL_WARNING,
+            'risk_score' => 80,
+            'risk_flags' => ['exact_duplicate'],
+            'reasons' => ['Perlu ditinjau ulang.'],
+            'duplicate_candidates' => [],
+            'detector_version' => 'v1',
+            'review_status' => TransactionRiskReview::REVIEW_AMAN,
+            'reviewed_by' => $admin->id,
+            'reviewed_at' => now(config('zakat.timezone'))->subMinute(),
+            'checked_at' => now(config('zakat.timezone'))->subMinute(),
+        ]);
+
+        TransactionRiskReview::query()->create([
+            'zakat_transaction_id' => $txB->id,
+            'group_no_transaksi' => $txB->no_transaksi,
+            'risk_level' => TransactionRiskReview::LEVEL_WARNING,
+            'risk_score' => 60,
+            'risk_flags' => ['updated_after_receipt_printed'],
+            'reasons' => ['Masih ada row yang belum ditinjau.'],
+            'duplicate_candidates' => [],
+            'detector_version' => 'v1',
+            'review_status' => TransactionRiskReview::REVIEW_BELUM_DITINJAU,
+            'checked_at' => now(config('zakat.timezone')),
+        ]);
+
+        $this->actingAs($admin)
+            ->get('/internal/history?review_status=aman')
+            ->assertOk()
+            ->assertDontSee('Pembayar Mixed');
+
+        $this->actingAs($admin)
+            ->get('/internal/history?review_status=belum_ditinjau')
+            ->assertOk()
+            ->assertSee('Pembayar Mixed')
+            ->assertSee('Belum Review');
+
+        $this->actingAs($admin)
+            ->get('/internal/anomalies')
+            ->assertOk()
+            ->assertSee('Pembayar Mixed');
+
+        $this->actingAs($admin)
+            ->get('/internal/anomalies/' . $txA->no_transaksi)
+            ->assertOk()
+            ->assertSee('Belum Ditinjau')
+            ->assertDontSee('Status Review</p><p class="mt-1 text-sm font-semibold text-slate-800">Aman', false);
+    }
+
+    public function test_deleted_warning_row_is_ignored_by_active_anomaly_views(): void
+    {
+        $admin = User::factory()->create(['role' => User::ROLE_ADMIN]);
+        $tx = $this->makeTransaction('TRX-20260516-0110', 'Pembayar Hapus Warning', 100000, $admin->id);
+
+        TransactionRiskReview::query()->create([
+            'zakat_transaction_id' => $tx->id,
+            'group_no_transaksi' => $tx->no_transaksi,
+            'risk_level' => TransactionRiskReview::LEVEL_WARNING,
+            'risk_score' => 80,
+            'risk_flags' => ['exact_duplicate'],
+            'reasons' => ['Kandidat duplikasi kuat.'],
+            'duplicate_candidates' => [],
+            'detector_version' => 'v1',
+            'review_status' => TransactionRiskReview::REVIEW_BELUM_DITINJAU,
+            'checked_at' => now(config('zakat.timezone')),
+        ]);
+
+        $this->actingAs($admin)
+            ->post('/internal/transactions/' . $tx->id . '/trash', [
+                'deleted_reason' => 'Hide old warning',
+            ])
+            ->assertRedirect();
+
+        $this->actingAs($admin)
+            ->get('/internal/anomalies')
+            ->assertOk()
+            ->assertSee('Belum ada kasus anomali aktif untuk filter ini.');
+
+        $this->actingAs($admin)
+            ->get('/internal/anomalies?flag_type=exact_duplicate')
+            ->assertOk()
+            ->assertDontSee('Pembayar Hapus Warning');
+    }
+
+    public function test_active_anomaly_queue_prioritizes_pending_review_then_higher_score(): void
+    {
+        $admin = User::factory()->create(['role' => User::ROLE_ADMIN]);
+        $txHighPending = $this->makeTransaction('TRX-20260516-0120', 'Pending Tinggi', 100000, $admin->id);
+        $txLowPending = $this->makeTransaction('TRX-20260516-0121', 'Pending Rendah', 100000, $admin->id);
+        $txFollowUp = $this->makeTransaction('TRX-20260516-0122', 'Follow Up', 100000, $admin->id);
+
+        TransactionRiskReview::query()->create([
+            'zakat_transaction_id' => $txHighPending->id,
+            'group_no_transaksi' => $txHighPending->no_transaksi,
+            'risk_level' => TransactionRiskReview::LEVEL_WARNING,
+            'risk_score' => 90,
+            'risk_flags' => ['exact_duplicate'],
+            'reasons' => ['Prioritas paling tinggi.'],
+            'duplicate_candidates' => [],
+            'detector_version' => 'v1',
+            'review_status' => TransactionRiskReview::REVIEW_BELUM_DITINJAU,
+            'checked_at' => now(config('zakat.timezone')),
+        ]);
+
+        TransactionRiskReview::query()->create([
+            'zakat_transaction_id' => $txLowPending->id,
+            'group_no_transaksi' => $txLowPending->no_transaksi,
+            'risk_level' => TransactionRiskReview::LEVEL_WARNING,
+            'risk_score' => 20,
+            'risk_flags' => ['updated_after_receipt_printed'],
+            'reasons' => ['Prioritas lebih rendah.'],
+            'duplicate_candidates' => [],
+            'detector_version' => 'v1',
+            'review_status' => TransactionRiskReview::REVIEW_BELUM_DITINJAU,
+            'checked_at' => now(config('zakat.timezone')),
+        ]);
+
+        TransactionRiskReview::query()->create([
+            'zakat_transaction_id' => $txFollowUp->id,
+            'group_no_transaksi' => $txFollowUp->no_transaksi,
+            'risk_level' => TransactionRiskReview::LEVEL_WARNING,
+            'risk_score' => 95,
+            'risk_flags' => ['significant_nominal_change'],
+            'reasons' => ['Perlu tindak lanjut tapi bukan pending baru.'],
+            'duplicate_candidates' => [],
+            'detector_version' => 'v1',
+            'review_status' => TransactionRiskReview::REVIEW_PERLU_TINDAK_LANJUT,
+            'checked_at' => now(config('zakat.timezone')),
+        ]);
+
+        $this->actingAs($admin)
+            ->get('/internal/anomalies')
+            ->assertOk()
+            ->assertSeeInOrder(['Pending Tinggi', 'Pending Rendah', 'Follow Up']);
+    }
+
     public function test_guest_cannot_access_risk_review_endpoints(): void
     {
         $admin = User::factory()->create(['role' => User::ROLE_ADMIN]);
@@ -554,8 +831,8 @@ class TransactionRiskReviewTest extends TestCase
             'group_no_transaksi' => $tx->no_transaksi,
             'risk_level' => TransactionRiskReview::LEVEL_WARNING,
             'risk_score' => 25,
-            'risk_flags' => ['fitrah_cash_mismatch'],
-            'reasons' => ['Butuh cek ulang.'],
+            'risk_flags' => ['updated_after_receipt_printed'],
+            'reasons' => ['Transaksi diubah setelah kwitansi pernah dicetak dan perlu verifikasi ulang.'],
             'duplicate_candidates' => [],
             'detector_version' => 'v1',
             'review_status' => TransactionRiskReview::REVIEW_BELUM_DITINJAU,
@@ -579,14 +856,14 @@ class TransactionRiskReviewTest extends TestCase
         $this->actingAs($staff)
             ->get('/internal/history')
             ->assertOk()
-            ->assertDontSee('Suspicious')
+            ->assertDontSee('Warning')
             ->assertDontSee('Tindak Lanjut');
 
         $this->actingAs($staff)
             ->get('/internal/transactions/' . $tx->id)
             ->assertOk()
             ->assertDontSee('Review Risiko')
-            ->assertDontSee('Butuh cek ulang.');
+            ->assertDontSee('Transaksi diubah setelah kwitansi pernah dicetak dan perlu verifikasi ulang.');
     }
 
     private function seedDefaultsAndStaff(): User

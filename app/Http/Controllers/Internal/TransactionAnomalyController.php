@@ -38,18 +38,35 @@ class TransactionAnomalyController extends Controller
     ): RedirectResponse {
         $validated = $request->validate([
             'review_status' => ['required', 'string', Rule::in(TransactionRiskReview::REVIEW_STATUSES)],
+            'review_note' => [
+                Rule::requiredIf(fn () => $request->input('review_status') === TransactionRiskReview::REVIEW_PERLU_TINDAK_LANJUT),
+                'nullable',
+                'string',
+                'max:1000',
+            ],
         ]);
 
         $tx = ZakatTransaction::query()->where('no_transaksi', $noTransaksi)->firstOrFail();
         $beforeReview = $reviewAssistantService->detailReviewForGroup($noTransaksi);
-        $reviewAssistantService->updateGroupReviewStatus($noTransaksi, $validated['review_status'], (int) $request->user()->id);
+        $reviewNote = isset($validated['review_note']) ? trim((string) $validated['review_note']) : null;
+        $reviewAssistantService->updateGroupReviewStatus(
+            $noTransaksi,
+            $validated['review_status'],
+            filled($reviewNote) ? $reviewNote : null,
+            (int) $request->user()->id
+        );
         $afterReview = $reviewAssistantService->detailReviewForGroup($noTransaksi);
 
-        if (($beforeReview['review_status'] ?? null) !== ($afterReview['review_status'] ?? null)) {
+        if (
+            ($beforeReview['review_status'] ?? null) !== ($afterReview['review_status'] ?? null)
+            || ($beforeReview['review_note'] ?? null) !== ($afterReview['review_note'] ?? null)
+        ) {
             Audit::log($request, 'transaction.risk_review_status_updated', $tx, [
                 'no_transaksi' => $noTransaksi,
                 'previous_review_status' => $beforeReview['review_status'] ?? null,
                 'new_review_status' => $afterReview['review_status'] ?? null,
+                'previous_review_note' => $beforeReview['review_note'] ?? null,
+                'new_review_note' => $afterReview['review_note'] ?? null,
                 'risk_level' => $afterReview['risk_level'] ?? null,
             ]);
         }

@@ -8,7 +8,7 @@
                     </svg>
                     Review Anomali
                 </h2>
-                <p class="text-sm text-slate-500">Workspace admin untuk meninjau transaksi yang terdeteksi perlu dicek ulang.</p>
+                <p class="text-sm text-slate-500">Antrean admin untuk memeriksa warning transaksi, menutup kasus yang aman, dan menandai kasus yang perlu tindak lanjut.</p>
             </div>
             <a href="{{ route('internal.transactions.index') }}" class="ui-btn ui-btn-secondary w-full sm:w-auto">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -21,10 +21,9 @@
 
     <div class="py-6 sm:py-10">
         <div class="mx-auto max-w-7xl space-y-6 sm:px-6 lg:px-8">
-            <div class="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-6">
+            <div class="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-5">
                 <x-ui-stat-card title="Total Kasus" :value="$overview['totalGroups']" description="Grup transaksi sesuai filter." />
-                <x-ui-stat-card title="Suspicious" :value="$overview['suspiciousGroups']" description="Perlu verifikasi prioritas." tone="danger" />
-                <x-ui-stat-card title="Warning" :value="$overview['warningGroups']" description="Butuh cek manual ringan." tone="warning" />
+                <x-ui-stat-card title="Warning" :value="$overview['warningGroups']" description="Kasus yang perlu dicek admin." tone="warning" />
                 <x-ui-stat-card title="Belum Review" :value="$overview['pendingReviewGroups']" description="Belum diputuskan admin." tone="muted" />
                 <x-ui-stat-card title="Aman" :value="$overview['safeReviewGroups']" description="Sudah ditutup aman." tone="info" />
                 <x-ui-stat-card title="Tindak Lanjut" :value="$overview['followUpGroups']" description="Masih perlu aksi lanjutan." tone="danger" />
@@ -50,13 +49,13 @@
 
                         <p class="text-sm text-slate-500">
                             {{ ($scope ?? 'active') === 'archived'
-                                ? 'Kasus yang sudah ditutup aman dipindahkan ke arsip review.'
-                                : 'Kasus aktif hanya menampilkan warning atau suspicious yang masih perlu perhatian admin.' }}
+                                ? 'Kasus yang sudah ditutup aman dipindahkan ke arsip review agar antrean aktif tetap ringkas.'
+                                : 'Kasus aktif hanya menampilkan warning yang masih perlu perhatian admin.' }}
                         </p>
                     </div>
                 </div>
 
-                <div class="ui-toolbar lg:flex-col xl:flex-row xl:items-start">
+                <div class="ui-toolbar-soft lg:flex-col xl:flex-row xl:items-start">
                     <div class="max-w-full space-y-1 xl:max-w-[280px] xl:flex-none">
                         <div class="ui-section-title">
                             <div class="h-6 w-2 rounded-full bg-amber-500"></div>
@@ -64,8 +63,8 @@
                         </div>
                         <p class="text-sm leading-6 text-slate-500">
                             {{ ($scope ?? 'active') === 'archived'
-                                ? 'Lihat kembali kasus yang sudah ditutup aman tanpa mengganggu antrean kerja aktif.'
-                                : 'Filter kasus aktif, lalu buka detail untuk keputusan review admin.' }}
+                                ? 'Lihat kembali kasus yang sudah selesai tanpa mengganggu antrean kerja aktif.'
+                                : 'Utamakan kasus belum ditinjau, buka detail, lalu putuskan apakah aman atau perlu tindak lanjut.' }}
                         </p>
                     </div>
 
@@ -113,9 +112,9 @@
 
                         <div class="relative w-full sm:min-w-[150px] sm:flex-[1_1_150px] xl:max-w-[170px]">
                             <select name="risk_level" class="ui-select w-full appearance-none pr-10">
-                                <option value="">Semua Risiko</option>
+                                <option value="">Semua Level</option>
                                 @foreach ($riskLevels ?? [] as $level)
-                                    <option value="{{ $level }}" @selected(($risk_level ?? '') === $level)>{{ ucfirst($level) }}</option>
+                                    <option value="{{ $level }}" @selected(($risk_level ?? '') === $level)>{{ \App\Models\TransactionRiskReview::levelLabel($level) }}</option>
                                 @endforeach
                             </select>
                             <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-gray-400">
@@ -127,7 +126,7 @@
                             <select name="review_status" class="ui-select w-full appearance-none pr-10">
                                 <option value="">Semua Review</option>
                                 @foreach ($reviewStatuses ?? [] as $statusValue)
-                                    <option value="{{ $statusValue }}" @selected(($review_status ?? '') === $statusValue)>{{ str_replace('_', ' ', ucfirst($statusValue)) }}</option>
+                                    <option value="{{ $statusValue }}" @selected(($review_status ?? '') === $statusValue)>{{ \App\Models\TransactionRiskReview::reviewStatusLabel($statusValue) }}</option>
                                 @endforeach
                             </select>
                             <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-gray-400">
@@ -135,7 +134,7 @@
                             </div>
                         </div>
 
-                        <button type="submit" class="ui-btn ui-btn-primary w-full sm:w-auto sm:flex-none">
+                        <button type="submit" class="ui-btn ui-btn-secondary w-full sm:w-auto sm:flex-none">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                             </svg>
@@ -148,13 +147,16 @@
                     </form>
                 </div>
 
+                @if (($scope ?? 'active') === 'active')
+                    <div class="border-t border-gray-100 bg-amber-50/60 px-4 py-3 text-sm leading-6 text-amber-900 sm:px-6">
+                        Warning bukan berarti transaksi salah. Halaman ini dipakai untuk memeriksa sinyal sistem, lalu memutuskan apakah kasus cukup ditutup aman atau perlu tindak lanjut.
+                    </div>
+                @endif
+
                 <div class="space-y-4 p-4 md:hidden">
                     @forelse ($groups as $group)
                         @php
                             $groupTime = ($group->waktu_terima ?? $group->created_at)?->timezone('Asia/Jakarta');
-                            $primaryFlagLabel = $group->primary_flag
-                                ? (\App\Services\Transactions\TransactionAnomalyService::flagLabels()[$group->primary_flag] ?? str_replace('_', ' ', $group->primary_flag))
-                                : '-';
                         @endphp
                         <article class="ui-mobile-card border-amber-100">
                             <div class="flex items-start justify-between gap-3">
@@ -171,27 +173,27 @@
                                 <x-risk-level-badge :level="$group->risk_level" />
                             </div>
 
-                            <div class="ui-mobile-card-muted grid grid-cols-1 gap-3 text-sm sm:grid-cols-2">
-                                <div class="space-y-1">
-                                    <p class="text-[11px] font-semibold uppercase tracking-wide text-slate-400">Kategori</p>
-                                    <x-zakat-category-tags :categories="$group->categories_list" />
+                            <div class="ui-mobile-meta-grid">
+                                <div class="ui-mobile-meta-item col-span-2">
+                                    <p class="ui-mobile-meta-label">Kategori</p>
+                                    <div class="mt-1">
+                                        <x-zakat-category-tags :categories="$group->categories_list" />
+                                    </div>
                                 </div>
-                                <div class="space-y-1">
-                                    <p class="text-[11px] font-semibold uppercase tracking-wide text-slate-400">Review</p>
+                                <div class="ui-mobile-meta-item">
+                                    <p class="ui-mobile-meta-label">Review</p>
                                     <x-review-status-badge :status="$group->review_status" />
                                 </div>
-                                <div class="space-y-1">
-                                    <p class="text-[11px] font-semibold uppercase tracking-wide text-slate-400">Flag Utama</p>
-                                    <p class="text-sm leading-5 text-slate-600">{{ $primaryFlagLabel }}</p>
+                                <div class="ui-mobile-meta-item">
+                                    <p class="ui-mobile-meta-label">Petugas</p>
+                                    <div class="ui-mobile-meta-value">{{ $group->petugas?->name ?? '-' }}</div>
+                                    <span class="mt-1 inline-flex items-center justify-center rounded px-2 py-0.5 text-[11px] font-bold uppercase bg-emerald-50 text-emerald-700 border border-emerald-100 whitespace-nowrap leading-tight text-center">
+                                        {{ $group->shift_label }}
+                                    </span>
                                 </div>
-                                <div class="space-y-1">
-                                    <p class="text-[11px] font-semibold uppercase tracking-wide text-slate-400">Petugas</p>
-                                    <div class="space-y-1">
-                                        <p class="font-semibold text-slate-700">{{ $group->petugas?->name ?? '-' }}</p>
-                                        <span class="inline-flex items-center rounded-md border border-emerald-100 bg-emerald-50 px-2 py-1 text-[11px] font-bold uppercase text-emerald-700">
-                                            {{ $group->shift_label }}
-                                        </span>
-                                    </div>
+                                <div class="ui-mobile-meta-item col-span-2">
+                                    <p class="ui-mobile-meta-label">Flag Utama</p>
+                                    <p class="mt-1 text-sm leading-6 text-slate-600">{{ $group->primary_flag_label ?? '-' }}</p>
                                 </div>
                             </div>
 
@@ -199,7 +201,7 @@
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                                 </svg>
-                                Buka Review
+                                Tinjau Kasus
                             </a>
                         </article>
                     @empty
@@ -261,7 +263,7 @@
                                         </div>
                                     </td>
                                     <td class="px-3 py-4 sm:px-6">
-                                        <div class="max-w-[220px] text-sm leading-5 text-gray-600">{{ $group->primary_flag ? (\App\Services\Transactions\TransactionAnomalyService::flagLabels()[$group->primary_flag] ?? str_replace('_', ' ', $group->primary_flag)) : '-' }}</div>
+                                        <div class="max-w-[220px] text-sm leading-5 text-gray-600">{{ $group->primary_flag_label ?? '-' }}</div>
                                     </td>
                                     <td class="px-3 py-4 text-center whitespace-nowrap">
                                         <x-review-status-badge :status="$group->review_status" />
@@ -295,6 +297,13 @@
                                                     ? 'Belum ada kasus aman di riwayat review untuk filter ini.'
                                                     : 'Belum ada kasus anomali aktif untuk filter ini.' }}
                                             </span>
+                                            @if ($groups->total() > 0 && request()->has('page') && request('page') > 1)
+                                                <div class="mt-4">
+                                                    <a href="{{ request()->fullUrlWithQuery(['page' => 1]) }}" class="ui-btn ui-btn-secondary">
+                                                        Kembali ke Halaman 1
+                                                    </a>
+                                                </div>
+                                            @endif
                                         </div>
                                     </td>
                                 </tr>

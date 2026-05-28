@@ -37,7 +37,7 @@
 
             <div class="ui-card overflow-hidden">
                 @if ($user)
-                    <div class="border-b border-emerald-50 bg-gradient-to-br from-white via-emerald-50/30 to-white px-6 py-5">
+                    <div class="ui-inline-note border-b border-emerald-100/70 rounded-none">
                         <div class="text-xs font-black uppercase tracking-[0.18em] text-emerald-700">Akun yang Diedit</div>
                         <div class="mt-1 text-lg font-black text-slate-900">{{ $user->name }}</div>
                         <div class="mt-0.5 text-sm font-semibold text-emerald-700">{{ '@' . $user->username }} - {{ $roleLabels[$user->role] ?? ucfirst($user->role) }}</div>

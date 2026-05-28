@@ -17,3 +17,5 @@ yarn-error.log
 /log_tail.txt
 /backups/*.sql
 /*.sql
+/tmp/
+/.playwright-cli/

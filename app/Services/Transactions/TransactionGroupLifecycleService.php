@@ -3,6 +3,7 @@
 namespace App\Services\Transactions;
 
 use App\Models\User;
+use App\Models\TransactionRiskReview;
 use App\Models\ZakatTransaction;
 use App\Support\Audit;
 use Illuminate\Http\Request;
@@ -126,6 +127,10 @@ class TransactionGroupLifecycleService
         $noTransaksi = $transaction->no_transaksi;
 
         DB::transaction(function () use ($noTransaksi, $request) {
+            TransactionRiskReview::query()
+                ->whereIn('zakat_transaction_id', ZakatTransaction::onlyTrashed()->where('no_transaksi', $noTransaksi)->select('id'))
+                ->delete();
+
             $affected = ZakatTransaction::onlyTrashed()
                 ->where('no_transaksi', $noTransaksi)
                 ->forceDelete();

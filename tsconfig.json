@@ -5,7 +5,8 @@
         "target": "ES2020",
         "module": "ESNext",
         "moduleResolution": "Node",
-        "baseUrl": "."
+        "baseUrl": ".",
+        "noEmit": true
     },
     "include": [
         "resources/js/**/*.js",

@@ -57,7 +57,7 @@
 
             {{-- Table --}}
             <div class="ui-card overflow-hidden shadow-md">
-                <div class="ui-toolbar">
+                <div class="ui-toolbar-soft">
                     <div class="flex items-center gap-2">
                         <div class="h-6 w-2 rounded-full bg-amber-500"></div>
                         <h3 class="font-bold text-gray-800">Daftar Tempat Sampah</h3>
@@ -72,7 +72,7 @@
                                 </svg>
                             </button>
                             @if($q)
-                                <a href="{{ route('internal.muzakki.trash') }}" class="p-2 text-gray-400 hover:text-red-500 transition-all" title="Reset">
+                                <a href="{{ route('internal.muzakki.trash') }}" class="ui-icon-button ui-icon-button-danger" title="Reset">
                                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                         <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
                                     </svg>
@@ -96,22 +96,20 @@
                                 @endif
                             </div>
 
-                            <div class="ui-mobile-card-muted space-y-3 text-sm">
-                                <div class="space-y-1">
-                                    <p class="text-[11px] font-semibold uppercase tracking-wide text-slate-400">Alamat</p>
-                                    <p class="text-sm leading-5 text-slate-600">{!! \App\Support\Format::highlight($m->address ?? '-', $q) !!}</p>
+                            <div class="ui-mobile-meta-grid">
+                                <div class="ui-mobile-meta-item col-span-2">
+                                    <p class="ui-mobile-meta-label">Alamat</p>
+                                    <p class="mt-1 text-sm leading-6 text-slate-600">{!! \App\Support\Format::highlight($m->address ?? '-', $q) !!}</p>
                                 </div>
-                                <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
-                                    <div class="space-y-1">
-                                        <p class="text-[11px] font-semibold uppercase tracking-wide text-slate-400">Waktu Hapus</p>
-                                        <p class="text-sm font-medium text-slate-700">{{ $m->deleted_at_formatted }}</p>
-                                    </div>
-                                    <div class="space-y-1">
-                                        <p class="text-[11px] font-semibold uppercase tracking-wide text-slate-400">Status</p>
-                                        <p class="text-sm font-medium text-slate-700">
-                                            {{ $m->days_left === null ? 'Countdown belum tersedia' : ($m->days_left > 0 ? 'Menunggu auto-delete' : 'Siap dihapus hari ini') }}
-                                        </p>
-                                    </div>
+                                <div class="ui-mobile-meta-item">
+                                    <p class="ui-mobile-meta-label">Waktu Hapus</p>
+                                    <p class="ui-mobile-meta-value">{{ $m->deleted_at_formatted }}</p>
+                                </div>
+                                <div class="ui-mobile-meta-item">
+                                    <p class="ui-mobile-meta-label">Status</p>
+                                    <p class="ui-mobile-meta-value">
+                                        {{ $m->days_left === null ? 'Countdown belum tersedia' : ($m->days_left > 0 ? 'Menunggu auto-delete' : 'Siap dihapus hari ini') }}
+                                    </p>
                                 </div>
                             </div>
 
@@ -162,7 +160,7 @@
                         <tbody class="divide-y divide-gray-50">
                             @if (count($muzakki) > 0)
                                 @foreach ($muzakki as $m)
-                                <tr class="hover:bg-gray-50 transition-colors">
+                                <tr class="transition-colors hover:bg-slate-50/70">
                                     <td class="px-6 py-4 font-bold text-gray-800">
                                         {!! \App\Support\Format::highlight($m->name, $q) !!}
                                         <div class="text-[10px] text-gray-400 font-medium">HP: {{ $m->phone ?? '-' }}</div>
@@ -182,7 +180,7 @@
                                         <div class="flex items-center justify-center gap-3">
                                             <form method="POST" action="{{ route('internal.muzakki.restore', $m->id) }}">
                                                 @csrf
-                                                <button type="submit" class="inline-flex items-center gap-1.5 rounded-lg bg-emerald-600 px-3 py-1.5 text-xs font-bold text-white shadow-sm hover:bg-emerald-700 transition-all">
+                                                <button type="submit" class="ui-btn ui-btn-primary px-3 py-2 text-xs">
                                                     <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
                                                     </svg>
@@ -190,7 +188,7 @@
                                                 </button>
                                             </form>
 
-                                            <button type="button" x-data x-on:click="$dispatch('open-modal', 'force-delete-muzakki-modal'); $dispatch('open-force-delete-modal', { id: {{ $m->id }}, name: '{{ addslashes($m->name) }}' })" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-red-600 text-xs font-bold text-white shadow-sm hover:bg-red-700 transition-all">
+                                            <button type="button" x-data x-on:click="$dispatch('open-modal', 'force-delete-muzakki-modal'); $dispatch('open-force-delete-modal', { id: {{ $m->id }}, name: '{{ addslashes($m->name) }}' })" class="ui-btn ui-btn-danger px-3 py-2 text-xs">
                                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                                                 </svg>
@@ -203,11 +201,11 @@
                             @else
                                 <tr>
                                     <td colspan="5" class="px-6 py-12 text-center">
-                                        <div class="flex flex-col items-center">
+                                        <div class="ui-empty-state-box flex flex-col items-center">
                                             <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 text-gray-200 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
                                             </svg>
-                                            <span class="text-sm font-bold text-gray-400">
+                                            <span class="ui-empty-state-copy font-bold">
                                                 {{ ($q ?? '') ? 'Data tidak ditemukan.' : 'Belum ada data muzakki di sampah.' }}
                                             </span>
                                         </div>

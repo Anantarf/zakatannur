@@ -15,11 +15,8 @@
             
             {{-- session('status') is handled globally by the app layout toast --}}
 
-            <div class="ui-card-strong overflow-hidden relative">
-                <!-- Subtle Emerald Accent -->
-                <div class="absolute inset-0 bg-gradient-to-br from-emerald-50/20 via-white to-white pointer-events-none"></div>
-                
-                <div class="relative z-10">
+            <div class="ui-card-strong overflow-hidden">
+                <div>
                     <!-- Penyetor & Meta Header -->
                     <div class="px-6 py-5 sm:px-8 sm:py-6 border-b border-gray-100/80">
                          <div class="flex flex-col sm:flex-row justify-between items-center sm:items-start gap-3 sm:gap-4 mb-6 text-center sm:text-left">
@@ -60,16 +57,16 @@
                                             </span>
                                         </div>
 
-                                        <div class="ui-mobile-card-muted space-y-3">
-                                            <div class="flex items-start justify-between gap-3">
-                                                <span class="text-[10px] font-black uppercase tracking-widest text-gray-400">Kategori</span>
-                                                <div class="max-w-[65%]">
+                                        <div class="ui-mobile-meta-grid">
+                                            <div class="ui-mobile-meta-item col-span-2">
+                                                <p class="ui-mobile-meta-label">Kategori</p>
+                                                <div class="mt-1">
                                                     <x-zakat-category-tags :categories="[$tx->category]" />
                                                 </div>
                                             </div>
-                                            <div class="flex items-start justify-between gap-3">
-                                                <span class="text-[10px] font-black uppercase tracking-widest text-gray-400">Keterangan</span>
-                                                <div class="text-right text-xs font-medium text-gray-500">
+                                            <div class="ui-mobile-meta-item">
+                                                <p class="ui-mobile-meta-label">Keterangan</p>
+                                                <div class="mt-1 text-right text-xs font-medium text-gray-500">
                                                     @if($tx->category === 'fitrah' && $tx->jiwa)
                                                         <span class="px-2 py-1 bg-white rounded-md border border-gray-100 font-bold text-gray-600">{{ $tx->jiwa }} Jiwa</span>
                                                     @elseif($tx->category === 'fidyah' && $tx->hari)
@@ -79,9 +76,9 @@
                                                     @endif
                                                 </div>
                                             </div>
-                                            <div class="flex items-start justify-between gap-3">
-                                                <span class="text-[10px] font-black uppercase tracking-widest text-gray-400">Nominal</span>
-                                                <div class="text-right">
+                                            <div class="ui-mobile-meta-item">
+                                                <p class="ui-mobile-meta-label">Nominal</p>
+                                                <div class="mt-1 text-right">
                                                     <p class="text-sm font-bold tabular-nums text-gray-900">
                                                         @if($tx->metode === 'beras')
                                                             {{ rtrim(rtrim(number_format($tx->jumlah_beras_kg, 2, ',', '.'), '0'), ',') }} <span class="ml-0.5 text-[10px] font-bold text-gray-400">kg</span>
@@ -164,12 +161,10 @@
                         </div>
 
                         <!-- Info Petugas & Shift -->
-                        <div class="px-5 py-4 border-t border-gray-100 bg-gray-50/50 mt-2 rounded-xl">
-                            <span class="text-[10px] font-bold text-gray-400 uppercase tracking-widest block mb-1">
-                                Penerima/Shift
-                            </span>
+                        <div class="ui-panel-note mt-3">
+                            <span class="text-[10px] font-bold text-gray-400 uppercase tracking-widest block mb-1">Penerima/Shift</span>
                             <div class="flex items-center gap-2 mt-1">
-                                <div class="h-6 w-6 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center border border-emerald-200 shadow-sm">
+                                <div class="flex h-6 w-6 items-center justify-center rounded-full border border-emerald-200 bg-emerald-100 text-emerald-600">
                                     <svg class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                                     </svg>
@@ -182,11 +177,9 @@
 
                         <!-- Ringkasan Total Akhir -->
                         <div class="mt-6 pt-5 border-t-2 border-gray-100">
-                            <div class="flex flex-col items-center sm:items-end space-y-3 px-6 py-5 bg-emerald-50/50 rounded-2xl border border-emerald-100 bg-gradient-to-br from-emerald-50 to-white relative overflow-hidden shadow-inner">
-                                <div class="absolute top-0 right-0 -translate-y-1/2 translate-x-1/4 w-40 h-40 bg-emerald-500/5 rounded-full blur-3xl"></div>
-                                
+                            <div class="rounded-2xl border border-emerald-100 bg-emerald-50/60 px-6 py-5">
                                 @if($totalUang > 0)
-                                    <div class="flex items-center gap-4 relative z-10 w-full justify-between sm:justify-end">
+                                    <div class="flex w-full items-center justify-between gap-4 sm:justify-end">
                                         <span class="text-[10px] sm:text-[11px] font-black text-gray-400 uppercase tracking-[0.2em]">Total Uang</span>
                                         <div class="flex flex-col items-center sm:items-end">
                                             <p class="text-base sm:text-xl font-black text-slate-900 tabular-nums bg-white px-3 py-1 rounded-lg border border-emerald-100 shadow-sm">
@@ -203,7 +196,7 @@
                                     </div>
                                 @endif
                                 @if($totalBeras > 0)
-                                    <div class="flex items-center gap-4 relative z-10 w-full justify-between sm:justify-end {{ $totalUang > 0 ? 'pt-3 mt-1 border-t border-emerald-100/30' : '' }}">
+                                    <div class="flex w-full items-center justify-between gap-4 sm:justify-end {{ $totalUang > 0 ? 'mt-3 border-t border-emerald-100/70 pt-3' : '' }}">
                                         <span class="text-[10px] sm:text-[11px] font-black text-gray-400 uppercase tracking-[0.2em]">Total Beras</span>
                                         <p class="text-base sm:text-xl font-black text-amber-700 tabular-nums bg-white px-3 py-1 rounded-lg border border-amber-100 shadow-sm">
                                             {{ \App\Support\Format::kg((float)$totalBeras) }}
@@ -214,19 +207,19 @@
                         </div>
 
                         <!-- Footer Action Buttons -->
-                        <div class="mt-8 pt-6 border-t border-gray-100 flex flex-col sm:flex-row gap-3 px-2 sm:px-0">
-                             <a href="{{ route('internal.transactions.receipt', ['transaction' => $mainTx->id]) }}" target="_blank" class="ui-btn ui-btn-primary flex-1 px-6 py-4 text-base font-black sm:order-1">
+                        <div class="mt-8 grid gap-3 border-t border-gray-100 px-2 pt-6 sm:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_auto] sm:px-0">
+                             <a href="{{ route('internal.transactions.receipt', ['transaction' => $mainTx->id]) }}" target="_blank" class="ui-btn ui-btn-primary px-6 py-4 text-base font-black">
                                  <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" /></svg>
-                                 CETAK TANDA TERIMA
+                                 Cetak Tanda Terima
                              </a>
-                             <a href="{{ route('internal.transactions.create') }}" class="ui-btn ui-btn-accent flex-1 px-6 py-4 text-base font-black sm:order-2">
+                             <a href="{{ route('internal.transactions.create') }}" class="ui-btn ui-btn-accent px-6 py-4 text-base font-black">
                                  <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4" /></svg>
-                                 INPUT BARU
+                                 Input Baru
                              </a>
                              @can('update', $mainTx)
-                                 <a href="{{ route('internal.transactions.edit', ['transaction' => $mainTx->id]) }}" class="ui-btn ui-btn-secondary flex-none px-6 py-4 text-xs font-black uppercase tracking-widest sm:order-3">
+                                 <a href="{{ route('internal.transactions.edit', ['transaction' => $mainTx->id]) }}" class="ui-btn ui-btn-secondary px-6 py-4 text-xs font-black uppercase tracking-widest">
                                      <svg class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h14a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
-                                     EDIT
+                                     Ubah
                                  </a>
                              @endcan
                         </div>
@@ -234,7 +227,7 @@
                 </div>
             </div>
             
-            <p class="mt-6 text-center text-xs text-gray-400 font-semibold uppercase tracking-[0.3em] opacity-60">Dokumentasi Administrasi Masjid An-Nur</p>
+            <p class="mt-6 text-center text-xs font-semibold uppercase tracking-[0.3em] text-gray-400/80">Dokumentasi Administrasi Masjid An-Nur</p>
         </div>
     </div>
 </x-app-layout>

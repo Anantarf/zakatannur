@@ -21,13 +21,23 @@ class TransactionRiskReview extends Model
     public const LEVELS = [
         self::LEVEL_NORMAL,
         self::LEVEL_WARNING,
-        self::LEVEL_SUSPICIOUS,
+    ];
+
+    public const LEVEL_LABELS = [
+        self::LEVEL_NORMAL => 'Normal',
+        self::LEVEL_WARNING => 'Warning',
     ];
 
     public const REVIEW_STATUSES = [
         self::REVIEW_BELUM_DITINJAU,
         self::REVIEW_AMAN,
         self::REVIEW_PERLU_TINDAK_LANJUT,
+    ];
+
+    public const REVIEW_STATUS_LABELS = [
+        self::REVIEW_BELUM_DITINJAU => 'Belum Ditinjau',
+        self::REVIEW_AMAN => 'Aman',
+        self::REVIEW_PERLU_TINDAK_LANJUT => 'Tindak Lanjut',
     ];
 
     protected $fillable = [
@@ -40,6 +50,7 @@ class TransactionRiskReview extends Model
         'duplicate_candidates',
         'detector_version',
         'review_status',
+        'review_note',
         'reviewed_by',
         'reviewed_at',
         'checked_at',
@@ -50,6 +61,7 @@ class TransactionRiskReview extends Model
         'risk_flags' => 'array',
         'reasons' => 'array',
         'duplicate_candidates' => 'array',
+        'reviewed_by' => 'integer',
         'reviewed_at' => 'datetime',
         'checked_at' => 'datetime',
     ];
@@ -62,5 +74,15 @@ class TransactionRiskReview extends Model
     public function reviewer(): BelongsTo
     {
         return $this->belongsTo(User::class, 'reviewed_by');
+    }
+
+    public static function levelLabel(?string $level): string
+    {
+        return self::LEVEL_LABELS[$level] ?? 'Belum Analisis';
+    }
+
+    public static function reviewStatusLabel(?string $status): string
+    {
+        return self::REVIEW_STATUS_LABELS[$status] ?? 'Belum Ditinjau';
     }
 }

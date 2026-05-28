@@ -8,7 +8,7 @@
                     </svg>
                     Detail Review Anomali
                 </h2>
-                <p class="text-sm text-slate-500">Nomor transaksi {{ $noTransaksi }} sedang ditinjau oleh admin.</p>
+                <p class="text-sm text-slate-500">Tinjau sinyal sistem, verifikasi detail transaksi, lalu putuskan apakah kasus ini aman atau perlu tindak lanjut.</p>
             </div>
             <div class="flex flex-col gap-2 sm:flex-row">
                 <a href="{{ route('internal.transactions.show', ['transaction' => $mainTx->id]) }}" class="ui-btn ui-btn-secondary w-full sm:w-auto">
@@ -34,74 +34,94 @@
 
             <x-form-errors />
 
-            <div class="grid grid-cols-1 gap-6 xl:grid-cols-[minmax(0,1.3fr)_minmax(320px,0.7fr)]">
+            @php
+                $riskLevelLabel = \App\Models\TransactionRiskReview::levelLabel($riskReview['risk_level'] ?? null);
+                $reviewStatusLabel = \App\Models\TransactionRiskReview::reviewStatusLabel($riskReview['review_status'] ?? null);
+                $hasDuplicateCandidates = !empty($riskReview['duplicate_candidates']);
+            @endphp
+
+            <div class="grid grid-cols-1 gap-6 xl:grid-cols-[minmax(0,1.4fr)_minmax(320px,0.6fr)]">
                 <div class="space-y-6">
                     <div class="ui-card-strong overflow-hidden">
                         <div class="border-b border-gray-100/80 px-6 py-5 sm:px-8 sm:py-6">
-                            <div class="mb-5 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-                                <div>
-                                    <p class="mb-1 text-[10px] font-black uppercase tracking-[0.2em] text-gray-400">Nomor Transaksi</p>
-                                    <h3 class="inline-block rounded-lg border border-emerald-100 bg-emerald-50 px-3 py-1 text-base font-bold text-emerald-700 sm:text-lg">{{ $noTransaksi }}</h3>
+                            <div class="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+                                <div class="space-y-3">
+                                    <div class="flex flex-wrap items-center gap-2">
+                                        <x-risk-level-badge :level="$riskReview['risk_level'] ?? null" />
+                                        <x-review-status-badge :status="$riskReview['review_status'] ?? null" />
+                                    </div>
+                                    <div>
+                                        <p class="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400">Nomor Transaksi</p>
+                                        <h3 class="mt-1 inline-flex rounded-lg border border-emerald-100 bg-emerald-50 px-3 py-1 font-mono text-sm font-bold text-emerald-700 sm:text-base">{{ $noTransaksi }}</h3>
+                                    </div>
+                                    <div>
+                                        <p class="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400">Pembayar</p>
+                                        <p class="mt-1 text-xl font-black leading-tight text-slate-800">{{ $mainTx->pembayar_nama }}</p>
+                                    </div>
                                 </div>
-                                <div class="sm:text-right">
-                                    <p class="mb-1 text-[10px] font-black uppercase tracking-[0.2em] text-gray-400">Pembayar</p>
-                                    <p class="text-lg font-black leading-tight text-slate-800">{{ $mainTx->pembayar_nama }}</p>
+
+                                <div class="ui-panel-note lg:min-w-[260px]">
+                                    <p class="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400">Status Review</p>
+                                    <p class="mt-1 text-sm font-semibold text-slate-800">{{ $reviewStatusLabel }}</p>
+                                    <p class="mt-3 text-[10px] font-black uppercase tracking-[0.2em] text-gray-400">Sinyal Aktif</p>
+                                    <p class="mt-1 text-sm font-semibold text-slate-800">{{ $riskMeta['flags_count'] }} warning</p>
                                 </div>
-                            </div>
-                            <div class="grid grid-cols-1 gap-3 sm:grid-cols-3">
-                                <x-ui-stat-card title="Risk Level" :value="ucfirst($riskReview['risk_level'] ?? 'normal')" description="Severity terkuat pada grup ini." class="!rounded-xl !px-3 !py-3" />
-                                <x-ui-stat-card title="Flag Terdeteksi" :value="$riskMeta['flags_count']" description="Jumlah pola yang aktif." class="!rounded-xl !px-3 !py-3" />
-                                <x-ui-stat-card title="Status Review" :value="match($riskReview['review_status'] ?? null) { 'perlu_tindak_lanjut' => 'Tindak Lanjut', 'aman' => 'Aman', default => 'Belum Review', }" description="Keputusan review terbaru." class="!rounded-xl !px-3 !py-3 [&_.ui-stat-value]:!text-sm [&_.ui-stat-value]:!leading-tight" />
                             </div>
                         </div>
 
-                        <div class="grid grid-cols-1 gap-4 border-b border-gray-100/80 bg-slate-50/70 px-6 py-5 sm:px-8 sm:py-6 lg:grid-cols-2">
-                            <div class="rounded-xl border border-gray-200 bg-white p-4">
-                                <p class="mb-3 text-[11px] font-semibold text-gray-500">Alasan deteksi</p>
+                        <div class="space-y-5 border-b border-gray-100/80 bg-slate-50/70 px-6 py-5 sm:px-8 sm:py-6">
+                            <section class="rounded-2xl border border-gray-200 bg-white p-5">
+                                <div class="mb-4 space-y-1">
+                                    <p class="text-[11px] font-semibold uppercase tracking-wide text-gray-500">Kenapa Ditandai</p>
+                                    <h4 class="text-lg font-bold text-slate-900">{{ $riskMeta['flag_labels'][0] ?? 'Perlu dicek ulang' }}</h4>
+                                </div>
                                 @if (!empty($riskReview['reasons']))
-                                    <ul class="space-y-2 text-sm text-gray-700">
+                                    <ul class="space-y-3 text-sm text-gray-700">
                                         @foreach ($riskReview['reasons'] as $reason)
-                                            <li class="flex items-start gap-2">
-                                                <span class="mt-1 h-1.5 w-1.5 flex-shrink-0 rounded-full bg-amber-500"></span>
-                                                <span>{{ $reason }}</span>
+                                            <li class="flex items-start gap-3 rounded-xl border border-slate-100 bg-slate-50/60 px-4 py-3">
+                                                <span class="mt-1.5 h-2 w-2 flex-shrink-0 rounded-full bg-amber-500"></span>
+                                                <span class="leading-6">{{ $reason }}</span>
                                             </li>
                                         @endforeach
                                     </ul>
                                 @else
                                     <p class="text-sm text-gray-500">Belum ada alasan risiko yang tercatat untuk grup transaksi ini.</p>
                                 @endif
-                            </div>
+                            </section>
 
-                            <div class="rounded-xl border border-gray-200 bg-white p-4">
-                                <p class="mb-3 text-[11px] font-semibold text-gray-500">Kandidat transaksi mirip</p>
-                                @if (!empty($riskReview['duplicate_candidates']))
+                            @if ($hasDuplicateCandidates)
+                                <section class="rounded-2xl border border-gray-200 bg-white p-5">
+                                    <div class="mb-4 space-y-1">
+                                        <p class="text-[11px] font-semibold uppercase tracking-wide text-gray-500">Kandidat Transaksi Mirip</p>
+                                        <h4 class="text-lg font-bold text-slate-900">Bandingkan transaksi terdekat</h4>
+                                    </div>
                                     <div class="space-y-3">
                                         @foreach ($riskReview['duplicate_candidates'] as $candidate)
-                                            <div class="rounded-lg border border-gray-100 bg-gray-50 px-3 py-2">
-                                                <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-                                                    <div>
+                                            <div class="rounded-xl border border-gray-100 bg-slate-50/70 px-4 py-4">
+                                                <div class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                                                    <div class="min-w-0">
                                                         <p class="font-mono text-xs font-semibold text-blue-600">{{ $candidate['no_transaksi'] ?? '-' }}</p>
-                                                        <p class="text-sm font-semibold text-gray-700">{{ $candidate['pembayar_nama'] ?? '-' }}</p>
+                                                        <p class="mt-1 text-sm font-semibold text-gray-800">{{ $candidate['pembayar_nama'] ?? '-' }}</p>
                                                         <p class="text-xs text-gray-500">{{ $candidate['muzakki_name'] ?? '-' }}</p>
                                                     </div>
-                                                    <div class="text-left text-xs text-gray-500 sm:text-right">
-                                                        <div>{{ $candidate['time_diff_minutes'] ?? 0 }} menit</div>
-                                                        <div class="font-semibold text-gray-600">{{ str_replace('_', ' ', ucfirst($candidate['match_type'] ?? '')) }}</div>
+                                                    <div class="grid gap-2 text-left text-xs text-gray-500 sm:text-right">
+                                                        <span class="rounded-full border border-slate-200 bg-white px-3 py-1 font-semibold text-slate-700">{{ $candidate['time_diff_minutes'] ?? 0 }} menit</span>
+                                                        <span class="font-semibold text-gray-600">{{ str_replace('_', ' ', ucfirst($candidate['match_type'] ?? '')) }}</span>
                                                     </div>
                                                 </div>
                                             </div>
                                         @endforeach
                                     </div>
-                                @else
-                                    <p class="text-sm text-gray-500">Belum ada kandidat transaksi mirip yang terdeteksi.</p>
-                                @endif
-                            </div>
+                                </section>
+                            @endif
                         </div>
 
                         <div class="px-6 py-5 sm:px-8 sm:py-6">
-                            <div class="mb-4 flex items-center gap-2">
-                                <span class="h-5 w-1 rounded-full bg-emerald-500"></span>
-                                <h4 class="text-sm font-bold uppercase tracking-wide text-gray-800">Rincian Pembayaran</h4>
+                            <div class="mb-4 space-y-1">
+                                <div class="flex items-center gap-2">
+                                    <span class="h-5 w-1 rounded-full bg-emerald-500"></span>
+                                    <h4 class="text-sm font-bold uppercase tracking-wide text-gray-800">Rincian Pembayaran</h4>
+                                </div>
                             </div>
                             <div class="space-y-3 md:hidden">
                                 @php $rowNo = 1; @endphp
@@ -118,16 +138,16 @@
                                                 </span>
                                             </div>
 
-                                            <div class="ui-mobile-card-muted space-y-3">
-                                                <div class="flex items-start justify-between gap-3">
-                                                    <span class="text-[10px] font-black uppercase tracking-widest text-gray-400">Kategori</span>
-                                                    <div class="max-w-[65%]">
+                                            <div class="ui-mobile-meta-grid">
+                                                <div class="ui-mobile-meta-item col-span-2">
+                                                    <p class="ui-mobile-meta-label">Kategori</p>
+                                                    <div class="mt-1">
                                                         <x-zakat-category-tags :categories="[$tx->category]" />
                                                     </div>
                                                 </div>
-                                                <div class="flex items-start justify-between gap-3">
-                                                    <span class="text-[10px] font-black uppercase tracking-widest text-gray-400">Keterangan</span>
-                                                    <div class="text-right text-xs font-medium text-gray-500">
+                                                <div class="ui-mobile-meta-item">
+                                                    <p class="ui-mobile-meta-label">Keterangan</p>
+                                                    <div class="mt-1 text-right text-xs font-medium text-gray-500">
                                                         @if($tx->category === 'fitrah' && $tx->jiwa)
                                                             <span class="rounded-md border border-gray-100 bg-white px-2 py-1 font-bold text-gray-600">{{ $tx->jiwa }} Jiwa</span>
                                                         @elseif($tx->category === 'fidyah' && $tx->hari)
@@ -137,9 +157,9 @@
                                                         @endif
                                                     </div>
                                                 </div>
-                                                <div class="flex items-start justify-between gap-3">
-                                                    <span class="text-[10px] font-black uppercase tracking-widest text-gray-400">Nominal</span>
-                                                    <div class="text-right">
+                                                <div class="ui-mobile-meta-item">
+                                                    <p class="ui-mobile-meta-label">Nominal</p>
+                                                    <div class="mt-1 text-right">
                                                         <p class="text-sm font-bold text-gray-900">
                                                             @if($tx->metode === 'beras')
                                                                 {{ rtrim(rtrim(number_format($tx->jumlah_beras_kg, 2, ',', '.'), '0'), ',') }} <span class="ml-0.5 text-[9px] font-bold text-gray-400">kg</span>
@@ -158,15 +178,22 @@
                                 @endforeach
                             </div>
 
-                            <div class="hidden overflow-x-auto rounded-xl border border-gray-100 bg-white shadow-sm md:block">
-                                <table class="min-w-full text-sm">
+                            <div class="hidden overflow-hidden rounded-xl border border-gray-100 bg-white shadow-sm md:block">
+                                <table class="w-full table-fixed text-sm">
+                                    <colgroup>
+                                        <col class="w-[30%]">
+                                        <col class="w-[22%]">
+                                        <col class="w-[14%]">
+                                        <col class="w-[14%]">
+                                        <col class="w-[20%]">
+                                    </colgroup>
                                     <thead>
                                         <tr class="border-b border-gray-100 bg-gray-50 text-left text-[11px] font-semibold uppercase tracking-wider text-gray-400 sm:text-xs">
-                                            <th class="px-6 py-4">Nama Muzakki</th>
-                                            <th class="px-3 py-4 sm:px-6">Kategori</th>
-                                            <th class="px-3 py-4 sm:px-6">Bentuk</th>
-                                            <th class="px-3 py-4 text-right sm:px-6">Keterangan</th>
-                                            <th class="px-3 py-4 text-right sm:px-6">Nominal</th>
+                                            <th class="px-5 py-4">Nama Muzakki</th>
+                                            <th class="px-3 py-4 sm:px-4">Kategori</th>
+                                            <th class="px-3 py-4 sm:px-4">Bentuk</th>
+                                            <th class="px-3 py-4 text-right sm:px-4">Keterangan</th>
+                                            <th class="px-3 py-4 text-right sm:px-5">Nominal</th>
                                         </tr>
                                     </thead>
                                     <tbody class="divide-y divide-gray-50">
@@ -176,22 +203,22 @@
                                             @foreach ($txsArr as $i => $tx)
                                                 <tr class="transition-colors hover:bg-emerald-50/30 {{ $i > 0 ? 'border-t border-dashed border-gray-100' : '' }}">
                                                     @if($i === 0)
-                                                        <td class="px-3 py-4 align-top sm:px-6" rowspan="{{ $txCount }}">
+                                                        <td class="px-4 py-4 align-top sm:px-5" rowspan="{{ $txCount }}">
                                                             <div class="flex items-start gap-3">
                                                                 <span class="mt-0.5 min-w-[1.25rem] text-xs font-semibold text-gray-400">{{ $rowNo++ }}.</span>
-                                                                <p class="text-sm font-bold leading-tight text-gray-900">{{ $muzakkiName }}</p>
+                                                                <p class="break-words text-sm font-bold leading-tight text-gray-900">{{ $muzakkiName }}</p>
                                                             </div>
                                                         </td>
                                                     @endif
-                                                    <td class="px-3 py-4 sm:px-6">
+                                                    <td class="px-3 py-4 sm:px-4">
                                                         <x-zakat-category-tags :categories="[$tx->category]" />
                                                     </td>
-                                                    <td class="px-3 py-4 sm:px-6">
+                                                    <td class="px-3 py-4 sm:px-4">
                                                         <span class="inline-flex items-center rounded px-2.5 py-1 text-[11px] font-bold uppercase tracking-wider {{ $tx->metode === 'beras' ? 'bg-amber-100 text-amber-700' : 'bg-emerald-100 text-emerald-700' }}">
                                                             {{ $tx->metode_label }}
                                                         </span>
                                                     </td>
-                                                    <td class="px-3 py-4 text-right text-xs font-medium text-gray-500 sm:px-6">
+                                                    <td class="px-3 py-4 text-right text-xs font-medium text-gray-500 sm:px-4">
                                                         @if($tx->category === 'fitrah' && $tx->jiwa)
                                                             <span class="rounded-md border border-gray-100 bg-gray-50 px-2 py-1 font-bold text-gray-600">{{ $tx->jiwa }} Jiwa</span>
                                                         @elseif($tx->category === 'fidyah' && $tx->hari)
@@ -200,12 +227,12 @@
                                                             -
                                                         @endif
                                                     </td>
-                                                    <td class="px-2 py-4 text-right sm:px-6">
-                                                        <p class="whitespace-nowrap text-[10px] font-bold text-gray-900 sm:text-sm">
+                                                    <td class="px-3 py-4 text-right sm:px-5">
+                                                        <p class="text-sm font-bold text-gray-900">
                                                             @if($tx->metode === 'beras')
-                                                                {{ rtrim(rtrim(number_format($tx->jumlah_beras_kg, 2, ',', '.'), '0'), ',') }} <span class="ml-0.5 text-[9px] font-bold text-gray-400 sm:text-xs">kg</span>
+                                                                <span class="whitespace-nowrap">{{ rtrim(rtrim(number_format($tx->jumlah_beras_kg, 2, ',', '.'), '0'), ',') }} <span class="ml-0.5 text-[10px] font-bold text-gray-400">kg</span></span>
                                                             @else
-                                                                {{ \App\Support\Format::rupiah((int) $tx->nominal_uang) }}
+                                                                <span class="whitespace-nowrap">{{ \App\Support\Format::rupiah((int) $tx->nominal_uang) }}</span>
                                                                 @if($tx->is_transfer)
                                                                     <x-transfer-badge class="ml-1" />
                                                                 @endif
@@ -223,14 +250,15 @@
                 </div>
 
                 <div class="space-y-6">
-                    <div class="ui-card p-5 sm:p-6">
-                        <div class="mb-4 flex flex-wrap items-center gap-2">
+                    <div class="ui-card h-fit p-5 sm:p-6">
+                        <h3 class="text-sm font-bold uppercase tracking-wide text-gray-800">Aksi Review</h3>
+                        <div class="mb-4 mt-3 flex flex-wrap items-center gap-2">
                             <x-risk-level-badge :level="$riskReview['risk_level'] ?? null" />
                             <x-review-status-badge :status="$riskReview['review_status'] ?? null" />
                         </div>
                         <p class="text-sm leading-6 text-gray-600">{{ $riskReview['summary_text'] ?? 'Belum ada hasil analisis risiko untuk transaksi ini.' }}</p>
 
-                        <div class="mt-5 space-y-3 rounded-xl border border-gray-100 bg-slate-50/70 p-4">
+                        <div class="mt-5 space-y-4 rounded-xl border border-gray-100 bg-slate-50/70 p-4">
                             <div>
                                 <p class="text-[11px] font-semibold uppercase tracking-wider text-gray-400">Status Kwitansi</p>
                                 <p class="mt-1 text-sm font-semibold text-gray-700">
@@ -247,7 +275,7 @@
                             </div>
 
                             <div>
-                                <p class="text-[11px] font-semibold uppercase tracking-wider text-gray-400">Flag Aktif</p>
+                                <p class="text-[11px] font-semibold uppercase tracking-wider text-gray-400">Sinyal Sistem</p>
                                 <div class="mt-2 flex flex-wrap gap-2">
                                     @forelse ($riskMeta['flag_labels'] as $flagLabel)
                                         <span class="inline-flex items-center rounded-full border border-amber-200 bg-amber-50 px-3 py-1 text-xs font-semibold text-amber-700">{{ $flagLabel }}</span>
@@ -265,24 +293,35 @@
                                     </p>
                                 </div>
                             @endif
-                        </div>
-                    </div>
 
-                    <div class="ui-card p-5 sm:p-6">
-                        <h3 class="text-sm font-bold uppercase tracking-wide text-gray-800">Keputusan Review</h3>
-                        <p class="mt-1 text-sm text-slate-500">Gunakan `Aman` bila transaksi memang sah dan tidak janggal. Gunakan `Tindak Lanjut` bila Anda akan langsung membetulkan atau menyesuaikan transaksi ini.</p>
+                            @if (!empty($riskReview['review_note']))
+                                <div>
+                                    <p class="text-[11px] font-semibold uppercase tracking-wider text-gray-400">Catatan Operator</p>
+                                    <p class="mt-1 rounded-xl border border-slate-200 bg-white px-3 py-3 text-sm leading-6 text-gray-700">{{ $riskReview['review_note'] }}</p>
+                                </div>
+                            @endif
+                        </div>
+
+                        <div class="ui-panel-note mt-5">
+                            Keputusan review tidak mengubah transaksi asli. Gunakan catatan singkat agar operator lain paham alasan penutupan atau tindak lanjut kasus ini.
+                        </div>
+
                         <form method="POST" action="{{ route('internal.anomalies.review_status', ['noTransaksi' => $noTransaksi]) }}" class="mt-5 space-y-3">
                             @csrf
                             @method('PATCH')
                             <select id="review_status" name="review_status" class="ui-select w-full bg-white">
                                 @foreach ($reviewStatuses as $statusValue)
-                                    <option value="{{ $statusValue }}" @selected(($riskReview['review_status'] ?? null) === $statusValue)>{{ str_replace('_', ' ', ucfirst($statusValue)) }}</option>
+                                    <option value="{{ $statusValue }}" @selected(($riskReview['review_status'] ?? null) === $statusValue)>{{ \App\Models\TransactionRiskReview::reviewStatusLabel($statusValue) }}</option>
                                 @endforeach
                             </select>
-                            <button type="submit" class="ui-btn ui-btn-primary w-full">Simpan Status Review</button>
+                            <div class="space-y-2">
+                                <label for="review_note" class="text-xs font-semibold uppercase tracking-wider text-gray-500">Catatan Review</label>
+                                <textarea id="review_note" name="review_note" rows="4" class="ui-textarea w-full bg-white" placeholder="Tuliskan alasan keputusan review. Wajib diisi jika status tindak lanjut.">{{ old('review_note', $riskReview['review_note'] ?? '') }}</textarea>
+                            </div>
+                            <button type="submit" class="ui-btn ui-btn-primary w-full">Simpan Keputusan Review</button>
                         </form>
                         <a href="{{ route('internal.transactions.edit', ['transaction' => $mainTx->id]) }}" class="ui-btn ui-btn-secondary mt-3 w-full">
-                            Edit Transaksi Untuk Tindak Lanjut
+                            Buka Ubah Transaksi
                         </a>
                     </div>
                 </div>

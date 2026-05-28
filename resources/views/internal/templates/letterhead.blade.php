@@ -17,8 +17,8 @@
         </div>
     </x-slot>
 
-    <div class="py-12">
-        <div class="max-w-5xl mx-auto sm:px-6 lg:px-8">
+    <div class="py-6 sm:py-10">
+        <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
             @if (session('status'))
                 <div class="ui-alert ui-alert-success mb-6">
                     <svg xmlns="http://www.w3.org/2000/svg" class="ui-alert-icon text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -31,17 +31,22 @@
             @if ($errors->any())
                 <div class="ui-alert ui-alert-error mb-6">
                     <div class="w-full">
-                        <div class="ui-alert-title text-red-700">Periksa input:</div>
-                    <ul class="mt-2 list-disc pl-5">
-                        @foreach ($errors->all() as $error)
-                            <li>{{ $error }}</li>
-                        @endforeach
-                    </ul>
+                        <div class="ui-alert-title text-red-700">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="ui-alert-icon" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
+                            </svg>
+                            Periksa input:
+                        </div>
+                        <ul class="list-disc pl-10 space-y-1 text-sm">
+                            @foreach ($errors->all() as $error)
+                                <li>{{ $error }}</li>
+                            @endforeach
+                        </ul>
                     </div>
                 </div>
             @endif
 
-            <div class="ui-card mb-6 overflow-hidden">
+            <div class="ui-card mb-6 overflow-hidden shadow-md">
                 <div class="p-5 sm:p-6">
                     <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                         <div>
@@ -62,8 +67,8 @@
             </div>
 
             <div class="grid grid-cols-1 gap-6 lg:grid-cols-2">
-                <div class="ui-card overflow-hidden">
-                    <div class="border-b border-emerald-50 bg-gradient-to-br from-white via-emerald-50/40 to-white px-6 py-5">
+                <div class="ui-card overflow-hidden shadow-md">
+                    <div class="ui-inline-note rounded-none border-b border-emerald-100/70">
                         <div class="text-sm font-black text-slate-900">Upload Template Baru</div>
                         <div class="mt-1 text-xs text-gray-600">Hanya PDF. Ukuran maks 10MB.</div>
                     </div>
@@ -71,27 +76,32 @@
                         <form method="POST" action="{{ route('internal.templates.letterhead.store') }}" enctype="multipart/form-data" class="space-y-4">
                             @csrf
 
-                            <div class="rounded-[1.35rem] border border-dashed border-emerald-200 bg-emerald-50/50 p-5">
+                            <div class="ui-settings-panel border-dashed border-emerald-200 bg-emerald-50/50">
                                 <label class="ui-form-label" for="file">File PDF</label>
-                                <input id="file" name="file" type="file" accept="application/pdf" class="block w-full rounded-xl border border-emerald-100 bg-white p-3 text-sm text-slate-700 shadow-sm file:mr-4 file:rounded-lg file:border-0 file:bg-emerald-600 file:px-4 file:py-2 file:text-sm file:font-bold file:text-white hover:file:bg-emerald-700" required />
+                                <input id="file" name="file" type="file" accept="application/pdf" class="ui-file-input" required />
                                 <p class="mt-2 text-xs text-emerald-700">Upload tidak otomatis mengaktifkan template. Aktifkan versi yang benar setelah preview.</p>
                             </div>
 
-                            <div class="flex flex-col-reverse gap-3 sm:flex-row sm:items-center">
-                                <a href="{{ route('dashboard') }}" class="ui-btn ui-btn-secondary w-full sm:w-auto">Kembali</a>
-                                <button type="submit" class="ui-btn ui-btn-primary w-full sm:w-auto">
-                                    Upload
-                                </button>
+                            <div class="ui-settings-panel ui-settings-panel-muted sm:flex sm:items-center sm:justify-between">
+                                <p class="mb-3 text-xs font-semibold text-slate-500 sm:mb-0">Upload dulu, lalu preview dan aktifkan versi yang benar.</p>
+                                <div class="flex flex-col-reverse gap-3 sm:flex-row sm:items-center">
+                                    <a href="{{ route('dashboard') }}" class="ui-btn ui-btn-secondary w-full sm:w-auto">Kembali</a>
+                                    <button type="submit" class="ui-btn ui-btn-primary w-full sm:w-auto">
+                                        Upload
+                                    </button>
+                                </div>
                             </div>
                         </form>
                     </div>
                 </div>
 
-                <div class="ui-card overflow-hidden">
-                    <div class="border-b border-slate-100 bg-slate-50/70 px-6 py-5">
+                <div class="ui-card overflow-hidden shadow-md">
+                <div class="ui-card-header ui-card-header-neutral">
+                    <div>
                         <div class="text-sm font-black text-slate-900">Daftar Versi</div>
                         <div class="mt-1 text-xs text-gray-600">Aktifkan tepat 1 template untuk dipakai saat cetak.</div>
                     </div>
+                </div>
                     <div class="p-6 text-gray-900">
 
                         <div class="space-y-3 md:hidden">
@@ -128,7 +138,7 @@
                                     </article>
                                 @endforeach
                             @else
-                                <div class="rounded-2xl border border-dashed border-slate-200 bg-slate-50 p-5 text-center text-sm text-gray-600">Belum ada template.</div>
+                                <div class="ui-empty-state-box text-sm text-gray-600">Belum ada template.</div>
                             @endif
                         </div>
 
@@ -184,7 +194,7 @@
                                     @else
                                         <tr>
                                             <td colspan="4" class="py-6 text-center text-sm text-gray-600">
-                                                <div class="rounded-2xl border border-dashed border-slate-200 bg-slate-50 p-5">Belum ada template.</div>
+                                                <div class="ui-empty-state-box py-5">Belum ada template.</div>
                                             </td>
                                         </tr>
                                     @endif
