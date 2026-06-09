@@ -107,8 +107,8 @@ export const createChartService = (config) => {
                         x: { duration: 0 },
                     },
                     scales: {
-                        y: { position: 'left', beginAtZero: true, suggestedMax: dailySuggestedMax(uangData, 1, 1000000), grid: { color: 'rgba(241, 245, 249, 1)', drawBorder: false }, ticks: { font: { family: publicChartFont, weight: '600', size: 12 }, color: '#64748b', callback: (v) => v >= 1000000 ? 'Rp ' + (v / 1000000) + 'jt' : 'Rp ' + v } },
-                        y1: { position: 'right', beginAtZero: true, suggestedMax: dailySuggestedMax(berasData, 1, 25), grid: { drawOnChartArea: false }, ticks: { font: { family: publicChartFont, weight: '600', size: 12 }, color: '#f59e0b', callback: (v) => v + ' kg' } },
+                        y: { position: 'left', beginAtZero: true, suggestedMax: dailySuggestedMax(uangData, 1, 1000000), grid: { color: 'rgba(241, 245, 249, 1)', drawBorder: false }, ticks: { font: { family: publicChartFont, weight: '600', size: 12 }, color: '#334155', callback: (v) => v >= 1000000 ? 'Rp ' + (v / 1000000) + 'jt' : 'Rp ' + v } },
+                        y1: { position: 'right', beginAtZero: true, suggestedMax: dailySuggestedMax(berasData, 1, 25), grid: { drawOnChartArea: false }, ticks: { font: { family: publicChartFont, weight: '600', size: 12 }, color: '#92400e', callback: (v) => v + ' kg' } },
                         x: {
                             grid: { display: false },
                             ticks: {
@@ -136,6 +136,32 @@ export const createChartService = (config) => {
 
         clearScanTimeout,
 
+
+        applyFilter(filter) {
+            if (!dailyChart) {
+                return;
+            }
+
+            const showUang = filter === 'uang' || filter === 'semua';
+            const showBeras = filter === 'beras' || filter === 'semua';
+
+            const uangMeta = dailyChart.data.datasets[0];
+            const berasMeta = dailyChart.data.datasets[1];
+
+            uangMeta.hidden = !showUang;
+            berasMeta.hidden = !showBeras;
+
+            if (showUang && !showBeras) {
+                dailyChart.options.scales.y1.display = false;
+            } else if (!showUang && showBeras) {
+                dailyChart.options.scales.y.display = false;
+            } else {
+                dailyChart.options.scales.y.display = true;
+                dailyChart.options.scales.y1.display = true;
+            }
+
+            dailyChart.update('none');
+        },
         autoHover(chart) {
             return chart;
         },

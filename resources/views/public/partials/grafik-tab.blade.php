@@ -4,7 +4,7 @@
     x-transition:enter-end="opacity-100 translate-y-0"
     class="flex flex-col items-center justify-center p-1 sm:p-2">
     <div class="public-chart-shell sm:px-5 sm:py-4">
-        <div class="mb-2 flex items-center justify-between">
+        <div class="mb-2 flex flex-wrap items-center justify-between gap-2">
             <div class="flex items-center gap-2">
                 <div class="public-chart-icon">
                     <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" /></svg>
@@ -14,6 +14,22 @@
                     <p class="hidden text-[11px] text-neutral-500 sm:block">Pola harian sebagai insight pendukung setelah ringkasan utama.</p>
                 </div>
             </div>
+
+            <div class="public-chart-filter" role="tablist" aria-label="Filter grafik">
+                <button type="button" role="tab"
+                    :aria-selected="chartFilter === 'uang'"
+                    :class="chartFilter === 'uang' ? 'public-chart-filter-active' : 'public-chart-filter-inactive'"
+                    @click="setChartFilter('uang')">Uang</button>
+                <button type="button" role="tab"
+                    :aria-selected="chartFilter === 'beras'"
+                    :class="chartFilter === 'beras' ? 'public-chart-filter-active' : 'public-chart-filter-inactive'"
+                    @click="setChartFilter('beras')">Beras</button>
+                <button type="button" role="tab"
+                    :aria-selected="chartFilter === 'semua'"
+                    :class="chartFilter === 'semua' ? 'public-chart-filter-active' : 'public-chart-filter-inactive'"
+                    @click="setChartFilter('semua')">Semua</button>
+            </div>
+
             <span class="public-pill public-pill-brand hidden px-3 py-1 text-[10px] tracking-[0.08em] sm:inline-flex" x-text="dailyChartData.range?.label || ''"></span>
         </div>
 

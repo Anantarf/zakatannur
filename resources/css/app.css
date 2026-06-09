@@ -176,15 +176,15 @@
     }
 
     .public-tab-chip {
-        @apply rounded-lg px-3.5 py-2 text-[11px] font-semibold tracking-[0.03em] transition-all duration-200 flex items-center justify-center text-center;
+        @apply rounded-md px-3.5 py-2 text-[12px] font-semibold tracking-[0.02em] transition-colors duration-150 flex items-center justify-center text-center;
     }
 
     .public-tab-chip-active {
-        @apply bg-white text-brand-900 shadow-sm ring-1 ring-brand-200/80;
+        @apply bg-emerald-600 text-white shadow-sm shadow-emerald-700/30;
     }
 
     .public-tab-chip-inactive {
-        @apply text-neutral-500 hover:bg-white/70 hover:text-slate-700;
+        @apply text-neutral-500 hover:text-neutral-800;
     }
 
     .public-tab-chip-mobile {
@@ -272,7 +272,7 @@
     }
 
     .public-chart-shell {
-        @apply w-full max-w-6xl rounded-card sm:rounded-[2rem] border border-white/80 bg-white/[0.88] p-3 shadow-xl shadow-brand-900/5 ring-1 ring-brand-900/5 backdrop-blur sm:p-4 lg:p-5;
+        @apply w-full max-w-6xl rounded-card sm:rounded-[2rem] border border-neutral-200/80 bg-white/[0.96] p-3 ring-1 ring-neutral-200/70 backdrop-blur sm:p-4 lg:p-5;
     }
 
     .public-chart-icon {
@@ -304,7 +304,7 @@
     }
 
     .public-nav-tabs {
-        @apply hidden shrink-0 items-center gap-1 rounded-xl border border-brand-900/5 bg-neutral-50/80 p-1 lg:flex;
+        @apply hidden shrink-0 items-center gap-3 lg:flex;
     }
 
     .public-nav-action {
@@ -874,6 +874,53 @@
     }
 }
 
+
+    .public-header-location {
+        @apply text-[14px] font-semibold text-neutral-800 sm:text-[15px];
+    }
+
+    .public-clock-pill {
+        @apply inline-flex items-center gap-2 self-end rounded-full border border-neutral-200 bg-white/90 px-3 py-1.5 shadow-sm;
+    }
+
+    .public-clock-text {
+        @apply text-[11px] font-semibold text-neutral-800 tabular-nums sm:text-[12px];
+    }
+
+    .public-stat-card {
+        @apply rounded-[1.1rem] border border-neutral-200/80 bg-white px-4 py-3 shadow-sm;
+    }
+
+    .public-stat-label {
+        @apply text-[10px] font-medium tracking-[0.03em] text-neutral-500;
+    }
+
+    .public-stat-value {
+        @apply mt-1 text-[0.98rem] font-semibold tabular-nums text-neutral-900 sm:text-[1.05rem];
+    }
+
+
+    .public-report-eyebrow {
+        @apply text-[12px] font-medium tracking-[0.04em] text-neutral-500;
+    }
+
+    .public-report-copy {
+        @apply mt-2 text-[13px] leading-relaxed text-neutral-500;
+    }
+
+
+    .public-chart-filter {
+        @apply inline-flex shrink-0 items-center gap-1 rounded-md border border-neutral-200 bg-white p-0.5;
+    }
+
+    .public-chart-filter-active {
+        @apply bg-emerald-600 px-2.5 py-1 text-[11px] font-semibold text-white;
+    }
+
+    .public-chart-filter-inactive {
+        @apply px-2.5 py-1 text-[11px] font-semibold text-neutral-500 transition-colors hover:text-neutral-800;
+    }
+
 /* ============================================================
    MODALS & DIALOGS
    ============================================================ */
@@ -918,7 +965,6 @@
 /* ============================================================
    UTILITIES & OVERRIDES (luar @layer)
    Kelas: .ui-table-action-label, .footer-logo,
-          .sticky-marquee, .sticky-marquee-track
    ============================================================ */
 
 .ui-table-action-label {
@@ -940,63 +986,6 @@
     transform: translateY(-1px);
 }
 
-.sticky-marquee {
-    position: fixed;
-    right: 0;
-    bottom: 0;
-    left: 0;
-    z-index: 45;
-    overflow: hidden;
-    /* Warna marquee mengikuti brand-800/700/600 */
-    border-top: 1px solid rgb(var(--color-brand-700-rgb) / 0.78);
-    background: linear-gradient(90deg,
-        rgb(var(--color-brand-900-rgb)) 0%,
-        rgb(var(--color-brand-700-rgb)) 52%,
-        rgb(var(--color-brand-600-rgb)) 100%);
-    box-shadow: 0 -10px 24px -22px rgb(var(--color-brand-700-rgb) / 0.48);
-}
-
-.sticky-marquee-track {
-    display: flex;
-    width: max-content;
-    animation: stickyMarquee 58s linear infinite;
-}
-
-.sticky-marquee-copy {
-    display: flex;
-    flex-shrink: 0;
-    align-items: center;
-    gap: 3.1rem;
-    padding: 0.6rem 1.2rem;
-    white-space: nowrap;
-    font-size: 9px;
-    font-weight: 600;
-    letter-spacing: 0.14em;
-    text-transform: uppercase;
-    color: rgba(236, 253, 245, 0.88);
-}
-
-.sticky-marquee-copy span {
-    position: relative;
-}
-
-.sticky-marquee-copy span:not(:last-child)::after {
-    content: "";
-    position: absolute;
-    top: 50%;
-    right: -1.62rem;
-    width: 0.24rem;
-    height: 0.24rem;
-    border-radius: 9999px;
-    background: rgba(209, 250, 229, 0.72);
-    transform: translateY(-50%);
-}
-
-@keyframes stickyMarquee {
-    to {
-        transform: translateX(-50%);
-    }
-}
 
 @layer components {
     .ui-skeleton {

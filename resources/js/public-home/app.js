@@ -30,6 +30,7 @@ const initialState = (config) => ({
     clock: '',
     chartTimeouts: [],
     carouselIndex: 0,
+    chartFilter: 'semua',
     carouselImages: [
         '/images/beranda_annur_new.webp',
         '/images/dokumentasi_1.webp',
@@ -63,6 +64,15 @@ export const createPublicHomeApp = (config, chartService) => {
             const parts = formatter.formatToParts(new Date());
             const d = parts.reduce((acc, part) => ({ ...acc, [part.type]: part.value }), {});
             this.clock = `${d.weekday}, ${d.day} ${d.month} ${d.year} ${d.hour}:${d.minute}:${d.second} WIB`;
+        },
+
+        setChartFilter(filter) {
+            if (this.chartFilter === filter) {
+                return;
+            }
+
+            this.chartFilter = filter;
+            chartService.applyFilter(filter);
         },
 
         initTimers() {
@@ -110,6 +120,7 @@ export const createPublicHomeApp = (config, chartService) => {
                     this.loadChartJs().then((success) => {
                         if (success) {
                             chartService.initDailyChart();
+                            chartService.applyFilter(this.chartFilter);
                         }
                     });
                 }
