@@ -6,6 +6,8 @@ use Illuminate\Support\ServiceProvider;
 use App\Services\Chatbot\ChatbotServiceInterface;
 use App\Services\Chatbot\Providers\MockChatbotProvider;
 
+use App\Services\Chatbot\Providers\GeminiChatbotProvider;
+
 class ChatbotServiceProvider extends ServiceProvider
 {
     /**
@@ -15,8 +17,18 @@ class ChatbotServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        // Ganti MockChatbotProvider dengan provider asli (OpenAI/Gemini) nantinya di sini
-        $this->app->bind(ChatbotServiceInterface::class, MockChatbotProvider::class);
+        $this->app->bind(ChatbotServiceInterface::class, function () {
+            $apiKey  = config('services.gemini.api_key');
+            $model   = config('services.gemini.model');
+            $baseUrl = config('services.gemini.base_url');
+
+            if (!empty($apiKey)) {
+                return new GeminiChatbotProvider($apiKey, $model, $baseUrl);
+            }
+
+            // Fallback ke mock jika API Key belum dikonfigurasi
+            return new MockChatbotProvider();
+        });
     }
 
     /**

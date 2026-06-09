@@ -1,7 +1,13 @@
 import { createDataMethods } from './data';
-import { formatCategory, joinGrammatically } from './format';
+import { formatCategory, joinGrammatically, formatUang, formatBeras, formatJiwa, formatJiwaPlain, animateValue } from './format';
 import { createIdleMethods } from './idle';
-import { bootstrapRealtime } from './realtime';
+import { createRealtime } from './realtime';
+
+const scrollToTop = () => {
+    if (typeof globalThis !== 'undefined' && typeof globalThis.scrollTo === 'function') {
+        globalThis.scrollTo({ top: 0, behavior: 'instant' });
+    }
+};
 
 const initialState = (config) => ({
     openLogin: config.openLogin,
@@ -30,115 +36,121 @@ const initialState = (config) => ({
     ],
 });
 
-export const createPublicHomeApp = (config, chartService) => ({
-    ...initialState(config),
-    ...createIdleMethods(),
-    ...createDataMethods(config, chartService),
+export const createPublicHomeApp = (config, chartService) => {
+    const getEcho = createRealtime(config.realtime ?? {});
 
-    updateClock() {
-        const options = { timeZone: 'Asia/Jakarta', weekday: 'long', day: '2-digit', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false };
-        const formatter = new Intl.DateTimeFormat('id-ID', options);
-        const parts = formatter.formatToParts(new Date());
-        const d = parts.reduce((acc, part) => ({ ...acc, [part.type]: part.value }), {});
-        this.clock = `${d.weekday}, ${d.day} ${d.month} ${d.year} ${d.hour}:${d.minute}:${d.second} WIB`;
-    },
+    return (stateFactory = initialState) => ({
+        ...stateFactory(config),
+        ...createIdleMethods(chartService),
+        ...createDataMethods(config, chartService, animateValue),
 
-    formatCat(category) {
-        return formatCategory(category);
-    },
+        formatUang,
+        formatBeras,
+        formatJiwa,
+        formatJiwaPlain,
 
-    joinGrammatically(items) {
-        return joinGrammatically(items);
-    },
+        formatCat(category) {
+            return formatCategory(category);
+        },
 
-    initTimers() {
-        this.updateClock();
-        setInterval(() => this.updateClock(), 1000);
+        joinGrammatically(items) {
+            return joinGrammatically(items);
+        },
 
-        const refreshSecs = Number(config.refreshIntervalSeconds || 0);
-        if (refreshSecs > 0) {
+        updateClock() {
+            const options = { timeZone: 'Asia/Jakarta', weekday: 'long', day: '2-digit', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false };
+            const formatter = new Intl.DateTimeFormat('id-ID', options);
+            const parts = formatter.formatToParts(new Date());
+            const d = parts.reduce((acc, part) => ({ ...acc, [part.type]: part.value }), {});
+            this.clock = `${d.weekday}, ${d.day} ${d.month} ${d.year} ${d.hour}:${d.minute}:${d.second} WIB`;
+        },
+
+        initTimers() {
+            this.updateClock();
+            setInterval(() => this.updateClock(), 1000);
+
+            const refreshSecs = Number(config.refreshIntervalSeconds || 0);
+            if (refreshSecs > 0) {
+                setInterval(() => {
+                    this.refreshSummary();
+                    this.pollLatest();
+                }, refreshSecs * 1000);
+            }
+
             setInterval(() => {
-                this.refreshSummary();
-                this.pollLatest();
-            }, refreshSecs * 1000);
-        }
+                this.carouselIndex = (this.carouselIndex + 1) % this.carouselImages.length;
+            }, 7000);
+        },
 
-        setInterval(() => {
-            this.carouselIndex = (this.carouselIndex + 1) % this.carouselImages.length;
-        }, 7000);
-    },
+        initWatchers() {
+            ['mousemove', 'mousedown', 'keydown', 'touchstart', 'scroll'].forEach((eventName) => {
+                globalThis.addEventListener(eventName, () => this.resetIdle(), { passive: true });
+            });
 
-    initWatchers() {
-        ['mousemove', 'mousedown', 'keydown', 'touchstart', 'scroll'].forEach((eventName) => {
-            window.addEventListener(eventName, () => this.resetIdle(), { passive: true });
-        });
+            this.$watch('openLogin', (value) => {
+                if (value) {
+                    clearTimeout(this.idleTimeout);
+                    this.isIdleMode = false;
+                } else {
+                    this.resetIdle();
+                }
+            });
 
-        this.$watch('openLogin', (value) => {
-            if (value) {
-                clearTimeout(this.idleTimeout);
-                this.isIdleMode = false;
-            } else {
-                this.resetIdle();
-            }
-        });
+            this.$watch('isIdleMode', (value) => {
+                if (value) {
+                    this.startIdleCycle();
+                }
+            });
 
-        this.$watch('isIdleMode', (value) => {
-            if (value) {
-                this.startIdleCycle();
-            }
-        });
+            this.$watch('activeTab', (value) => {
+                chartService.clearScanTimeout();
 
-        this.$watch('activeTab', (value) => {
-            if (window.chartScanTimeout) {
-                clearTimeout(window.chartScanTimeout);
-                window.chartScanTimeout = null;
-            }
+                if (value === 'grafik') {
+                    scrollToTop();
+                    this.loadChartJs().then((success) => {
+                        if (success) {
+                            chartService.initDailyChart();
+                        }
+                    });
+                }
+            });
+        },
 
-            if (value === 'grafik') {
-                window.scrollTo({ top: 0, behavior: 'instant' });
-                this.loadChartJs().then((success) => {
-                    if (success) {
-                        chartService.initDailyChart();
-                    }
-                });
-            }
-        });
-    },
-
-    initRealtime() {
-        const echo = bootstrapRealtime(config.realtime ?? {});
-        if (!echo) {
-            return;
-        }
-
-        echo.channel('public-transactions').listen('.transaction.created', (event) => {
-            const items = event.items || [];
-            if (items.length === 0) {
+        initRealtime() {
+            const echo = getEcho();
+            if (!echo) {
                 return;
             }
 
-            const now = Date.now();
-            if (now - this.lastFetchTime > 2000) {
-                this.refreshSummary();
-            }
+            echo.channel('public-transactions').listen('.transaction.created', (event) => {
+                const items = event.items || [];
+                if (items.length === 0) {
+                    return;
+                }
 
-            this.pushTransactionNotification(items);
-        });
-    },
+                const now = Date.now();
+                if (now - this.lastFetchTime > 2000) {
+                    this.refreshSummary();
+                }
 
-    init() {
-        this.initTimers();
-        this.pollLatest();
-        this.refreshSummary();
+                this.pushTransactionNotification(items);
+            });
+        },
 
-        this.loadChartJs().then((success) => {
-            if (success) {
-                chartService.initHistoricalChart();
-            }
-        });
+        init() {
+            this.initTimers();
+            this.pollLatest();
+            this.refreshSummary();
 
-        this.resetIdle();
-        this.initWatchers();
-        this.initRealtime();
-    },
-});
+            this.loadChartJs().then((success) => {
+                if (success) {
+                    chartService.initHistoricalChart();
+                }
+            });
+
+            this.resetIdle();
+            this.initWatchers();
+            this.initRealtime();
+        },
+    });
+};

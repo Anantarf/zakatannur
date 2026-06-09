@@ -1,11 +1,10 @@
-export const createIdleMethods = () => ({
+export const createIdleMethods = (chartService) => ({
     clearChartTimeouts() {
         this.chartTimeouts.forEach((t) => clearTimeout(t));
         this.chartTimeouts = [];
 
-        if (window.chartScanTimeout) {
-            clearTimeout(window.chartScanTimeout);
-            window.chartScanTimeout = null;
+        if (chartService) {
+            chartService.clearScanTimeout();
         }
 
         const container = document.getElementById('idle-cards-container');
@@ -18,10 +17,13 @@ export const createIdleMethods = () => ({
         clearTimeout(this.idleTimeout);
         this.clearChartTimeouts();
 
-        if (this.activeTab === 'grafik' && window.myDailyChart) {
-            window.myDailyChart.setActiveElements([]);
-            window.myDailyChart.tooltip.setActiveElements([], { x: 0, y: 0 });
-            window.myDailyChart.update('none');
+        if (this.activeTab === 'grafik' && chartService) {
+            const chart = chartService.getDailyChart();
+            if (chart) {
+                chart.setActiveElements([]);
+                chart.tooltip.setActiveElements([], { x: 0, y: 0 });
+                chart.update('none');
+            }
         }
 
         this.isIdleMode = false;

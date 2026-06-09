@@ -3,21 +3,22 @@
 namespace App\Services\Transactions;
 
 use App\Models\ZakatTransaction;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
 
 class TransactionAnomalyDetector
 {
+    private const OUTLIER_MULTIPLIER = 5;
+    private const OUTLIER_SCORE = 15;
+    private const OUTLIER_MIN_SAMPLE = 10;
+    private const AVG_CACHE_TTL_SECONDS = 300;
+
     public function analyze(ZakatTransaction $transaction): array
     {
         $score = 0;
         $flags = [];
         $reasons = [];
         $context = (array) ($transaction->getAttribute('anomaly_context') ?? []);
-
-        if (($context['restored_after_delete'] ?? false) === true) {
-            $score += 25;
-            $flags[] = 'restored_after_delete';
-            $reasons[] = 'Transaksi ini sempat dihapus lalu dipulihkan kembali ke riwayat aktif.';
-        }
 
         if (($context['updated_after_receipt_printed'] ?? false) === true) {
             $score += 30;
@@ -31,11 +32,66 @@ class TransactionAnomalyDetector
             $reasons[] = $this->significantChangeReason($transaction, $context);
         }
 
+        $outlierResult = $this->checkStatisticalOutlier($transaction);
+        if ($outlierResult !== null) {
+            $score += self::OUTLIER_SCORE;
+            $flags[] = 'statistical_outlier';
+            $reasons[] = $outlierResult;
+        }
+
         return [
             'score' => $score,
             'flags' => $flags,
             'reasons' => $reasons,
         ];
+    }
+
+    private function checkStatisticalOutlier(ZakatTransaction $transaction): ?string
+    {
+        if ($transaction->metode === ZakatTransaction::METHOD_BERAS) {
+            return null;
+        }
+
+        $nominal = (int) $transaction->nominal_uang;
+        if ($nominal <= 0) {
+            return null;
+        }
+
+        $avg = $this->averageNominalUang();
+        if ($avg === null || $avg <= 0) {
+            return null;
+        }
+
+        $threshold = $avg * self::OUTLIER_MULTIPLIER;
+
+        if ($nominal > $threshold) {
+            return sprintf(
+                'Nominal Rp%s melebihi %dx rata-rata penerimaan uang (rata-rata: Rp%s).',
+                number_format($nominal, 0, ',', '.'),
+                self::OUTLIER_MULTIPLIER,
+                number_format((int) $avg, 0, ',', '.')
+            );
+        }
+
+        return null;
+    }
+
+    private function averageNominalUang(): ?float
+    {
+        return Cache::remember('anomaly:avg_nominal_uang', self::AVG_CACHE_TTL_SECONDS, function () {
+            $stats = DB::table('zakat_transactions')
+                ->whereNull('deleted_at')
+                ->where('metode', '!=', ZakatTransaction::METHOD_BERAS)
+                ->where('nominal_uang', '>', 0)
+                ->selectRaw('AVG(nominal_uang) as avg_nominal, COUNT(*) as total')
+                ->first();
+
+            if (!$stats || (int) $stats->total < self::OUTLIER_MIN_SAMPLE) {
+                return null;
+            }
+
+            return (float) $stats->avg_nominal;
+        });
     }
 
     private function significantChangeReason(ZakatTransaction $transaction, array $context): string

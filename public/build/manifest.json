@@ -9,7 +9,7 @@
     "isEntry": true
   },
   "resources/js/app.js": {
-    "file": "assets/app-C_IkaKNB.js",
+    "file": "assets/app-vRTnRwCS.js",
     "name": "app",
     "src": "resources/js/app.js",
     "isEntry": true,
@@ -19,10 +19,13 @@
     ]
   },
   "resources/js/public-home.js": {
-    "file": "assets/public-home-p6M6du4h.js",
+    "file": "assets/public-home-DrcQUu9D.js",
     "name": "public-home",
     "src": "resources/js/public-home.js",
-    "isDynamicEntry": true
+    "isDynamicEntry": true,
+    "imports": [
+      "resources/js/app.js"
+    ]
   },
   "resources/js/transaction-form.js": {
     "file": "assets/transaction-form-IovfWrAS.js",

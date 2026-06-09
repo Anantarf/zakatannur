@@ -1,19 +1,23 @@
-export const bootstrapRealtime = (realtime = {}) => {
-    if (window.__zakatEcho) {
-        return window.__zakatEcho;
-    }
+export const createRealtime = (realtime = {}, host = (typeof window !== 'undefined' ? window : globalThis)) => {
+    let echoInstance = null;
 
-    if (!realtime.enabled || typeof window.Pusher === 'undefined' || typeof window.Echo === 'undefined') {
-        return null;
-    }
+    return () => {
+        if (echoInstance) {
+            return echoInstance;
+        }
 
-    const EchoConstructor = window.Echo;
-    window.__zakatEcho = new EchoConstructor({
-        broadcaster: 'pusher',
-        key: realtime.key,
-        cluster: realtime.cluster,
-        forceTLS: true,
-    });
+        if (!realtime.enabled || typeof host.Pusher === 'undefined' || typeof host.Echo === 'undefined') {
+            return null;
+        }
 
-    return window.__zakatEcho;
+        const EchoConstructor = host.Echo;
+        echoInstance = new EchoConstructor({
+            broadcaster: 'pusher',
+            key: realtime.key,
+            cluster: realtime.cluster,
+            forceTLS: true,
+        });
+
+        return echoInstance;
+    };
 };

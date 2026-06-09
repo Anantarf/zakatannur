@@ -6,7 +6,12 @@ import {
     writeSeenTransactionIds,
 } from './notifications';
 
-export const createDataMethods = (config, chartService) => ({
+const noopAnimate = () => {};
+
+export const createDataMethods = (config, chartService, animateValue = noopAnimate) => {
+    const boundAnimate = typeof animateValue === 'function' ? animateValue : noopAnimate;
+
+    return {
     async refreshSummary() {
         if (document.visibilityState !== 'visible') {
             return;
@@ -66,8 +71,8 @@ export const createDataMethods = (config, chartService) => ({
 
         const animate = (id, start, end, type) => {
             const element = document.getElementById(id);
-            if (element && end > start && typeof window.animateValue === 'function') {
-                window.animateValue(element, start, end, 2000, type);
+            if (element && end > start) {
+                boundAnimate(element, start, end, 2000, type);
             }
         };
 
@@ -161,4 +166,5 @@ export const createDataMethods = (config, chartService) => ({
         this.notification.queue.push(buildNotificationMessage(items, formatCategory, joinGrammatically));
         this.processQueue();
     },
-});
+    };
+};

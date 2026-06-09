@@ -107,12 +107,6 @@ class TransactionGroupLifecycleService
             ->orderBy('id')
             ->get();
 
-        foreach ($restoredTransactions as $restoredTransaction) {
-            $restoredTransaction->setAttribute('anomaly_context', [
-                'restored_after_delete' => true,
-            ]);
-        }
-
         $this->reviewAssistantService->syncForTransactions($restoredTransactions);
 
         return [

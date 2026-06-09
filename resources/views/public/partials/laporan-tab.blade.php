@@ -18,17 +18,17 @@
                         <p class="text-[12px] font-medium tracking-[0.03em] text-neutral-600">Kategori</p>
                         <h3 class="mt-1 text-[1.28rem] font-semibold leading-tight text-neutral-950" x-text="formatCat(item.category)"></h3>
                     </div>
-                    <span class="public-pill public-pill-sky tabular-nums" x-text="item.total_jiwa.toLocaleString('id-ID') + ' Jiwa'"></span>
+                    <span class="public-pill public-pill-sky tabular-nums" x-text="formatJiwa(item.total_jiwa)"></span>
                 </div>
 
                 <dl class="mt-4 grid grid-cols-2 gap-3">
                     <div class="public-subcard public-subcard-brand p-4">
                         <dt class="text-[12px] font-medium tracking-[0.03em] text-brand-800/80">Uang</dt>
-                        <dd class="mt-1.5 text-[18px] font-semibold text-brand-800 tabular-nums" x-text="'Rp ' + (item.total_uang || 0).toLocaleString('id-ID')"></dd>
+                        <dd class="mt-1.5 text-[18px] font-semibold text-brand-800 tabular-nums" x-text="formatUang(item.total_uang)"></dd>
                     </div>
                     <div class="public-subcard public-subcard-amber p-4">
                         <dt class="text-[12px] font-medium tracking-[0.03em] text-amber-800/80">Beras</dt>
-                        <dd class="mt-1.5 text-[18px] font-semibold text-amber-800 tabular-nums" x-text="(item.total_beras_kg || 0).toFixed(2).replace('.', ',') + ' Kg'"></dd>
+                        <dd class="mt-1.5 text-[18px] font-semibold text-amber-800 tabular-nums" x-text="formatBeras(item.total_beras_kg)"></dd>
                     </div>
                 </dl>
             </article>
@@ -37,9 +37,9 @@
         <div x-show="items.length > 0" class="public-section public-section-muted">
             <p class="text-[12px] font-medium tracking-[0.03em] text-neutral-600">Total penerimaan</p>
             <div class="mt-3 grid grid-cols-1 gap-3 text-[19px] tabular-nums">
-                <span class="font-semibold text-neutral-950" x-text="(totals.total_jiwa || 0).toLocaleString('id-ID') + ' Jiwa'"></span>
-                <span class="font-semibold text-brand-800" x-text="'Rp ' + (totals.total_uang || 0).toLocaleString('id-ID')"></span>
-                <span class="font-semibold text-amber-800" x-text="(totals.total_beras_kg || 0).toFixed(2).replace('.', ',') + ' Kg'"></span>
+                <span class="font-semibold text-neutral-950" x-text="formatJiwa(totals.total_jiwa)"></span>
+                <span class="font-semibold text-brand-800" x-text="formatUang(totals.total_uang)"></span>
+                <span class="font-semibold text-amber-800" x-text="formatBeras(totals.total_beras_kg)"></span>
             </div>
         </div>
 
@@ -75,15 +75,15 @@
                         </div>
                         <div class="public-subcard public-subcard-sky px-3 py-2 text-center">
                             <p class="text-[10px] font-medium tracking-[0.03em] text-sky-800/80">Jiwa</p>
-                            <p class="mt-0.5 text-[0.98rem] font-semibold text-sky-950 tabular-nums" x-text="item.total_jiwa.toLocaleString('id-ID')"></p>
+                            <p class="mt-0.5 text-[0.98rem] font-semibold text-sky-950 tabular-nums" x-text="formatJiwaPlain(item.total_jiwa)"></p>
                         </div>
                         <div class="public-subcard public-subcard-brand px-3 py-2 text-center">
                             <p class="text-[10px] font-medium tracking-[0.03em] text-brand-800/80">Uang</p>
-                            <p class="mt-0.5 text-[0.96rem] font-semibold text-brand-800 tabular-nums" x-text="'Rp ' + (item.total_uang || 0).toLocaleString('id-ID')"></p>
+                            <p class="mt-0.5 text-[0.96rem] font-semibold text-brand-800 tabular-nums" x-text="formatUang(item.total_uang)"></p>
                         </div>
                         <div class="public-subcard public-subcard-amber px-3 py-2 text-center">
                             <p class="text-[10px] font-medium tracking-[0.03em] text-amber-800/80">Beras</p>
-                            <p class="mt-0.5 text-[0.96rem] font-semibold text-amber-800 tabular-nums" x-text="(item.total_beras_kg || 0).toFixed(2).replace('.', ',') + ' Kg'"></p>
+                            <p class="mt-0.5 text-[0.96rem] font-semibold text-amber-800 tabular-nums" x-text="formatBeras(item.total_beras_kg)"></p>
                         </div>
                     </article>
                 </template>

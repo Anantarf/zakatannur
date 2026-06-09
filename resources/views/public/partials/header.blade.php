@@ -25,15 +25,15 @@
                 <div class="grid grid-cols-3 gap-2 sm:min-w-[28rem]">
                     <div class="public-metric-card">
                         <p class="public-metric-label">Jiwa</p>
-                        <p class="public-metric-value" x-text="(totals.total_jiwa || 0).toLocaleString('id-ID')"></p>
+                        <p class="public-metric-value" x-text="formatJiwaPlain(totals.total_jiwa)"></p>
                     </div>
                     <div class="public-metric-card-brand">
                         <p class="public-metric-label public-metric-label-brand">Uang</p>
-                        <p class="public-metric-value public-metric-value-brand" x-text="'Rp ' + (totals.total_uang || 0).toLocaleString('id-ID')"></p>
+                        <p class="public-metric-value public-metric-value-brand" x-text="formatUang(totals.total_uang)"></p>
                     </div>
                     <div class="public-metric-card-amber">
                         <p class="public-metric-label public-metric-label-amber">Beras</p>
-                        <p class="public-metric-value public-metric-value-amber" x-text="(totals.total_beras_kg || 0).toFixed(2).replace('.', ',') + ' Kg'"></p>
+                        <p class="public-metric-value public-metric-value-amber" x-text="formatBeras(totals.total_beras_kg)"></p>
                     </div>
                 </div>
             </div>

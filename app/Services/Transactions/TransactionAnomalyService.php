@@ -30,15 +30,15 @@ class TransactionAnomalyService
             'summary' => 'Data transaksi berubah setelah bukti cetak pernah keluar.',
             'next_step' => 'Pastikan perubahan sah dan tidak menimbulkan selisih dengan bukti yang sudah beredar.',
         ],
-        'restored_after_delete' => [
-            'label' => 'Direstore setelah dihapus',
-            'summary' => 'Transaksi sempat dihapus lalu dikembalikan ke riwayat aktif.',
-            'next_step' => 'Pastikan alasan restore jelas dan transaksi memang perlu diaktifkan kembali.',
-        ],
         'significant_nominal_change' => [
             'label' => 'Perubahan nominal signifikan',
             'summary' => 'Total uang atau beras pada grup transaksi berubah cukup besar.',
             'next_step' => 'Bandingkan nilai lama dan baru, lalu pastikan perubahan sesuai kebutuhan lapangan.',
+        ],
+        'statistical_outlier' => [
+            'label' => 'Outlier statistik',
+            'summary' => 'Nominal transaksi jauh di atas rata-rata kebiasaan penerimaan.',
+            'next_step' => 'Verifikasi apakah ada kesalahan ketik (typo) angka nol atau jamaah memang membayar dalam jumlah besar.',
         ],
     ];
 
