@@ -8,13 +8,6 @@ const dailySuggestedMax = (values, floor, step) => {
     return Math.max(floor, Math.ceil((max * 1.1) / step) * step);
 };
 
-const chartHasDataAtIndex = (chart, index) => {
-    const uang = chart.data.datasets[0].data[index];
-    const beras = chart.data.datasets[1].data[index];
-
-    return uang > 0 || beras > 0;
-};
-
 const dailyDatasetValues = (data, key) => {
     const dataset = data?.datasets?.find((item) => item.key === key);
 
@@ -22,6 +15,7 @@ const dailyDatasetValues = (data, key) => {
 };
 
 const dailyLabels = (data) => data?.labels ?? [];
+const publicChartFont = "'Plus Jakarta Sans', sans-serif";
 
 export const createChartService = (config) => ({
     updateDailyChart(newData) {
@@ -55,88 +49,79 @@ export const createChartService = (config) => ({
 
         const uangData = dailyDatasetValues(config.dailyChartData, 'uang');
         const berasData = dailyDatasetValues(config.dailyChartData, 'beras');
-        const uangGradient = dailyCtx.createLinearGradient(0, 0, 0, 400);
-        const berasGradient = dailyCtx.createLinearGradient(0, 0, 0, 400);
-
-        uangGradient.addColorStop(0, 'rgba(16, 185, 129, 0.2)');
-        uangGradient.addColorStop(1, 'rgba(16, 185, 129, 0)');
-        berasGradient.addColorStop(0, 'rgba(245, 158, 11, 0.2)');
-        berasGradient.addColorStop(1, 'rgba(245, 158, 11, 0)');
-
         window.myDailyChart = new Chart(dailyCtx, {
-            type: 'line',
+            type: 'bar',
             data: {
                 labels: dailyLabels(config.dailyChartData),
                 datasets: [
-                    { label: 'Uang Zakat', data: uangData, borderColor: '#10b981', borderWidth: 6, backgroundColor: uangGradient, fill: true, tension: 0.4, pointBackgroundColor: '#ffffff', pointBorderColor: '#10b981', pointBorderWidth: 4, pointRadius: 6, yAxisID: 'y' },
-                    { label: 'Beras Zakat', data: berasData, borderColor: '#f59e0b', borderWidth: 6, backgroundColor: berasGradient, fill: true, tension: 0.4, pointBackgroundColor: '#ffffff', pointBorderColor: '#f59e0b', pointBorderWidth: 4, pointRadius: 6, yAxisID: 'y1' },
+                    {
+                        label: 'Uang Zakat',
+                        data: uangData,
+                        backgroundColor: 'rgba(16, 185, 129, 0.78)',
+                        borderColor: '#10b981',
+                        borderWidth: 1.5,
+                        borderRadius: 8,
+                        borderSkipped: false,
+                        categoryPercentage: 0.56,
+                        barPercentage: 0.72,
+                        maxBarThickness: 18,
+                        yAxisID: 'y',
+                    },
+                    {
+                        label: 'Beras Zakat',
+                        data: berasData,
+                        backgroundColor: 'rgba(245, 158, 11, 0.62)',
+                        borderColor: '#f59e0b',
+                        borderWidth: 1.5,
+                        borderRadius: 8,
+                        borderSkipped: false,
+                        categoryPercentage: 0.56,
+                        barPercentage: 0.72,
+                        maxBarThickness: 18,
+                        yAxisID: 'y1',
+                    },
                 ],
             },
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
-                animations: { y: { type: 'number', duration: 1000, easing: 'easeOutQuart', from: (ctx) => ctx.type === 'data' ? ctx.chart.scales.y.bottom : null, delay: (ctx) => ctx.datasetIndex * 300 }, x: { duration: 0 } },
+                interaction: { mode: 'index', intersect: false },
+                animations: {
+                    y: {
+                        type: 'number',
+                        duration: 900,
+                        easing: 'easeOutQuart',
+                        from: (ctx) => ctx.type === 'data' ? ctx.chart.scales.y.bottom : null,
+                        delay: (ctx) => ctx.datasetIndex * 120,
+                    },
+                    x: { duration: 0 },
+                },
                 scales: {
-                    y: { position: 'left', beginAtZero: true, suggestedMax: dailySuggestedMax(uangData, 1, 1000000), grid: { color: 'rgba(241, 245, 249, 1)', drawBorder: false }, ticks: { font: { family: 'Outfit, sans-serif', weight: 'bold', size: 12 }, color: '#64748b', callback: (v) => v >= 1000000 ? 'Rp ' + (v / 1000000) + 'jt' : 'Rp ' + v } },
-                    y1: { position: 'right', beginAtZero: true, suggestedMax: dailySuggestedMax(berasData, 1, 25), grid: { drawOnChartArea: false }, ticks: { font: { family: 'Outfit, sans-serif', weight: 'bold', size: 12 }, color: '#f59e0b', callback: (v) => v + ' kg' } },
-                    x: { grid: { display: false }, ticks: { font: { family: 'Outfit, sans-serif', weight: 'bold', size: 12 }, color: '#64748b' } },
+                    y: { position: 'left', beginAtZero: true, suggestedMax: dailySuggestedMax(uangData, 1, 1000000), grid: { color: 'rgba(241, 245, 249, 1)', drawBorder: false }, ticks: { font: { family: publicChartFont, weight: '600', size: 12 }, color: '#64748b', callback: (v) => v >= 1000000 ? 'Rp ' + (v / 1000000) + 'jt' : 'Rp ' + v } },
+                    y1: { position: 'right', beginAtZero: true, suggestedMax: dailySuggestedMax(berasData, 1, 25), grid: { drawOnChartArea: false }, ticks: { font: { family: publicChartFont, weight: '600', size: 12 }, color: '#f59e0b', callback: (v) => v + ' kg' } },
+                    x: {
+                        grid: { display: false },
+                        ticks: {
+                            autoSkip: true,
+                            maxRotation: 0,
+                            minRotation: 0,
+                            font: { family: publicChartFont, weight: '600', size: 12 },
+                            color: '#64748b',
+                        },
+                    },
                 },
                 plugins: {
-                    legend: { position: 'top', labels: { usePointStyle: true, padding: 20, font: { family: 'Outfit, sans-serif', weight: 'bold', size: 12 } } },
+                    legend: { position: 'top', labels: { usePointStyle: true, padding: 20, font: { family: publicChartFont, weight: '600', size: 12 } } },
                     tooltip: { backgroundColor: '#1e293b', padding: 15, cornerRadius: 15, titleFont: { size: 14, weight: 'bold' }, bodyFont: { size: 13 }, callbacks: { label: (ctx) => ctx.datasetIndex === 0 ? 'Total Uang: Rp ' + ctx.parsed.y.toLocaleString('id-ID') : 'Total Beras: ' + ctx.parsed.y + ' Kg' } },
                 },
             },
         });
 
         clearTimeout(window.chartScanTimeout);
-        window.chartScanTimeout = setTimeout(() => this.autoHover(window.myDailyChart), 2800);
     },
 
     autoHover(chart) {
-        if (!chart || !chart.data.labels?.length) {
-            return;
-        }
-
-        const validIndices = chart.data.labels
-            .map((_, index) => index)
-            .filter((index) => chartHasDataAtIndex(chart, index));
-
-        if (validIndices.length === 0) {
-            return;
-        }
-
-        let currentIndex = 0;
-
-        const runStep = () => {
-            if (currentIndex >= validIndices.length) {
-                window.chartScanTimeout = setTimeout(() => {
-                    currentIndex = 0;
-                    runStep();
-                }, 5000);
-                return;
-            }
-
-            const index = validIndices[currentIndex];
-            const activeElements = [{ datasetIndex: 0, index }, { datasetIndex: 1, index }];
-            chart.setActiveElements(activeElements);
-            chart.tooltip.setActiveElements(activeElements, {
-                x: chart.getDatasetMeta(0).data[index].x,
-                y: chart.getDatasetMeta(0).data[index].y,
-            });
-            chart.update('none');
-
-            window.chartScanTimeout = setTimeout(() => {
-                chart.setActiveElements([]);
-                chart.tooltip.setActiveElements([], { x: 0, y: 0 });
-                chart.update('none');
-                window.chartScanTimeout = setTimeout(() => {
-                    currentIndex += 1;
-                    runStep();
-                }, 1000);
-            }, 1500);
-        };
-
-        runStep();
+        return chart;
     },
 
     initHistoricalChart() {

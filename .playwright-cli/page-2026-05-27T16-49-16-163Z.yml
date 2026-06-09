@@ -1,0 +1,864 @@
+- generic [ref=e2]:
+  - navigation [ref=e3]:
+    - generic [ref=e5]:
+      - link "Logo Zakat Annur Zakat Annur Masjid An-Nur Komplek BPK V Gandul" [ref=e7] [cursor=pointer]:
+        - /url: http://127.0.0.1:8000/dashboard
+        - generic [ref=e8]:
+          - img "Logo Zakat Annur" [ref=e9]
+          - generic [ref=e10]:
+            - generic [ref=e11]: Zakat Annur
+            - generic [ref=e12]: Masjid An-Nur Komplek BPK V Gandul
+      - button "Super Admin @superadmin" [ref=e16] [cursor=pointer]:
+        - img [ref=e18]
+        - generic [ref=e20]:
+          - generic [ref=e21]: Super Admin
+          - generic [ref=e22]: "@superadmin"
+        - img [ref=e23]
+  - banner [ref=e25]:
+    - generic [ref=e28]:
+      - generic [ref=e29]:
+        - heading "Riwayat Transaksi" [level=2] [ref=e30]:
+          - img [ref=e31]
+          - text: Riwayat Transaksi
+        - paragraph [ref=e33]: Pantau transaksi masuk, cari data yang dibutuhkan, lalu buka aksi operasional per transaksi.
+      - generic [ref=e34]:
+        - link "Input Baru" [ref=e35] [cursor=pointer]:
+          - /url: http://127.0.0.1:8000/internal/transactions/create
+          - img [ref=e36]
+          - text: Input Baru
+        - generic [ref=e38]:
+          - button "Export" [ref=e39] [cursor=pointer]:
+            - img [ref=e40]
+            - text: Export
+          - link "Sampah" [ref=e42] [cursor=pointer]:
+            - /url: http://127.0.0.1:8000/internal/transactions/trash
+            - img [ref=e43]
+  - main [ref=e45]:
+    - generic [ref=e48]:
+      - generic [ref=e49]:
+        - generic [ref=e50]:
+          - heading "Daftar Transaksi" [level=3] [ref=e53]
+          - paragraph [ref=e54]: Filter, cari, lalu buka aksi cepat per transaksi dari tabel ini.
+        - generic [ref=e55]:
+          - textbox "Cari nomor transaksi atau nama..." [ref=e56]
+          - generic [ref=e57]:
+            - combobox [ref=e58]:
+              - option "Semua Kategori" [selected]
+              - option "Zakat Fitrah"
+              - option "Fidyah"
+              - option "Zakat Mal"
+              - option "Infaq Shodaqoh"
+            - generic:
+              - img
+          - generic [ref=e59]:
+            - combobox [ref=e60]:
+              - option "Semua Tahun"
+              - option "2026" [selected]
+            - generic:
+              - img
+          - generic [ref=e61]:
+            - combobox [ref=e62]:
+              - option "Semua Periode" [selected]
+              - option "Ramadan 2026"
+            - generic:
+              - img
+          - button "Terapkan" [ref=e63] [cursor=pointer]:
+            - img [ref=e64]
+            - text: Terapkan
+          - link "Reset" [ref=e66] [cursor=pointer]:
+            - /url: http://127.0.0.1:8000/internal/history
+      - table [ref=e68]:
+        - rowgroup [ref=e69]:
+          - row "No. Transaksi Waktu Pembayar Kategori Bentuk Total Nominal Risiko Petugas Aksi" [ref=e70]:
+            - columnheader "No. Transaksi" [ref=e71]
+            - columnheader "Waktu" [ref=e72]
+            - columnheader "Pembayar" [ref=e73]
+            - columnheader "Kategori" [ref=e74]
+            - columnheader "Bentuk" [ref=e75]
+            - columnheader "Total Nominal" [ref=e76]
+            - columnheader "Risiko" [ref=e77]
+            - columnheader "Petugas" [ref=e78]
+            - columnheader "Aksi" [ref=e79]
+        - rowgroup [ref=e80]:
+          - row "TRX-20260321-0004 21/03/2026 00:17 Maulidiya Ulfa + 1 Muzakki Lainnya Zakat Fitrah Uang Rp 100.000 Normal Belum Review Rara Pagi Lihat transaksi Ubah transaksi Cetak tanda terima Hapus transaksi" [ref=e81]:
+            - cell "TRX-20260321-0004" [ref=e82]
+            - cell "21/03/2026 00:17" [ref=e83]:
+              - generic [ref=e84]:
+                - generic [ref=e85]: 21/03/2026
+                - generic [ref=e86]: 00:17
+            - cell "Maulidiya Ulfa + 1 Muzakki Lainnya" [ref=e87]:
+              - generic [ref=e88]: Maulidiya Ulfa
+              - generic [ref=e89]: + 1 Muzakki Lainnya
+            - cell "Zakat Fitrah" [ref=e90]:
+              - generic [ref=e93]: Zakat Fitrah
+            - cell "Uang" [ref=e94]:
+              - generic [ref=e96]: Uang
+            - cell "Rp 100.000" [ref=e97]:
+              - generic [ref=e99]: Rp 100.000
+            - cell "Normal Belum Review" [ref=e100]:
+              - generic [ref=e101]:
+                - generic [ref=e102]: Normal
+                - generic [ref=e103]: Belum Review
+            - cell "Rara Pagi" [ref=e104]:
+              - generic [ref=e105]:
+                - generic [ref=e106]: Rara
+                - generic [ref=e107]: Pagi
+            - cell "Lihat transaksi Ubah transaksi Cetak tanda terima Hapus transaksi" [ref=e108]:
+              - generic [ref=e109]:
+                - link "Lihat transaksi" [ref=e110] [cursor=pointer]:
+                  - /url: http://127.0.0.1:8000/internal/transactions/2888
+                  - img [ref=e111]
+                - link "Ubah transaksi" [ref=e114] [cursor=pointer]:
+                  - /url: http://127.0.0.1:8000/internal/transactions/2888/edit
+                  - img [ref=e115]
+                - link "Cetak tanda terima" [ref=e117] [cursor=pointer]:
+                  - /url: http://127.0.0.1:8000/internal/transactions/2888/receipt
+                  - img [ref=e118]
+                - button "Hapus transaksi" [ref=e120] [cursor=pointer]:
+                  - img [ref=e121]
+          - row "TRX-20260321-0003 21/03/2026 00:15 Riko Kamarullah + 2 Muzakki Lainnya Zakat Fitrah Uang Rp 150.000 TF Normal Belum Review Rara Pagi Lihat transaksi Ubah transaksi Cetak tanda terima Hapus transaksi" [ref=e123]:
+            - cell "TRX-20260321-0003" [ref=e124]
+            - cell "21/03/2026 00:15" [ref=e125]:
+              - generic [ref=e126]:
+                - generic [ref=e127]: 21/03/2026
+                - generic [ref=e128]: 00:15
+            - cell "Riko Kamarullah + 2 Muzakki Lainnya" [ref=e129]:
+              - generic [ref=e130]: Riko Kamarullah
+              - generic [ref=e131]: + 2 Muzakki Lainnya
+            - cell "Zakat Fitrah" [ref=e132]:
+              - generic [ref=e135]: Zakat Fitrah
+            - cell "Uang" [ref=e136]:
+              - generic [ref=e138]: Uang
+            - cell "Rp 150.000 TF" [ref=e139]:
+              - generic [ref=e141]:
+                - text: Rp 150.000
+                - generic [ref=e142]: TF
+            - cell "Normal Belum Review" [ref=e143]:
+              - generic [ref=e144]:
+                - generic [ref=e145]: Normal
+                - generic [ref=e146]: Belum Review
+            - cell "Rara Pagi" [ref=e147]:
+              - generic [ref=e148]:
+                - generic [ref=e149]: Rara
+                - generic [ref=e150]: Pagi
+            - cell "Lihat transaksi Ubah transaksi Cetak tanda terima Hapus transaksi" [ref=e151]:
+              - generic [ref=e152]:
+                - link "Lihat transaksi" [ref=e153] [cursor=pointer]:
+                  - /url: http://127.0.0.1:8000/internal/transactions/2886
+                  - img [ref=e154]
+                - link "Ubah transaksi" [ref=e157] [cursor=pointer]:
+                  - /url: http://127.0.0.1:8000/internal/transactions/2886/edit
+                  - img [ref=e158]
+                - link "Cetak tanda terima" [ref=e160] [cursor=pointer]:
+                  - /url: http://127.0.0.1:8000/internal/transactions/2886/receipt
+                  - img [ref=e161]
+                - button "Hapus transaksi" [ref=e163] [cursor=pointer]:
+                  - img [ref=e164]
+          - row "TRX-20260321-0002 21/03/2026 00:09 Ichsan Sabri Zakat Fitrah Uang Rp 50.000 Normal Belum Review Rara Pagi Lihat transaksi Ubah transaksi Cetak tanda terima Hapus transaksi" [ref=e166]:
+            - cell "TRX-20260321-0002" [ref=e167]
+            - cell "21/03/2026 00:09" [ref=e168]:
+              - generic [ref=e169]:
+                - generic [ref=e170]: 21/03/2026
+                - generic [ref=e171]: 00:09
+            - cell "Ichsan Sabri" [ref=e172]:
+              - generic [ref=e173]: Ichsan Sabri
+            - cell "Zakat Fitrah" [ref=e174]:
+              - generic [ref=e177]: Zakat Fitrah
+            - cell "Uang" [ref=e178]:
+              - generic [ref=e180]: Uang
+            - cell "Rp 50.000" [ref=e181]:
+              - generic [ref=e183]: Rp 50.000
+            - cell "Normal Belum Review" [ref=e184]:
+              - generic [ref=e185]:
+                - generic [ref=e186]: Normal
+                - generic [ref=e187]: Belum Review
+            - cell "Rara Pagi" [ref=e188]:
+              - generic [ref=e189]:
+                - generic [ref=e190]: Rara
+                - generic [ref=e191]: Pagi
+            - cell "Lihat transaksi Ubah transaksi Cetak tanda terima Hapus transaksi" [ref=e192]:
+              - generic [ref=e193]:
+                - link "Lihat transaksi" [ref=e194] [cursor=pointer]:
+                  - /url: http://127.0.0.1:8000/internal/transactions/2883
+                  - img [ref=e195]
+                - link "Ubah transaksi" [ref=e198] [cursor=pointer]:
+                  - /url: http://127.0.0.1:8000/internal/transactions/2883/edit
+                  - img [ref=e199]
+                - link "Cetak tanda terima" [ref=e201] [cursor=pointer]:
+                  - /url: http://127.0.0.1:8000/internal/transactions/2883/receipt
+                  - img [ref=e202]
+                - button "Hapus transaksi" [ref=e204] [cursor=pointer]:
+                  - img [ref=e205]
+          - row "TRX-20260321-0001 21/03/2026 00:06 Dwi Sasongko Ari Wibowo + 2 Muzakki Lainnya Zakat Fitrah Uang Rp 150.000 Normal Belum Review Lintang Pagi Lihat transaksi Ubah transaksi Cetak tanda terima Hapus transaksi" [ref=e207]:
+            - cell "TRX-20260321-0001" [ref=e208]
+            - cell "21/03/2026 00:06" [ref=e209]:
+              - generic [ref=e210]:
+                - generic [ref=e211]: 21/03/2026
+                - generic [ref=e212]: 00:06
+            - cell "Dwi Sasongko Ari Wibowo + 2 Muzakki Lainnya" [ref=e213]:
+              - generic [ref=e214]: Dwi Sasongko Ari Wibowo
+              - generic [ref=e215]: + 2 Muzakki Lainnya
+            - cell "Zakat Fitrah" [ref=e216]:
+              - generic [ref=e219]: Zakat Fitrah
+            - cell "Uang" [ref=e220]:
+              - generic [ref=e222]: Uang
+            - cell "Rp 150.000" [ref=e223]:
+              - generic [ref=e225]: Rp 150.000
+            - cell "Normal Belum Review" [ref=e226]:
+              - generic [ref=e227]:
+                - generic [ref=e228]: Normal
+                - generic [ref=e229]: Belum Review
+            - cell "Lintang Pagi" [ref=e230]:
+              - generic [ref=e231]:
+                - generic [ref=e232]: Lintang
+                - generic [ref=e233]: Pagi
+            - cell "Lihat transaksi Ubah transaksi Cetak tanda terima Hapus transaksi" [ref=e234]:
+              - generic [ref=e235]:
+                - link "Lihat transaksi" [ref=e236] [cursor=pointer]:
+                  - /url: http://127.0.0.1:8000/internal/transactions/2882
+                  - img [ref=e237]
+                - link "Ubah transaksi" [ref=e240] [cursor=pointer]:
+                  - /url: http://127.0.0.1:8000/internal/transactions/2882/edit
+                  - img [ref=e241]
+                - link "Cetak tanda terima" [ref=e243] [cursor=pointer]:
+                  - /url: http://127.0.0.1:8000/internal/transactions/2882/receipt
+                  - img [ref=e244]
+                - button "Hapus transaksi" [ref=e246] [cursor=pointer]:
+                  - img [ref=e247]
+          - row "TRX-20260320-0152 20/03/2026 23:59 Riswan Dedi + 1 Muzakki Lainnya Zakat Fitrah Uang Rp 300.000 Normal Belum Review Lintang Pagi Lihat transaksi Ubah transaksi Cetak tanda terima Hapus transaksi" [ref=e249]:
+            - cell "TRX-20260320-0152" [ref=e250]
+            - cell "20/03/2026 23:59" [ref=e251]:
+              - generic [ref=e252]:
+                - generic [ref=e253]: 20/03/2026
+                - generic [ref=e254]: 23:59
+            - cell "Riswan Dedi + 1 Muzakki Lainnya" [ref=e255]:
+              - generic [ref=e256]: Riswan Dedi
+              - generic [ref=e257]: + 1 Muzakki Lainnya
+            - cell "Zakat Fitrah" [ref=e258]:
+              - generic [ref=e261]: Zakat Fitrah
+            - cell "Uang" [ref=e262]:
+              - generic [ref=e264]: Uang
+            - cell "Rp 300.000" [ref=e265]:
+              - generic [ref=e267]: Rp 300.000
+            - cell "Normal Belum Review" [ref=e268]:
+              - generic [ref=e269]:
+                - generic [ref=e270]: Normal
+                - generic [ref=e271]: Belum Review
+            - cell "Lintang Pagi" [ref=e272]:
+              - generic [ref=e273]:
+                - generic [ref=e274]: Lintang
+                - generic [ref=e275]: Pagi
+            - cell "Lihat transaksi Ubah transaksi Cetak tanda terima Hapus transaksi" [ref=e276]:
+              - generic [ref=e277]:
+                - link "Lihat transaksi" [ref=e278] [cursor=pointer]:
+                  - /url: http://127.0.0.1:8000/internal/transactions/2879
+                  - img [ref=e279]
+                - link "Ubah transaksi" [ref=e282] [cursor=pointer]:
+                  - /url: http://127.0.0.1:8000/internal/transactions/2879/edit
+                  - img [ref=e283]
+                - link "Cetak tanda terima" [ref=e285] [cursor=pointer]:
+                  - /url: http://127.0.0.1:8000/internal/transactions/2879/receipt
+                  - img [ref=e286]
+                - button "Hapus transaksi" [ref=e288] [cursor=pointer]:
+                  - img [ref=e289]
+          - row "TRX-20260320-0145 20/03/2026 23:51 Amiderita + 1 Muzakki Lainnya Zakat Fitrah Infaq Shodaqoh Uang Rp 120.000 TF Normal Belum Review ZakatAnnur Pagi Lihat transaksi Ubah transaksi Cetak tanda terima Hapus transaksi" [ref=e291]:
+            - cell "TRX-20260320-0145" [ref=e292]
+            - cell "20/03/2026 23:51" [ref=e293]:
+              - generic [ref=e294]:
+                - generic [ref=e295]: 20/03/2026
+                - generic [ref=e296]: 23:51
+            - cell "Amiderita + 1 Muzakki Lainnya" [ref=e297]:
+              - generic [ref=e298]: Amiderita
+              - generic [ref=e299]: + 1 Muzakki Lainnya
+            - cell "Zakat Fitrah Infaq Shodaqoh" [ref=e300]:
+              - generic [ref=e301]:
+                - generic [ref=e303]: Zakat Fitrah
+                - generic [ref=e305]: Infaq Shodaqoh
+            - cell "Uang" [ref=e306]:
+              - generic [ref=e308]: Uang
+            - cell "Rp 120.000 TF" [ref=e309]:
+              - generic [ref=e311]:
+                - text: Rp 120.000
+                - generic [ref=e312]: TF
+            - cell "Normal Belum Review" [ref=e313]:
+              - generic [ref=e314]:
+                - generic [ref=e315]: Normal
+                - generic [ref=e316]: Belum Review
+            - cell "ZakatAnnur Pagi" [ref=e317]:
+              - generic [ref=e318]:
+                - generic [ref=e319]: ZakatAnnur
+                - generic [ref=e320]: Pagi
+            - cell "Lihat transaksi Ubah transaksi Cetak tanda terima Hapus transaksi" [ref=e321]:
+              - generic [ref=e322]:
+                - link "Lihat transaksi" [ref=e323] [cursor=pointer]:
+                  - /url: http://127.0.0.1:8000/internal/transactions/2852
+                  - img [ref=e324]
+                - link "Ubah transaksi" [ref=e327] [cursor=pointer]:
+                  - /url: http://127.0.0.1:8000/internal/transactions/2852/edit
+                  - img [ref=e328]
+                - link "Cetak tanda terima" [ref=e330] [cursor=pointer]:
+                  - /url: http://127.0.0.1:8000/internal/transactions/2852/receipt
+                  - img [ref=e331]
+                - button "Hapus transaksi" [ref=e333] [cursor=pointer]:
+                  - img [ref=e334]
+          - row "TRX-20260320-0151 20/03/2026 23:51 Mohammadsyah + 3 Muzakki Lainnya Zakat Fitrah Uang Rp 200.000 Normal Belum Review Lintang Pagi Lihat transaksi Ubah transaksi Cetak tanda terima Hapus transaksi" [ref=e336]:
+            - cell "TRX-20260320-0151" [ref=e337]
+            - cell "20/03/2026 23:51" [ref=e338]:
+              - generic [ref=e339]:
+                - generic [ref=e340]: 20/03/2026
+                - generic [ref=e341]: 23:51
+            - cell "Mohammadsyah + 3 Muzakki Lainnya" [ref=e342]:
+              - generic [ref=e343]: Mohammadsyah
+              - generic [ref=e344]: + 3 Muzakki Lainnya
+            - cell "Zakat Fitrah" [ref=e345]:
+              - generic [ref=e348]: Zakat Fitrah
+            - cell "Uang" [ref=e349]:
+              - generic [ref=e351]: Uang
+            - cell "Rp 200.000" [ref=e352]:
+              - generic [ref=e354]: Rp 200.000
+            - cell "Normal Belum Review" [ref=e355]:
+              - generic [ref=e356]:
+                - generic [ref=e357]: Normal
+                - generic [ref=e358]: Belum Review
+            - cell "Lintang Pagi" [ref=e359]:
+              - generic [ref=e360]:
+                - generic [ref=e361]: Lintang
+                - generic [ref=e362]: Pagi
+            - cell "Lihat transaksi Ubah transaksi Cetak tanda terima Hapus transaksi" [ref=e363]:
+              - generic [ref=e364]:
+                - link "Lihat transaksi" [ref=e365] [cursor=pointer]:
+                  - /url: http://127.0.0.1:8000/internal/transactions/2873
+                  - img [ref=e366]
+                - link "Ubah transaksi" [ref=e369] [cursor=pointer]:
+                  - /url: http://127.0.0.1:8000/internal/transactions/2873/edit
+                  - img [ref=e370]
+                - link "Cetak tanda terima" [ref=e372] [cursor=pointer]:
+                  - /url: http://127.0.0.1:8000/internal/transactions/2873/receipt
+                  - img [ref=e373]
+                - button "Hapus transaksi" [ref=e375] [cursor=pointer]:
+                  - img [ref=e376]
+          - row "TRX-20260320-0146 20/03/2026 23:50 William + 1 Muzakki Lainnya Zakat Fitrah Infaq Shodaqoh Uang Rp 200.000 TF Normal Belum Review ZakatAnnur Pagi Lihat transaksi Ubah transaksi Cetak tanda terima Hapus transaksi" [ref=e378]:
+            - cell "TRX-20260320-0146" [ref=e379]
+            - cell "20/03/2026 23:50" [ref=e380]:
+              - generic [ref=e381]:
+                - generic [ref=e382]: 20/03/2026
+                - generic [ref=e383]: 23:50
+            - cell "William + 1 Muzakki Lainnya" [ref=e384]:
+              - generic [ref=e385]: William
+              - generic [ref=e386]: + 1 Muzakki Lainnya
+            - cell "Zakat Fitrah Infaq Shodaqoh" [ref=e387]:
+              - generic [ref=e388]:
+                - generic [ref=e390]: Zakat Fitrah
+                - generic [ref=e392]: Infaq Shodaqoh
+            - cell "Uang" [ref=e393]:
+              - generic [ref=e395]: Uang
+            - cell "Rp 200.000 TF" [ref=e396]:
+              - generic [ref=e398]:
+                - text: Rp 200.000
+                - generic [ref=e399]: TF
+            - cell "Normal Belum Review" [ref=e400]:
+              - generic [ref=e401]:
+                - generic [ref=e402]: Normal
+                - generic [ref=e403]: Belum Review
+            - cell "ZakatAnnur Pagi" [ref=e404]:
+              - generic [ref=e405]:
+                - generic [ref=e406]: ZakatAnnur
+                - generic [ref=e407]: Pagi
+            - cell "Lihat transaksi Ubah transaksi Cetak tanda terima Hapus transaksi" [ref=e408]:
+              - generic [ref=e409]:
+                - link "Lihat transaksi" [ref=e410] [cursor=pointer]:
+                  - /url: http://127.0.0.1:8000/internal/transactions/2855
+                  - img [ref=e411]
+                - link "Ubah transaksi" [ref=e414] [cursor=pointer]:
+                  - /url: http://127.0.0.1:8000/internal/transactions/2855/edit
+                  - img [ref=e415]
+                - link "Cetak tanda terima" [ref=e417] [cursor=pointer]:
+                  - /url: http://127.0.0.1:8000/internal/transactions/2855/receipt
+                  - img [ref=e418]
+                - button "Hapus transaksi" [ref=e420] [cursor=pointer]:
+                  - img [ref=e421]
+          - row "TRX-20260320-0150 20/03/2026 23:49 Adri Aji Pitria Utama + 2 Muzakki Lainnya Zakat Fitrah Uang Rp 150.000 Normal Belum Review Lintang Pagi Lihat transaksi Ubah transaksi Cetak tanda terima Hapus transaksi" [ref=e423]:
+            - cell "TRX-20260320-0150" [ref=e424]
+            - cell "20/03/2026 23:49" [ref=e425]:
+              - generic [ref=e426]:
+                - generic [ref=e427]: 20/03/2026
+                - generic [ref=e428]: 23:49
+            - cell "Adri Aji Pitria Utama + 2 Muzakki Lainnya" [ref=e429]:
+              - generic [ref=e430]: Adri Aji Pitria Utama
+              - generic [ref=e431]: + 2 Muzakki Lainnya
+            - cell "Zakat Fitrah" [ref=e432]:
+              - generic [ref=e435]: Zakat Fitrah
+            - cell "Uang" [ref=e436]:
+              - generic [ref=e438]: Uang
+            - cell "Rp 150.000" [ref=e439]:
+              - generic [ref=e441]: Rp 150.000
+            - cell "Normal Belum Review" [ref=e442]:
+              - generic [ref=e443]:
+                - generic [ref=e444]: Normal
+                - generic [ref=e445]: Belum Review
+            - cell "Lintang Pagi" [ref=e446]:
+              - generic [ref=e447]:
+                - generic [ref=e448]: Lintang
+                - generic [ref=e449]: Pagi
+            - cell "Lihat transaksi Ubah transaksi Cetak tanda terima Hapus transaksi" [ref=e450]:
+              - generic [ref=e451]:
+                - link "Lihat transaksi" [ref=e452] [cursor=pointer]:
+                  - /url: http://127.0.0.1:8000/internal/transactions/2869
+                  - img [ref=e453]
+                - link "Ubah transaksi" [ref=e456] [cursor=pointer]:
+                  - /url: http://127.0.0.1:8000/internal/transactions/2869/edit
+                  - img [ref=e457]
+                - link "Cetak tanda terima" [ref=e459] [cursor=pointer]:
+                  - /url: http://127.0.0.1:8000/internal/transactions/2869/receipt
+                  - img [ref=e460]
+                - button "Hapus transaksi" [ref=e462] [cursor=pointer]:
+                  - img [ref=e463]
+          - row "TRX-20260320-0149 20/03/2026 23:48 Ganesha Triadi Pratama + 1 Muzakki Lainnya Zakat Fitrah Infaq Shodaqoh Uang Rp 200.000 Normal Belum Review Lintang Pagi Lihat transaksi Ubah transaksi Cetak tanda terima Hapus transaksi" [ref=e465]:
+            - cell "TRX-20260320-0149" [ref=e466]
+            - cell "20/03/2026 23:48" [ref=e467]:
+              - generic [ref=e468]:
+                - generic [ref=e469]: 20/03/2026
+                - generic [ref=e470]: 23:48
+            - cell "Ganesha Triadi Pratama + 1 Muzakki Lainnya" [ref=e471]:
+              - generic [ref=e472]: Ganesha Triadi Pratama
+              - generic [ref=e473]: + 1 Muzakki Lainnya
+            - cell "Zakat Fitrah Infaq Shodaqoh" [ref=e474]:
+              - generic [ref=e475]:
+                - generic [ref=e477]: Zakat Fitrah
+                - generic [ref=e479]: Infaq Shodaqoh
+            - cell "Uang" [ref=e480]:
+              - generic [ref=e482]: Uang
+            - cell "Rp 200.000" [ref=e483]:
+              - generic [ref=e485]: Rp 200.000
+            - cell "Normal Belum Review" [ref=e486]:
+              - generic [ref=e487]:
+                - generic [ref=e488]: Normal
+                - generic [ref=e489]: Belum Review
+            - cell "Lintang Pagi" [ref=e490]:
+              - generic [ref=e491]:
+                - generic [ref=e492]: Lintang
+                - generic [ref=e493]: Pagi
+            - cell "Lihat transaksi Ubah transaksi Cetak tanda terima Hapus transaksi" [ref=e494]:
+              - generic [ref=e495]:
+                - link "Lihat transaksi" [ref=e496] [cursor=pointer]:
+                  - /url: http://127.0.0.1:8000/internal/transactions/2866
+                  - img [ref=e497]
+                - link "Ubah transaksi" [ref=e500] [cursor=pointer]:
+                  - /url: http://127.0.0.1:8000/internal/transactions/2866/edit
+                  - img [ref=e501]
+                - link "Cetak tanda terima" [ref=e503] [cursor=pointer]:
+                  - /url: http://127.0.0.1:8000/internal/transactions/2866/receipt
+                  - img [ref=e504]
+                - button "Hapus transaksi" [ref=e506] [cursor=pointer]:
+                  - img [ref=e507]
+          - row "TRX-20260320-0148 20/03/2026 23:46 Eko Tri Nugroho + 3 Muzakki Lainnya Zakat Fitrah Infaq Shodaqoh Uang Rp 400.000 Normal Belum Review Lintang Pagi Lihat transaksi Ubah transaksi Cetak tanda terima Hapus transaksi" [ref=e509]:
+            - cell "TRX-20260320-0148" [ref=e510]
+            - cell "20/03/2026 23:46" [ref=e511]:
+              - generic [ref=e512]:
+                - generic [ref=e513]: 20/03/2026
+                - generic [ref=e514]: 23:46
+            - cell "Eko Tri Nugroho + 3 Muzakki Lainnya" [ref=e515]:
+              - generic [ref=e516]: Eko Tri Nugroho
+              - generic [ref=e517]: + 3 Muzakki Lainnya
+            - cell "Zakat Fitrah Infaq Shodaqoh" [ref=e518]:
+              - generic [ref=e519]:
+                - generic [ref=e521]: Zakat Fitrah
+                - generic [ref=e523]: Infaq Shodaqoh
+            - cell "Uang" [ref=e524]:
+              - generic [ref=e526]: Uang
+            - cell "Rp 400.000" [ref=e527]:
+              - generic [ref=e529]: Rp 400.000
+            - cell "Normal Belum Review" [ref=e530]:
+              - generic [ref=e531]:
+                - generic [ref=e532]: Normal
+                - generic [ref=e533]: Belum Review
+            - cell "Lintang Pagi" [ref=e534]:
+              - generic [ref=e535]:
+                - generic [ref=e536]: Lintang
+                - generic [ref=e537]: Pagi
+            - cell "Lihat transaksi Ubah transaksi Cetak tanda terima Hapus transaksi" [ref=e538]:
+              - generic [ref=e539]:
+                - link "Lihat transaksi" [ref=e540] [cursor=pointer]:
+                  - /url: http://127.0.0.1:8000/internal/transactions/2863
+                  - img [ref=e541]
+                - link "Ubah transaksi" [ref=e544] [cursor=pointer]:
+                  - /url: http://127.0.0.1:8000/internal/transactions/2863/edit
+                  - img [ref=e545]
+                - link "Cetak tanda terima" [ref=e547] [cursor=pointer]:
+                  - /url: http://127.0.0.1:8000/internal/transactions/2863/receipt
+                  - img [ref=e548]
+                - button "Hapus transaksi" [ref=e550] [cursor=pointer]:
+                  - img [ref=e551]
+          - row "TRX-20260320-0147 20/03/2026 23:44 Samsudin + 2 Muzakki Lainnya Zakat Fitrah Uang Rp 150.000 TF Normal Belum Review Lintang Pagi Lihat transaksi Ubah transaksi Cetak tanda terima Hapus transaksi" [ref=e553]:
+            - cell "TRX-20260320-0147" [ref=e554]
+            - cell "20/03/2026 23:44" [ref=e555]:
+              - generic [ref=e556]:
+                - generic [ref=e557]: 20/03/2026
+                - generic [ref=e558]: 23:44
+            - cell "Samsudin + 2 Muzakki Lainnya" [ref=e559]:
+              - generic [ref=e560]: Samsudin
+              - generic [ref=e561]: + 2 Muzakki Lainnya
+            - cell "Zakat Fitrah" [ref=e562]:
+              - generic [ref=e565]: Zakat Fitrah
+            - cell "Uang" [ref=e566]:
+              - generic [ref=e568]: Uang
+            - cell "Rp 150.000 TF" [ref=e569]:
+              - generic [ref=e571]:
+                - text: Rp 150.000
+                - generic [ref=e572]: TF
+            - cell "Normal Belum Review" [ref=e573]:
+              - generic [ref=e574]:
+                - generic [ref=e575]: Normal
+                - generic [ref=e576]: Belum Review
+            - cell "Lintang Pagi" [ref=e577]:
+              - generic [ref=e578]:
+                - generic [ref=e579]: Lintang
+                - generic [ref=e580]: Pagi
+            - cell "Lihat transaksi Ubah transaksi Cetak tanda terima Hapus transaksi" [ref=e581]:
+              - generic [ref=e582]:
+                - link "Lihat transaksi" [ref=e583] [cursor=pointer]:
+                  - /url: http://127.0.0.1:8000/internal/transactions/2858
+                  - img [ref=e584]
+                - link "Ubah transaksi" [ref=e587] [cursor=pointer]:
+                  - /url: http://127.0.0.1:8000/internal/transactions/2858/edit
+                  - img [ref=e588]
+                - link "Cetak tanda terima" [ref=e590] [cursor=pointer]:
+                  - /url: http://127.0.0.1:8000/internal/transactions/2858/receipt
+                  - img [ref=e591]
+                - button "Hapus transaksi" [ref=e593] [cursor=pointer]:
+                  - img [ref=e594]
+          - row "TRX-20260320-0144 20/03/2026 22:21 Welldy Daud + 1 Muzakki Lainnya Zakat Fitrah Uang Rp 100.000 Normal Belum Review Rara Pagi Lihat transaksi Ubah transaksi Cetak tanda terima Hapus transaksi" [ref=e596]:
+            - cell "TRX-20260320-0144" [ref=e597]
+            - cell "20/03/2026 22:21" [ref=e598]:
+              - generic [ref=e599]:
+                - generic [ref=e600]: 20/03/2026
+                - generic [ref=e601]: 22:21
+            - cell "Welldy Daud + 1 Muzakki Lainnya" [ref=e602]:
+              - generic [ref=e603]: Welldy Daud
+              - generic [ref=e604]: + 1 Muzakki Lainnya
+            - cell "Zakat Fitrah" [ref=e605]:
+              - generic [ref=e608]: Zakat Fitrah
+            - cell "Uang" [ref=e609]:
+              - generic [ref=e611]: Uang
+            - cell "Rp 100.000" [ref=e612]:
+              - generic [ref=e614]: Rp 100.000
+            - cell "Normal Belum Review" [ref=e615]:
+              - generic [ref=e616]:
+                - generic [ref=e617]: Normal
+                - generic [ref=e618]: Belum Review
+            - cell "Rara Pagi" [ref=e619]:
+              - generic [ref=e620]:
+                - generic [ref=e621]: Rara
+                - generic [ref=e622]: Pagi
+            - cell "Lihat transaksi Ubah transaksi Cetak tanda terima Hapus transaksi" [ref=e623]:
+              - generic [ref=e624]:
+                - link "Lihat transaksi" [ref=e625] [cursor=pointer]:
+                  - /url: http://127.0.0.1:8000/internal/transactions/2849
+                  - img [ref=e626]
+                - link "Ubah transaksi" [ref=e629] [cursor=pointer]:
+                  - /url: http://127.0.0.1:8000/internal/transactions/2849/edit
+                  - img [ref=e630]
+                - link "Cetak tanda terima" [ref=e632] [cursor=pointer]:
+                  - /url: http://127.0.0.1:8000/internal/transactions/2849/receipt
+                  - img [ref=e633]
+                - button "Hapus transaksi" [ref=e635] [cursor=pointer]:
+                  - img [ref=e636]
+          - row "TRX-20260320-0143 20/03/2026 22:15 Rochati Maryanah Zakat Fitrah Infaq Shodaqoh Uang Rp 100.000 TF Normal Belum Review Anas Malam Lihat transaksi Ubah transaksi Cetak tanda terima Hapus transaksi" [ref=e638]:
+            - cell "TRX-20260320-0143" [ref=e639]
+            - cell "20/03/2026 22:15" [ref=e640]:
+              - generic [ref=e641]:
+                - generic [ref=e642]: 20/03/2026
+                - generic [ref=e643]: 22:15
+            - cell "Rochati Maryanah" [ref=e644]:
+              - generic [ref=e645]: Rochati Maryanah
+            - cell "Zakat Fitrah Infaq Shodaqoh" [ref=e646]:
+              - generic [ref=e647]:
+                - generic [ref=e649]: Zakat Fitrah
+                - generic [ref=e651]: Infaq Shodaqoh
+            - cell "Uang" [ref=e652]:
+              - generic [ref=e654]: Uang
+            - cell "Rp 100.000 TF" [ref=e655]:
+              - generic [ref=e657]:
+                - text: Rp 100.000
+                - generic [ref=e658]: TF
+            - cell "Normal Belum Review" [ref=e659]:
+              - generic [ref=e660]:
+                - generic [ref=e661]: Normal
+                - generic [ref=e662]: Belum Review
+            - cell "Anas Malam" [ref=e663]:
+              - generic [ref=e664]:
+                - generic [ref=e665]: Anas
+                - generic [ref=e666]: Malam
+            - cell "Lihat transaksi Ubah transaksi Cetak tanda terima Hapus transaksi" [ref=e667]:
+              - generic [ref=e668]:
+                - link "Lihat transaksi" [ref=e669] [cursor=pointer]:
+                  - /url: http://127.0.0.1:8000/internal/transactions/2847
+                  - img [ref=e670]
+                - link "Ubah transaksi" [ref=e673] [cursor=pointer]:
+                  - /url: http://127.0.0.1:8000/internal/transactions/2847/edit
+                  - img [ref=e674]
+                - link "Cetak tanda terima" [ref=e676] [cursor=pointer]:
+                  - /url: http://127.0.0.1:8000/internal/transactions/2847/receipt
+                  - img [ref=e677]
+                - button "Hapus transaksi" [ref=e679] [cursor=pointer]:
+                  - img [ref=e680]
+          - row "TRX-20260320-0142 20/03/2026 22:09 Abdul Aziz + 2 Muzakki Lainnya Zakat Fitrah Uang Rp 150.000 Normal Belum Review Anas Malam Lihat transaksi Ubah transaksi Cetak tanda terima Hapus transaksi" [ref=e682]:
+            - cell "TRX-20260320-0142" [ref=e683]
+            - cell "20/03/2026 22:09" [ref=e684]:
+              - generic [ref=e685]:
+                - generic [ref=e686]: 20/03/2026
+                - generic [ref=e687]: 22:09
+            - cell "Abdul Aziz + 2 Muzakki Lainnya" [ref=e688]:
+              - generic [ref=e689]: Abdul Aziz
+              - generic [ref=e690]: + 2 Muzakki Lainnya
+            - cell "Zakat Fitrah" [ref=e691]:
+              - generic [ref=e694]: Zakat Fitrah
+            - cell "Uang" [ref=e695]:
+              - generic [ref=e697]: Uang
+            - cell "Rp 150.000" [ref=e698]:
+              - generic [ref=e700]: Rp 150.000
+            - cell "Normal Belum Review" [ref=e701]:
+              - generic [ref=e702]:
+                - generic [ref=e703]: Normal
+                - generic [ref=e704]: Belum Review
+            - cell "Anas Malam" [ref=e705]:
+              - generic [ref=e706]:
+                - generic [ref=e707]: Anas
+                - generic [ref=e708]: Malam
+            - cell "Lihat transaksi Ubah transaksi Cetak tanda terima Hapus transaksi" [ref=e709]:
+              - generic [ref=e710]:
+                - link "Lihat transaksi" [ref=e711] [cursor=pointer]:
+                  - /url: http://127.0.0.1:8000/internal/transactions/2845
+                  - img [ref=e712]
+                - link "Ubah transaksi" [ref=e715] [cursor=pointer]:
+                  - /url: http://127.0.0.1:8000/internal/transactions/2845/edit
+                  - img [ref=e716]
+                - link "Cetak tanda terima" [ref=e718] [cursor=pointer]:
+                  - /url: http://127.0.0.1:8000/internal/transactions/2845/receipt
+                  - img [ref=e719]
+                - button "Hapus transaksi" [ref=e721] [cursor=pointer]:
+                  - img [ref=e722]
+          - row "TRX-20260320-0141 20/03/2026 22:09 Balgis Ismet Fidyah Uang Rp 750.000 Normal Belum Review ashfi Malam Lihat transaksi Ubah transaksi Cetak tanda terima Hapus transaksi" [ref=e724]:
+            - cell "TRX-20260320-0141" [ref=e725]
+            - cell "20/03/2026 22:09" [ref=e726]:
+              - generic [ref=e727]:
+                - generic [ref=e728]: 20/03/2026
+                - generic [ref=e729]: 22:09
+            - cell "Balgis Ismet" [ref=e730]:
+              - generic [ref=e731]: Balgis Ismet
+            - cell "Fidyah" [ref=e732]:
+              - generic [ref=e735]: Fidyah
+            - cell "Uang" [ref=e736]:
+              - generic [ref=e738]: Uang
+            - cell "Rp 750.000" [ref=e739]:
+              - generic [ref=e741]: Rp 750.000
+            - cell "Normal Belum Review" [ref=e742]:
+              - generic [ref=e743]:
+                - generic [ref=e744]: Normal
+                - generic [ref=e745]: Belum Review
+            - cell "ashfi Malam" [ref=e746]:
+              - generic [ref=e747]:
+                - generic [ref=e748]: ashfi
+                - generic [ref=e749]: Malam
+            - cell "Lihat transaksi Ubah transaksi Cetak tanda terima Hapus transaksi" [ref=e750]:
+              - generic [ref=e751]:
+                - link "Lihat transaksi" [ref=e752] [cursor=pointer]:
+                  - /url: http://127.0.0.1:8000/internal/transactions/2842
+                  - img [ref=e753]
+                - link "Ubah transaksi" [ref=e756] [cursor=pointer]:
+                  - /url: http://127.0.0.1:8000/internal/transactions/2842/edit
+                  - img [ref=e757]
+                - link "Cetak tanda terima" [ref=e759] [cursor=pointer]:
+                  - /url: http://127.0.0.1:8000/internal/transactions/2842/receipt
+                  - img [ref=e760]
+                - button "Hapus transaksi" [ref=e762] [cursor=pointer]:
+                  - img [ref=e763]
+          - row "TRX-20260320-0140 20/03/2026 22:03 Muhammad Fadel Baabud Zakat Mal Uang Rp 5.000.000 Normal Belum Review ashfi Malam Lihat transaksi Ubah transaksi Cetak tanda terima Hapus transaksi" [ref=e765]:
+            - cell "TRX-20260320-0140" [ref=e766]
+            - cell "20/03/2026 22:03" [ref=e767]:
+              - generic [ref=e768]:
+                - generic [ref=e769]: 20/03/2026
+                - generic [ref=e770]: 22:03
+            - cell "Muhammad Fadel Baabud" [ref=e771]:
+              - generic [ref=e772]: Muhammad Fadel Baabud
+            - cell "Zakat Mal" [ref=e773]:
+              - generic [ref=e776]: Zakat Mal
+            - cell "Uang" [ref=e777]:
+              - generic [ref=e779]: Uang
+            - cell "Rp 5.000.000" [ref=e780]:
+              - generic [ref=e782]: Rp 5.000.000
+            - cell "Normal Belum Review" [ref=e783]:
+              - generic [ref=e784]:
+                - generic [ref=e785]: Normal
+                - generic [ref=e786]: Belum Review
+            - cell "ashfi Malam" [ref=e787]:
+              - generic [ref=e788]:
+                - generic [ref=e789]: ashfi
+                - generic [ref=e790]: Malam
+            - cell "Lihat transaksi Ubah transaksi Cetak tanda terima Hapus transaksi" [ref=e791]:
+              - generic [ref=e792]:
+                - link "Lihat transaksi" [ref=e793] [cursor=pointer]:
+                  - /url: http://127.0.0.1:8000/internal/transactions/2841
+                  - img [ref=e794]
+                - link "Ubah transaksi" [ref=e797] [cursor=pointer]:
+                  - /url: http://127.0.0.1:8000/internal/transactions/2841/edit
+                  - img [ref=e798]
+                - link "Cetak tanda terima" [ref=e800] [cursor=pointer]:
+                  - /url: http://127.0.0.1:8000/internal/transactions/2841/receipt
+                  - img [ref=e801]
+                - button "Hapus transaksi" [ref=e803] [cursor=pointer]:
+                  - img [ref=e804]
+          - row "TRX-20260320-0139 20/03/2026 22:00 Muhammad Fadel Baabud + 2 Muzakki Lainnya Zakat Fitrah Infaq Shodaqoh Uang Rp 200.000 Normal Belum Review ashfi Malam Lihat transaksi Ubah transaksi Cetak tanda terima Hapus transaksi" [ref=e806]:
+            - cell "TRX-20260320-0139" [ref=e807]
+            - cell "20/03/2026 22:00" [ref=e808]:
+              - generic [ref=e809]:
+                - generic [ref=e810]: 20/03/2026
+                - generic [ref=e811]: 22:00
+            - cell "Muhammad Fadel Baabud + 2 Muzakki Lainnya" [ref=e812]:
+              - generic [ref=e813]: Muhammad Fadel Baabud
+              - generic [ref=e814]: + 2 Muzakki Lainnya
+            - cell "Zakat Fitrah Infaq Shodaqoh" [ref=e815]:
+              - generic [ref=e816]:
+                - generic [ref=e818]: Zakat Fitrah
+                - generic [ref=e820]: Infaq Shodaqoh
+            - cell "Uang" [ref=e821]:
+              - generic [ref=e823]: Uang
+            - cell "Rp 200.000" [ref=e824]:
+              - generic [ref=e826]: Rp 200.000
+            - cell "Normal Belum Review" [ref=e827]:
+              - generic [ref=e828]:
+                - generic [ref=e829]: Normal
+                - generic [ref=e830]: Belum Review
+            - cell "ashfi Malam" [ref=e831]:
+              - generic [ref=e832]:
+                - generic [ref=e833]: ashfi
+                - generic [ref=e834]: Malam
+            - cell "Lihat transaksi Ubah transaksi Cetak tanda terima Hapus transaksi" [ref=e835]:
+              - generic [ref=e836]:
+                - link "Lihat transaksi" [ref=e837] [cursor=pointer]:
+                  - /url: http://127.0.0.1:8000/internal/transactions/2840
+                  - img [ref=e838]
+                - link "Ubah transaksi" [ref=e841] [cursor=pointer]:
+                  - /url: http://127.0.0.1:8000/internal/transactions/2840/edit
+                  - img [ref=e842]
+                - link "Cetak tanda terima" [ref=e844] [cursor=pointer]:
+                  - /url: http://127.0.0.1:8000/internal/transactions/2840/receipt
+                  - img [ref=e845]
+                - button "Hapus transaksi" [ref=e847] [cursor=pointer]:
+                  - img [ref=e848]
+          - row "TRX-20260320-0138 20/03/2026 21:55 Budiyasto + 5 Muzakki Lainnya Zakat Fitrah Uang Rp 300.000 Normal Belum Review azka Malam Lihat transaksi Ubah transaksi Cetak tanda terima Hapus transaksi" [ref=e850]:
+            - cell "TRX-20260320-0138" [ref=e851]
+            - cell "20/03/2026 21:55" [ref=e852]:
+              - generic [ref=e853]:
+                - generic [ref=e854]: 20/03/2026
+                - generic [ref=e855]: 21:55
+            - cell "Budiyasto + 5 Muzakki Lainnya" [ref=e856]:
+              - generic [ref=e857]: Budiyasto
+              - generic [ref=e858]: + 5 Muzakki Lainnya
+            - cell "Zakat Fitrah" [ref=e859]:
+              - generic [ref=e862]: Zakat Fitrah
+            - cell "Uang" [ref=e863]:
+              - generic [ref=e865]: Uang
+            - cell "Rp 300.000" [ref=e866]:
+              - generic [ref=e868]: Rp 300.000
+            - cell "Normal Belum Review" [ref=e869]:
+              - generic [ref=e870]:
+                - generic [ref=e871]: Normal
+                - generic [ref=e872]: Belum Review
+            - cell "azka Malam" [ref=e873]:
+              - generic [ref=e874]:
+                - generic [ref=e875]: azka
+                - generic [ref=e876]: Malam
+            - cell "Lihat transaksi Ubah transaksi Cetak tanda terima Hapus transaksi" [ref=e877]:
+              - generic [ref=e878]:
+                - link "Lihat transaksi" [ref=e879] [cursor=pointer]:
+                  - /url: http://127.0.0.1:8000/internal/transactions/2836
+                  - img [ref=e880]
+                - link "Ubah transaksi" [ref=e883] [cursor=pointer]:
+                  - /url: http://127.0.0.1:8000/internal/transactions/2836/edit
+                  - img [ref=e884]
+                - link "Cetak tanda terima" [ref=e886] [cursor=pointer]:
+                  - /url: http://127.0.0.1:8000/internal/transactions/2836/receipt
+                  - img [ref=e887]
+                - button "Hapus transaksi" [ref=e889] [cursor=pointer]:
+                  - img [ref=e890]
+          - row "TRX-20260320-0137 20/03/2026 21:48 Rully Ade Saputra + 2 Muzakki Lainnya Zakat Fitrah Uang Rp 150.000 Normal Belum Review Ninna Malam Lihat transaksi Ubah transaksi Cetak tanda terima Hapus transaksi" [ref=e892]:
+            - cell "TRX-20260320-0137" [ref=e893]
+            - cell "20/03/2026 21:48" [ref=e894]:
+              - generic [ref=e895]:
+                - generic [ref=e896]: 20/03/2026
+                - generic [ref=e897]: 21:48
+            - cell "Rully Ade Saputra + 2 Muzakki Lainnya" [ref=e898]:
+              - generic [ref=e899]: Rully Ade Saputra
+              - generic [ref=e900]: + 2 Muzakki Lainnya
+            - cell "Zakat Fitrah" [ref=e901]:
+              - generic [ref=e904]: Zakat Fitrah
+            - cell "Uang" [ref=e905]:
+              - generic [ref=e907]: Uang
+            - cell "Rp 150.000" [ref=e908]:
+              - generic [ref=e910]: Rp 150.000
+            - cell "Normal Belum Review" [ref=e911]:
+              - generic [ref=e912]:
+                - generic [ref=e913]: Normal
+                - generic [ref=e914]: Belum Review
+            - cell "Ninna Malam" [ref=e915]:
+              - generic [ref=e916]:
+                - generic [ref=e917]: Ninna
+                - generic [ref=e918]: Malam
+            - cell "Lihat transaksi Ubah transaksi Cetak tanda terima Hapus transaksi" [ref=e919]:
+              - generic [ref=e920]:
+                - link "Lihat transaksi" [ref=e921] [cursor=pointer]:
+                  - /url: http://127.0.0.1:8000/internal/transactions/2830
+                  - img [ref=e922]
+                - link "Ubah transaksi" [ref=e925] [cursor=pointer]:
+                  - /url: http://127.0.0.1:8000/internal/transactions/2830/edit
+                  - img [ref=e926]
+                - link "Cetak tanda terima" [ref=e928] [cursor=pointer]:
+                  - /url: http://127.0.0.1:8000/internal/transactions/2830/receipt
+                  - img [ref=e929]
+                - button "Hapus transaksi" [ref=e931] [cursor=pointer]:
+                  - img [ref=e932]
+      - navigation "Navigasi Pagination" [ref=e935]:
+        - generic [ref=e936]:
+          - paragraph [ref=e938]: Menampilkan 1 sampai 20 dari 748 hasil
+          - generic [ref=e940]:
+            - generic "Halaman sebelumnya" [ref=e941]:
+              - img [ref=e943]
+            - generic [ref=e946]: "1"
+            - link "Ke halaman 2" [ref=e947] [cursor=pointer]:
+              - /url: http://127.0.0.1:8000/internal/history?page=2
+              - text: "2"
+            - link "Ke halaman 3" [ref=e948] [cursor=pointer]:
+              - /url: http://127.0.0.1:8000/internal/history?page=3
+              - text: "3"
+            - link "Ke halaman 4" [ref=e949] [cursor=pointer]:
+              - /url: http://127.0.0.1:8000/internal/history?page=4
+              - text: "4"
+            - link "Ke halaman 5" [ref=e950] [cursor=pointer]:
+              - /url: http://127.0.0.1:8000/internal/history?page=5
+              - text: "5"
+            - link "Ke halaman 6" [ref=e951] [cursor=pointer]:
+              - /url: http://127.0.0.1:8000/internal/history?page=6
+              - text: "6"
+            - link "Ke halaman 7" [ref=e952] [cursor=pointer]:
+              - /url: http://127.0.0.1:8000/internal/history?page=7
+              - text: "7"
+            - link "Ke halaman 8" [ref=e953] [cursor=pointer]:
+              - /url: http://127.0.0.1:8000/internal/history?page=8
+              - text: "8"
+            - link "Ke halaman 9" [ref=e954] [cursor=pointer]:
+              - /url: http://127.0.0.1:8000/internal/history?page=9
+              - text: "9"
+            - link "Ke halaman 10" [ref=e955] [cursor=pointer]:
+              - /url: http://127.0.0.1:8000/internal/history?page=10
+              - text: "10"
+            - generic [ref=e957]: ...
+            - link "Ke halaman 37" [ref=e958] [cursor=pointer]:
+              - /url: http://127.0.0.1:8000/internal/history?page=37
+              - text: "37"
+            - link "Ke halaman 38" [ref=e959] [cursor=pointer]:
+              - /url: http://127.0.0.1:8000/internal/history?page=38
+              - text: "38"
+            - link "Halaman berikutnya" [ref=e960] [cursor=pointer]:
+              - /url: http://127.0.0.1:8000/internal/history?page=2
+              - img [ref=e961]

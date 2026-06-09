@@ -1,5 +1,5 @@
-<article class="flex flex-col justify-between rounded-[1.35rem] border border-emerald-900/10 bg-white/90 p-5 shadow-lg shadow-emerald-900/5 transition-all group hover:-translate-y-1 hover:border-emerald-300/70 hover:bg-white">
-    <div class="mb-4 flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-100 text-emerald-700 shadow-sm transition-all group-hover:bg-emerald-700 group-hover:text-white">
+<article class="public-shell flex flex-col justify-between p-5 transition-colors group hover:border-brand-200 hover:bg-white">
+    <div class="mb-4 flex h-10 w-10 items-center justify-center rounded-xl bg-brand-100 text-brand-700 shadow-sm transition-all group-hover:bg-brand-700 group-hover:text-white">
         @switch($icon)
             @case('people')
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
@@ -21,7 +21,7 @@
         @endswitch
     </div>
     <div>
-        <h4 class="text-[0.98rem] sm:text-[1.02rem] font-black tracking-[-0.015em] text-slate-950">{{ $title }}</h4>
-        <p class="mt-1.5 text-[13px] sm:text-[13.5px] font-medium leading-relaxed text-slate-600">{{ $description }}</p>
+        <h4 class="text-[0.98rem] font-black tracking-[-0.015em] text-neutral-950 sm:text-[1.02rem]">{{ $title }}</h4>
+        <p class="mt-1.5 text-[13px] font-medium leading-relaxed text-neutral-600 sm:text-[13.5px]">{{ $description }}</p>
     </div>
 </article>

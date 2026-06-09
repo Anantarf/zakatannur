@@ -116,7 +116,7 @@
                                                     <p class="ui-mobile-meta-label">Risiko</p>
                                                     <p class="mt-1 text-xs leading-5 text-slate-500">Buka detail review untuk melihat alasan dan tindak lanjut.</p>
                                                 </div>
-                                                @if ($t->risk_level === \App\Models\TransactionRiskReview::LEVEL_WARNING || $t->risk_level === \App\Models\TransactionRiskReview::LEVEL_SUSPICIOUS)
+                                                @if ($t->risk_level === \App\Models\TransactionRiskReview::LEVEL_WARNING)
                                                     <a href="{{ route('internal.anomalies.show', ['noTransaksi' => $t->no_transaksi]) }}" class="flex flex-col items-end gap-1">
                                                         <x-risk-level-badge :level="$t->risk_level" />
                                                         <x-review-status-badge :status="$t->review_status" />
@@ -238,7 +238,7 @@
                                     </td>
                                     @if ($canViewRisk)
                                         <td class="px-2 sm:px-4 py-4 text-center whitespace-nowrap">
-                                            @if ($t->risk_level === \App\Models\TransactionRiskReview::LEVEL_WARNING || $t->risk_level === \App\Models\TransactionRiskReview::LEVEL_SUSPICIOUS)
+                                            @if ($t->risk_level === \App\Models\TransactionRiskReview::LEVEL_WARNING)
                                                 <a href="{{ route('internal.anomalies.show', ['noTransaksi' => $t->no_transaksi]) }}" class="flex flex-col items-center gap-1">
                                                     <x-risk-level-badge :level="$t->risk_level" />
                                                     <x-review-status-badge :status="$t->review_status" />

@@ -1,0 +1,870 @@
+- generic [ref=e2]:
+  - navigation [ref=e3]:
+    - generic [ref=e5]:
+      - link "Logo Zakat Annur Zakat Annur Masjid An-Nur Komplek BPK V Gandul" [ref=e7] [cursor=pointer]:
+        - /url: http://127.0.0.1:8000/dashboard
+        - generic [ref=e8]:
+          - img "Logo Zakat Annur" [ref=e9]
+          - generic [ref=e10]:
+            - generic [ref=e11]: Zakat Annur
+            - generic [ref=e12]: Masjid An-Nur Komplek BPK V Gandul
+      - generic [ref=e14]:
+        - link "Dashboard" [ref=e15] [cursor=pointer]:
+          - /url: http://127.0.0.1:8000/dashboard
+        - link "Muzakki" [ref=e16] [cursor=pointer]:
+          - /url: http://127.0.0.1:8000/internal/muzakki
+        - link "Riwayat Transaksi" [ref=e17] [cursor=pointer]:
+          - /url: http://127.0.0.1:8000/internal/history
+        - link "Input Transaksi" [ref=e18] [cursor=pointer]:
+          - /url: http://127.0.0.1:8000/internal/transactions/create
+        - button "Pengaturan Admin" [ref=e21] [cursor=pointer]
+      - button "Super Admin @superadmin" [ref=e25] [cursor=pointer]:
+        - img [ref=e27]
+        - generic [ref=e29]:
+          - generic [ref=e30]: Super Admin
+          - generic [ref=e31]: "@superadmin"
+        - img [ref=e32]
+  - banner [ref=e34]:
+    - generic [ref=e37]:
+      - heading "Audit Logs" [level=2] [ref=e38]:
+        - img [ref=e39]
+        - text: Audit Logs
+      - paragraph [ref=e41]: Riwayat aktivitas penting untuk membantu pelacakan dan akuntabilitas sistem.
+  - main [ref=e42]:
+    - generic [ref=e44]:
+      - generic [ref=e45]:
+        - generic [ref=e46]:
+          - generic [ref=e47]: Total Log
+          - generic [ref=e48]: "3448"
+          - generic [ref=e49]: Total aktivitas yang tercatat di tabel audit.
+        - generic [ref=e50]:
+          - generic [ref=e51]: Log Terbaru
+          - generic [ref=e52]: 27/05/2026 23:03
+          - generic [ref=e53]: Waktu catatan terakhir yang masuk ke audit log.
+        - generic [ref=e54]:
+          - generic [ref=e55]: Akses
+          - generic [ref=e56]: Super Admin Only
+          - generic [ref=e57]: Area ini dibatasi untuk kontrol dan pelacakan tingkat tinggi.
+      - generic [ref=e58]:
+        - generic [ref=e59]:
+          - generic [ref=e62]:
+            - heading "Riwayat Aktivitas" [level=3] [ref=e63]
+            - paragraph [ref=e64]: Klik judul kolom untuk mengurutkan data.
+          - generic [ref=e65]: Super Admin
+        - generic [ref=e66]:
+          - table [ref=e68]:
+            - rowgroup [ref=e69]:
+              - row "Waktu Petugas Aksi Tabel ID Detail Perubahan" [ref=e70]:
+                - columnheader "Waktu" [ref=e71]:
+                  - link "Waktu" [ref=e72] [cursor=pointer]:
+                    - /url: http://127.0.0.1:8000/internal/audit-logs?sort_by=created_at&sort_dir=asc
+                    - text: Waktu
+                    - img [ref=e73]
+                - columnheader "Petugas" [ref=e75]:
+                  - link "Petugas" [ref=e76] [cursor=pointer]:
+                    - /url: http://127.0.0.1:8000/internal/audit-logs?sort_by=petugas&sort_dir=asc
+                    - text: Petugas
+                    - img [ref=e77]
+                - columnheader "Aksi" [ref=e79]:
+                  - link "Aksi" [ref=e80] [cursor=pointer]:
+                    - /url: http://127.0.0.1:8000/internal/audit-logs?sort_by=action&sort_dir=asc
+                    - text: Aksi
+                    - img [ref=e81]
+                - columnheader "Tabel" [ref=e83]
+                - columnheader "ID" [ref=e84]
+                - columnheader "Detail Perubahan" [ref=e85]
+            - rowgroup [ref=e86]:
+              - 'row "27/05/2026 23:03:04 WIB Super Admin 127.0.0.1 login #... View Data" [ref=e87]':
+                - cell "27/05/2026 23:03:04 WIB" [ref=e88]:
+                  - text: 27/05/2026 23:03:04
+                  - generic [ref=e89]: WIB
+                - cell "Super Admin 127.0.0.1" [ref=e90]:
+                  - generic [ref=e91]:
+                    - generic [ref=e92]: Super Admin
+                    - generic [ref=e93]: 127.0.0.1
+                - cell "login" [ref=e94]
+                - cell [ref=e95]
+                - cell "#..." [ref=e96]
+                - cell "View Data" [ref=e97]:
+                  - button "View Data" [ref=e99] [cursor=pointer]:
+                    - generic [ref=e100]: View Data
+                    - img [ref=e101]
+              - 'row "19/05/2026 20:02:11 WIB Super Admin 127.0.0.1 logout #... View Data" [ref=e103]':
+                - cell "19/05/2026 20:02:11 WIB" [ref=e104]:
+                  - text: 19/05/2026 20:02:11
+                  - generic [ref=e105]: WIB
+                - cell "Super Admin 127.0.0.1" [ref=e106]:
+                  - generic [ref=e107]:
+                    - generic [ref=e108]: Super Admin
+                    - generic [ref=e109]: 127.0.0.1
+                - cell "logout" [ref=e110]
+                - cell [ref=e111]
+                - cell "#..." [ref=e112]
+                - cell "View Data" [ref=e113]:
+                  - button "View Data" [ref=e115] [cursor=pointer]:
+                    - generic [ref=e116]: View Data
+                    - img [ref=e117]
+              - 'row "19/05/2026 17:54:01 WIB Super Admin 127.0.0.1 settings.period.updated #... View Data" [ref=e119]':
+                - cell "19/05/2026 17:54:01 WIB" [ref=e120]:
+                  - text: 19/05/2026 17:54:01
+                  - generic [ref=e121]: WIB
+                - cell "Super Admin 127.0.0.1" [ref=e122]:
+                  - generic [ref=e123]:
+                    - generic [ref=e124]: Super Admin
+                    - generic [ref=e125]: 127.0.0.1
+                - cell "settings.period.updated" [ref=e126]
+                - cell [ref=e127]
+                - cell "#..." [ref=e128]
+                - cell "View Data" [ref=e129]:
+                  - button "View Data" [ref=e131] [cursor=pointer]:
+                    - generic [ref=e132]: View Data
+                    - img [ref=e133]
+              - 'row "19/05/2026 17:50:41 WIB Super Admin 127.0.0.1 settings.period.updated #... View Data" [ref=e135]':
+                - cell "19/05/2026 17:50:41 WIB" [ref=e136]:
+                  - text: 19/05/2026 17:50:41
+                  - generic [ref=e137]: WIB
+                - cell "Super Admin 127.0.0.1" [ref=e138]:
+                  - generic [ref=e139]:
+                    - generic [ref=e140]: Super Admin
+                    - generic [ref=e141]: 127.0.0.1
+                - cell "settings.period.updated" [ref=e142]
+                - cell [ref=e143]
+                - cell "#..." [ref=e144]
+                - cell "View Data" [ref=e145]:
+                  - button "View Data" [ref=e147] [cursor=pointer]:
+                    - generic [ref=e148]: View Data
+                    - img [ref=e149]
+              - 'row "19/05/2026 17:43:59 WIB Super Admin 127.0.0.1 settings.period.updated #... View Data" [ref=e151]':
+                - cell "19/05/2026 17:43:59 WIB" [ref=e152]:
+                  - text: 19/05/2026 17:43:59
+                  - generic [ref=e153]: WIB
+                - cell "Super Admin 127.0.0.1" [ref=e154]:
+                  - generic [ref=e155]:
+                    - generic [ref=e156]: Super Admin
+                    - generic [ref=e157]: 127.0.0.1
+                - cell "settings.period.updated" [ref=e158]
+                - cell [ref=e159]
+                - cell "#..." [ref=e160]
+                - cell "View Data" [ref=e161]:
+                  - button "View Data" [ref=e163] [cursor=pointer]:
+                    - generic [ref=e164]: View Data
+                    - img [ref=e165]
+              - 'row "19/05/2026 17:25:49 WIB Super Admin 127.0.0.1 settings.period.updated #... View Data" [ref=e167]':
+                - cell "19/05/2026 17:25:49 WIB" [ref=e168]:
+                  - text: 19/05/2026 17:25:49
+                  - generic [ref=e169]: WIB
+                - cell "Super Admin 127.0.0.1" [ref=e170]:
+                  - generic [ref=e171]:
+                    - generic [ref=e172]: Super Admin
+                    - generic [ref=e173]: 127.0.0.1
+                - cell "settings.period.updated" [ref=e174]
+                - cell [ref=e175]
+                - cell "#..." [ref=e176]
+                - cell "View Data" [ref=e177]:
+                  - button "View Data" [ref=e179] [cursor=pointer]:
+                    - generic [ref=e180]: View Data
+                    - img [ref=e181]
+              - 'row "19/05/2026 17:11:37 WIB Super Admin 127.0.0.1 settings.period.updated #... View Data" [ref=e183]':
+                - cell "19/05/2026 17:11:37 WIB" [ref=e184]:
+                  - text: 19/05/2026 17:11:37
+                  - generic [ref=e185]: WIB
+                - cell "Super Admin 127.0.0.1" [ref=e186]:
+                  - generic [ref=e187]:
+                    - generic [ref=e188]: Super Admin
+                    - generic [ref=e189]: 127.0.0.1
+                - cell "settings.period.updated" [ref=e190]
+                - cell [ref=e191]
+                - cell "#..." [ref=e192]
+                - cell "View Data" [ref=e193]:
+                  - button "View Data" [ref=e195] [cursor=pointer]:
+                    - generic [ref=e196]: View Data
+                    - img [ref=e197]
+              - 'row "19/05/2026 17:00:17 WIB Super Admin 127.0.0.1 settings.period.updated #... View Data" [ref=e199]':
+                - cell "19/05/2026 17:00:17 WIB" [ref=e200]:
+                  - text: 19/05/2026 17:00:17
+                  - generic [ref=e201]: WIB
+                - cell "Super Admin 127.0.0.1" [ref=e202]:
+                  - generic [ref=e203]:
+                    - generic [ref=e204]: Super Admin
+                    - generic [ref=e205]: 127.0.0.1
+                - cell "settings.period.updated" [ref=e206]
+                - cell [ref=e207]
+                - cell "#..." [ref=e208]
+                - cell "View Data" [ref=e209]:
+                  - button "View Data" [ref=e211] [cursor=pointer]:
+                    - generic [ref=e212]: View Data
+                    - img [ref=e213]
+              - 'row "19/05/2026 17:00:16 WIB Super Admin 127.0.0.1 settings.period.updated #... View Data" [ref=e215]':
+                - cell "19/05/2026 17:00:16 WIB" [ref=e216]:
+                  - text: 19/05/2026 17:00:16
+                  - generic [ref=e217]: WIB
+                - cell "Super Admin 127.0.0.1" [ref=e218]:
+                  - generic [ref=e219]:
+                    - generic [ref=e220]: Super Admin
+                    - generic [ref=e221]: 127.0.0.1
+                - cell "settings.period.updated" [ref=e222]
+                - cell [ref=e223]
+                - cell "#..." [ref=e224]
+                - cell "View Data" [ref=e225]:
+                  - button "View Data" [ref=e227] [cursor=pointer]:
+                    - generic [ref=e228]: View Data
+                    - img [ref=e229]
+              - 'row "19/05/2026 16:41:01 WIB Super Admin 127.0.0.1 login #... View Data" [ref=e231]':
+                - cell "19/05/2026 16:41:01 WIB" [ref=e232]:
+                  - text: 19/05/2026 16:41:01
+                  - generic [ref=e233]: WIB
+                - cell "Super Admin 127.0.0.1" [ref=e234]:
+                  - generic [ref=e235]:
+                    - generic [ref=e236]: Super Admin
+                    - generic [ref=e237]: 127.0.0.1
+                - cell "login" [ref=e238]
+                - cell [ref=e239]
+                - cell "#..." [ref=e240]
+                - cell "View Data" [ref=e241]:
+                  - button "View Data" [ref=e243] [cursor=pointer]:
+                    - generic [ref=e244]: View Data
+                    - img [ref=e245]
+              - 'row "19/05/2026 16:40:06 WIB Super Admin 127.0.0.1 logout #... View Data" [ref=e247]':
+                - cell "19/05/2026 16:40:06 WIB" [ref=e248]:
+                  - text: 19/05/2026 16:40:06
+                  - generic [ref=e249]: WIB
+                - cell "Super Admin 127.0.0.1" [ref=e250]:
+                  - generic [ref=e251]:
+                    - generic [ref=e252]: Super Admin
+                    - generic [ref=e253]: 127.0.0.1
+                - cell "logout" [ref=e254]
+                - cell [ref=e255]
+                - cell "#..." [ref=e256]
+                - cell "View Data" [ref=e257]:
+                  - button "View Data" [ref=e259] [cursor=pointer]:
+                    - generic [ref=e260]: View Data
+                    - img [ref=e261]
+              - 'row "19/05/2026 13:05:27 WIB Super Admin 127.0.0.1 transaction.risk_review_status_updated ZakatTransaction #2708... View Data" [ref=e263]':
+                - cell "19/05/2026 13:05:27 WIB" [ref=e264]:
+                  - text: 19/05/2026 13:05:27
+                  - generic [ref=e265]: WIB
+                - cell "Super Admin 127.0.0.1" [ref=e266]:
+                  - generic [ref=e267]:
+                    - generic [ref=e268]: Super Admin
+                    - generic [ref=e269]: 127.0.0.1
+                - cell "transaction.risk_review_status_updated" [ref=e270]
+                - cell "ZakatTransaction" [ref=e271]
+                - cell "#2708..." [ref=e272]
+                - cell "View Data" [ref=e273]:
+                  - button "View Data" [ref=e275] [cursor=pointer]:
+                    - generic [ref=e276]: View Data
+                    - img [ref=e277]
+              - 'row "19/05/2026 13:05:16 WIB Super Admin 127.0.0.1 transaction.risk_review_status_updated ZakatTransaction #2708... View Data" [ref=e279]':
+                - cell "19/05/2026 13:05:16 WIB" [ref=e280]:
+                  - text: 19/05/2026 13:05:16
+                  - generic [ref=e281]: WIB
+                - cell "Super Admin 127.0.0.1" [ref=e282]:
+                  - generic [ref=e283]:
+                    - generic [ref=e284]: Super Admin
+                    - generic [ref=e285]: 127.0.0.1
+                - cell "transaction.risk_review_status_updated" [ref=e286]
+                - cell "ZakatTransaction" [ref=e287]
+                - cell "#2708..." [ref=e288]
+                - cell "View Data" [ref=e289]:
+                  - button "View Data" [ref=e291] [cursor=pointer]:
+                    - generic [ref=e292]: View Data
+                    - img [ref=e293]
+              - 'row "19/05/2026 13:02:27 WIB Super Admin 127.0.0.1 login #... View Data" [ref=e295]':
+                - cell "19/05/2026 13:02:27 WIB" [ref=e296]:
+                  - text: 19/05/2026 13:02:27
+                  - generic [ref=e297]: WIB
+                - cell "Super Admin 127.0.0.1" [ref=e298]:
+                  - generic [ref=e299]:
+                    - generic [ref=e300]: Super Admin
+                    - generic [ref=e301]: 127.0.0.1
+                - cell "login" [ref=e302]
+                - cell [ref=e303]
+                - cell "#..." [ref=e304]
+                - cell "View Data" [ref=e305]:
+                  - button "View Data" [ref=e307] [cursor=pointer]:
+                    - generic [ref=e308]: View Data
+                    - img [ref=e309]
+              - 'row "19/05/2026 09:50:17 WIB Super Admin 127.0.0.1 login #... View Data" [ref=e311]':
+                - cell "19/05/2026 09:50:17 WIB" [ref=e312]:
+                  - text: 19/05/2026 09:50:17
+                  - generic [ref=e313]: WIB
+                - cell "Super Admin 127.0.0.1" [ref=e314]:
+                  - generic [ref=e315]:
+                    - generic [ref=e316]: Super Admin
+                    - generic [ref=e317]: 127.0.0.1
+                - cell "login" [ref=e318]
+                - cell [ref=e319]
+                - cell "#..." [ref=e320]
+                - cell "View Data" [ref=e321]:
+                  - button "View Data" [ref=e323] [cursor=pointer]:
+                    - generic [ref=e324]: View Data
+                    - img [ref=e325]
+              - 'row "19/05/2026 03:26:13 WIB Super Admin 127.0.0.1 template.deleted #... View Data" [ref=e327]':
+                - cell "19/05/2026 03:26:13 WIB" [ref=e328]:
+                  - text: 19/05/2026 03:26:13
+                  - generic [ref=e329]: WIB
+                - cell "Super Admin 127.0.0.1" [ref=e330]:
+                  - generic [ref=e331]:
+                    - generic [ref=e332]: Super Admin
+                    - generic [ref=e333]: 127.0.0.1
+                - cell "template.deleted" [ref=e334]
+                - cell [ref=e335]
+                - cell "#..." [ref=e336]
+                - cell "View Data" [ref=e337]:
+                  - button "View Data" [ref=e339] [cursor=pointer]:
+                    - generic [ref=e340]: View Data
+                    - img [ref=e341]
+              - 'row "19/05/2026 03:25:59 WIB Super Admin 127.0.0.1 template.deleted #... View Data" [ref=e343]':
+                - cell "19/05/2026 03:25:59 WIB" [ref=e344]:
+                  - text: 19/05/2026 03:25:59
+                  - generic [ref=e345]: WIB
+                - cell "Super Admin 127.0.0.1" [ref=e346]:
+                  - generic [ref=e347]:
+                    - generic [ref=e348]: Super Admin
+                    - generic [ref=e349]: 127.0.0.1
+                - cell "template.deleted" [ref=e350]
+                - cell [ref=e351]
+                - cell "#..." [ref=e352]
+                - cell "View Data" [ref=e353]:
+                  - button "View Data" [ref=e355] [cursor=pointer]:
+                    - generic [ref=e356]: View Data
+                    - img [ref=e357]
+              - 'row "19/05/2026 02:45:54 WIB Super Admin 127.0.0.1 login #... View Data" [ref=e359]':
+                - cell "19/05/2026 02:45:54 WIB" [ref=e360]:
+                  - text: 19/05/2026 02:45:54
+                  - generic [ref=e361]: WIB
+                - cell "Super Admin 127.0.0.1" [ref=e362]:
+                  - generic [ref=e363]:
+                    - generic [ref=e364]: Super Admin
+                    - generic [ref=e365]: 127.0.0.1
+                - cell "login" [ref=e366]
+                - cell [ref=e367]
+                - cell "#..." [ref=e368]
+                - cell "View Data" [ref=e369]:
+                  - button "View Data" [ref=e371] [cursor=pointer]:
+                    - generic [ref=e372]: View Data
+                    - img [ref=e373]
+              - 'row "18/05/2026 19:26:08 WIB Super Admin 127.0.0.1 transaction.risk_review_status_updated ZakatTransaction #1652... View Data" [ref=e375]':
+                - cell "18/05/2026 19:26:08 WIB" [ref=e376]:
+                  - text: 18/05/2026 19:26:08
+                  - generic [ref=e377]: WIB
+                - cell "Super Admin 127.0.0.1" [ref=e378]:
+                  - generic [ref=e379]:
+                    - generic [ref=e380]: Super Admin
+                    - generic [ref=e381]: 127.0.0.1
+                - cell "transaction.risk_review_status_updated" [ref=e382]
+                - cell "ZakatTransaction" [ref=e383]
+                - cell "#1652..." [ref=e384]
+                - cell "View Data" [ref=e385]:
+                  - button "View Data" [ref=e387] [cursor=pointer]:
+                    - generic [ref=e388]: View Data
+                    - img [ref=e389]
+              - 'row "18/05/2026 19:16:22 WIB Super Admin 127.0.0.1 login #... View Data" [ref=e391]':
+                - cell "18/05/2026 19:16:22 WIB" [ref=e392]:
+                  - text: 18/05/2026 19:16:22
+                  - generic [ref=e393]: WIB
+                - cell "Super Admin 127.0.0.1" [ref=e394]:
+                  - generic [ref=e395]:
+                    - generic [ref=e396]: Super Admin
+                    - generic [ref=e397]: 127.0.0.1
+                - cell "login" [ref=e398]
+                - cell [ref=e399]
+                - cell "#..." [ref=e400]
+                - cell "View Data" [ref=e401]:
+                  - button "View Data" [ref=e403] [cursor=pointer]:
+                    - generic [ref=e404]: View Data
+                    - img [ref=e405]
+              - 'row "18/05/2026 00:05:20 WIB Super Admin 127.0.0.1 logout #... View Data" [ref=e407]':
+                - cell "18/05/2026 00:05:20 WIB" [ref=e408]:
+                  - text: 18/05/2026 00:05:20
+                  - generic [ref=e409]: WIB
+                - cell "Super Admin 127.0.0.1" [ref=e410]:
+                  - generic [ref=e411]:
+                    - generic [ref=e412]: Super Admin
+                    - generic [ref=e413]: 127.0.0.1
+                - cell "logout" [ref=e414]
+                - cell [ref=e415]
+                - cell "#..." [ref=e416]
+                - cell "View Data" [ref=e417]:
+                  - button "View Data" [ref=e419] [cursor=pointer]:
+                    - generic [ref=e420]: View Data
+                    - img [ref=e421]
+              - 'row "17/05/2026 23:09:56 WIB Super Admin 127.0.0.1 login #... View Data" [ref=e423]':
+                - cell "17/05/2026 23:09:56 WIB" [ref=e424]:
+                  - text: 17/05/2026 23:09:56
+                  - generic [ref=e425]: WIB
+                - cell "Super Admin 127.0.0.1" [ref=e426]:
+                  - generic [ref=e427]:
+                    - generic [ref=e428]: Super Admin
+                    - generic [ref=e429]: 127.0.0.1
+                - cell "login" [ref=e430]
+                - cell [ref=e431]
+                - cell "#..." [ref=e432]
+                - cell "View Data" [ref=e433]:
+                  - button "View Data" [ref=e435] [cursor=pointer]:
+                    - generic [ref=e436]: View Data
+                    - img [ref=e437]
+              - 'row "14/05/2026 18:04:28 WIB Super Admin 127.0.0.1 login #... View Data" [ref=e439]':
+                - cell "14/05/2026 18:04:28 WIB" [ref=e440]:
+                  - text: 14/05/2026 18:04:28
+                  - generic [ref=e441]: WIB
+                - cell "Super Admin 127.0.0.1" [ref=e442]:
+                  - generic [ref=e443]:
+                    - generic [ref=e444]: Super Admin
+                    - generic [ref=e445]: 127.0.0.1
+                - cell "login" [ref=e446]
+                - cell [ref=e447]
+                - cell "#..." [ref=e448]
+                - cell "View Data" [ref=e449]:
+                  - button "View Data" [ref=e451] [cursor=pointer]:
+                    - generic [ref=e452]: View Data
+                    - img [ref=e453]
+              - 'row "30/04/2026 13:17:38 WIB Super Admin 127.0.0.1 login #... View Data" [ref=e455]':
+                - cell "30/04/2026 13:17:38 WIB" [ref=e456]:
+                  - text: 30/04/2026 13:17:38
+                  - generic [ref=e457]: WIB
+                - cell "Super Admin 127.0.0.1" [ref=e458]:
+                  - generic [ref=e459]:
+                    - generic [ref=e460]: Super Admin
+                    - generic [ref=e461]: 127.0.0.1
+                - cell "login" [ref=e462]
+                - cell [ref=e463]
+                - cell "#..." [ref=e464]
+                - cell "View Data" [ref=e465]:
+                  - button "View Data" [ref=e467] [cursor=pointer]:
+                    - generic [ref=e468]: View Data
+                    - img [ref=e469]
+              - 'row "30/03/2026 10:31:43 WIB Sulthon 182.2.184.20 login #... View Data" [ref=e471]':
+                - cell "30/03/2026 10:31:43 WIB" [ref=e472]:
+                  - text: 30/03/2026 10:31:43
+                  - generic [ref=e473]: WIB
+                - cell "Sulthon 182.2.184.20" [ref=e474]:
+                  - generic [ref=e475]:
+                    - generic [ref=e476]: Sulthon
+                    - generic [ref=e477]: 182.2.184.20
+                - cell "login" [ref=e478]
+                - cell [ref=e479]
+                - cell "#..." [ref=e480]
+                - cell "View Data" [ref=e481]:
+                  - button "View Data" [ref=e483] [cursor=pointer]:
+                    - generic [ref=e484]: View Data
+                    - img [ref=e485]
+              - 'row "29/03/2026 10:55:57 WIB Super Admin 114.124.208.240 login #... View Data" [ref=e487]':
+                - cell "29/03/2026 10:55:57 WIB" [ref=e488]:
+                  - text: 29/03/2026 10:55:57
+                  - generic [ref=e489]: WIB
+                - cell "Super Admin 114.124.208.240" [ref=e490]:
+                  - generic [ref=e491]:
+                    - generic [ref=e492]: Super Admin
+                    - generic [ref=e493]: 114.124.208.240
+                - cell "login" [ref=e494]
+                - cell [ref=e495]
+                - cell "#..." [ref=e496]
+                - cell "View Data" [ref=e497]:
+                  - button "View Data" [ref=e499] [cursor=pointer]:
+                    - generic [ref=e500]: View Data
+                    - img [ref=e501]
+              - 'row "28/03/2026 14:44:48 WIB Super Admin 2400:9800:1b0:2ce1:48d0:87ff:fe8c:18 login #... View Data" [ref=e503]':
+                - cell "28/03/2026 14:44:48 WIB" [ref=e504]:
+                  - text: 28/03/2026 14:44:48
+                  - generic [ref=e505]: WIB
+                - cell "Super Admin 2400:9800:1b0:2ce1:48d0:87ff:fe8c:18" [ref=e506]:
+                  - generic [ref=e507]:
+                    - generic [ref=e508]: Super Admin
+                    - generic [ref=e509]: 2400:9800:1b0:2ce1:48d0:87ff:fe8c:18
+                - cell "login" [ref=e510]
+                - cell [ref=e511]
+                - cell "#..." [ref=e512]
+                - cell "View Data" [ref=e513]:
+                  - button "View Data" [ref=e515] [cursor=pointer]:
+                    - generic [ref=e516]: View Data
+                    - img [ref=e517]
+              - 'row "24/03/2026 15:22:37 WIB Super Admin 2400:9800:1f7:b17a:4043:a7ff:fe0b:857a login #... View Data" [ref=e519]':
+                - cell "24/03/2026 15:22:37 WIB" [ref=e520]:
+                  - text: 24/03/2026 15:22:37
+                  - generic [ref=e521]: WIB
+                - cell "Super Admin 2400:9800:1f7:b17a:4043:a7ff:fe0b:857a" [ref=e522]:
+                  - generic [ref=e523]:
+                    - generic [ref=e524]: Super Admin
+                    - generic [ref=e525]: 2400:9800:1f7:b17a:4043:a7ff:fe0b:857a
+                - cell "login" [ref=e526]
+                - cell [ref=e527]
+                - cell "#..." [ref=e528]
+                - cell "View Data" [ref=e529]:
+                  - button "View Data" [ref=e531] [cursor=pointer]:
+                    - generic [ref=e532]: View Data
+                    - img [ref=e533]
+              - 'row "22/03/2026 20:25:11 WIB Super Admin 110.137.15.41 logout #... View Data" [ref=e535]':
+                - cell "22/03/2026 20:25:11 WIB" [ref=e536]:
+                  - text: 22/03/2026 20:25:11
+                  - generic [ref=e537]: WIB
+                - cell "Super Admin 110.137.15.41" [ref=e538]:
+                  - generic [ref=e539]:
+                    - generic [ref=e540]: Super Admin
+                    - generic [ref=e541]: 110.137.15.41
+                - cell "logout" [ref=e542]
+                - cell [ref=e543]
+                - cell "#..." [ref=e544]
+                - cell "View Data" [ref=e545]:
+                  - button "View Data" [ref=e547] [cursor=pointer]:
+                    - generic [ref=e548]: View Data
+                    - img [ref=e549]
+              - 'row "22/03/2026 20:23:04 WIB Super Admin 110.137.15.41 login #... View Data" [ref=e551]':
+                - cell "22/03/2026 20:23:04 WIB" [ref=e552]:
+                  - text: 22/03/2026 20:23:04
+                  - generic [ref=e553]: WIB
+                - cell "Super Admin 110.137.15.41" [ref=e554]:
+                  - generic [ref=e555]:
+                    - generic [ref=e556]: Super Admin
+                    - generic [ref=e557]: 110.137.15.41
+                - cell "login" [ref=e558]
+                - cell [ref=e559]
+                - cell "#..." [ref=e560]
+                - cell "View Data" [ref=e561]:
+                  - button "View Data" [ref=e563] [cursor=pointer]:
+                    - generic [ref=e564]: View Data
+                    - img [ref=e565]
+              - 'row "22/03/2026 20:21:57 WIB Super Admin 110.137.15.41 logout #... View Data" [ref=e567]':
+                - cell "22/03/2026 20:21:57 WIB" [ref=e568]:
+                  - text: 22/03/2026 20:21:57
+                  - generic [ref=e569]: WIB
+                - cell "Super Admin 110.137.15.41" [ref=e570]:
+                  - generic [ref=e571]:
+                    - generic [ref=e572]: Super Admin
+                    - generic [ref=e573]: 110.137.15.41
+                - cell "logout" [ref=e574]
+                - cell [ref=e575]
+                - cell "#..." [ref=e576]
+                - cell "View Data" [ref=e577]:
+                  - button "View Data" [ref=e579] [cursor=pointer]:
+                    - generic [ref=e580]: View Data
+                    - img [ref=e581]
+              - 'row "22/03/2026 20:21:06 WIB Super Admin 110.137.15.41 login #... View Data" [ref=e583]':
+                - cell "22/03/2026 20:21:06 WIB" [ref=e584]:
+                  - text: 22/03/2026 20:21:06
+                  - generic [ref=e585]: WIB
+                - cell "Super Admin 110.137.15.41" [ref=e586]:
+                  - generic [ref=e587]:
+                    - generic [ref=e588]: Super Admin
+                    - generic [ref=e589]: 110.137.15.41
+                - cell "login" [ref=e590]
+                - cell [ref=e591]
+                - cell "#..." [ref=e592]
+                - cell "View Data" [ref=e593]:
+                  - button "View Data" [ref=e595] [cursor=pointer]:
+                    - generic [ref=e596]: View Data
+                    - img [ref=e597]
+              - 'row "21/03/2026 00:17:15 WIB Rara 103.136.57.66 logout #... View Data" [ref=e599]':
+                - cell "21/03/2026 00:17:15 WIB" [ref=e600]:
+                  - text: 21/03/2026 00:17:15
+                  - generic [ref=e601]: WIB
+                - cell "Rara 103.136.57.66" [ref=e602]:
+                  - generic [ref=e603]:
+                    - generic [ref=e604]: Rara
+                    - generic [ref=e605]: 103.136.57.66
+                - cell "logout" [ref=e606]
+                - cell [ref=e607]
+                - cell "#..." [ref=e608]
+                - cell "View Data" [ref=e609]:
+                  - button "View Data" [ref=e611] [cursor=pointer]:
+                    - generic [ref=e612]: View Data
+                    - img [ref=e613]
+              - 'row "21/03/2026 00:17:03 WIB Rara 103.136.57.66 created ZakatTransaction #2887... View Data" [ref=e615]':
+                - cell "21/03/2026 00:17:03 WIB" [ref=e616]:
+                  - text: 21/03/2026 00:17:03
+                  - generic [ref=e617]: WIB
+                - cell "Rara 103.136.57.66" [ref=e618]:
+                  - generic [ref=e619]:
+                    - generic [ref=e620]: Rara
+                    - generic [ref=e621]: 103.136.57.66
+                - cell "created" [ref=e622]
+                - cell "ZakatTransaction" [ref=e623]
+                - cell "#2887..." [ref=e624]
+                - cell "View Data" [ref=e625]:
+                  - button "View Data" [ref=e627] [cursor=pointer]:
+                    - generic [ref=e628]: View Data
+                    - img [ref=e629]
+              - 'row "21/03/2026 00:17:03 WIB Rara 103.136.57.66 created ZakatTransaction #2888... View Data" [ref=e631]':
+                - cell "21/03/2026 00:17:03 WIB" [ref=e632]:
+                  - text: 21/03/2026 00:17:03
+                  - generic [ref=e633]: WIB
+                - cell "Rara 103.136.57.66" [ref=e634]:
+                  - generic [ref=e635]:
+                    - generic [ref=e636]: Rara
+                    - generic [ref=e637]: 103.136.57.66
+                - cell "created" [ref=e638]
+                - cell "ZakatTransaction" [ref=e639]
+                - cell "#2888..." [ref=e640]
+                - cell "View Data" [ref=e641]:
+                  - button "View Data" [ref=e643] [cursor=pointer]:
+                    - generic [ref=e644]: View Data
+                    - img [ref=e645]
+              - 'row "21/03/2026 00:17:03 WIB Rara 103.136.57.66 Created.Transaction #... View Data" [ref=e647]':
+                - cell "21/03/2026 00:17:03 WIB" [ref=e648]:
+                  - text: 21/03/2026 00:17:03
+                  - generic [ref=e649]: WIB
+                - cell "Rara 103.136.57.66" [ref=e650]:
+                  - generic [ref=e651]:
+                    - generic [ref=e652]: Rara
+                    - generic [ref=e653]: 103.136.57.66
+                - cell "Created.Transaction" [ref=e654]
+                - cell [ref=e655]
+                - cell "#..." [ref=e656]
+                - cell "View Data" [ref=e657]:
+                  - button "View Data" [ref=e659] [cursor=pointer]:
+                    - generic [ref=e660]: View Data
+                    - img [ref=e661]
+              - 'row "21/03/2026 00:15:48 WIB Rara 103.136.57.66 updated ZakatTransaction #2885... View Data" [ref=e663]':
+                - cell "21/03/2026 00:15:48 WIB" [ref=e664]:
+                  - text: 21/03/2026 00:15:48
+                  - generic [ref=e665]: WIB
+                - cell "Rara 103.136.57.66" [ref=e666]:
+                  - generic [ref=e667]:
+                    - generic [ref=e668]: Rara
+                    - generic [ref=e669]: 103.136.57.66
+                - cell "updated" [ref=e670]
+                - cell "ZakatTransaction" [ref=e671]
+                - cell "#2885..." [ref=e672]
+                - cell "View Data" [ref=e673]:
+                  - button "View Data" [ref=e675] [cursor=pointer]:
+                    - generic [ref=e676]: View Data
+                    - img [ref=e677]
+              - 'row "21/03/2026 00:15:48 WIB Rara 103.136.57.66 updated ZakatTransaction #2886... View Data" [ref=e679]':
+                - cell "21/03/2026 00:15:48 WIB" [ref=e680]:
+                  - text: 21/03/2026 00:15:48
+                  - generic [ref=e681]: WIB
+                - cell "Rara 103.136.57.66" [ref=e682]:
+                  - generic [ref=e683]:
+                    - generic [ref=e684]: Rara
+                    - generic [ref=e685]: 103.136.57.66
+                - cell "updated" [ref=e686]
+                - cell "ZakatTransaction" [ref=e687]
+                - cell "#2886..." [ref=e688]
+                - cell "View Data" [ref=e689]:
+                  - button "View Data" [ref=e691] [cursor=pointer]:
+                    - generic [ref=e692]: View Data
+                    - img [ref=e693]
+              - 'row "21/03/2026 00:15:48 WIB Rara 103.136.57.66 Updated.Transaction #... View Data" [ref=e695]':
+                - cell "21/03/2026 00:15:48 WIB" [ref=e696]:
+                  - text: 21/03/2026 00:15:48
+                  - generic [ref=e697]: WIB
+                - cell "Rara 103.136.57.66" [ref=e698]:
+                  - generic [ref=e699]:
+                    - generic [ref=e700]: Rara
+                    - generic [ref=e701]: 103.136.57.66
+                - cell "Updated.Transaction" [ref=e702]
+                - cell [ref=e703]
+                - cell "#..." [ref=e704]
+                - cell "View Data" [ref=e705]:
+                  - button "View Data" [ref=e707] [cursor=pointer]:
+                    - generic [ref=e708]: View Data
+                    - img [ref=e709]
+              - 'row "21/03/2026 00:15:47 WIB Rara 103.136.57.66 updated ZakatTransaction #2884... View Data" [ref=e711]':
+                - cell "21/03/2026 00:15:47 WIB" [ref=e712]:
+                  - text: 21/03/2026 00:15:47
+                  - generic [ref=e713]: WIB
+                - cell "Rara 103.136.57.66" [ref=e714]:
+                  - generic [ref=e715]:
+                    - generic [ref=e716]: Rara
+                    - generic [ref=e717]: 103.136.57.66
+                - cell "updated" [ref=e718]
+                - cell "ZakatTransaction" [ref=e719]
+                - cell "#2884..." [ref=e720]
+                - cell "View Data" [ref=e721]:
+                  - button "View Data" [ref=e723] [cursor=pointer]:
+                    - generic [ref=e724]: View Data
+                    - img [ref=e725]
+              - 'row "21/03/2026 00:15:01 WIB Rara 103.136.57.66 created ZakatTransaction #2884... View Data" [ref=e727]':
+                - cell "21/03/2026 00:15:01 WIB" [ref=e728]:
+                  - text: 21/03/2026 00:15:01
+                  - generic [ref=e729]: WIB
+                - cell "Rara 103.136.57.66" [ref=e730]:
+                  - generic [ref=e731]:
+                    - generic [ref=e732]: Rara
+                    - generic [ref=e733]: 103.136.57.66
+                - cell "created" [ref=e734]
+                - cell "ZakatTransaction" [ref=e735]
+                - cell "#2884..." [ref=e736]
+                - cell "View Data" [ref=e737]:
+                  - button "View Data" [ref=e739] [cursor=pointer]:
+                    - generic [ref=e740]: View Data
+                    - img [ref=e741]
+              - 'row "21/03/2026 00:15:01 WIB Rara 103.136.57.66 created ZakatTransaction #2885... View Data" [ref=e743]':
+                - cell "21/03/2026 00:15:01 WIB" [ref=e744]:
+                  - text: 21/03/2026 00:15:01
+                  - generic [ref=e745]: WIB
+                - cell "Rara 103.136.57.66" [ref=e746]:
+                  - generic [ref=e747]:
+                    - generic [ref=e748]: Rara
+                    - generic [ref=e749]: 103.136.57.66
+                - cell "created" [ref=e750]
+                - cell "ZakatTransaction" [ref=e751]
+                - cell "#2885..." [ref=e752]
+                - cell "View Data" [ref=e753]:
+                  - button "View Data" [ref=e755] [cursor=pointer]:
+                    - generic [ref=e756]: View Data
+                    - img [ref=e757]
+              - 'row "21/03/2026 00:15:01 WIB Rara 103.136.57.66 created ZakatTransaction #2886... View Data" [ref=e759]':
+                - cell "21/03/2026 00:15:01 WIB" [ref=e760]:
+                  - text: 21/03/2026 00:15:01
+                  - generic [ref=e761]: WIB
+                - cell "Rara 103.136.57.66" [ref=e762]:
+                  - generic [ref=e763]:
+                    - generic [ref=e764]: Rara
+                    - generic [ref=e765]: 103.136.57.66
+                - cell "created" [ref=e766]
+                - cell "ZakatTransaction" [ref=e767]
+                - cell "#2886..." [ref=e768]
+                - cell "View Data" [ref=e769]:
+                  - button "View Data" [ref=e771] [cursor=pointer]:
+                    - generic [ref=e772]: View Data
+                    - img [ref=e773]
+              - 'row "21/03/2026 00:15:01 WIB Rara 103.136.57.66 Created.Transaction #... View Data" [ref=e775]':
+                - cell "21/03/2026 00:15:01 WIB" [ref=e776]:
+                  - text: 21/03/2026 00:15:01
+                  - generic [ref=e777]: WIB
+                - cell "Rara 103.136.57.66" [ref=e778]:
+                  - generic [ref=e779]:
+                    - generic [ref=e780]: Rara
+                    - generic [ref=e781]: 103.136.57.66
+                - cell "Created.Transaction" [ref=e782]
+                - cell [ref=e783]
+                - cell "#..." [ref=e784]
+                - cell "View Data" [ref=e785]:
+                  - button "View Data" [ref=e787] [cursor=pointer]:
+                    - generic [ref=e788]: View Data
+                    - img [ref=e789]
+              - 'row "21/03/2026 00:09:10 WIB Rara 103.136.57.66 created ZakatTransaction #2883... View Data" [ref=e791]':
+                - cell "21/03/2026 00:09:10 WIB" [ref=e792]:
+                  - text: 21/03/2026 00:09:10
+                  - generic [ref=e793]: WIB
+                - cell "Rara 103.136.57.66" [ref=e794]:
+                  - generic [ref=e795]:
+                    - generic [ref=e796]: Rara
+                    - generic [ref=e797]: 103.136.57.66
+                - cell "created" [ref=e798]
+                - cell "ZakatTransaction" [ref=e799]
+                - cell "#2883..." [ref=e800]
+                - cell "View Data" [ref=e801]:
+                  - button "View Data" [ref=e803] [cursor=pointer]:
+                    - generic [ref=e804]: View Data
+                    - img [ref=e805]
+              - 'row "21/03/2026 00:09:10 WIB Rara 103.136.57.66 Created.Transaction #... View Data" [ref=e807]':
+                - cell "21/03/2026 00:09:10 WIB" [ref=e808]:
+                  - text: 21/03/2026 00:09:10
+                  - generic [ref=e809]: WIB
+                - cell "Rara 103.136.57.66" [ref=e810]:
+                  - generic [ref=e811]:
+                    - generic [ref=e812]: Rara
+                    - generic [ref=e813]: 103.136.57.66
+                - cell "Created.Transaction" [ref=e814]
+                - cell [ref=e815]
+                - cell "#..." [ref=e816]
+                - cell "View Data" [ref=e817]:
+                  - button "View Data" [ref=e819] [cursor=pointer]:
+                    - generic [ref=e820]: View Data
+                    - img [ref=e821]
+              - 'row "21/03/2026 00:08:10 WIB Rara 103.136.57.66 login #... View Data" [ref=e823]':
+                - cell "21/03/2026 00:08:10 WIB" [ref=e824]:
+                  - text: 21/03/2026 00:08:10
+                  - generic [ref=e825]: WIB
+                - cell "Rara 103.136.57.66" [ref=e826]:
+                  - generic [ref=e827]:
+                    - generic [ref=e828]: Rara
+                    - generic [ref=e829]: 103.136.57.66
+                - cell "login" [ref=e830]
+                - cell [ref=e831]
+                - cell "#..." [ref=e832]
+                - cell "View Data" [ref=e833]:
+                  - button "View Data" [ref=e835] [cursor=pointer]:
+                    - generic [ref=e836]: View Data
+                    - img [ref=e837]
+              - 'row "21/03/2026 00:08:04 WIB Lintang 103.136.57.66 logout #... View Data" [ref=e839]':
+                - cell "21/03/2026 00:08:04 WIB" [ref=e840]:
+                  - text: 21/03/2026 00:08:04
+                  - generic [ref=e841]: WIB
+                - cell "Lintang 103.136.57.66" [ref=e842]:
+                  - generic [ref=e843]:
+                    - generic [ref=e844]: Lintang
+                    - generic [ref=e845]: 103.136.57.66
+                - cell "logout" [ref=e846]
+                - cell [ref=e847]
+                - cell "#..." [ref=e848]
+                - cell "View Data" [ref=e849]:
+                  - button "View Data" [ref=e851] [cursor=pointer]:
+                    - generic [ref=e852]: View Data
+                    - img [ref=e853]
+              - 'row "21/03/2026 00:06:04 WIB Lintang 103.136.57.66 created ZakatTransaction #2880... View Data" [ref=e855]':
+                - cell "21/03/2026 00:06:04 WIB" [ref=e856]:
+                  - text: 21/03/2026 00:06:04
+                  - generic [ref=e857]: WIB
+                - cell "Lintang 103.136.57.66" [ref=e858]:
+                  - generic [ref=e859]:
+                    - generic [ref=e860]: Lintang
+                    - generic [ref=e861]: 103.136.57.66
+                - cell "created" [ref=e862]
+                - cell "ZakatTransaction" [ref=e863]
+                - cell "#2880..." [ref=e864]
+                - cell "View Data" [ref=e865]:
+                  - button "View Data" [ref=e867] [cursor=pointer]:
+                    - generic [ref=e868]: View Data
+                    - img [ref=e869]
+              - 'row "21/03/2026 00:06:04 WIB Lintang 103.136.57.66 created ZakatTransaction #2881... View Data" [ref=e871]':
+                - cell "21/03/2026 00:06:04 WIB" [ref=e872]:
+                  - text: 21/03/2026 00:06:04
+                  - generic [ref=e873]: WIB
+                - cell "Lintang 103.136.57.66" [ref=e874]:
+                  - generic [ref=e875]:
+                    - generic [ref=e876]: Lintang
+                    - generic [ref=e877]: 103.136.57.66
+                - cell "created" [ref=e878]
+                - cell "ZakatTransaction" [ref=e879]
+                - cell "#2881..." [ref=e880]
+                - cell "View Data" [ref=e881]:
+                  - button "View Data" [ref=e883] [cursor=pointer]:
+                    - generic [ref=e884]: View Data
+                    - img [ref=e885]
+          - navigation "Pagination Navigation" [ref=e888]:
+            - generic [ref=e889]:
+              - paragraph [ref=e891]: Showing 1 to 50 of 3448 results
+              - generic [ref=e893]:
+                - generic "&laquo; Previous" [ref=e894]:
+                  - img [ref=e896]
+                - generic [ref=e899]: "1"
+                - link "Go to page 2" [ref=e900] [cursor=pointer]:
+                  - /url: http://127.0.0.1:8000/internal/audit-logs?page=2
+                  - text: "2"
+                - link "Go to page 3" [ref=e901] [cursor=pointer]:
+                  - /url: http://127.0.0.1:8000/internal/audit-logs?page=3
+                  - text: "3"
+                - link "Go to page 4" [ref=e902] [cursor=pointer]:
+                  - /url: http://127.0.0.1:8000/internal/audit-logs?page=4
+                  - text: "4"
+                - link "Go to page 5" [ref=e903] [cursor=pointer]:
+                  - /url: http://127.0.0.1:8000/internal/audit-logs?page=5
+                  - text: "5"
+                - link "Go to page 6" [ref=e904] [cursor=pointer]:
+                  - /url: http://127.0.0.1:8000/internal/audit-logs?page=6
+                  - text: "6"
+                - link "Go to page 7" [ref=e905] [cursor=pointer]:
+                  - /url: http://127.0.0.1:8000/internal/audit-logs?page=7
+                  - text: "7"
+                - link "Go to page 8" [ref=e906] [cursor=pointer]:
+                  - /url: http://127.0.0.1:8000/internal/audit-logs?page=8
+                  - text: "8"
+                - link "Go to page 9" [ref=e907] [cursor=pointer]:
+                  - /url: http://127.0.0.1:8000/internal/audit-logs?page=9
+                  - text: "9"
+                - link "Go to page 10" [ref=e908] [cursor=pointer]:
+                  - /url: http://127.0.0.1:8000/internal/audit-logs?page=10
+                  - text: "10"
+                - generic [ref=e910]: ...
+                - link "Go to page 68" [ref=e911] [cursor=pointer]:
+                  - /url: http://127.0.0.1:8000/internal/audit-logs?page=68
+                  - text: "68"
+                - link "Go to page 69" [ref=e912] [cursor=pointer]:
+                  - /url: http://127.0.0.1:8000/internal/audit-logs?page=69
+                  - text: "69"
+                - link "Next &raquo;" [ref=e913] [cursor=pointer]:
+                  - /url: http://127.0.0.1:8000/internal/audit-logs?page=2
+                  - img [ref=e914]

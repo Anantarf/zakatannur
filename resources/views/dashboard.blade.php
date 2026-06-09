@@ -17,9 +17,9 @@
                 <div class="ui-card-strong p-5 sm:p-6">
                     <div class="flex flex-col gap-5 sm:flex-row sm:items-start sm:justify-between">
                         <div class="space-y-2">
-                            <p class="text-[11px] font-black uppercase tracking-[0.24em] text-emerald-700">Workspace Dashboard</p>
-                            <h3 class="text-xl font-black leading-tight text-slate-950 sm:text-[1.7rem]">Dashboard kerja yang lebih tenang dan fokus.</h3>
-                            <p class="max-w-2xl text-sm leading-6 text-slate-500">Pantau ringkasan transaksi, baca ritme kerja hari ini, lalu masuk ke halaman operasional tanpa harus memilah terlalu banyak distraksi.</p>
+                            <p class="text-[11px] font-black uppercase tracking-[0.24em] text-emerald-700">Overview</p>
+                            <h3 class="text-xl font-black leading-tight text-slate-950 sm:text-[1.7rem]">Manajemen Operasional Zakat</h3>
+                            <p class="max-w-2xl text-sm leading-6 text-slate-500">Kelola transaksi, pantau metrik penerimaan hari ini, dan akses aksi operasional dengan cepat dari satu tempat.</p>
                         </div>
                         <div class="flex flex-wrap gap-2">
                             <a href="{{ route('internal.transactions.create') }}" class="ui-btn ui-btn-primary w-full sm:w-auto">Input Transaksi</a>
@@ -49,7 +49,7 @@
                 </div>
 
                 <div class="ui-card p-5 sm:p-6">
-                    <p class="text-[11px] font-black uppercase tracking-[0.24em] text-slate-400">Aksi Cepat</p>
+                    <p class="text-[11px] font-black uppercase tracking-[0.24em] text-slate-400">Navigasi Cepat</p>
                     <div class="mt-4 grid grid-cols-1 gap-3">
                         <a href="{{ route('internal.transactions.index', array_filter(['year' => $year, 'period_id' => $periodId, 'metode' => $metode])) }}" class="ui-action-tile">
                             <p class="text-sm font-black text-slate-900">Riwayat Transaksi</p>
@@ -72,7 +72,7 @@
                 <div class="px-4 sm:px-6 py-3 sm:py-4 border-b border-gray-50 flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4">
                     <div class="flex items-center gap-2 flex-wrap">
                         <div class="w-1.5 h-5 sm:w-2 sm:h-6 bg-emerald-500 rounded-full flex-shrink-0"></div>
-                        <h3 class="font-bold text-sm sm:text-base text-gray-800">Grafik Transaksi Zakat</h3>
+                        <h3 class="font-bold text-sm sm:text-base text-gray-800">Tren Penerimaan</h3>
                         @if($chartPeriodLabel)
                             <span class="inline-flex items-center gap-1 rounded-full bg-amber-100 border border-amber-200 px-2.5 py-0.5 text-[10px] font-bold text-amber-700 uppercase tracking-wide whitespace-nowrap">
                                 <svg class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
@@ -95,7 +95,7 @@
                     </form>
                 </div>
                 <div class="p-4 sm:p-6">
-                    <p class="mb-4 text-sm leading-6 text-slate-500">Gunakan grafik ini untuk membaca ritme transaksi pada window aktif. Arsip lengkap tetap lebih cocok dibuka dari rekap dan riwayat.</p>
+                    <p class="mb-4 text-sm leading-6 text-slate-500">Visualisasi tren transaksi aktif. Untuk laporan terperinci, gunakan menu Rekapitulasi atau Riwayat.</p>
                     @if (!empty($dashboardChartSourceNote))
                         <div class="mb-4 rounded-2xl border border-sky-100 bg-sky-50 px-4 py-3 text-xs leading-relaxed text-sky-800">
                             {{ $dashboardChartSourceNote }}
@@ -303,14 +303,14 @@
                         data: {!! json_encode($chartData['datasets'][0]['values'] ?? $chartData['values'] ?? []) !!},
                         borderColor: lineColor,
                         backgroundColor: gradient,
-                        borderWidth: 3,
+                        borderWidth: 2.5,
                         fill: true,
-                        tension: 0.4,
+                        tension: 0.18,
                         pointBackgroundColor: '#fff',
                         pointBorderColor: lineColor,
                         pointBorderWidth: 2,
-                        pointRadius: 4,
-                        pointHoverRadius: 6
+                        pointRadius: 0,
+                        pointHoverRadius: 5
                     }]
                 },
                 options: {

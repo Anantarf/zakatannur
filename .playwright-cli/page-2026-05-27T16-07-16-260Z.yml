@@ -1,0 +1,512 @@
+- generic [ref=e2]:
+  - navigation [ref=e3]:
+    - generic [ref=e5]:
+      - link "Logo Zakat Annur Zakat Annur Masjid An-Nur Komplek BPK V Gandul" [ref=e7] [cursor=pointer]:
+        - /url: http://127.0.0.1:8000/dashboard
+        - generic [ref=e8]:
+          - img "Logo Zakat Annur" [ref=e9]
+          - generic [ref=e10]:
+            - generic [ref=e11]: Zakat Annur
+            - generic [ref=e12]: Masjid An-Nur Komplek BPK V Gandul
+      - generic [ref=e14]:
+        - link "Dashboard" [ref=e15] [cursor=pointer]:
+          - /url: http://127.0.0.1:8000/dashboard
+        - link "Muzakki" [ref=e16] [cursor=pointer]:
+          - /url: http://127.0.0.1:8000/internal/muzakki
+        - link "Riwayat Transaksi" [ref=e17] [cursor=pointer]:
+          - /url: http://127.0.0.1:8000/internal/history
+        - link "Input Transaksi" [ref=e18] [cursor=pointer]:
+          - /url: http://127.0.0.1:8000/internal/transactions/create
+        - button "Pengaturan Admin" [ref=e21] [cursor=pointer]
+      - button "Super Admin @superadmin" [ref=e25] [cursor=pointer]:
+        - img [ref=e27]
+        - generic [ref=e29]:
+          - generic [ref=e30]: Super Admin
+          - generic [ref=e31]: "@superadmin"
+        - img [ref=e32]
+  - banner [ref=e34]:
+    - generic [ref=e37]:
+      - generic [ref=e38]:
+        - heading "Data Muzakki" [level=2] [ref=e39]:
+          - img [ref=e40]
+          - text: Data Muzakki
+        - paragraph [ref=e42]: Pantau profil, kontribusi, dan riwayat muzakki secara ringan.
+      - link "Sampah" [ref=e44] [cursor=pointer]:
+        - /url: http://127.0.0.1:8000/internal/muzakki/trash
+        - img [ref=e45]
+        - text: Sampah
+  - main [ref=e47]:
+    - generic [ref=e49]:
+      - generic [ref=e50]:
+        - generic [ref=e51]:
+          - paragraph [ref=e52]: Total Muzakki
+          - paragraph [ref=e53]: "2.565"
+          - paragraph [ref=e54]: Kontak aktif di master data.
+        - generic [ref=e55]:
+          - paragraph [ref=e56]: Pernah Transaksi
+          - paragraph [ref=e57]: "2.348"
+          - paragraph [ref=e58]: Memiliki riwayat transaksi valid.
+        - generic [ref=e59]:
+          - paragraph [ref=e60]: Hasil Pencarian
+          - paragraph [ref=e61]: "2.565"
+          - paragraph [ref=e62]: Menampilkan semua data.
+      - generic [ref=e63]:
+        - generic [ref=e64]:
+          - heading "Daftar Muzakki" [level=3] [ref=e67]
+          - generic [ref=e68]:
+            - textbox "Cari nama/alamat..." [ref=e69]
+            - button [ref=e71] [cursor=pointer]:
+              - img [ref=e72]
+        - table [ref=e75]:
+          - rowgroup [ref=e76]:
+            - row "Nama No HP Alamat CRM Ringkas Aksi" [ref=e77]:
+              - columnheader "Nama" [ref=e78]
+              - columnheader "No HP" [ref=e79]
+              - columnheader "Alamat" [ref=e80]
+              - columnheader "CRM Ringkas" [ref=e81]
+              - columnheader "Aksi" [ref=e82]
+          - rowgroup [ref=e83]:
+            - 'row "A. zulfikar JL. tonsea no. 10 D gandul cinere 1 transaksi Rp 50.000 / 0,00 Kg Terakhir: 12 Mar 2026 Profil Ubah Hapus" [ref=e84]':
+              - cell "A. zulfikar" [ref=e85]
+              - cell [ref=e86]
+              - cell "JL. tonsea no. 10 D gandul cinere" [ref=e87]
+              - 'cell "1 transaksi Rp 50.000 / 0,00 Kg Terakhir: 12 Mar 2026" [ref=e88]':
+                - generic [ref=e89]:
+                  - generic [ref=e90]: 1 transaksi
+                  - generic [ref=e91]: Rp 50.000 / 0,00 Kg
+                  - generic [ref=e92]: "Terakhir: 12 Mar 2026"
+              - cell "Profil Ubah Hapus" [ref=e93]:
+                - generic [ref=e94]:
+                  - link "Profil" [ref=e95] [cursor=pointer]:
+                    - /url: http://127.0.0.1:8000/internal/muzakki/28
+                  - link "Ubah" [ref=e96] [cursor=pointer]:
+                    - /url: http://127.0.0.1:8000/internal/muzakki/28/edit
+                    - img [ref=e97]
+                    - text: Ubah
+                  - button "Hapus" [ref=e99] [cursor=pointer]:
+                    - img [ref=e100]
+                    - text: Hapus
+            - 'row "Abadi Insan - Komplek BPK V Gandul Blok F24 1 transaksi Rp 50.000 / 0,00 Kg Terakhir: 16 Mar 2026 Profil Ubah Hapus" [ref=e102]':
+              - cell "Abadi Insan" [ref=e103]
+              - cell "-" [ref=e104]
+              - cell "Komplek BPK V Gandul Blok F24" [ref=e105]
+              - 'cell "1 transaksi Rp 50.000 / 0,00 Kg Terakhir: 16 Mar 2026" [ref=e106]':
+                - generic [ref=e107]:
+                  - generic [ref=e108]: 1 transaksi
+                  - generic [ref=e109]: Rp 50.000 / 0,00 Kg
+                  - generic [ref=e110]: "Terakhir: 16 Mar 2026"
+              - cell "Profil Ubah Hapus" [ref=e111]:
+                - generic [ref=e112]:
+                  - link "Profil" [ref=e113] [cursor=pointer]:
+                    - /url: http://127.0.0.1:8000/internal/muzakki/531
+                  - link "Ubah" [ref=e114] [cursor=pointer]:
+                    - /url: http://127.0.0.1:8000/internal/muzakki/531/edit
+                    - img [ref=e115]
+                    - text: Ubah
+                  - button "Hapus" [ref=e117] [cursor=pointer]:
+                    - img [ref=e118]
+                    - text: Hapus
+            - 'row "Abd. Kadir - Jl. H. Usman Rt. 05, Rw. 013, No. 38F 1 transaksi Rp 50.000 / 0,00 Kg Terakhir: 16 Mar 2026 Profil Ubah Hapus" [ref=e120]':
+              - cell "Abd. Kadir" [ref=e121]
+              - cell "-" [ref=e122]
+              - cell "Jl. H. Usman Rt. 05, Rw. 013, No. 38F" [ref=e123]
+              - 'cell "1 transaksi Rp 50.000 / 0,00 Kg Terakhir: 16 Mar 2026" [ref=e124]':
+                - generic [ref=e125]:
+                  - generic [ref=e126]: 1 transaksi
+                  - generic [ref=e127]: Rp 50.000 / 0,00 Kg
+                  - generic [ref=e128]: "Terakhir: 16 Mar 2026"
+              - cell "Profil Ubah Hapus" [ref=e129]:
+                - generic [ref=e130]:
+                  - link "Profil" [ref=e131] [cursor=pointer]:
+                    - /url: http://127.0.0.1:8000/internal/muzakki/528
+                  - link "Ubah" [ref=e132] [cursor=pointer]:
+                    - /url: http://127.0.0.1:8000/internal/muzakki/528/edit
+                    - img [ref=e133]
+                    - text: Ubah
+                  - button "Hapus" [ref=e135] [cursor=pointer]:
+                    - img [ref=e136]
+                    - text: Hapus
+            - 'row "Abdul Aziz Jl. Andara 66, Gg. Pribadi I 1 transaksi Rp 50.000 / 0,00 Kg Terakhir: 20 Mar 2026 Profil Ubah Hapus" [ref=e138]':
+              - cell "Abdul Aziz" [ref=e139]
+              - cell [ref=e140]
+              - cell "Jl. Andara 66, Gg. Pribadi I" [ref=e141]
+              - 'cell "1 transaksi Rp 50.000 / 0,00 Kg Terakhir: 20 Mar 2026" [ref=e142]':
+                - generic [ref=e143]:
+                  - generic [ref=e144]: 1 transaksi
+                  - generic [ref=e145]: Rp 50.000 / 0,00 Kg
+                  - generic [ref=e146]: "Terakhir: 20 Mar 2026"
+              - cell "Profil Ubah Hapus" [ref=e147]:
+                - generic [ref=e148]:
+                  - link "Profil" [ref=e149] [cursor=pointer]:
+                    - /url: http://127.0.0.1:8000/internal/muzakki/2536
+                  - link "Ubah" [ref=e150] [cursor=pointer]:
+                    - /url: http://127.0.0.1:8000/internal/muzakki/2536/edit
+                    - img [ref=e151]
+                    - text: Ubah
+                  - button "Hapus" [ref=e153] [cursor=pointer]:
+                    - img [ref=e154]
+                    - text: Hapus
+            - 'row "Abdul Ghofur Pahlevi FGC Residence 1 transaksi Rp 6.350.000 / 0,00 Kg Terakhir: 19 Mar 2026 Profil Ubah Hapus" [ref=e156]':
+              - cell "Abdul Ghofur Pahlevi" [ref=e157]
+              - cell [ref=e158]
+              - cell "FGC Residence" [ref=e159]
+              - 'cell "1 transaksi Rp 6.350.000 / 0,00 Kg Terakhir: 19 Mar 2026" [ref=e160]':
+                - generic [ref=e161]:
+                  - generic [ref=e162]: 1 transaksi
+                  - generic [ref=e163]: Rp 6.350.000 / 0,00 Kg
+                  - generic [ref=e164]: "Terakhir: 19 Mar 2026"
+              - cell "Profil Ubah Hapus" [ref=e165]:
+                - generic [ref=e166]:
+                  - link "Profil" [ref=e167] [cursor=pointer]:
+                    - /url: http://127.0.0.1:8000/internal/muzakki/1841
+                  - link "Ubah" [ref=e168] [cursor=pointer]:
+                    - /url: http://127.0.0.1:8000/internal/muzakki/1841/edit
+                    - img [ref=e169]
+                    - text: Ubah
+                  - button "Hapus" [ref=e171] [cursor=pointer]:
+                    - img [ref=e172]
+                    - text: Hapus
+            - 'row "Abdul Ghofur Pahlevi PGC Residence 1 transaksi Rp 0 / 2,50 Kg Terakhir: 15 Mar 2026 Profil Ubah Hapus" [ref=e174]':
+              - cell "Abdul Ghofur Pahlevi" [ref=e175]
+              - cell [ref=e176]
+              - cell "PGC Residence" [ref=e177]
+              - 'cell "1 transaksi Rp 0 / 2,50 Kg Terakhir: 15 Mar 2026" [ref=e178]':
+                - generic [ref=e179]:
+                  - generic [ref=e180]: 1 transaksi
+                  - generic [ref=e181]: Rp 0 / 2,50 Kg
+                  - generic [ref=e182]: "Terakhir: 15 Mar 2026"
+              - cell "Profil Ubah Hapus" [ref=e183]:
+                - generic [ref=e184]:
+                  - link "Profil" [ref=e185] [cursor=pointer]:
+                    - /url: http://127.0.0.1:8000/internal/muzakki/443
+                  - link "Ubah" [ref=e186] [cursor=pointer]:
+                    - /url: http://127.0.0.1:8000/internal/muzakki/443/edit
+                    - img [ref=e187]
+                    - text: Ubah
+                  - button "Hapus" [ref=e189] [cursor=pointer]:
+                    - img [ref=e190]
+                    - text: Hapus
+            - 'row "Abdul Hasib Jl, Gandul Raya 1 transaksi Rp 0 / 2,50 Kg Terakhir: 19 Mar 2026 Profil Ubah Hapus" [ref=e192]':
+              - cell "Abdul Hasib" [ref=e193]
+              - cell [ref=e194]
+              - cell "Jl, Gandul Raya" [ref=e195]
+              - 'cell "1 transaksi Rp 0 / 2,50 Kg Terakhir: 19 Mar 2026" [ref=e196]':
+                - generic [ref=e197]:
+                  - generic [ref=e198]: 1 transaksi
+                  - generic [ref=e199]: Rp 0 / 2,50 Kg
+                  - generic [ref=e200]: "Terakhir: 19 Mar 2026"
+              - cell "Profil Ubah Hapus" [ref=e201]:
+                - generic [ref=e202]:
+                  - link "Profil" [ref=e203] [cursor=pointer]:
+                    - /url: http://127.0.0.1:8000/internal/muzakki/1852
+                  - link "Ubah" [ref=e204] [cursor=pointer]:
+                    - /url: http://127.0.0.1:8000/internal/muzakki/1852/edit
+                    - img [ref=e205]
+                    - text: Ubah
+                  - button "Hapus" [ref=e207] [cursor=pointer]:
+                    - img [ref=e208]
+                    - text: Hapus
+            - 'row "Abdul Muir Jl, Raya Gandul 0 transaksi Rp 0 / 0,00 Kg Terakhir: - Profil Ubah Hapus" [ref=e210]':
+              - cell "Abdul Muir" [ref=e211]
+              - cell [ref=e212]
+              - cell "Jl, Raya Gandul" [ref=e213]
+              - 'cell "0 transaksi Rp 0 / 0,00 Kg Terakhir: -" [ref=e214]':
+                - generic [ref=e215]:
+                  - generic [ref=e216]: 0 transaksi
+                  - generic [ref=e217]: Rp 0 / 0,00 Kg
+                  - generic [ref=e218]: "Terakhir: -"
+              - cell "Profil Ubah Hapus" [ref=e219]:
+                - generic [ref=e220]:
+                  - link "Profil" [ref=e221] [cursor=pointer]:
+                    - /url: http://127.0.0.1:8000/internal/muzakki/2467
+                  - link "Ubah" [ref=e222] [cursor=pointer]:
+                    - /url: http://127.0.0.1:8000/internal/muzakki/2467/edit
+                    - img [ref=e223]
+                    - text: Ubah
+                  - button "Hapus" [ref=e225] [cursor=pointer]:
+                    - img [ref=e226]
+                    - text: Hapus
+            - 'row "Abdul Rahman - Jl. Komplek MPR # No. 50 RT 012/013 Jakarta Selatan 1 transaksi Rp 50.000 / 0,00 Kg Terakhir: 18 Mar 2026 Profil Ubah Hapus" [ref=e228]':
+              - cell "Abdul Rahman" [ref=e229]
+              - cell "-" [ref=e230]
+              - 'cell "Jl. Komplek MPR # No. 50 RT 012/013 Jakarta Selatan" [ref=e231]'
+              - 'cell "1 transaksi Rp 50.000 / 0,00 Kg Terakhir: 18 Mar 2026" [ref=e232]':
+                - generic [ref=e233]:
+                  - generic [ref=e234]: 1 transaksi
+                  - generic [ref=e235]: Rp 50.000 / 0,00 Kg
+                  - generic [ref=e236]: "Terakhir: 18 Mar 2026"
+              - cell "Profil Ubah Hapus" [ref=e237]:
+                - generic [ref=e238]:
+                  - link "Profil" [ref=e239] [cursor=pointer]:
+                    - /url: http://127.0.0.1:8000/internal/muzakki/1200
+                  - link "Ubah" [ref=e240] [cursor=pointer]:
+                    - /url: http://127.0.0.1:8000/internal/muzakki/1200/edit
+                    - img [ref=e241]
+                    - text: Ubah
+                  - button "Hapus" [ref=e243] [cursor=pointer]:
+                    - img [ref=e244]
+                    - text: Hapus
+            - 'row "Abdul Rahman Wahab Jl. Lestari RT. 34 RW. 7 No. 52 1 transaksi Rp 50.000 / 0,00 Kg Terakhir: 20 Mar 2026 Profil Ubah Hapus" [ref=e246]':
+              - cell "Abdul Rahman Wahab" [ref=e247]
+              - cell [ref=e248]
+              - cell "Jl. Lestari RT. 34 RW. 7 No. 52" [ref=e249]
+              - 'cell "1 transaksi Rp 50.000 / 0,00 Kg Terakhir: 20 Mar 2026" [ref=e250]':
+                - generic [ref=e251]:
+                  - generic [ref=e252]: 1 transaksi
+                  - generic [ref=e253]: Rp 50.000 / 0,00 Kg
+                  - generic [ref=e254]: "Terakhir: 20 Mar 2026"
+              - cell "Profil Ubah Hapus" [ref=e255]:
+                - generic [ref=e256]:
+                  - link "Profil" [ref=e257] [cursor=pointer]:
+                    - /url: http://127.0.0.1:8000/internal/muzakki/2444
+                  - link "Ubah" [ref=e258] [cursor=pointer]:
+                    - /url: http://127.0.0.1:8000/internal/muzakki/2444/edit
+                    - img [ref=e259]
+                    - text: Ubah
+                  - button "Hapus" [ref=e261] [cursor=pointer]:
+                    - img [ref=e262]
+                    - text: Hapus
+            - 'row "Abdul Rojak Komplek BPK V 2 transaksi Rp 150.000 / 0,00 Kg Terakhir: 15 Mar 2026 Profil Ubah Hapus" [ref=e264]':
+              - cell "Abdul Rojak" [ref=e265]
+              - cell [ref=e266]
+              - cell "Komplek BPK V" [ref=e267]
+              - 'cell "2 transaksi Rp 150.000 / 0,00 Kg Terakhir: 15 Mar 2026" [ref=e268]':
+                - generic [ref=e269]:
+                  - generic [ref=e270]: 2 transaksi
+                  - generic [ref=e271]: Rp 150.000 / 0,00 Kg
+                  - generic [ref=e272]: "Terakhir: 15 Mar 2026"
+              - cell "Profil Ubah Hapus" [ref=e273]:
+                - generic [ref=e274]:
+                  - link "Profil" [ref=e275] [cursor=pointer]:
+                    - /url: http://127.0.0.1:8000/internal/muzakki/416
+                  - link "Ubah" [ref=e276] [cursor=pointer]:
+                    - /url: http://127.0.0.1:8000/internal/muzakki/416/edit
+                    - img [ref=e277]
+                    - text: Ubah
+                  - button "Hapus" [ref=e279] [cursor=pointer]:
+                    - img [ref=e280]
+                    - text: Hapus
+            - 'row "Abdul Syukur JL Masjid Al-Akhyar Gandul 1 transaksi Rp 0 / 2,50 Kg Terakhir: 19 Mar 2026 Profil Ubah Hapus" [ref=e282]':
+              - cell "Abdul Syukur" [ref=e283]
+              - cell [ref=e284]
+              - cell "JL Masjid Al-Akhyar Gandul" [ref=e285]
+              - 'cell "1 transaksi Rp 0 / 2,50 Kg Terakhir: 19 Mar 2026" [ref=e286]':
+                - generic [ref=e287]:
+                  - generic [ref=e288]: 1 transaksi
+                  - generic [ref=e289]: Rp 0 / 2,50 Kg
+                  - generic [ref=e290]: "Terakhir: 19 Mar 2026"
+              - cell "Profil Ubah Hapus" [ref=e291]:
+                - generic [ref=e292]:
+                  - link "Profil" [ref=e293] [cursor=pointer]:
+                    - /url: http://127.0.0.1:8000/internal/muzakki/1692
+                  - link "Ubah" [ref=e294] [cursor=pointer]:
+                    - /url: http://127.0.0.1:8000/internal/muzakki/1692/edit
+                    - img [ref=e295]
+                    - text: Ubah
+                  - button "Hapus" [ref=e297] [cursor=pointer]:
+                    - img [ref=e298]
+                    - text: Hapus
+            - 'row "Abi Rangga Al kafi Jl. Mendik N0. 9N, Gandul, Cinere 1 transaksi Rp 50.000 / 0,00 Kg Terakhir: 13 Mar 2026 Profil Ubah Hapus" [ref=e300]':
+              - cell "Abi Rangga Al kafi" [ref=e301]
+              - cell [ref=e302]
+              - cell "Jl. Mendik N0. 9N, Gandul, Cinere" [ref=e303]
+              - 'cell "1 transaksi Rp 50.000 / 0,00 Kg Terakhir: 13 Mar 2026" [ref=e304]':
+                - generic [ref=e305]:
+                  - generic [ref=e306]: 1 transaksi
+                  - generic [ref=e307]: Rp 50.000 / 0,00 Kg
+                  - generic [ref=e308]: "Terakhir: 13 Mar 2026"
+              - cell "Profil Ubah Hapus" [ref=e309]:
+                - generic [ref=e310]:
+                  - link "Profil" [ref=e311] [cursor=pointer]:
+                    - /url: http://127.0.0.1:8000/internal/muzakki/13
+                  - link "Ubah" [ref=e312] [cursor=pointer]:
+                    - /url: http://127.0.0.1:8000/internal/muzakki/13/edit
+                    - img [ref=e313]
+                    - text: Ubah
+                  - button "Hapus" [ref=e315] [cursor=pointer]:
+                    - img [ref=e316]
+                    - text: Hapus
+            - 'row "Abigeil Arimbi Lukira Apartemen Cinere Gndul 1 transaksi Rp 50.000 / 0,00 Kg Terakhir: 20 Mar 2026 Profil Ubah Hapus" [ref=e318]':
+              - cell "Abigeil Arimbi Lukira" [ref=e319]
+              - cell [ref=e320]
+              - cell "Apartemen Cinere Gndul" [ref=e321]
+              - 'cell "1 transaksi Rp 50.000 / 0,00 Kg Terakhir: 20 Mar 2026" [ref=e322]':
+                - generic [ref=e323]:
+                  - generic [ref=e324]: 1 transaksi
+                  - generic [ref=e325]: Rp 50.000 / 0,00 Kg
+                  - generic [ref=e326]: "Terakhir: 20 Mar 2026"
+              - cell "Profil Ubah Hapus" [ref=e327]:
+                - generic [ref=e328]:
+                  - link "Profil" [ref=e329] [cursor=pointer]:
+                    - /url: http://127.0.0.1:8000/internal/muzakki/2450
+                  - link "Ubah" [ref=e330] [cursor=pointer]:
+                    - /url: http://127.0.0.1:8000/internal/muzakki/2450/edit
+                    - img [ref=e331]
+                    - text: Ubah
+                  - button "Hapus" [ref=e333] [cursor=pointer]:
+                    - img [ref=e334]
+                    - text: Hapus
+            - 'row "Abil Sidqi Arsalaan - JL Lestari Kavling Trenggono 1 transaksi Rp 50.000 / 0,00 Kg Terakhir: 17 Mar 2026 Profil Ubah Hapus" [ref=e336]':
+              - cell "Abil Sidqi Arsalaan" [ref=e337]
+              - cell "-" [ref=e338]
+              - cell "JL Lestari Kavling Trenggono" [ref=e339]
+              - 'cell "1 transaksi Rp 50.000 / 0,00 Kg Terakhir: 17 Mar 2026" [ref=e340]':
+                - generic [ref=e341]:
+                  - generic [ref=e342]: 1 transaksi
+                  - generic [ref=e343]: Rp 50.000 / 0,00 Kg
+                  - generic [ref=e344]: "Terakhir: 17 Mar 2026"
+              - cell "Profil Ubah Hapus" [ref=e345]:
+                - generic [ref=e346]:
+                  - link "Profil" [ref=e347] [cursor=pointer]:
+                    - /url: http://127.0.0.1:8000/internal/muzakki/864
+                  - link "Ubah" [ref=e348] [cursor=pointer]:
+                    - /url: http://127.0.0.1:8000/internal/muzakki/864/edit
+                    - img [ref=e349]
+                    - text: Ubah
+                  - button "Hapus" [ref=e351] [cursor=pointer]:
+                    - img [ref=e352]
+                    - text: Hapus
+            - 'row "Abiyyu Musahazik - Komplek BPK V Gandul 1 transaksi Rp 50.000 / 0,00 Kg Terakhir: 16 Mar 2026 Profil Ubah Hapus" [ref=e354]':
+              - cell "Abiyyu Musahazik" [ref=e355]
+              - cell "-" [ref=e356]
+              - cell "Komplek BPK V Gandul" [ref=e357]
+              - 'cell "1 transaksi Rp 50.000 / 0,00 Kg Terakhir: 16 Mar 2026" [ref=e358]':
+                - generic [ref=e359]:
+                  - generic [ref=e360]: 1 transaksi
+                  - generic [ref=e361]: Rp 50.000 / 0,00 Kg
+                  - generic [ref=e362]: "Terakhir: 16 Mar 2026"
+              - cell "Profil Ubah Hapus" [ref=e363]:
+                - generic [ref=e364]:
+                  - link "Profil" [ref=e365] [cursor=pointer]:
+                    - /url: http://127.0.0.1:8000/internal/muzakki/686
+                  - link "Ubah" [ref=e366] [cursor=pointer]:
+                    - /url: http://127.0.0.1:8000/internal/muzakki/686/edit
+                    - img [ref=e367]
+                    - text: Ubah
+                  - button "Hapus" [ref=e369] [cursor=pointer]:
+                    - img [ref=e370]
+                    - text: Hapus
+            - 'row "Abqori Jundulah M - Komplek BPK V Blok S-12 1 transaksi Rp 50.000 / 0,00 Kg Terakhir: 17 Mar 2026 Profil Ubah Hapus" [ref=e372]':
+              - cell "Abqori Jundulah M" [ref=e373]
+              - cell "-" [ref=e374]
+              - cell "Komplek BPK V Blok S-12" [ref=e375]
+              - 'cell "1 transaksi Rp 50.000 / 0,00 Kg Terakhir: 17 Mar 2026" [ref=e376]':
+                - generic [ref=e377]:
+                  - generic [ref=e378]: 1 transaksi
+                  - generic [ref=e379]: Rp 50.000 / 0,00 Kg
+                  - generic [ref=e380]: "Terakhir: 17 Mar 2026"
+              - cell "Profil Ubah Hapus" [ref=e381]:
+                - generic [ref=e382]:
+                  - link "Profil" [ref=e383] [cursor=pointer]:
+                    - /url: http://127.0.0.1:8000/internal/muzakki/1051
+                  - link "Ubah" [ref=e384] [cursor=pointer]:
+                    - /url: http://127.0.0.1:8000/internal/muzakki/1051/edit
+                    - img [ref=e385]
+                    - text: Ubah
+                  - button "Hapus" [ref=e387] [cursor=pointer]:
+                    - img [ref=e388]
+                    - text: Hapus
+            - 'row "Achadian Kliwan Martianto Cinere Resort Apartement Tower Kintamani K6 unit 22 1 transaksi Rp 50.000 / 0,00 Kg Terakhir: 20 Mar 2026 Profil Ubah Hapus" [ref=e390]':
+              - cell "Achadian Kliwan Martianto" [ref=e391]
+              - cell [ref=e392]
+              - cell "Cinere Resort Apartement Tower Kintamani K6 unit 22" [ref=e393]
+              - 'cell "1 transaksi Rp 50.000 / 0,00 Kg Terakhir: 20 Mar 2026" [ref=e394]':
+                - generic [ref=e395]:
+                  - generic [ref=e396]: 1 transaksi
+                  - generic [ref=e397]: Rp 50.000 / 0,00 Kg
+                  - generic [ref=e398]: "Terakhir: 20 Mar 2026"
+              - cell "Profil Ubah Hapus" [ref=e399]:
+                - generic [ref=e400]:
+                  - link "Profil" [ref=e401] [cursor=pointer]:
+                    - /url: http://127.0.0.1:8000/internal/muzakki/2155
+                  - link "Ubah" [ref=e402] [cursor=pointer]:
+                    - /url: http://127.0.0.1:8000/internal/muzakki/2155/edit
+                    - img [ref=e403]
+                    - text: Ubah
+                  - button "Hapus" [ref=e405] [cursor=pointer]:
+                    - img [ref=e406]
+                    - text: Hapus
+            - 'row "Achmad Agung Purnomo S - Komplek BPK V Blok H no 1 1 transaksi Rp 0 / 5,00 Kg Terakhir: 16 Mar 2026 Profil Ubah Hapus" [ref=e408]':
+              - cell "Achmad Agung Purnomo S" [ref=e409]
+              - cell "-" [ref=e410]
+              - cell "Komplek BPK V Blok H no 1" [ref=e411]
+              - 'cell "1 transaksi Rp 0 / 5,00 Kg Terakhir: 16 Mar 2026" [ref=e412]':
+                - generic [ref=e413]:
+                  - generic [ref=e414]: 1 transaksi
+                  - generic [ref=e415]: Rp 0 / 5,00 Kg
+                  - generic [ref=e416]: "Terakhir: 16 Mar 2026"
+              - cell "Profil Ubah Hapus" [ref=e417]:
+                - generic [ref=e418]:
+                  - link "Profil" [ref=e419] [cursor=pointer]:
+                    - /url: http://127.0.0.1:8000/internal/muzakki/591
+                  - link "Ubah" [ref=e420] [cursor=pointer]:
+                    - /url: http://127.0.0.1:8000/internal/muzakki/591/edit
+                    - img [ref=e421]
+                    - text: Ubah
+                  - button "Hapus" [ref=e423] [cursor=pointer]:
+                    - img [ref=e424]
+                    - text: Hapus
+            - 'row "Achmad Agung Purnomo S. - Komplek BPK V Blok H no 1 0 transaksi Rp 0 / 0,00 Kg Terakhir: - Profil Ubah Hapus" [ref=e426]':
+              - cell "Achmad Agung Purnomo S." [ref=e427]
+              - cell "-" [ref=e428]
+              - cell "Komplek BPK V Blok H no 1" [ref=e429]
+              - 'cell "0 transaksi Rp 0 / 0,00 Kg Terakhir: -" [ref=e430]':
+                - generic [ref=e431]:
+                  - generic [ref=e432]: 0 transaksi
+                  - generic [ref=e433]: Rp 0 / 0,00 Kg
+                  - generic [ref=e434]: "Terakhir: -"
+              - cell "Profil Ubah Hapus" [ref=e435]:
+                - generic [ref=e436]:
+                  - link "Profil" [ref=e437] [cursor=pointer]:
+                    - /url: http://127.0.0.1:8000/internal/muzakki/590
+                  - link "Ubah" [ref=e438] [cursor=pointer]:
+                    - /url: http://127.0.0.1:8000/internal/muzakki/590/edit
+                    - img [ref=e439]
+                    - text: Ubah
+                  - button "Hapus" [ref=e441] [cursor=pointer]:
+                    - img [ref=e442]
+                    - text: Hapus
+        - navigation "Navigasi Pagination" [ref=e445]:
+          - generic [ref=e446]:
+            - paragraph [ref=e448]: Menampilkan 1 sampai 20 dari 2565 hasil
+            - generic [ref=e450]:
+              - generic "Halaman sebelumnya" [ref=e451]:
+                - img [ref=e453]
+              - generic [ref=e456]: "1"
+              - link "Ke halaman 2" [ref=e457] [cursor=pointer]:
+                - /url: http://127.0.0.1:8000/internal/muzakki?page=2
+                - text: "2"
+              - link "Ke halaman 3" [ref=e458] [cursor=pointer]:
+                - /url: http://127.0.0.1:8000/internal/muzakki?page=3
+                - text: "3"
+              - link "Ke halaman 4" [ref=e459] [cursor=pointer]:
+                - /url: http://127.0.0.1:8000/internal/muzakki?page=4
+                - text: "4"
+              - link "Ke halaman 5" [ref=e460] [cursor=pointer]:
+                - /url: http://127.0.0.1:8000/internal/muzakki?page=5
+                - text: "5"
+              - link "Ke halaman 6" [ref=e461] [cursor=pointer]:
+                - /url: http://127.0.0.1:8000/internal/muzakki?page=6
+                - text: "6"
+              - link "Ke halaman 7" [ref=e462] [cursor=pointer]:
+                - /url: http://127.0.0.1:8000/internal/muzakki?page=7
+                - text: "7"
+              - link "Ke halaman 8" [ref=e463] [cursor=pointer]:
+                - /url: http://127.0.0.1:8000/internal/muzakki?page=8
+                - text: "8"
+              - link "Ke halaman 9" [ref=e464] [cursor=pointer]:
+                - /url: http://127.0.0.1:8000/internal/muzakki?page=9
+                - text: "9"
+              - link "Ke halaman 10" [ref=e465] [cursor=pointer]:
+                - /url: http://127.0.0.1:8000/internal/muzakki?page=10
+                - text: "10"
+              - generic [ref=e467]: ...
+              - link "Ke halaman 128" [ref=e468] [cursor=pointer]:
+                - /url: http://127.0.0.1:8000/internal/muzakki?page=128
+                - text: "128"
+              - link "Ke halaman 129" [ref=e469] [cursor=pointer]:
+                - /url: http://127.0.0.1:8000/internal/muzakki?page=129
+                - text: "129"
+              - link "Halaman berikutnya" [ref=e470] [cursor=pointer]:
+                - /url: http://127.0.0.1:8000/internal/muzakki?page=2
+                - img [ref=e471]

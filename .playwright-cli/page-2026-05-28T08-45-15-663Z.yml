@@ -1,0 +1,54 @@
+- generic [ref=e1]:
+  - navigation [ref=e2]:
+    - generic [ref=e4]:
+      - link "Logo Zakat Annur Zakat Annur Masjid An-Nur Komplek BPK V Gandul" [ref=e6] [cursor=pointer]:
+        - /url: http://127.0.0.1:8000
+        - generic [ref=e7]:
+          - img "Logo Zakat Annur" [ref=e8]
+          - generic [ref=e9]:
+            - generic [ref=e10]: Zakat Annur
+            - generic [ref=e11]: Masjid An-Nur Komplek BPK V Gandul
+      - generic [ref=e12]:
+        - button "Beranda" [ref=e13] [cursor=pointer]
+        - button "Ringkasan penerimaan" [ref=e14] [cursor=pointer]
+        - button "Grafik harian" [active] [ref=e15] [cursor=pointer]
+      - generic [ref=e16]:
+        - button "Masuk":
+          - img
+          - generic: Masuk
+  - main [ref=e21]:
+    - generic [ref=e194]:
+      - generic [ref=e195]:
+        - generic [ref=e196]:
+          - img [ref=e198]
+          - generic [ref=e200]:
+            - heading "Grafik penerimaan harian" [level=2] [ref=e201]
+            - paragraph [ref=e202]: Pola harian sebagai insight pendukung setelah ringkasan utama.
+        - generic [ref=e203]: 10 Mar - 23 Mar 2026
+      - generic [ref=e204]:
+        - generic [ref=e205]:
+          - img [ref=e207]
+          - paragraph [ref=e209]: Total penerimaan uang
+          - heading "Rp 290.596.000" [level=3] [ref=e210]
+        - generic [ref=e211]:
+          - img [ref=e213]
+          - paragraph [ref=e217]: Total penerimaan beras
+          - heading "1323,30 Kg" [level=3] [ref=e218]
+  - contentinfo [ref=e106]:
+    - generic [ref=e107]:
+      - generic [ref=e108]: Powered by
+      - generic [ref=e109]:
+        - generic [ref=e110]: Ikatan Remaja Komplek BPK V Gandul
+        - img "Logo IRK" [ref=e111]
+  - generic "Informasi zakat berjalan" [ref=e112]:
+    - generic [ref=e113]:
+      - generic [ref=e114]:
+        - generic [ref=e115]: Masjid An-Nur Komplek BPK V Gandul - Melayani dan menyalurkan Zakat Fitrah, Fidyah, Zakat Mal, Infaq Shodaqoh.
+        - generic [ref=e116]: Tunaikan zakat tepat waktu agar manfaatnya dapat segera dirasakan oleh saudara kita yang membutuhkan.
+        - generic [ref=e117]: Amanah dan transparan dalam pengelolaan zakat adalah komitmen utama Panitia Zakat Masjid An-Nur.
+      - generic [ref=e118]:
+        - generic [ref=e119]: Masjid An-Nur Komplek BPK V Gandul - Melayani dan menyalurkan Zakat Fitrah, Fidyah, Zakat Mal, Infaq Shodaqoh.
+        - generic [ref=e120]: Tunaikan zakat tepat waktu agar manfaatnya dapat segera dirasakan oleh saudara kita yang membutuhkan.
+        - generic [ref=e121]: Amanah dan transparan dalam pengelolaan zakat adalah komitmen utama Panitia Zakat Masjid An-Nur.
+  - button "Buka chatbot" [ref=e123] [cursor=pointer]:
+    - img [ref=e124]

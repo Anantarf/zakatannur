@@ -1,0 +1,331 @@
+- generic [ref=e2]:
+  - navigation [ref=e3]:
+    - generic [ref=e5]:
+      - link "Logo Zakat Annur Zakat Annur Masjid An-Nur Komplek BPK V Gandul" [ref=e7] [cursor=pointer]:
+        - /url: http://127.0.0.1:8000/dashboard
+        - generic [ref=e8]:
+          - img "Logo Zakat Annur" [ref=e9]
+          - generic [ref=e10]:
+            - generic [ref=e11]: Zakat Annur
+            - generic [ref=e12]: Masjid An-Nur Komplek BPK V Gandul
+      - button "Super Admin @superadmin" [ref=e16] [cursor=pointer]:
+        - img [ref=e18]
+        - generic [ref=e20]:
+          - generic [ref=e21]: Super Admin
+          - generic [ref=e22]: "@superadmin"
+        - img [ref=e23]
+  - banner [ref=e25]:
+    - heading "Dashboard Pengelolaan" [level=2] [ref=e29]:
+      - img [ref=e30]
+      - text: Dashboard Pengelolaan
+  - main [ref=e32]:
+    - generic [ref=e34]:
+      - generic [ref=e35]:
+        - generic [ref=e36]:
+          - generic [ref=e37]:
+            - generic [ref=e38]:
+              - paragraph [ref=e39]: Workspace Dashboard
+              - heading "Dashboard kerja yang lebih tenang dan fokus." [level=3] [ref=e40]
+              - paragraph [ref=e41]: Pantau ringkasan transaksi, baca ritme kerja hari ini, lalu masuk ke halaman operasional tanpa harus memilah terlalu banyak distraksi.
+            - generic [ref=e42]:
+              - link "Input Transaksi" [ref=e43] [cursor=pointer]:
+                - /url: http://127.0.0.1:8000/internal/transactions/create
+              - link "Buka Riwayat" [ref=e44] [cursor=pointer]:
+                - /url: http://127.0.0.1:8000/internal/history
+          - generic [ref=e45]:
+            - generic [ref=e46]:
+              - paragraph [ref=e47]: Total Transaksi
+              - paragraph [ref=e48]: "2.595"
+              - paragraph [ref=e49]: Jumlah transaksi yang tampil di ringkasan dashboard.
+            - generic [ref=e50]:
+              - paragraph [ref=e51]: Transaksi Hari Ini
+              - paragraph [ref=e52]: "0"
+              - paragraph [ref=e53]: Transaksi valid yang tercatat hari ini.
+            - generic [ref=e54]:
+              - paragraph [ref=e55]: Transaksi Terakhir
+              - paragraph [ref=e56]: 21/03/2026 00:17
+              - paragraph [ref=e57]: Waktu transaksi terbaru yang tercatat di sistem.
+        - generic [ref=e58]:
+          - paragraph [ref=e59]: Aksi Cepat
+          - generic [ref=e60]:
+            - link "Riwayat Transaksi Telusuri transaksi lengkap sesuai filter dashboard saat ini." [ref=e61] [cursor=pointer]:
+              - /url: http://127.0.0.1:8000/internal/history
+              - paragraph [ref=e62]: Riwayat Transaksi
+              - paragraph [ref=e63]: Telusuri transaksi lengkap sesuai filter dashboard saat ini.
+            - link "Data Muzakki Cari data muzakki dan lihat riwayat yang sudah tercatat." [ref=e64] [cursor=pointer]:
+              - /url: http://127.0.0.1:8000/internal/muzakki
+              - paragraph [ref=e65]: Data Muzakki
+              - paragraph [ref=e66]: Cari data muzakki dan lihat riwayat yang sudah tercatat.
+            - link "Trash Transaksi Cek transaksi yang pernah dihapus dan masih tersimpan di trash." [ref=e67] [cursor=pointer]:
+              - /url: http://127.0.0.1:8000/internal/transactions/trash
+              - paragraph [ref=e68]: Trash Transaksi
+              - paragraph [ref=e69]: Cek transaksi yang pernah dihapus dan masih tersimpan di trash.
+      - generic [ref=e70]:
+        - generic [ref=e71]:
+          - generic [ref=e72]:
+            - heading "Grafik Transaksi Zakat" [level=3] [ref=e74]
+            - generic [ref=e75]:
+              - img [ref=e76]
+              - text: "Range: 10 Mar - 23 Mar 2026"
+          - combobox [ref=e79] [cursor=pointer]:
+            - option "7 Hari"
+            - option "14 Hari" [selected]
+            - option "30 Hari"
+        - generic [ref=e80]:
+          - paragraph [ref=e81]: Gunakan grafik ini untuk membaca ritme transaksi pada window aktif. Arsip lengkap tetap lebih cocok dibuka dari rekap dan riwayat.
+          - generic [ref=e82]: Grafik ini sedang memakai periode pilihan manual dari Pengaturan Admin.
+          - generic [ref=e84]:
+            - img [ref=e85]
+            - generic:
+              - generic: 10 Mar
+              - generic: 11 Mar
+              - generic: 12 Mar
+              - generic: 13 Mar
+              - generic: 14 Mar
+              - generic: 15 Mar
+              - generic: 16 Mar
+              - generic: 17 Mar
+              - generic: 18 Mar
+              - generic: 19 Mar
+              - generic: 20 Mar
+              - generic: 21 Mar
+              - generic: 22 Mar
+              - generic: 23 Mar
+      - generic [ref=e102]:
+        - generic [ref=e103]:
+          - heading "Rekapitulasi Zakat" [level=3] [ref=e106]
+          - generic [ref=e107]:
+            - combobox [ref=e109] [cursor=pointer]:
+              - option "Semua Waktu" [selected]
+              - option "Tahun 2026"
+            - combobox [ref=e111] [cursor=pointer]:
+              - option "Semua Periode" [selected]
+              - option "Ramadan 2026"
+            - combobox [ref=e113] [cursor=pointer]:
+              - option "Semua Bentuk" [selected]
+              - option "Uang"
+              - option "Beras"
+              - option "Cek"
+        - table [ref=e116]:
+          - rowgroup [ref=e117]:
+            - row "Kategori Total Transaksi Total Uang Total Beras" [ref=e118]:
+              - columnheader "Kategori" [ref=e119]
+              - columnheader "Total Transaksi" [ref=e120]
+              - columnheader "Total Uang" [ref=e121]
+              - columnheader "Total Beras" [ref=e122]
+          - rowgroup [ref=e123]:
+            - row "Zakat Fitrah 2,298 Rp 91.565.000 1.323,30 Kg" [ref=e124]:
+              - cell "Zakat Fitrah" [ref=e125]
+              - cell "2,298" [ref=e126]
+              - cell "Rp 91.565.000" [ref=e127]
+              - cell "1.323,30 Kg" [ref=e128]
+            - row "Fidyah 44 Rp 39.250.000 0,00 Kg" [ref=e129]:
+              - cell "Fidyah" [ref=e130]
+              - cell "44" [ref=e131]
+              - cell "Rp 39.250.000" [ref=e132]
+              - cell "0,00 Kg" [ref=e133]
+            - row "Zakat Mal 48 Rp 128.300.000 0,00 Kg" [ref=e134]:
+              - cell "Zakat Mal" [ref=e135]
+              - cell "48" [ref=e136]
+              - cell "Rp 128.300.000" [ref=e137]
+              - cell "0,00 Kg" [ref=e138]
+            - row "Infaq Shodaqoh 205 Rp 31.481.000 0,00 Kg" [ref=e139]:
+              - cell "Infaq Shodaqoh" [ref=e140]
+              - cell "205" [ref=e141]
+              - cell "Rp 31.481.000" [ref=e142]
+              - cell "0,00 Kg" [ref=e143]
+          - rowgroup [ref=e144]:
+            - row "GRAND TOTAL 2,595 Rp 290.596.000 1.323,30 Kg" [ref=e145]:
+              - cell "GRAND TOTAL" [ref=e146]
+              - cell "2,595" [ref=e147]
+              - cell "Rp 290.596.000" [ref=e148]
+              - cell "1.323,30 Kg" [ref=e149]
+      - generic [ref=e150]:
+        - generic [ref=e151]:
+          - heading "10 Transaksi Terakhir" [level=3] [ref=e154]
+          - link "Lengkap" [ref=e155] [cursor=pointer]:
+            - /url: http://127.0.0.1:8000/internal/history?year=2026
+            - text: Lengkap
+            - img [ref=e156]
+        - table [ref=e160]:
+          - rowgroup [ref=e161]:
+            - row "No. Transaksi Waktu Pembayar Kategori Bentuk Total Nominal Petugas" [ref=e162]:
+              - columnheader "No. Transaksi" [ref=e163]
+              - columnheader "Waktu" [ref=e164]
+              - columnheader "Pembayar" [ref=e165]
+              - columnheader "Kategori" [ref=e166]
+              - columnheader "Bentuk" [ref=e167]
+              - columnheader "Total Nominal" [ref=e168]
+              - columnheader "Petugas" [ref=e169]
+          - rowgroup [ref=e170]:
+            - row "TRX-20260321-0004 21/03/2026 00:17 Maulidiya Ulfa + 1 Muzakki Lainnya Zakat Fitrah Uang Rp 100.000 Rara Pagi" [ref=e171]:
+              - cell "TRX-20260321-0004" [ref=e172]
+              - cell "21/03/2026 00:17" [ref=e173]
+              - cell "Maulidiya Ulfa + 1 Muzakki Lainnya" [ref=e174]:
+                - generic [ref=e175]: Maulidiya Ulfa
+                - generic [ref=e176]: + 1 Muzakki Lainnya
+              - cell "Zakat Fitrah" [ref=e177]:
+                - generic [ref=e180]: Zakat Fitrah
+              - cell "Uang" [ref=e181]:
+                - generic [ref=e183]: Uang
+              - cell "Rp 100.000" [ref=e184]:
+                - generic [ref=e187]: Rp 100.000
+              - cell "Rara Pagi" [ref=e188]:
+                - generic [ref=e189]:
+                  - generic [ref=e190]: Rara
+                  - generic [ref=e191]: Pagi
+            - row "TRX-20260321-0003 21/03/2026 00:15 Riko Kamarullah + 2 Muzakki Lainnya Zakat Fitrah Uang Rp 150.000 TF Rara Pagi" [ref=e192]:
+              - cell "TRX-20260321-0003" [ref=e193]
+              - cell "21/03/2026 00:15" [ref=e194]
+              - cell "Riko Kamarullah + 2 Muzakki Lainnya" [ref=e195]:
+                - generic [ref=e196]: Riko Kamarullah
+                - generic [ref=e197]: + 2 Muzakki Lainnya
+              - cell "Zakat Fitrah" [ref=e198]:
+                - generic [ref=e201]: Zakat Fitrah
+              - cell "Uang" [ref=e202]:
+                - generic [ref=e204]: Uang
+              - cell "Rp 150.000 TF" [ref=e205]:
+                - generic [ref=e207]:
+                  - generic [ref=e208]: Rp 150.000
+                  - generic [ref=e209]: TF
+              - cell "Rara Pagi" [ref=e210]:
+                - generic [ref=e211]:
+                  - generic [ref=e212]: Rara
+                  - generic [ref=e213]: Pagi
+            - row "TRX-20260321-0002 21/03/2026 00:09 Ichsan Sabri Zakat Fitrah Uang Rp 50.000 Rara Pagi" [ref=e214]:
+              - cell "TRX-20260321-0002" [ref=e215]
+              - cell "21/03/2026 00:09" [ref=e216]
+              - cell "Ichsan Sabri" [ref=e217]:
+                - generic [ref=e218]: Ichsan Sabri
+              - cell "Zakat Fitrah" [ref=e219]:
+                - generic [ref=e222]: Zakat Fitrah
+              - cell "Uang" [ref=e223]:
+                - generic [ref=e225]: Uang
+              - cell "Rp 50.000" [ref=e226]:
+                - generic [ref=e229]: Rp 50.000
+              - cell "Rara Pagi" [ref=e230]:
+                - generic [ref=e231]:
+                  - generic [ref=e232]: Rara
+                  - generic [ref=e233]: Pagi
+            - row "TRX-20260321-0001 21/03/2026 00:06 Dwi Sasongko Ari Wibowo + 2 Muzakki Lainnya Zakat Fitrah Uang Rp 150.000 Lintang Pagi" [ref=e234]:
+              - cell "TRX-20260321-0001" [ref=e235]
+              - cell "21/03/2026 00:06" [ref=e236]
+              - cell "Dwi Sasongko Ari Wibowo + 2 Muzakki Lainnya" [ref=e237]:
+                - generic [ref=e238]: Dwi Sasongko Ari Wibowo
+                - generic [ref=e239]: + 2 Muzakki Lainnya
+              - cell "Zakat Fitrah" [ref=e240]:
+                - generic [ref=e243]: Zakat Fitrah
+              - cell "Uang" [ref=e244]:
+                - generic [ref=e246]: Uang
+              - cell "Rp 150.000" [ref=e247]:
+                - generic [ref=e250]: Rp 150.000
+              - cell "Lintang Pagi" [ref=e251]:
+                - generic [ref=e252]:
+                  - generic [ref=e253]: Lintang
+                  - generic [ref=e254]: Pagi
+            - row "TRX-20260320-0152 20/03/2026 23:59 Riswan Dedi + 1 Muzakki Lainnya Zakat Fitrah Uang Rp 300.000 Lintang Pagi" [ref=e255]:
+              - cell "TRX-20260320-0152" [ref=e256]
+              - cell "20/03/2026 23:59" [ref=e257]
+              - cell "Riswan Dedi + 1 Muzakki Lainnya" [ref=e258]:
+                - generic [ref=e259]: Riswan Dedi
+                - generic [ref=e260]: + 1 Muzakki Lainnya
+              - cell "Zakat Fitrah" [ref=e261]:
+                - generic [ref=e264]: Zakat Fitrah
+              - cell "Uang" [ref=e265]:
+                - generic [ref=e267]: Uang
+              - cell "Rp 300.000" [ref=e268]:
+                - generic [ref=e271]: Rp 300.000
+              - cell "Lintang Pagi" [ref=e272]:
+                - generic [ref=e273]:
+                  - generic [ref=e274]: Lintang
+                  - generic [ref=e275]: Pagi
+            - row "TRX-20260320-0145 20/03/2026 23:51 Amiderita + 1 Muzakki Lainnya Zakat Fitrah Infaq Shodaqoh Uang Rp 120.000 TF ZakatAnnur Pagi" [ref=e276]:
+              - cell "TRX-20260320-0145" [ref=e277]
+              - cell "20/03/2026 23:51" [ref=e278]
+              - cell "Amiderita + 1 Muzakki Lainnya" [ref=e279]:
+                - generic [ref=e280]: Amiderita
+                - generic [ref=e281]: + 1 Muzakki Lainnya
+              - cell "Zakat Fitrah Infaq Shodaqoh" [ref=e282]:
+                - generic [ref=e283]:
+                  - generic [ref=e285]: Zakat Fitrah
+                  - generic [ref=e287]: Infaq Shodaqoh
+              - cell "Uang" [ref=e288]:
+                - generic [ref=e290]: Uang
+              - cell "Rp 120.000 TF" [ref=e291]:
+                - generic [ref=e293]:
+                  - generic [ref=e294]: Rp 120.000
+                  - generic [ref=e295]: TF
+              - cell "ZakatAnnur Pagi" [ref=e296]:
+                - generic [ref=e297]:
+                  - generic [ref=e298]: ZakatAnnur
+                  - generic [ref=e299]: Pagi
+            - row "TRX-20260320-0151 20/03/2026 23:51 Mohammadsyah + 3 Muzakki Lainnya Zakat Fitrah Uang Rp 200.000 Lintang Pagi" [ref=e300]:
+              - cell "TRX-20260320-0151" [ref=e301]
+              - cell "20/03/2026 23:51" [ref=e302]
+              - cell "Mohammadsyah + 3 Muzakki Lainnya" [ref=e303]:
+                - generic [ref=e304]: Mohammadsyah
+                - generic [ref=e305]: + 3 Muzakki Lainnya
+              - cell "Zakat Fitrah" [ref=e306]:
+                - generic [ref=e309]: Zakat Fitrah
+              - cell "Uang" [ref=e310]:
+                - generic [ref=e312]: Uang
+              - cell "Rp 200.000" [ref=e313]:
+                - generic [ref=e316]: Rp 200.000
+              - cell "Lintang Pagi" [ref=e317]:
+                - generic [ref=e318]:
+                  - generic [ref=e319]: Lintang
+                  - generic [ref=e320]: Pagi
+            - row "TRX-20260320-0146 20/03/2026 23:50 William + 1 Muzakki Lainnya Zakat Fitrah Infaq Shodaqoh Uang Rp 200.000 TF ZakatAnnur Pagi" [ref=e321]:
+              - cell "TRX-20260320-0146" [ref=e322]
+              - cell "20/03/2026 23:50" [ref=e323]
+              - cell "William + 1 Muzakki Lainnya" [ref=e324]:
+                - generic [ref=e325]: William
+                - generic [ref=e326]: + 1 Muzakki Lainnya
+              - cell "Zakat Fitrah Infaq Shodaqoh" [ref=e327]:
+                - generic [ref=e328]:
+                  - generic [ref=e330]: Zakat Fitrah
+                  - generic [ref=e332]: Infaq Shodaqoh
+              - cell "Uang" [ref=e333]:
+                - generic [ref=e335]: Uang
+              - cell "Rp 200.000 TF" [ref=e336]:
+                - generic [ref=e338]:
+                  - generic [ref=e339]: Rp 200.000
+                  - generic [ref=e340]: TF
+              - cell "ZakatAnnur Pagi" [ref=e341]:
+                - generic [ref=e342]:
+                  - generic [ref=e343]: ZakatAnnur
+                  - generic [ref=e344]: Pagi
+            - row "TRX-20260320-0150 20/03/2026 23:49 Adri Aji Pitria Utama + 2 Muzakki Lainnya Zakat Fitrah Uang Rp 150.000 Lintang Pagi" [ref=e345]:
+              - cell "TRX-20260320-0150" [ref=e346]
+              - cell "20/03/2026 23:49" [ref=e347]
+              - cell "Adri Aji Pitria Utama + 2 Muzakki Lainnya" [ref=e348]:
+                - generic [ref=e349]: Adri Aji Pitria Utama
+                - generic [ref=e350]: + 2 Muzakki Lainnya
+              - cell "Zakat Fitrah" [ref=e351]:
+                - generic [ref=e354]: Zakat Fitrah
+              - cell "Uang" [ref=e355]:
+                - generic [ref=e357]: Uang
+              - cell "Rp 150.000" [ref=e358]:
+                - generic [ref=e361]: Rp 150.000
+              - cell "Lintang Pagi" [ref=e362]:
+                - generic [ref=e363]:
+                  - generic [ref=e364]: Lintang
+                  - generic [ref=e365]: Pagi
+            - row "TRX-20260320-0149 20/03/2026 23:48 Ganesha Triadi Pratama + 1 Muzakki Lainnya Zakat Fitrah Infaq Shodaqoh Uang Rp 200.000 Lintang Pagi" [ref=e366]:
+              - cell "TRX-20260320-0149" [ref=e367]
+              - cell "20/03/2026 23:48" [ref=e368]
+              - cell "Ganesha Triadi Pratama + 1 Muzakki Lainnya" [ref=e369]:
+                - generic [ref=e370]: Ganesha Triadi Pratama
+                - generic [ref=e371]: + 1 Muzakki Lainnya
+              - cell "Zakat Fitrah Infaq Shodaqoh" [ref=e372]:
+                - generic [ref=e373]:
+                  - generic [ref=e375]: Zakat Fitrah
+                  - generic [ref=e377]: Infaq Shodaqoh
+              - cell "Uang" [ref=e378]:
+                - generic [ref=e380]: Uang
+              - cell "Rp 200.000" [ref=e381]:
+                - generic [ref=e384]: Rp 200.000
+              - cell "Lintang Pagi" [ref=e385]:
+                - generic [ref=e386]:
+                  - generic [ref=e387]: Lintang
+                  - generic [ref=e388]: Pagi

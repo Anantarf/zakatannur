@@ -16,7 +16,7 @@
         || request()->routeIs('internal.templates.*');
 @endphp
 
-<nav x-data="{ open: false }" class="ui-topbar px-4 pt-4 sm:px-6 lg:px-8">
+<nav x-data="{ open: false }" class="ui-topbar relative z-[120] isolate px-4 pt-4 sm:px-6 lg:px-8">
     <div class="ui-topbar-panel">
         <div class="flex flex-1 items-center gap-4">
             <div class="shrink-0">

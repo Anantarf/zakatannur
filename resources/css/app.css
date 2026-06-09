@@ -1,9 +1,78 @@
+@import url('https://fonts.bunny.net/css?family=plus-jakarta-sans:400,500,600,700,800&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 [x-cloak] {
     display: none !important;
+}
+
+/* ============================================================
+   DESIGN TOKENS
+   ============================================================
+   Semua variabel di sini adalah satu-satunya tempat untuk
+   mengubah aspek visual utama seluruh aplikasi.
+
+   WARNA BRAND
+     Ubah nilai RGB berikut untuk mengganti warna dominan aplikasi.
+     Format: "R G B" (tanpa koma, tanpa #)
+
+   BORDER RADIUS
+     --radius-card   : kelengkungan panel/card utama
+     --radius-button : kelengkungan tombol dan input
+
+   BAYANGAN (SHADOW)
+     --shadow-topbar      : bayangan di topbar navigasi
+     --shadow-page-header : bayangan di header halaman
+
+   TIPOGRAFI
+     --text-eyebrow : ukuran label uppercase kecil (badge, kicker)
+     --text-caption : ukuran teks metadata kecil (nomor tabel, info)
+     --text-body-sm : ukuran teks baris tabel dan deskripsi
+   ============================================================ */
+
+:root {
+    /* ── Brand Colors (Emerald Default) ────────────────────────
+       Ganti nilai di sini untuk mengubah warna tema aplikasi.
+       Format: "R G B" (spasi, bukan koma) ─────────────────── */
+    --color-brand-50-rgb: 240 253 244;
+    --color-brand-100-rgb: 220 252 231;
+    --color-brand-200-rgb: 167 243 208;
+    --color-brand-300-rgb: 110 231 183;
+    --color-brand-400-rgb: 52 211 153;
+    --color-brand-500-rgb: 16 185 129;
+    --color-brand-600-rgb: 5 150 105;
+    --color-brand-700-rgb: 4 120 87;
+    --color-brand-800-rgb: 6 95 70;
+    --color-brand-900-rgb: 6 78 59;
+    --color-brand-950-rgb: 2 44 34;
+
+    /* ── Neutral / Slate Colors ─────────────────────────────── */
+    --color-neutral-50-rgb: 248 250 252;
+    --color-neutral-100-rgb: 241 245 249;
+    --color-neutral-200-rgb: 226 232 240;
+    --color-neutral-300-rgb: 203 213 225;
+    --color-neutral-400-rgb: 148 163 184;
+    --color-neutral-500-rgb: 100 116 139;
+    --color-neutral-600-rgb: 71 85 105;
+    --color-neutral-700-rgb: 51 65 85;
+    --color-neutral-800-rgb: 30 41 59;
+    --color-neutral-900-rgb: 15 23 42;
+    --color-neutral-950-rgb: 2 6 23;
+
+    /* ── Border Radius ──────────────────────────────────────── */
+    --radius-card: 1.75rem;
+    --radius-button: 0.75rem;
+
+    /* ── Shadows ────────────────────────────────────────────── */
+    --shadow-topbar: 0 18px 55px -30px rgba(15, 23, 42, 0.35);
+    --shadow-page-header: 0 20px 60px -36px rgba(15, 23, 42, 0.4);
+
+    /* ── Typography Scale ───────────────────────────────────── */
+    --text-eyebrow: 10px;   /* label badge, kicker, kolom uppercase */
+    --text-caption: 11px;   /* nomor tabel kecil, metadata compact */
+    --text-body-sm: 13px;   /* teks baris tabel, deskripsi pendek */
 }
 
 @keyframes slideInRight {
@@ -19,72 +88,257 @@
 }
 
 @layer components {
+
+    /* ──────────────────────────────────────────────────────────
+       PUBLIC — Landing Page
+       Kelas: .public-panel, .public-section, .public-kicker,
+              .public-title, .public-tab-chip-*
+    ────────────────────────────────────────────────────────── */
+
     .public-shell-gap {
-        @apply pt-2 sm:pt-3;
+        @apply pt-1.5 sm:pt-2;
     }
 
     .public-header {
-        @apply py-2 sm:py-4;
+        @apply py-1 sm:py-2;
     }
 
     .public-kicker {
-        @apply mb-2.5 inline-flex items-center rounded-full border border-emerald-200 bg-white/80 px-4 py-1.5 text-[10px] font-black uppercase tracking-[0.18em] text-emerald-800 shadow-sm;
+        @apply mb-2 inline-flex items-center rounded-full border border-brand-200 bg-white/80 px-4 py-1.5 text-[10px] font-semibold tracking-[0.12em] text-brand-800 shadow-sm;
     }
 
     .public-title {
-        @apply text-3xl sm:text-4xl lg:text-5xl font-black text-slate-950 leading-[1.14] tracking-[-0.02em];
+        @apply text-3xl sm:text-4xl lg:text-5xl font-bold text-neutral-950 leading-[1.08] tracking-[-0.03em];
     }
 
     .public-subtitle {
-        @apply mt-1 block text-[12px] sm:text-[14px] font-black uppercase tracking-[0.16em] text-slate-500;
+        @apply mt-1 block text-[12px] sm:text-[14px] font-medium tracking-[0.08em] text-neutral-500;
     }
 
     .public-panel {
-        @apply rounded-[1.75rem] sm:rounded-[2rem] border border-white/80 bg-white/[0.88] p-3 shadow-xl shadow-emerald-900/5 ring-1 ring-emerald-900/5 backdrop-blur sm:p-4 lg:p-5;
+        @apply rounded-card sm:rounded-[2rem] border border-white/80 bg-white/[0.88] p-3 shadow-xl shadow-brand-900/5 ring-1 ring-brand-900/5 backdrop-blur sm:p-4 lg:p-5;
+    }
+
+    .public-shell {
+        @apply rounded-card border border-white/80 bg-white/[0.92] shadow-lg shadow-brand-900/5 ring-1 ring-brand-100/40 backdrop-blur;
+    }
+
+    .public-shell-muted {
+        @apply bg-[linear-gradient(135deg,rgba(255,255,255,0.96),rgba(240,253,244,0.84))];
     }
 
     .public-section {
-        @apply rounded-[1.75rem] border border-emerald-900/[0.08] bg-white/75 p-5 shadow-sm shadow-emerald-900/5 ring-1 ring-white/60 sm:p-6;
+        @apply rounded-card border border-brand-900/[0.08] bg-white/75 p-5 shadow-sm shadow-brand-900/5 ring-1 ring-white/60 sm:p-6;
     }
 
     .public-section-muted {
-        @apply bg-gradient-to-br from-white/80 via-white/70 to-emerald-50/70;
+        @apply bg-gradient-to-br from-white/80 via-white/70 to-brand-50/70;
+    }
+
+    .public-subcard {
+        @apply rounded-[1.1rem] border border-neutral-200/80 bg-white/[0.92] px-4 py-3 shadow-sm;
+    }
+
+    .public-subcard-brand {
+        @apply border-brand-100/90 bg-brand-50/[0.78] text-brand-900;
+    }
+
+    .public-subcard-amber {
+        @apply border-amber-100/90 bg-amber-50/[0.82] text-amber-900;
+    }
+
+    .public-subcard-sky {
+        @apply border-sky-100/90 bg-sky-50/[0.82] text-sky-900;
+    }
+
+    .public-pill {
+        @apply inline-flex items-center gap-2 rounded-full border bg-white/90 px-3 py-1.5 text-[11px] font-semibold shadow-sm;
+    }
+
+    .public-pill-brand {
+        @apply border-brand-100 text-brand-800;
+    }
+
+    .public-pill-sky {
+        @apply border-sky-100 bg-sky-50 text-sky-900;
+    }
+
+    .public-pill-amber {
+        @apply border-amber-100 bg-amber-50 text-amber-800;
     }
 
     .public-section-title {
-        @apply text-2xl sm:text-[2rem] font-black tracking-[-0.03em] text-slate-950;
+        @apply text-2xl sm:text-[2rem] font-bold tracking-[-0.03em] text-neutral-950;
     }
 
     .public-section-copy {
-        @apply text-sm sm:text-base leading-relaxed text-slate-600 font-semibold;
+        @apply text-sm sm:text-base leading-relaxed text-neutral-600 font-medium;
     }
 
     .public-tab-chip {
-        @apply px-4 py-2 rounded-lg text-[12px] font-bold tracking-wide transition-all duration-200 flex items-center justify-center text-center;
+        @apply rounded-lg px-3.5 py-2 text-[11px] font-semibold tracking-[0.03em] transition-all duration-200 flex items-center justify-center text-center;
     }
 
     .public-tab-chip-active {
-        @apply bg-white text-emerald-800 shadow-sm ring-1 ring-emerald-100;
+        @apply bg-white text-brand-900 shadow-sm ring-1 ring-brand-200/80;
     }
 
     .public-tab-chip-inactive {
-        @apply text-slate-500 hover:bg-white/70 hover:text-slate-800;
+        @apply text-neutral-500 hover:bg-white/70 hover:text-slate-700;
     }
 
     .public-tab-chip-mobile {
-        @apply flex-1 py-2 rounded-lg text-[10px] font-black tracking-wide transition-all text-center;
+        @apply flex-1 rounded-lg py-2 text-[10px] font-semibold tracking-[0.03em] transition-all text-center;
     }
 
     .public-tab-chip-mobile-active {
-        @apply bg-white text-emerald-800 shadow-sm ring-1 ring-emerald-100;
+        @apply bg-white text-brand-900 shadow-sm ring-1 ring-brand-200/80;
     }
 
     .public-tab-chip-mobile-inactive {
-        @apply text-slate-500 hover:bg-white/70 hover:text-slate-800;
+        @apply text-neutral-500 hover:bg-white/70 hover:text-slate-700;
     }
 
+    .public-header-shell {
+        @apply overflow-hidden rounded-card border border-white/80 bg-[linear-gradient(135deg,rgba(255,255,255,0.96),rgba(240,253,244,0.84))] px-4 py-4 shadow-lg shadow-brand-900/5 ring-1 ring-brand-100/40 backdrop-blur sm:px-5;
+    }
+
+    .public-header-kicker {
+        @apply text-[10px] font-medium tracking-[0.12em] text-brand-800;
+    }
+
+    .public-header-title {
+        @apply mt-1.5 text-[1.65rem] font-bold leading-none tracking-[-0.05em] text-neutral-950 sm:text-[2.05rem];
+    }
+
+    .public-header-meta {
+        @apply mt-1.5 flex flex-wrap items-center gap-x-2 gap-y-1 text-[12px] font-medium text-neutral-600 sm:text-[13px];
+    }
+
+    .public-header-divider {
+        @apply hidden h-1 w-1 rounded-full bg-neutral-300 sm:inline-block;
+    }
+
+    .public-metric-card {
+        @apply rounded-[1.1rem] border border-neutral-200/80 bg-white/[0.92] px-4 py-3 shadow-sm;
+    }
+
+    .public-metric-card-brand {
+        @apply rounded-[1.1rem] border border-brand-100/90 bg-brand-50/[0.78] px-4 py-3 text-brand-900 shadow-sm;
+    }
+
+    .public-metric-card-amber {
+        @apply rounded-[1.1rem] border border-amber-100/90 bg-amber-50/[0.82] px-4 py-3 text-amber-900 shadow-sm;
+    }
+
+    .public-metric-label {
+        @apply text-[10px] font-medium tracking-[0.03em] text-neutral-500;
+    }
+
+    .public-metric-label-brand {
+        @apply text-brand-700;
+    }
+
+    .public-metric-label-amber {
+        @apply text-amber-700;
+    }
+
+    .public-metric-value {
+        @apply mt-1 text-[0.98rem] font-semibold tabular-nums text-neutral-900 sm:text-[1.05rem];
+    }
+
+    .public-metric-value-brand {
+        @apply text-brand-800;
+    }
+
+    .public-metric-value-amber {
+        @apply text-amber-800;
+    }
+
+    .public-report-shell {
+        @apply rounded-card border border-white/80 bg-white/[0.92] px-4 py-4 shadow-lg shadow-brand-900/5 ring-1 ring-brand-100/40 backdrop-blur sm:px-5 sm:py-5;
+    }
+
+    .public-report-intro {
+        @apply rounded-card border border-brand-900/[0.08] bg-gradient-to-br from-white/80 via-white/70 to-brand-50/70 p-5 shadow-sm shadow-brand-900/5 ring-1 ring-white/60;
+    }
+
+    .public-report-card {
+        @apply rounded-card border border-white/80 bg-white/[0.92] px-5 py-5 shadow-lg shadow-brand-900/5 ring-1 ring-brand-100/40 backdrop-blur;
+    }
+
+    .public-report-row {
+        @apply grid items-center gap-2.5 rounded-[1.12rem] border border-neutral-200/75 bg-white/[0.92] px-4 py-3 shadow-sm transition-colors hover:border-brand-100 hover:bg-brand-50/[0.12];
+    }
+
+    .public-chart-shell {
+        @apply w-full max-w-6xl rounded-card sm:rounded-[2rem] border border-white/80 bg-white/[0.88] p-3 shadow-xl shadow-brand-900/5 ring-1 ring-brand-900/5 backdrop-blur sm:p-4 lg:p-5;
+    }
+
+    .public-chart-icon {
+        @apply rounded-xl bg-brand-800 p-1.5 text-white shadow-sm;
+    }
+
+    .public-chart-metric {
+        @apply relative overflow-hidden rounded-[1.2rem] border px-4 py-2.5 shadow-sm;
+    }
+
+    .public-chart-metric-brand {
+        @apply border-brand-100 bg-brand-50 text-brand-950;
+    }
+
+    .public-chart-metric-amber {
+        @apply border-amber-100 bg-amber-50 text-amber-950;
+    }
+
+    .public-quote-card {
+        @apply relative mx-auto max-w-4xl overflow-hidden rounded-card border border-brand-100/70 bg-[linear-gradient(135deg,rgba(255,255,255,0.96),rgba(236,253,245,0.9))] p-4 text-neutral-900 shadow-lg shadow-brand-900/5 ring-1 ring-white/80 sm:p-5;
+    }
+
+    .public-cta-card {
+        @apply flex cursor-pointer items-center justify-between gap-3 rounded-card border border-brand-100/90 bg-white/[0.95] px-4 py-3.5 text-neutral-900 shadow-lg shadow-brand-900/5 ring-1 ring-white/80 transition-all hover:border-brand-200 hover:bg-white sm:px-5;
+    }
+
+    .public-nav-shell {
+        @apply relative mx-auto max-w-7xl rounded-[1.25rem] border border-white/90 bg-white/[0.92] px-3 py-1.5 shadow-lg shadow-brand-900/5 ring-1 ring-brand-100/40 backdrop-blur-xl sm:px-4;
+    }
+
+    .public-nav-tabs {
+        @apply hidden shrink-0 items-center gap-1 rounded-xl border border-brand-900/5 bg-neutral-50/80 p-1 lg:flex;
+    }
+
+    .public-nav-action {
+        @apply inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-xl border border-brand-200/80 bg-brand-600 text-white shadow-sm shadow-brand-700/[0.12] transition-all duration-300 hover:bg-brand-700 sm:h-8 sm:w-auto sm:justify-start sm:px-3 sm:py-1.5;
+    }
+
+    .public-nav-mobile-tabs {
+        @apply mt-1.5 flex items-center justify-center gap-1 border-t border-brand-900/5 pt-1.5 lg:hidden;
+    }
+
+    .public-footer-shell {
+        @apply relative z-10 mt-8 border-t border-brand-900/10 bg-white/60 backdrop-blur-sm sm:mt-10;
+    }
+
+    .public-footer-credit {
+        @apply mx-auto flex max-w-5xl flex-col items-center justify-center gap-1.5 px-6 pb-10 pt-4 text-center sm:flex-row sm:gap-2.5 sm:py-5;
+    }
+
+    .public-footer-kicker {
+        @apply text-[10px] font-medium tracking-[0.08em] text-brand-900/55;
+    }
+
+    .public-footer-brand {
+        @apply text-[10px] font-medium tracking-[0.08em] text-brand-800/85 transition-colors duration-300 group-hover:text-brand-900;
+    }
+
+    /* ──────────────────────────────────────────────────────────
+       SHELL & NAVIGATION
+       Kelas: .ui-shell, .ui-topbar, .ui-nav-link-*,
+              .ui-dropdown-panel, .ui-header-link
+    ────────────────────────────────────────────────────────── */
+
     .ui-shell {
-        @apply min-h-screen bg-[radial-gradient(circle_at_top,_rgba(16,185,129,0.12),_transparent_38%),linear-gradient(180deg,_#f7faf7_0%,_#f2f6f3_45%,_#edf2ef_100%)] text-slate-900;
+        @apply min-h-screen bg-[radial-gradient(circle_at_top,_rgba(16,185,129,0.12),_transparent_38%),linear-gradient(180deg,_#f7faf7_0%,_#f2f6f3_45%,_#edf2ef_100%)] text-neutral-900;
     }
 
     .ui-shell-main {
@@ -96,7 +350,8 @@
     }
 
     .ui-topbar-panel {
-        @apply mx-auto flex max-w-7xl items-center justify-between gap-4 rounded-[1.75rem] border border-white/80 bg-white/90 px-4 py-3 shadow-[0_18px_55px_-30px_rgba(15,23,42,0.35)] ring-1 ring-emerald-100/40 sm:px-5;
+        @apply mx-auto flex max-w-7xl items-center justify-between gap-4 rounded-card border border-white/80 bg-white/90 px-4 py-3 ring-1 ring-brand-100/40 sm:px-5;
+        box-shadow: var(--shadow-topbar);
     }
 
     .ui-brand-lockup {
@@ -104,7 +359,7 @@
     }
 
     .ui-brand-kicker {
-        @apply text-[10px] font-black uppercase tracking-[0.24em] text-emerald-600;
+        @apply text-[10px] font-black uppercase tracking-[0.24em] text-brand-600;
     }
 
     .ui-page-header {
@@ -112,39 +367,46 @@
     }
 
     .ui-page-header-card {
-        @apply rounded-[1.75rem] border border-white/80 bg-white/90 px-5 py-5 shadow-[0_20px_60px_-36px_rgba(15,23,42,0.4)] ring-1 ring-emerald-100/50 sm:px-6;
+        @apply rounded-card border border-white/80 bg-white/90 px-5 py-5 ring-1 ring-brand-100/50 sm:px-6;
+        box-shadow: var(--shadow-page-header);
     }
 
     .ui-page-title {
-        @apply flex items-center justify-center gap-2 text-center text-xl font-black leading-tight text-emerald-900 sm:justify-start sm:text-left sm:text-2xl;
+        @apply flex items-center justify-center gap-2 text-center text-xl font-black leading-tight text-brand-900 sm:justify-start sm:text-left sm:text-2xl;
     }
 
     .ui-page-title-icon {
-        @apply h-7 w-7 shrink-0 text-emerald-600;
+        @apply h-7 w-7 shrink-0 text-brand-600;
     }
 
     .ui-page-title-copy {
-        @apply mt-1 text-sm text-slate-500;
+        @apply mt-1 text-sm text-neutral-500;
     }
 
+    /* ──────────────────────────────────────────────────────────
+       CARDS & LAYOUTS
+       Kelas: .ui-card, .ui-card-strong, .ui-card-muted,
+              .ui-toolbar, .ui-page-header-card, .ui-kpi-card
+    ────────────────────────────────────────────────────────── */
+
     .ui-card {
-        @apply rounded-2xl border border-gray-100 bg-white shadow-sm;
+        @apply rounded-card border border-neutral-100 bg-white shadow-sm;
     }
 
     .ui-card-strong {
-        @apply rounded-2xl border border-emerald-100/30 bg-white shadow-lg shadow-gray-200/50;
+        @apply rounded-card border border-brand-100/30 bg-white shadow-lg shadow-neutral-200/50;
     }
 
     .ui-card-muted {
-        @apply rounded-2xl border border-slate-200/80 bg-slate-50/70 shadow-sm;
+        @apply rounded-card border border-neutral-200/80 bg-neutral-50/70 shadow-sm;
     }
 
     .ui-toolbar {
-        @apply flex flex-col gap-4 border-b border-gray-50 px-4 py-4 sm:px-6 lg:flex-row lg:items-center lg:justify-between;
+        @apply flex flex-col gap-4 border-b border-neutral-50 px-4 py-4 sm:px-6 lg:flex-row lg:items-center lg:justify-between;
     }
 
     .ui-toolbar-soft {
-        @apply flex flex-col gap-4 border-b border-slate-100 bg-slate-50/55 px-4 py-4 sm:px-6 lg:flex-row lg:items-start lg:justify-between;
+        @apply flex flex-col gap-4 border-b border-neutral-100 bg-neutral-50/55 px-4 py-4 sm:px-6 lg:flex-row lg:items-start lg:justify-between;
     }
 
     .ui-section-title {
@@ -152,7 +414,7 @@
     }
 
     .ui-section-accent {
-        @apply h-5 w-1 rounded-full bg-emerald-500;
+        @apply h-5 w-1 rounded-full bg-brand-500;
     }
 
     .ui-card-header {
@@ -160,7 +422,7 @@
     }
 
     .ui-card-header-emerald {
-        @apply border-emerald-100 bg-emerald-50;
+        @apply border-brand-100 bg-brand-50;
     }
 
     .ui-card-header-amber {
@@ -172,27 +434,33 @@
     }
 
     .ui-card-header-neutral {
-        @apply border-gray-50 bg-white;
+        @apply border-neutral-50 bg-white;
     }
 
     .ui-card-header-title {
-        @apply font-bold text-slate-800;
+        @apply font-bold text-neutral-800;
     }
 
     .ui-card-header-icon {
         @apply h-5 w-5 shrink-0;
     }
 
+    /* ──────────────────────────────────────────────────────────
+       BUTTONS & INTERACTIVE ELEMENTS
+       Kelas: .ui-btn, .ui-btn-primary/secondary/accent/danger,
+              .ui-btn-pill, .ui-icon-button-*
+    ────────────────────────────────────────────────────────── */
+
     .ui-btn {
-        @apply inline-flex items-center justify-center gap-2 rounded-xl font-bold transition-all focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50;
+        @apply inline-flex items-center justify-center gap-2 rounded-button font-bold transition-all focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50;
     }
 
     .ui-btn-primary {
-        @apply bg-emerald-600 px-4 py-2.5 text-sm text-white shadow-lg shadow-emerald-100 hover:bg-emerald-700 focus:ring-emerald-500;
+        @apply bg-brand-600 px-4 py-2.5 text-sm text-white shadow-lg shadow-brand-100 hover:bg-brand-700 focus:ring-brand-500;
     }
 
     .ui-btn-secondary {
-        @apply border border-gray-200 bg-white px-4 py-2.5 text-sm text-gray-700 shadow-sm hover:bg-gray-50 focus:ring-emerald-500;
+        @apply border border-neutral-200 bg-white px-4 py-2.5 text-sm text-neutral-700 shadow-sm hover:bg-neutral-50 focus:ring-brand-500;
     }
 
     .ui-btn-accent {
@@ -204,7 +472,7 @@
     }
 
     .ui-btn-pill {
-        @apply rounded-full border border-emerald-100 bg-emerald-50 px-4 py-2 text-sm leading-4 text-emerald-700 hover:bg-emerald-100 focus:ring-emerald-500;
+        @apply rounded-full border border-brand-100 bg-brand-50 px-4 py-2 text-sm leading-4 text-brand-700 hover:bg-brand-100 focus:ring-brand-500;
     }
 
     .ui-icon-button {
@@ -212,7 +480,7 @@
     }
 
     .ui-icon-button-neutral {
-        @apply text-gray-500 hover:bg-gray-100 hover:text-gray-700;
+        @apply text-neutral-500 hover:bg-neutral-100 hover:text-neutral-700;
     }
 
     .ui-icon-button-amber {
@@ -228,35 +496,47 @@
     }
 
     .ui-icon-button-disabled {
-        @apply cursor-not-allowed text-gray-300;
+        @apply cursor-not-allowed text-neutral-300;
     }
 
+    /* ──────────────────────────────────────────────────────────
+       FORM INPUTS
+       Kelas: .ui-input, .ui-select, .ui-textarea, .ui-file-input,
+              .ui-form-label, .ui-inline-note
+    ────────────────────────────────────────────────────────── */
+
     .ui-input {
-        @apply rounded-xl border-gray-200 bg-white px-4 py-2.5 text-sm text-gray-700 shadow-sm focus:border-emerald-500 focus:ring-emerald-500;
+        @apply rounded-button border-neutral-200 bg-white px-4 py-2.5 text-sm text-neutral-700 shadow-sm focus:border-brand-500 focus:ring-brand-500;
     }
 
     .ui-select {
-        @apply rounded-xl border-gray-200 bg-gray-50 px-4 py-2.5 text-sm font-medium text-gray-600 focus:border-emerald-500 focus:ring-emerald-500;
+        @apply rounded-button border-neutral-200 bg-neutral-50 px-4 py-2.5 text-sm font-medium text-neutral-600 focus:border-brand-500 focus:ring-brand-500;
     }
 
     .ui-textarea {
-        @apply rounded-xl border-gray-200 bg-white px-4 py-2.5 text-sm text-gray-700 shadow-sm focus:border-emerald-500 focus:ring-emerald-500;
+        @apply rounded-button border-neutral-200 bg-white px-4 py-2.5 text-sm text-neutral-700 shadow-sm focus:border-brand-500 focus:ring-brand-500;
     }
 
     .ui-file-input {
-        @apply block w-full rounded-xl border border-slate-200 bg-white p-3 text-sm text-slate-700 shadow-sm transition focus:border-emerald-500 focus:ring-emerald-500 file:mr-4 file:rounded-lg file:border-0 file:bg-emerald-600 file:px-4 file:py-2 file:text-sm file:font-bold file:text-white hover:file:bg-emerald-700;
+        @apply block w-full rounded-button border border-neutral-200 bg-white p-3 text-sm text-neutral-700 shadow-sm transition focus:border-brand-500 focus:ring-brand-500 file:mr-4 file:rounded-lg file:border-0 file:bg-brand-600 file:px-4 file:py-2 file:text-sm file:font-bold file:text-white hover:file:bg-brand-700;
     }
 
     .ui-inline-note {
-        @apply rounded-2xl border border-emerald-100 bg-emerald-50/50 px-6 py-5;
+        @apply rounded-card border border-brand-100 bg-brand-50/50 px-6 py-5;
     }
 
     .ui-form-label {
-        @apply mb-1 block text-sm font-bold text-slate-700;
+        @apply mb-1 block text-sm font-bold text-neutral-700;
     }
 
+    /* ──────────────────────────────────────────────────────────
+       ALERTS & NOTIFICATIONS
+       Kelas: .ui-alert, .ui-alert-success/warning/error,
+              .ui-alert-title
+    ────────────────────────────────────────────────────────── */
+
     .ui-alert {
-        @apply flex items-start gap-3 rounded-2xl border p-4 shadow-sm;
+        @apply flex items-start gap-3 rounded-card border p-4 shadow-sm;
     }
 
     .ui-alert-icon {
@@ -264,7 +544,7 @@
     }
 
     .ui-alert-success {
-        @apply border-emerald-200 bg-emerald-50 text-emerald-900;
+        @apply border-brand-200 bg-brand-50 text-brand-900;
     }
 
     .ui-alert-warning {
@@ -279,16 +559,22 @@
         @apply mb-2 flex items-center gap-2 font-bold;
     }
 
+    /* ──────────────────────────────────────────────────────────
+       MOBILE CARDS (tampilan < md breakpoint)
+       Kelas: .ui-mobile-card, .ui-mobile-meta-grid,
+              .ui-mobile-meta-label, .ui-mobile-meta-value
+    ────────────────────────────────────────────────────────── */
+
     .ui-mobile-card {
-        @apply rounded-2xl border border-gray-100 bg-white p-4 shadow-sm;
+        @apply rounded-card border border-neutral-100 bg-white p-4 shadow-sm;
     }
 
     .ui-mobile-card-muted {
-        @apply mt-3 rounded-xl bg-gray-50 px-3 py-3;
+        @apply mt-3 rounded-button bg-neutral-50 px-3 py-3;
     }
 
     .ui-mobile-meta-grid {
-        @apply mt-3 grid grid-cols-2 gap-3 rounded-xl border border-slate-100 bg-slate-50/85 px-3 py-3;
+        @apply mt-3 grid grid-cols-2 gap-3 rounded-button border border-neutral-100 bg-neutral-50/85 px-3 py-3;
     }
 
     .ui-mobile-meta-item {
@@ -296,11 +582,11 @@
     }
 
     .ui-mobile-meta-label {
-        @apply text-[10px] font-black uppercase tracking-[0.16em] text-slate-400;
+        @apply text-[10px] font-black uppercase tracking-[0.16em] text-neutral-400;
     }
 
     .ui-mobile-meta-value {
-        @apply text-sm font-semibold leading-5 text-slate-700;
+        @apply text-sm font-semibold leading-5 text-neutral-700;
     }
 
     .ui-empty-state {
@@ -308,12 +594,18 @@
     }
 
     .ui-empty-state-box {
-        @apply rounded-2xl border border-dashed border-slate-200 bg-slate-50 px-6 py-10 text-center;
+        @apply rounded-card border border-dashed border-neutral-200 bg-neutral-50 px-6 py-10 text-center;
     }
 
     .ui-empty-state-copy {
-        @apply text-sm font-medium text-gray-400;
+        @apply text-sm font-medium text-neutral-400;
     }
+
+    /* ──────────────────────────────────────────────────────────
+       BADGES & STATUS INDICATORS
+       Kelas: .ui-badge-risk-*, .ui-badge-review-*,
+              .ui-badge-token-*, .ui-role-badge-*
+    ────────────────────────────────────────────────────────── */
 
     .ui-role-badge {
         @apply inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-bold uppercase;
@@ -328,11 +620,11 @@
     }
 
     .ui-role-badge-staff {
-        @apply bg-gray-100 text-gray-600;
+        @apply bg-neutral-100 text-neutral-600;
     }
 
     .ui-header-link {
-        @apply inline-flex w-full items-center justify-center gap-2 rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm font-bold text-gray-700 shadow-sm transition-all hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 sm:w-auto sm:py-2;
+        @apply inline-flex w-full items-center justify-center gap-2 rounded-button border border-neutral-200 bg-white px-4 py-3 text-sm font-bold text-neutral-700 shadow-sm transition-all hover:bg-neutral-50 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:ring-offset-2 sm:w-auto sm:py-2;
     }
 
     .ui-badge {
@@ -352,7 +644,7 @@
     }
 
     .ui-badge-risk-normal {
-        @apply border-emerald-100 bg-emerald-50 text-emerald-700;
+        @apply border-brand-100 bg-brand-50 text-brand-700;
     }
 
     .ui-badge-risk-warning {
@@ -364,11 +656,11 @@
     }
 
     .ui-badge-risk-empty {
-        @apply border-gray-100 bg-gray-50 text-gray-500;
+        @apply border-neutral-100 bg-neutral-50 text-neutral-500;
     }
 
     .ui-badge-review-pending {
-        @apply border-gray-100 bg-gray-50 text-gray-500;
+        @apply border-neutral-100 bg-neutral-50 text-neutral-500;
     }
 
     .ui-badge-review-safe {
@@ -380,7 +672,7 @@
     }
 
     .ui-badge-token-emerald {
-        @apply border-emerald-100 bg-emerald-50 text-emerald-700;
+        @apply border-brand-100 bg-brand-50 text-brand-700;
     }
 
     .ui-badge-token-amber {
@@ -388,15 +680,21 @@
     }
 
     .ui-badge-token-slate {
-        @apply border-gray-100 bg-gray-50 text-gray-600;
+        @apply border-neutral-100 bg-neutral-50 text-neutral-600;
     }
 
+    /* ──────────────────────────────────────────────────────────
+       STAT & KPI CARDS
+       Kelas: .ui-stat-card, .ui-stat-card-*,
+              .ui-kpi-card, .ui-kpi-label, .ui-kpi-value
+    ────────────────────────────────────────────────────────── */
+
     .ui-stat-card {
-        @apply rounded-2xl border px-4 py-4 shadow-sm transition-colors;
+        @apply rounded-card border px-4 py-4 shadow-sm transition-colors;
     }
 
     .ui-stat-card-default {
-        @apply border-gray-100 bg-white;
+        @apply border-neutral-100 bg-white;
     }
 
     .ui-stat-card-warning {
@@ -408,7 +706,7 @@
     }
 
     .ui-stat-card-muted {
-        @apply border-slate-100 bg-slate-50/80;
+        @apply border-neutral-100 bg-neutral-50/80;
     }
 
     .ui-stat-card-info {
@@ -420,7 +718,7 @@
     }
 
     .ui-stat-value {
-        @apply mt-2 text-2xl font-black tabular-nums text-slate-900;
+        @apply mt-2 text-2xl font-black tabular-nums text-neutral-900;
     }
 
     .ui-stat-description {
@@ -428,27 +726,33 @@
     }
 
     .ui-kpi-card {
-        @apply rounded-[1.65rem] border border-slate-200/80 bg-white px-4 py-4 shadow-sm;
+        @apply rounded-card border border-neutral-200/80 bg-white px-4 py-4 shadow-sm;
     }
 
     .ui-kpi-label {
-        @apply text-[10px] font-black uppercase tracking-[0.18em] text-slate-400;
+        @apply text-[10px] font-black uppercase tracking-[0.18em] text-neutral-400;
     }
 
     .ui-kpi-value {
-        @apply mt-2 text-2xl font-black tracking-[-0.02em] text-slate-900;
+        @apply mt-2 text-2xl font-black tracking-[-0.02em] text-neutral-900;
     }
 
     .ui-kpi-note {
-        @apply mt-1 text-sm leading-5 text-slate-500;
+        @apply mt-1 text-sm leading-5 text-neutral-500;
     }
 
+    /* ──────────────────────────────────────────────────────────
+       ACTION TILES & PANEL NOTES
+       Kelas: .ui-action-tile, .ui-action-tile-accent/info,
+              .ui-panel-note
+    ────────────────────────────────────────────────────────── */
+
     .ui-action-tile {
-        @apply rounded-2xl border border-slate-200 bg-white px-4 py-4 transition hover:border-slate-300 hover:bg-slate-50/80;
+        @apply rounded-card border border-neutral-200 bg-white px-4 py-4 transition hover:border-neutral-300 hover:bg-neutral-50/80;
     }
 
     .ui-action-tile-accent {
-        @apply border-emerald-200 bg-emerald-50/65 hover:border-emerald-300 hover:bg-emerald-100/70;
+        @apply border-brand-200 bg-brand-50/65 hover:border-brand-300 hover:bg-brand-100/70;
     }
 
     .ui-action-tile-info {
@@ -456,23 +760,29 @@
     }
 
     .ui-panel-note {
-        @apply rounded-2xl border border-slate-200/80 bg-slate-50/80 px-4 py-3 text-sm leading-6 text-slate-600;
+        @apply rounded-card border border-neutral-200/80 bg-neutral-50/80 px-4 py-3 text-sm leading-6 text-neutral-600;
     }
+
+    /* ──────────────────────────────────────────────────────────
+       SETTINGS PANELS
+       Kelas: .ui-settings-panel, .ui-settings-panel-*,
+              .ui-settings-choice, .ui-settings-note
+    ────────────────────────────────────────────────────────── */
 
     .ui-settings-panel {
         @apply rounded-[1.35rem] border p-4 shadow-sm sm:p-5;
     }
 
     .ui-settings-panel-white {
-        @apply border-slate-100 bg-white;
+        @apply border-neutral-100 bg-white;
     }
 
     .ui-settings-panel-muted {
-        @apply border-slate-100 bg-slate-50/70;
+        @apply border-neutral-100 bg-neutral-50/70;
     }
 
     .ui-settings-panel-emerald {
-        @apply border-emerald-100 bg-emerald-50/60;
+        @apply border-brand-100 bg-brand-50/60;
     }
 
     .ui-settings-panel-sky {
@@ -484,15 +794,15 @@
     }
 
     .ui-settings-summary-shell {
-        @apply rounded-[1.35rem] border border-emerald-100 bg-gradient-to-br from-emerald-50 via-white to-emerald-50/70 p-4 shadow-sm;
+        @apply rounded-[1.35rem] border border-brand-100 bg-gradient-to-br from-brand-50 via-white to-brand-50/70 p-4 shadow-sm;
     }
 
     .ui-settings-summary-card {
-        @apply rounded-2xl border bg-white/80 p-4;
+        @apply rounded-card border bg-white/80 p-4;
     }
 
     .ui-settings-summary-card-emerald {
-        @apply border-emerald-100/80;
+        @apply border-brand-100/80;
     }
 
     .ui-settings-kicker {
@@ -504,27 +814,27 @@
     }
 
     .ui-settings-section-title {
-        @apply text-sm font-black text-slate-900;
+        @apply text-sm font-black text-neutral-900;
     }
 
     .ui-settings-section-copy {
-        @apply text-xs leading-relaxed text-slate-500;
+        @apply text-xs leading-relaxed text-neutral-500;
     }
 
     .ui-settings-note {
-        @apply mt-3 rounded-2xl border bg-white/75 px-3 py-2 text-xs;
+        @apply mt-3 rounded-card border bg-white/75 px-3 py-2 text-xs;
     }
 
     .ui-settings-choice {
-        @apply rounded-2xl border bg-white/85 p-4 text-sm shadow-sm transition;
+        @apply rounded-card border bg-white/85 p-4 text-sm shadow-sm transition;
     }
 
     .ui-settings-choice-copy {
-        @apply mt-1 block text-xs leading-relaxed text-slate-600;
+        @apply mt-1 block text-xs leading-relaxed text-neutral-600;
     }
 
     .ui-settings-check {
-        @apply flex items-start gap-3 rounded-2xl border bg-white/80 p-4 text-sm;
+        @apply flex items-start gap-3 rounded-card border bg-white/80 p-4 text-sm;
     }
 
     .ui-nav-link {
@@ -532,37 +842,84 @@
     }
 
     .ui-nav-link-active {
-        @apply bg-emerald-600 text-white shadow-lg shadow-emerald-200/70;
+        @apply bg-brand-600 text-white shadow-lg shadow-brand-200/70;
     }
 
     .ui-nav-link-inactive {
-        @apply text-slate-600 hover:bg-emerald-50 hover:text-emerald-700 focus:bg-emerald-50 focus:text-emerald-700;
+        @apply text-neutral-600 hover:bg-brand-50 hover:text-brand-700 focus:bg-brand-50 focus:text-brand-700;
     }
 
     .ui-nav-link-mobile {
-        @apply block w-full rounded-2xl px-4 py-3 text-left text-sm font-semibold transition duration-150 ease-in-out focus:outline-none;
+        @apply block w-full rounded-card px-4 py-3 text-left text-sm font-semibold transition duration-150 ease-in-out focus:outline-none;
     }
 
     .ui-nav-link-mobile-active {
-        @apply bg-emerald-600 text-white shadow-lg shadow-emerald-200/70;
+        @apply bg-brand-600 text-white shadow-lg shadow-brand-200/70;
     }
 
     .ui-nav-link-mobile-inactive {
-        @apply text-slate-600 hover:bg-emerald-50/80 hover:text-emerald-700 focus:bg-emerald-50 focus:text-emerald-700;
+        @apply text-neutral-600 hover:bg-brand-50/80 hover:text-brand-700 focus:bg-brand-50 focus:text-brand-700;
     }
 
     .ui-dropdown-panel {
-        @apply rounded-xl border border-gray-100 bg-white py-1 shadow-lg ring-1 ring-black/5;
+        @apply rounded-button border border-neutral-100 bg-white py-1 shadow-lg ring-1 ring-black/5;
     }
 
     .ui-dropdown-link {
-        @apply block w-full px-4 py-2 text-left text-sm text-gray-700 transition duration-150 ease-in-out hover:bg-emerald-50 hover:text-emerald-700 focus:bg-emerald-50 focus:text-emerald-700 focus:outline-none;
+        @apply block w-full px-4 py-2 text-left text-sm text-neutral-700 transition duration-150 ease-in-out hover:bg-brand-50 hover:text-brand-700 focus:bg-brand-50 focus:text-brand-700 focus:outline-none;
     }
 
     .ui-toast-enter {
         animation: slideInRight 0.4s ease-out forwards;
     }
 }
+
+/* ============================================================
+   MODALS & DIALOGS
+   ============================================================ */
+
+/* Utility classes for modal panels and boxes */
+.ui-modal-panel {
+    @apply fixed inset-0 z-[200] flex min-h-full items-center justify-center p-4 w-screen overflow-y-auto sm:p-6;
+}
+
+.ui-modal-box {
+    @apply relative transform overflow-hidden rounded-3xl bg-white text-left shadow-2xl transition-all sm:my-8 sm:w-full sm:max-w-md border border-gray-100;
+}
+
+.ui-modal-close-btn {
+    @apply rounded-full bg-white p-2 text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 transition-all;
+}
+
+/* ============================================================
+   LOADING SKELETONS
+   ============================================================ */
+
+@keyframes shimmer {
+    0% { background-position: -200% 0; }
+    100% { background-position: 200% 0; }
+}
+
+.skeleton {
+    background: linear-gradient(90deg, #f0f0f0 25%, #e5e5e5 37%, #f0f0f0 63%);
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite;
+}
+
+.skeleton-text {
+    @apply h-4 w-full rounded bg-gray-200;
+}
+
+.skeleton-circle {
+    @apply rounded-full bg-gray-200;
+}
+
+
+/* ============================================================
+   UTILITIES & OVERRIDES (luar @layer)
+   Kelas: .ui-table-action-label, .footer-logo,
+          .sticky-marquee, .sticky-marquee-track
+   ============================================================ */
 
 .ui-table-action-label {
     display: none;
@@ -574,25 +931,6 @@
     }
 }
 
-.marquee-container {
-    width: 100%;
-    overflow: hidden;
-    display: flex;
-    align-items: center;
-}
-
-.marquee-track {
-    display: flex;
-    width: max-content;
-    animation: marquee 90s linear infinite;
-}
-
-@keyframes marquee {
-    to {
-        transform: translateX(-50%);
-    }
-}
-
 .footer-logo {
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
@@ -600,4 +938,68 @@
 .footer-item-group:hover .footer-logo {
     opacity: 1;
     transform: translateY(-1px);
+}
+
+.sticky-marquee {
+    position: fixed;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 45;
+    overflow: hidden;
+    /* Warna marquee mengikuti brand-800/700/600 */
+    border-top: 1px solid rgb(var(--color-brand-700-rgb) / 0.78);
+    background: linear-gradient(90deg,
+        rgb(var(--color-brand-900-rgb)) 0%,
+        rgb(var(--color-brand-700-rgb)) 52%,
+        rgb(var(--color-brand-600-rgb)) 100%);
+    box-shadow: 0 -10px 24px -22px rgb(var(--color-brand-700-rgb) / 0.48);
+}
+
+.sticky-marquee-track {
+    display: flex;
+    width: max-content;
+    animation: stickyMarquee 58s linear infinite;
+}
+
+.sticky-marquee-copy {
+    display: flex;
+    flex-shrink: 0;
+    align-items: center;
+    gap: 3.1rem;
+    padding: 0.6rem 1.2rem;
+    white-space: nowrap;
+    font-size: 9px;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: rgba(236, 253, 245, 0.88);
+}
+
+.sticky-marquee-copy span {
+    position: relative;
+}
+
+.sticky-marquee-copy span:not(:last-child)::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    right: -1.62rem;
+    width: 0.24rem;
+    height: 0.24rem;
+    border-radius: 9999px;
+    background: rgba(209, 250, 229, 0.72);
+    transform: translateY(-50%);
+}
+
+@keyframes stickyMarquee {
+    to {
+        transform: translateX(-50%);
+    }
+}
+
+@layer components {
+    .ui-skeleton {
+        @apply animate-pulse bg-slate-200 rounded;
+    }
 }

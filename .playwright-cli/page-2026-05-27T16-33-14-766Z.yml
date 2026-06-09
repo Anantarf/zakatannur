@@ -1,0 +1,117 @@
+- generic [active] [ref=e1]:
+  - dialog:
+    - generic [ref=e5]:
+      - button "Tutup" [ref=e7] [cursor=pointer]:
+        - generic [ref=e8]: Tutup
+        - img [ref=e9]
+      - generic [ref=e11]:
+        - generic [ref=e12]:
+          - img "Logo Zakat Annur" [ref=e14]
+          - heading "Masuk ke Sistem" [level=2] [ref=e15]
+          - paragraph [ref=e16]: Silakan masuk dengan akun panitia Anda
+        - generic [ref=e17]:
+          - generic [ref=e18]:
+            - generic [ref=e19]: Nama Pengguna
+            - textbox "Nama Pengguna" [ref=e20]:
+              - /placeholder: Masukkan username
+          - generic [ref=e21]:
+            - generic [ref=e22]: Kata Sandi
+            - generic [ref=e23]:
+              - textbox "Kata Sandi" [ref=e24]:
+                - /placeholder: Kata sandi
+              - button "Tampilkan kata sandi" [ref=e25] [cursor=pointer]:
+                - img [ref=e26]
+          - generic [ref=e30] [cursor=pointer]:
+            - checkbox "Ingat Saya" [ref=e31]
+            - generic [ref=e32]: Ingat Saya
+          - button "Masuk Sekarang" [ref=e33] [cursor=pointer]
+  - navigation [ref=e34]:
+    - generic [ref=e36]:
+      - link "Logo Zakat Annur Zakat Annur Masjid An-Nur Komplek BPK V Gandul" [ref=e38] [cursor=pointer]:
+        - /url: http://127.0.0.1:8000
+        - generic [ref=e39]:
+          - img "Logo Zakat Annur" [ref=e40]
+          - generic [ref=e41]:
+            - generic [ref=e42]: Zakat Annur
+            - generic [ref=e43]: Masjid An-Nur Komplek BPK V Gandul
+      - generic [ref=e44]:
+        - button "BERANDA" [ref=e45] [cursor=pointer]
+        - button "RINGKASAN PENERIMAAN" [ref=e46] [cursor=pointer]
+        - button "GRAFIK HARIAN" [ref=e47] [cursor=pointer]
+      - button "MASUK" [ref=e49] [cursor=pointer]:
+        - img [ref=e50]
+        - generic [ref=e52]: MASUK
+  - main [ref=e53]:
+    - generic [ref=e55]:
+      - paragraph [ref=e56]: Sistem Informasi Penerimaan Zakat
+      - generic [ref=e57]: Masjid An-Nur
+      - generic [ref=e58]: Komplek BPK V Gandul
+    - generic [ref=e61]:
+      - generic [ref=e62]:
+        - img "Dokumentasi Masjid An-Nur" [ref=e65]
+        - generic [ref=e67]:
+          - paragraph [ref=e68]: Transparansi Penerimaan Zakat
+          - heading "Amanah Dalam Mengelola Kebaikan." [level=2] [ref=e69]:
+            - text: Amanah Dalam
+            - text: Mengelola Kebaikan.
+          - paragraph [ref=e70]: Memantau penerimaan zakat dengan tampilan yang terbuka, ringkas, dan mudah dibaca oleh jamaah.
+      - generic [ref=e71]:
+        - paragraph [ref=e72]: Nilai Utama
+        - 'heading "Zakat: Sucikan Harta, Berdayakan Sesama" [level=3] [ref=e73]'
+        - paragraph [ref=e74]: Zakat adalah kewajiban yang mensucikan jiwa dan harta kita. Melalui pengelolaan yang transparan di Masjid An-Nur, zakat Anda menjadi jembatan harapan bagi mereka yang membutuhkan.
+      - generic [ref=e75]:
+        - article [ref=e76]:
+          - img [ref=e78]
+          - generic [ref=e80]:
+            - heading "Manajemen Muzakki" [level=4] [ref=e81]
+            - paragraph [ref=e82]: Pencatatan data jamaah muzakki yang rapi dan amanah.
+        - article [ref=e83]:
+          - img [ref=e85]
+          - generic [ref=e87]:
+            - heading "Laporan Real-Time" [level=4] [ref=e88]
+            - paragraph [ref=e89]: Transparansi penuh melalui rekapitulasi otomatis publik.
+        - article [ref=e90]:
+          - img [ref=e92]
+          - generic [ref=e94]:
+            - heading "Amanah & Profesional" [level=4] [ref=e95]
+            - paragraph [ref=e96]: Dikelola oleh Panitia Zakat dengan integritas tinggi.
+      - generic [ref=e97] [cursor=pointer]:
+        - generic [ref=e98]:
+          - img [ref=e100]
+          - generic [ref=e102]:
+            - paragraph [ref=e103]: Laporan
+            - heading "Lihat Laporan Perolehan" [level=4] [ref=e104]
+            - paragraph [ref=e105]: Pantau penyaluran dan penerimaan secara langsung di halaman laporan.
+        - img [ref=e107]
+      - article [ref=e109]:
+        - img [ref=e111]
+        - generic [ref=e113]:
+          - paragraph [ref=e114]: Pengingat
+          - paragraph [ref=e115]: "\"Ambillah zakat dari harta mereka guna membersihkan dan mensucikan mereka, dan berdoalah untuk mereka...\""
+          - paragraph [ref=e117]: "— QS. At-Taubah: 103"
+  - generic [ref=e118]:
+    - generic [ref=e121]:
+      - generic [ref=e122]:
+        - generic [ref=e123]: Masjid An-Nur Komplek BPK V Gandul - Melayani dan menyalurkan Zakat Fitrah, Fidyah, Zakat Mal, Infaq Shodaqoh.
+        - generic [ref=e124]: Tunaikan zakat tepat waktu agar manfaatnya dapat segera dirasakan oleh saudara kita yang membutuhkan.
+        - generic [ref=e125]: Zakat Anda sangat berarti untuk membantu sesama dan meringankan beban umat.
+        - generic [ref=e126]: Semoga zakat yang Bapak dan Ibu keluarkan menjadi pembersih harta dan pembuka pintu rezeki.
+        - generic [ref=e127]: Amanah dan transparan dalam pengelolaan zakat adalah komitmen utama Panitia Zakat Masjid An-Nur.
+        - generic [ref=e128]: Mari raih keberkahan dengan menyisihkan sebagian harta untuk kemaslahatan umat.
+        - generic [ref=e129]: Harta yang dizakatkan tidak akan berkurang, melainkan bertambah berkahnya.
+      - generic [ref=e130]:
+        - generic [ref=e131]: Masjid An-Nur Komplek BPK V Gandul - Melayani dan menyalurkan Zakat Fitrah, Fidyah, Zakat Mal, Infaq Shodaqoh.
+        - generic [ref=e132]: Tunaikan zakat tepat waktu agar manfaatnya dapat segera dirasakan oleh saudara kita yang membutuhkan.
+        - generic [ref=e133]: Zakat Anda sangat berarti untuk membantu sesama dan meringankan beban umat.
+        - generic [ref=e134]: Semoga zakat yang Bapak dan Ibu keluarkan menjadi pembersih harta dan pembuka pintu rezeki.
+        - generic [ref=e135]: Amanah dan transparan dalam pengelolaan zakat adalah komitmen utama Panitia Zakat Masjid An-Nur.
+        - generic [ref=e136]: Mari raih keberkahan dengan menyisihkan sebagian harta untuk kemaslahatan umat.
+        - generic [ref=e137]: Harta yang dizakatkan tidak akan berkurang, melainkan bertambah berkahnya.
+    - contentinfo [ref=e138]:
+      - generic [ref=e140]:
+        - generic [ref=e141]: Powered by
+        - generic [ref=e142]:
+          - generic [ref=e143]: Ikatan Remaja Komplek BPK V Gandul
+          - img "Logo IRK" [ref=e144]
+  - button "Buka chatbot" [ref=e146] [cursor=pointer]:
+    - img [ref=e147]
