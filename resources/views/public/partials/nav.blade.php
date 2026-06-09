@@ -1,8 +1,8 @@
 @php
     $tabs = [
         ['key' => 'beranda', 'label' => 'Beranda', 'mobile_label' => 'Beranda'],
-        ['key' => 'laporan', 'label' => 'Ringkasan penerimaan', 'mobile_label' => 'Ringkasan', 'title' => 'Ringkasan penerimaan zakat'],
-        ['key' => 'grafik', 'label' => 'Grafik harian', 'mobile_label' => 'Grafik', 'title' => 'Grafik penerimaan harian'],
+        ['key' => 'laporan', 'label' => 'Ringkasan Penerimaan', 'mobile_label' => 'Ringkasan', 'title' => 'Ringkasan Penerimaan Zakat'],
+        ['key' => 'grafik', 'label' => 'Grafik Harian', 'mobile_label' => 'Grafik', 'title' => 'Grafik Penerimaan Harian'],
     ];
 @endphp
 

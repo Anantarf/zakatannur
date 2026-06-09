@@ -56,7 +56,7 @@
                             <article class="ui-mobile-card">
                                 <div class="flex items-start justify-between gap-3">
                                     <div class="min-w-0">
-                                        <span class="inline-flex rounded-md bg-blue-50 px-2 py-1 font-mono text-[11px] font-semibold text-blue-600">{!! \App\Support\Format::highlight($t->no_transaksi, $q) !!}</span>
+                                        <span class="inline-flex rounded-md bg-blue-50 px-2 py-1 font-sans text-[11px] font-semibold text-blue-600">{!! \App\Support\Format::highlight($t->no_transaksi, $q) !!}</span>
                                         <div class="mt-2 text-sm font-semibold leading-tight text-gray-800">{!! \App\Support\Format::highlight($t->pembayar_nama, $q) !!}</div>
                                         @if($t->muzakki_total > 1)
                                             <div class="mt-1 text-[11px] text-gray-500">+ {{ $t->muzakki_total - 1 }} muzakki lainnya</div>
@@ -194,7 +194,7 @@
                                 @foreach ($transactions as $t)
                                 <tr class="hover:bg-emerald-50/30 transition-colors">
                                     <td class="px-3 py-4 whitespace-nowrap">
-                                        <span class="font-mono text-xs font-semibold text-blue-600 bg-blue-50 px-2 py-1 rounded-md">{!! \App\Support\Format::highlight($t->no_transaksi, $q) !!}</span>
+                                        <span class="font-sans text-xs font-semibold text-blue-600 bg-blue-50 px-2 py-1 rounded-md">{!! \App\Support\Format::highlight($t->no_transaksi, $q) !!}</span>
                                     </td>
                                     <td class="px-3 py-4 text-gray-500 text-[13px] whitespace-nowrap">
                                         @if ($t->waktu_terima)
@@ -334,7 +334,7 @@
         <form method="POST" x-data="{ id: '', no: '' }" x-on:open-trash-modal.window="id = $event.detail.id; no = $event.detail.no; $el.action = '{{ url('/internal/transactions') }}/' + id + '/trash';" class="p-6">
             @csrf
             <h2 class="text-lg font-medium text-gray-900">
-                Yakin ingin memindahkan transaksi <span x-text="no" class="font-bold font-mono text-red-600"></span> ke Sampah?
+                Yakin ingin memindahkan transaksi <span x-text="no" class="font-bold font-sans text-red-600"></span> ke Sampah?
             </h2>
             <p class="mt-1 text-sm text-gray-600">
                 Transaksi akan otomatis dihapus permanen dari sistem setelah 30 hari.
@@ -404,7 +404,7 @@
                             @endforeach
                         </select>
                 @else
-                    <div class="p-4 bg-gray-50 border border-gray-200 rounded-lg text-sm text-gray-500 italic text-center">
+                    <div class="p-4 bg-gray-50 border border-gray-200 rounded-lg text-sm text-gray-500 not-italic text-center">
                         Belum ada transaksi valid yang tersedia untuk diekspor.
                     </div>
                 @endif
@@ -443,7 +443,7 @@
                             @endforeach
                         </select>
                 @else
-                    <div class="p-4 bg-gray-50 border border-gray-200 rounded-lg text-sm text-gray-500 italic text-center">
+                    <div class="p-4 bg-gray-50 border border-gray-200 rounded-lg text-sm text-gray-500 not-italic text-center">
                         Belum ada transaksi valid yang tersedia untuk diekspor.
                     </div>
                 @endif

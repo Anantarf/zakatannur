@@ -54,7 +54,7 @@
                                 <article class="ui-mobile-card">
                                     <div class="flex items-start justify-between gap-3">
                                         <div class="min-w-0">
-                                            <div class="font-mono text-[11px] text-slate-500">{{ $log->created_at->format('d/m/Y H:i:s') }}</div>
+                                            <div class="font-sans text-[11px] text-slate-500">{{ $log->created_at->format('d/m/Y H:i:s') }}</div>
                                             <div class="mt-2 font-bold text-slate-800">{{ $log->actorUser->name ?? 'System' }}</div>
                                             <div class="mt-1 text-[11px] font-medium tracking-tight text-slate-400">{{ $log->ip }}</div>
                                         </div>
@@ -70,7 +70,7 @@
                                         </div>
                                         <div class="ui-mobile-meta-item">
                                             <p class="ui-mobile-meta-label">ID</p>
-                                            <span class="font-mono text-xs text-slate-500">#{{ substr($log->subject_id, 0, 8) }}...</span>
+                                            <span class="font-sans text-xs text-slate-500">#{{ substr($log->subject_id, 0, 8) }}...</span>
                                         </div>
                                     </div>
 
@@ -123,7 +123,7 @@
                                 @if (count($logs) > 0)
                                     @foreach ($logs as $log)
                                     <tr class="hover:bg-slate-50/50 transition-colors">
-                                        <td class="px-6 py-4 font-mono text-xs text-slate-500">
+                                        <td class="px-6 py-4 font-sans text-xs text-slate-500">
                                             {{ $log->created_at->timezone('Asia/Jakarta')->format('d/m/Y H:i:s') }}
                                             <div class="mt-1 font-sans text-[10px] font-bold text-slate-300">WIB</div>
                                         </td>
@@ -139,7 +139,7 @@
                                         <td class="px-6 py-4 text-xs font-bold text-slate-500">
                                             {{ class_basename($log->subject_type) }}
                                         </td>
-                                        <td class="px-6 py-4 text-xs font-mono text-slate-400">
+                                        <td class="px-6 py-4 text-xs font-sans text-slate-400">
                                             #{{ substr($log->subject_id, 0, 8) }}...
                                         </td>
                                         <td class="px-6 py-4">

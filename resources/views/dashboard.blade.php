@@ -86,7 +86,7 @@
                         @if(request('year')) <input type="hidden" name="year" value="{{ request('year') }}"> @endif
                         @if(request('period_id')) <input type="hidden" name="period_id" value="{{ request('period_id') }}"> @endif
                         @if(request('metode')) <input type="hidden" name="metode" value="{{ request('metode') }}"> @endif
-                        
+
                         <select name="days" onchange="this.form.submit()" class="appearance-none rounded-lg border-gray-200 bg-gray-50 pl-3 pr-8 py-1.5 text-[11px] sm:text-xs font-black text-gray-500 uppercase tracking-widest focus:border-emerald-500 focus:ring-emerald-500 transition-all cursor-pointer">
                             <option value="7" @selected($activeDays == 7)>7 Hari</option>
                             <option value="14" @selected($activeDays == 14)>14 Hari</option>
@@ -106,84 +106,7 @@
                             {{ $dashboardChartRange['fallback_note'] }}
                         </div>
                     @endif
-                    @php
-                        $chartValues = $chartData['datasets'][0]['values'] ?? $chartData['values'] ?? [];
-                        $chartLabels = $chartData['labels'] ?? [];
-                        $chartMax = max(1, (int) max($chartValues ?: [0]));
-                        $chartMin = min(0, (int) min($chartValues ?: [0]));
-                        $svgWidth = 960;
-                        $svgHeight = 250;
-                        $paddingX = 28;
-                        $paddingTop = 20;
-                        $paddingBottom = 34;
-                        $plotWidth = $svgWidth - ($paddingX * 2);
-                        $plotHeight = $svgHeight - $paddingTop - $paddingBottom;
-                        $pointCount = max(count($chartValues), 1);
-                        $stepX = $pointCount > 1 ? ($plotWidth / ($pointCount - 1)) : 0;
-                        $rangeValue = max(1, $chartMax - $chartMin);
-                        $points = [];
-
-                        foreach ($chartValues as $index => $value) {
-                            $x = $paddingX + ($stepX * $index);
-                            $normalized = ($value - $chartMin) / $rangeValue;
-                            $y = $paddingTop + ($plotHeight - ($normalized * $plotHeight));
-                            $points[] = ['x' => round($x, 2), 'y' => round($y, 2)];
-                        }
-
-                        $linePath = '';
-                        $areaPath = '';
-                        if (!empty($points)) {
-                            $linePath = 'M ' . $points[0]['x'] . ' ' . $points[0]['y'];
-                            for ($i = 1; $i < count($points); $i++) {
-                                $previous = $points[$i - 1];
-                                $current = $points[$i];
-                                $controlX = round(($previous['x'] + $current['x']) / 2, 2);
-                                $linePath .= ' C ' . $controlX . ' ' . $previous['y'] . ', ' . $controlX . ' ' . $current['y'] . ', ' . $current['x'] . ' ' . $current['y'];
-                            }
-
-                            $baselineY = $paddingTop + $plotHeight;
-                            $lastPoint = $points[count($points) - 1];
-                            $areaPath = $linePath
-                                . ' L ' . $lastPoint['x'] . ' ' . $baselineY
-                                . ' L ' . $points[0]['x'] . ' ' . $baselineY
-                                . ' Z';
-                        }
-                    @endphp
-                    <div id="dashboardChartFallback" class="rounded-2xl border border-slate-100 bg-slate-50/70 p-4">
-                        <div class="relative h-[200px] sm:h-[250px]">
-                            <svg viewBox="0 0 {{ $svgWidth }} {{ $svgHeight }}" class="h-full w-full" preserveAspectRatio="none" aria-hidden="true">
-                                <defs>
-                                    <linearGradient id="dashboardChartArea" x1="0" y1="0" x2="0" y2="1">
-                                        <stop offset="0%" stop-color="#f59e0b" stop-opacity="0.28" />
-                                        <stop offset="100%" stop-color="#f59e0b" stop-opacity="0.04" />
-                                    </linearGradient>
-                                </defs>
-
-                                @for ($i = 0; $i < 4; $i++)
-                                    @php
-                                        $gridY = $paddingTop + (($plotHeight / 3) * $i);
-                                    @endphp
-                                    <line x1="{{ $paddingX }}" y1="{{ $gridY }}" x2="{{ $svgWidth - $paddingX }}" y2="{{ $gridY }}" stroke="#e2e8f0" stroke-width="1" />
-                                @endfor
-
-                                @if ($areaPath !== '')
-                                    <path d="{{ $areaPath }}" fill="url(#dashboardChartArea)" />
-                                    <path d="{{ $linePath }}" fill="none" stroke="#d97706" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" />
-                                @endif
-
-                                @foreach ($points as $point)
-                                    <circle cx="{{ $point['x'] }}" cy="{{ $point['y'] }}" r="4.5" fill="#ffffff" stroke="#d97706" stroke-width="3" />
-                                @endforeach
-                            </svg>
-
-                            <div class="pointer-events-none absolute inset-x-0 bottom-0 grid gap-2 text-[10px] font-bold leading-tight text-slate-400" style="grid-template-columns: repeat({{ max(count($chartLabels), 1) }}, minmax(0, 1fr));">
-                                @foreach ($chartLabels as $label)
-                                    <div class="text-center">{{ $label }}</div>
-                                @endforeach
-                            </div>
-                        </div>
-                    </div>
-                    <div id="dashboardChartCanvasWrap" class="relative hidden h-[200px] w-full sm:h-[250px]">
+                    <div class="relative h-[320px] w-full sm:h-[380px]">
                         <canvas id="dailyTrendChart"></canvas>
                     </div>
                 </div>
@@ -232,7 +155,7 @@
                         </div>
 
                         @if(request('days')) <input type="hidden" name="days" value="{{ request('days') }}"> @endif
-                        
+
                         @if($year || $periodId || $metode)
                             <a href="{{ route('dashboard') }}" class="inline-flex items-center justify-center gap-2 rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-semibold text-slate-500 transition-all hover:border-emerald-200 hover:text-emerald-700" title="Reset Filters">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
@@ -272,11 +195,14 @@
 
 @push('scripts')
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0"></script>
 <script>
 (function() {
     const isOffSeason = {{ $offSeason ? 'true' : 'false' }};
     const lineColor   = isOffSeason ? '#d97706' : '#10b981';
-    const gradFrom    = isOffSeason ? 'rgba(217, 119, 6, 0.15)' : 'rgba(16, 185, 129, 0.2)';
+    const lineColorSoft = isOffSeason ? 'rgba(217, 119, 6, 0.92)' : 'rgba(16, 185, 129, 0.92)';
+    const gradFrom    = isOffSeason ? 'rgba(217, 119, 6, 0.18)' : 'rgba(16, 185, 129, 0.22)';
+    const labelColor  = isOffSeason ? '#92400e' : '#047857';
 
     function initChart() {
         try {
@@ -284,76 +210,115 @@
                 setTimeout(initChart, 100);
                 return;
             }
+            if (typeof ChartDataLabels !== 'undefined' && typeof Chart.registry !== 'undefined') {
+                try { Chart.register(ChartDataLabels); } catch (_) {}
+            }
+
             const canvas = document.getElementById('dailyTrendChart');
-            const canvasWrap = document.getElementById('dashboardChartCanvasWrap');
-            const fallback = document.getElementById('dashboardChartFallback');
             if (!canvas) return;
 
             const ctx = canvas.getContext('2d');
-            const gradient = ctx.createLinearGradient(0, 0, 0, 250);
+            const gradient = ctx.createLinearGradient(0, 0, 0, 300);
             gradient.addColorStop(0, gradFrom);
             gradient.addColorStop(1, 'rgba(0,0,0,0)');
+
+            const chartValues = {!! json_encode($chartData['datasets'][0]['values'] ?? $chartData['values'] ?? []) !!};
+            const chartLabels = {!! json_encode($chartData['labels'] ?? []) !!};
+            const chartLabel = {!! json_encode($chartData['datasets'][0]['label'] ?? 'Jumlah Transaksi') !!};
+
+            const sumValues = chartValues.reduce((a, b) => a + (Number(b) || 0), 0);
+            const maxValues = Math.max(...chartValues, 0);
+            const avgValues = chartValues.length ? sumValues / chartValues.length : 0;
+            const lastValue = chartValues[chartValues.length - 1] ?? 0;
+            const prevValue = chartValues.length > 1 ? chartValues[chartValues.length - 2] ?? 0 : 0;
+            const delta = lastValue - prevValue;
 
             new Chart(ctx, {
                 type: 'line',
                 data: {
-                    labels: {!! json_encode($chartData['labels'] ?? []) !!},
+                    labels: chartLabels,
                     datasets: [{
-                        label: {!! json_encode($chartData['datasets'][0]['label'] ?? 'Jumlah Transaksi') !!},
-                        data: {!! json_encode($chartData['datasets'][0]['values'] ?? $chartData['values'] ?? []) !!},
+                        label: chartLabel,
+                        data: chartValues,
                         borderColor: lineColor,
                         backgroundColor: gradient,
-                        borderWidth: 2.5,
+                        borderWidth: 3,
                         fill: true,
-                        tension: 0.18,
+                        tension: 0.36,
                         pointBackgroundColor: '#fff',
                         pointBorderColor: lineColor,
-                        pointBorderWidth: 2,
-                        pointRadius: 0,
-                        pointHoverRadius: 5
-                    }]
-                },
+                        pointBorderWidth: 2.5,
+                        pointRadius: 4.5,
+                        pointHoverRadius: 7,
+                        datalabels: {
+                            display: (ctx) => Number(ctx.dataset.data[ctx.dataIndex]) > 0,
+                            align: 'top',
+                            anchor: 'end',
+                            offset: 6,
+                            color: labelColor,
+                            backgroundColor: 'rgba(255, 255, 255, 0.92)',
+                            borderColor: labelColor,
+                            borderWidth: 1,
+                            borderRadius: 6,
+                            padding: { top: 3, bottom: 3, left: 6, right: 6 },
+                            font: { family: "'Plus Jakarta Sans', sans-serif", weight: '700', size: 10 },
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
+                    interaction: { mode: 'index', intersect: false },
+                    animation: { duration: 900, easing: 'easeOutQuart' },
+                    layout: { padding: { top: 36, right: 18, bottom: 8, left: 4 } },
                     plugins: {
                         legend: { display: false },
                         tooltip: {
-                            backgroundColor: '#1e293b',
-                            padding: 12,
-                            titleFont: { size: 12, weight: 'bold' },
-                            bodyFont: { size: 12 },
+                            backgroundColor: '#0f172a',
+                            padding: 14,
+                            cornerRadius: 12,
+                            borderColor: 'rgba(148, 163, 184, 0.2)',
+                            borderWidth: 1,
+                            titleFont: { family: "'Plus Jakarta Sans', sans-serif", size: 12, weight: '700' },
+                            titleColor: '#94a3b8',
+                            bodyFont: { family: "'Plus Jakarta Sans', sans-serif", size: 12, weight: '600' },
+                            bodyColor: '#f0fdf4',
                             displayColors: false,
+                            boxPadding: 6,
                             callbacks: {
-                                label: function(context) {
-                                    return context.raw + ' Transaksi';
-                                }
-                            }
-                        }
+                                title: (items) => items[0]?.label ?? '',
+                                label: (ctx) => ' ' + chartLabel + ': ' + new Intl.NumberFormat('id-ID').format(ctx.parsed.y || 0),
+                                afterBody: (items) => {
+                                    return [
+                                        '',
+                                        'Periode ini: ' + new Intl.NumberFormat('id-ID').format(sumValues) + ' total',
+                                        'Rata-rata: ' + new Intl.NumberFormat('id-ID').format(Math.round(avgValues)) + ' / hari',
+                                        'Tertinggi: ' + new Intl.NumberFormat('id-ID').format(maxValues),
+                                        'Delta vs kemarin: ' + (delta >= 0 ? '+' : '') + new Intl.NumberFormat('id-ID').format(delta),
+                                    ];
+                                },
+                            },
+                        },
                     },
                     scales: {
                         y: {
                             beginAtZero: true,
-                            grid: { color: '#f1f5f9' },
+                            grid: { color: 'rgba(226, 232, 240, 0.55)', drawBorder: false },
                             ticks: {
                                 stepSize: 1,
-                                color: '#64748b',
-                                font: { size: 11, weight: '600' }
-                            }
+                                color: '#334155',
+                                font: { family: "'Plus Jakarta Sans', sans-serif", size: 11, weight: '600' },
+                                padding: 8,
+                            },
                         },
                         x: {
                             grid: { display: false },
                             ticks: {
-                                color: '#64748b',
-                                font: { size: 11, weight: '600' }
-                            }
-                        }
-                    }
-                }
+                                color: '#334155',
+                                font: { family: "'Plus Jakarta Sans', sans-serif", size: 11, weight: '600' },
+                                padding: 6,
+                            },
+                        },
+                    },
+                },
             });
-
-            canvasWrap?.classList.remove('hidden');
-            fallback?.classList.add('hidden');
         } catch (e) {
             console.error("Chart Error: ", e);
         }

@@ -124,7 +124,7 @@
             </form>
             <div class="mt-2 flex items-center justify-between px-2">
                 <span class="text-[10px] text-gray-400">Didukung oleh AI Chatbot</span>
-                <span class="font-mono text-[10px] text-gray-400" x-text="`${input.length}/500`"></span>
+                <span class="font-sans tabular-nums text-[10px] text-gray-400" x-text="`${input.length}/500`"></span>
             </div>
         </div>
     </div>

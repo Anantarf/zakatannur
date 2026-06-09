@@ -86,7 +86,7 @@
                                 <div class="flex items-start justify-between gap-3">
                                     <div class="min-w-0">
                                         <div class="text-sm font-bold leading-tight text-gray-800">{{ $u->name }}</div>
-                                        <div class="mt-1 font-mono text-xs text-gray-500">{{ $u->username }}</div>
+                                        <div class="mt-1 font-sans text-xs text-gray-500">{{ $u->username }}</div>
                                     </div>
                                     <span class="ui-role-badge {{ $u->role === 'super_admin' ? 'ui-role-badge-super' : ($u->role === 'admin' ? 'ui-role-badge-admin' : 'ui-role-badge-staff') }}">
                                         {{ $roleLabels[$u->role] ?? ucfirst($u->role) }}
@@ -133,7 +133,7 @@
                                 @foreach ($users as $u)
                                 <tr class="hover:bg-gray-50 transition-colors">
                                     <td class="px-6 py-4 font-bold text-gray-800">{{ $u->name }}</td>
-                                    <td class="px-6 py-4 text-gray-500 font-mono text-xs">{{ $u->username }}</td>
+                                    <td class="px-6 py-4 text-gray-500 font-sans text-xs">{{ $u->username }}</td>
                                     <td class="px-6 py-4">
                                         <span class="ui-role-badge {{ $u->role === 'super_admin' ? 'ui-role-badge-super' : ($u->role === 'admin' ? 'ui-role-badge-admin' : 'ui-role-badge-staff') }}">
                                             {{ $roleLabels[$u->role] ?? ucfirst($u->role) }}

@@ -25,7 +25,7 @@ export const buildNotificationMessage = (items, formatCategory, joinGrammaticall
     }
 
     if (sumBeras > 0) {
-        parts.push(sumBeras.toFixed(2).replace('.', ',') + ' Kg');
+        parts.push(new Intl.NumberFormat('id-ID', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(sumBeras) + ' Kg');
     }
 
     return `Alhamdulillah! Diperoleh ${joinGrammatically(categories)}: ${parts.join(' dan ')}`;

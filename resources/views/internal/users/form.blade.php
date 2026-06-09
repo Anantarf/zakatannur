@@ -79,7 +79,7 @@
                             </select>
                             <x-input-error class="mt-2" :messages="$errors->get('role')" />
                             @if (empty($allowedRoles))
-                                <p class="mt-1 text-xs text-gray-500 italic">Role tidak tersedia untuk akun ini.</p>
+                                <p class="mt-1 text-xs text-gray-500 not-italic">Role tidak tersedia untuk akun ini.</p>
                             @else
                                 <p class="mt-1 text-xs text-slate-500">Pilih role sesuai tanggung jawab operasional pengguna.</p>
                             @endif

@@ -54,9 +54,34 @@
             </div>
         </div>
 
-        <div class="h-[290px] sm:h-[340px] w-full relative">
-            <canvas id="dailyChart"></canvas>
-            <div id="idle-cards-container" class="absolute inset-0 pointer-events-none overflow-hidden mt-6"></div>
+        <div class="space-y-3">
+            <div x-show="chartFilter !== 'beras'" x-transition.opacity.duration.300ms
+                class="public-chart-card">
+                <div class="public-chart-card-head">
+                    <span class="public-chart-card-title">
+                        <span class="h-1.5 w-1.5 rounded-full bg-emerald-500"></span>
+                        Grafik Penerimaan Uang
+                    </span>
+                    <span class="public-chart-card-meta" id="chart-uang-range"></span>
+                </div>
+                <div class="h-[240px] w-full sm:h-[280px] relative">
+                    <canvas id="dailyChartUang"></canvas>
+                </div>
+            </div>
+
+            <div x-show="chartFilter !== 'uang'" x-transition.opacity.duration.300ms
+                class="public-chart-card">
+                <div class="public-chart-card-head">
+                    <span class="public-chart-card-title">
+                        <span class="h-1.5 w-1.5 rounded-full bg-amber-500"></span>
+                        Grafik Penerimaan Beras
+                    </span>
+                    <span class="public-chart-card-meta" id="chart-beras-range"></span>
+                </div>
+                <div class="h-[240px] w-full sm:h-[280px] relative">
+                    <canvas id="dailyChartBeras"></canvas>
+                </div>
+            </div>
         </div>
     </div>
 </div>

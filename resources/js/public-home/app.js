@@ -89,7 +89,7 @@ export const createPublicHomeApp = (config, chartService) => {
 
             setInterval(() => {
                 this.carouselIndex = (this.carouselIndex + 1) % this.carouselImages.length;
-            }, 7000);
+            }, 15000);
         },
 
         initWatchers() {
@@ -154,9 +154,11 @@ export const createPublicHomeApp = (config, chartService) => {
             this.refreshSummary();
 
             this.loadChartJs().then((success) => {
-                if (success) {
-                    chartService.initHistoricalChart();
+                if (!success) {
+                    return;
                 }
+                chartService.initHistoricalChart();
+                chartService.initDailyChart();
             });
 
             this.resetIdle();

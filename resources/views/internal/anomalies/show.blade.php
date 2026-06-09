@@ -52,7 +52,7 @@
                                     </div>
                                     <div>
                                         <p class="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400">Nomor Transaksi</p>
-                                        <h3 class="mt-1 inline-flex rounded-lg border border-emerald-100 bg-emerald-50 px-3 py-1 font-mono text-sm font-bold text-emerald-700 sm:text-base">{{ $noTransaksi }}</h3>
+                                        <h3 class="mt-1 inline-flex rounded-lg border border-emerald-100 bg-emerald-50 px-3 py-1 font-sans text-sm font-bold text-emerald-700 sm:text-base">{{ $noTransaksi }}</h3>
                                     </div>
                                     <div>
                                         <p class="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400">Pembayar</p>
@@ -100,7 +100,7 @@
                                             <div class="rounded-xl border border-gray-100 bg-slate-50/70 px-4 py-4">
                                                 <div class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                                                     <div class="min-w-0">
-                                                        <p class="font-mono text-xs font-semibold text-blue-600">{{ $candidate['no_transaksi'] ?? '-' }}</p>
+                                                        <p class="font-sans text-xs font-semibold text-blue-600">{{ $candidate['no_transaksi'] ?? '-' }}</p>
                                                         <p class="mt-1 text-sm font-semibold text-gray-800">{{ $candidate['pembayar_nama'] ?? '-' }}</p>
                                                         <p class="text-xs text-gray-500">{{ $candidate['muzakki_name'] ?? '-' }}</p>
                                                     </div>

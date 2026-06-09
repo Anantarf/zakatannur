@@ -161,7 +161,7 @@
                         <article class="ui-mobile-card border-amber-100">
                             <div class="flex items-start justify-between gap-3">
                                 <div class="space-y-1">
-                                    <span class="inline-flex rounded-md bg-blue-50 px-2 py-1 font-mono text-xs font-semibold text-blue-600">{{ $group->no_transaksi }}</span>
+                                    <span class="inline-flex rounded-md bg-blue-50 px-2 py-1 font-sans text-xs font-semibold text-blue-600">{{ $group->no_transaksi }}</span>
                                     <h4 class="text-sm font-bold leading-tight text-slate-900">{{ $group->pembayar_nama }}</h4>
                                     <p class="text-xs text-slate-500">
                                         {{ $groupTime?->format('d/m/Y H:i') ?? '-' }}
@@ -239,7 +239,7 @@
                             @forelse ($groups as $group)
                                 <tr class="transition-colors hover:bg-amber-50/30">
                                     <td class="whitespace-nowrap px-3 py-4 sm:px-6">
-                                        <span class="rounded-md bg-blue-50 px-2 py-1 font-mono text-xs font-semibold text-blue-600">{{ $group->no_transaksi }}</span>
+                                        <span class="rounded-md bg-blue-50 px-2 py-1 font-sans text-xs font-semibold text-blue-600">{{ $group->no_transaksi }}</span>
                                     </td>
                                     <td class="whitespace-nowrap px-3 py-4 text-[13px] text-gray-500 sm:px-6">
                                         @php $groupTime = ($group->waktu_terima ?? $group->created_at)?->timezone('Asia/Jakarta'); @endphp

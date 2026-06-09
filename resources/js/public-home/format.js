@@ -1,5 +1,6 @@
 const rupiahFormatter = new Intl.NumberFormat('id-ID');
 const jiwaFormatter = new Intl.NumberFormat('id-ID');
+const berasFormatter = new Intl.NumberFormat('id-ID', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
 const safeNumber = (value) => (Number.isFinite(value) ? value : 0);
 export const formatCategory = (category) => {
@@ -31,7 +32,7 @@ export const joinGrammatically = (items) => {
 
 export const formatUang = (value) => 'Rp ' + rupiahFormatter.format(safeNumber(value));
 
-export const formatBeras = (value) => safeNumber(value).toFixed(2).replace('.', ',') + ' Kg';
+export const formatBeras = (value) => berasFormatter.format(safeNumber(value)) + ' Kg';
 
 export const formatJiwa = (value) => jiwaFormatter.format(safeNumber(value)) + ' Jiwa';
 

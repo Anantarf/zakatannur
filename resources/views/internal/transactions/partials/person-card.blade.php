@@ -31,7 +31,7 @@
                     </label>
 
                     <template x-if="!person.zakat.fitrah.is_custom">
-                        <div class="text-[11px] bg-emerald-100/50 text-emerald-800 px-2 py-1.5 rounded border border-emerald-200 font-medium italic">
+                        <div class="text-[11px] bg-emerald-100/50 text-emerald-800 px-2 py-1.5 rounded border border-emerald-200 font-medium not-italic">
                             Sesuai Standar
                         </div>
                     </template>
@@ -82,7 +82,7 @@
                     </label>
 
                     <template x-if="!person.zakat.fidyah.is_custom">
-                        <div class="text-[11px] bg-amber-100/50 text-amber-800 px-2 py-1.5 rounded border border-amber-200 font-medium italic">
+                        <div class="text-[11px] bg-amber-100/50 text-amber-800 px-2 py-1.5 rounded border border-amber-200 font-medium not-italic">
                             Sesuai Standar
                         </div>
                     </template>

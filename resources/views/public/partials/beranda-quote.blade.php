@@ -6,7 +6,7 @@
         <p class="text-[10px] font-semibold uppercase tracking-[0.22em] text-brand-700/80">
             Pengingat
         </p>
-        <p class="max-w-3xl text-[1rem] font-semibold italic leading-relaxed text-neutral-800 sm:text-[1.2rem]">
+        <p class="max-w-3xl text-[1rem] font-semibold leading-[1.55] text-neutral-800 sm:text-[1.2rem]">
             "Ambillah zakat dari harta mereka guna membersihkan dan mensucikan mereka, dan berdoalah untuk mereka..."
         </p>
         <div>

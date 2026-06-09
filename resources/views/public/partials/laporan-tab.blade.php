@@ -23,10 +23,10 @@
 
                 <dl class="mt-4 grid grid-cols-2 gap-3">
                     <div class="public-subcard public-subcard-brand p-4">
-                        <dd class="text-[18px] font-semibold text-brand-800 tabular-nums" x-text="formatUang(item.total_uang)"></dd>
+                        <dd class="text-[18px] font-semibold text-brand-800 tabular-nums text-right" x-text="formatUang(item.total_uang)"></dd>
                     </div>
                     <div class="public-subcard public-subcard-amber p-4">
-                        <dd class="text-[18px] font-semibold text-amber-800 tabular-nums" x-text="formatBeras(item.total_beras_kg)"></dd>
+                        <dd class="text-[18px] font-semibold text-amber-800 tabular-nums text-right" x-text="formatBeras(item.total_beras_kg)"></dd>
                     </div>
                 </dl>
             </article>
@@ -60,9 +60,9 @@
 
             <div class="mt-2.5 grid grid-cols-[1.28fr_0.72fr_0.98fr_0.98fr] items-center gap-2.5 px-2 pb-1.5 text-[10px] font-medium tracking-[0.03em] text-neutral-500">
                 <span>Kategori</span>
-                <span class="text-center">Jiwa</span>
-                <span class="text-center">Uang</span>
-                <span class="text-center">Beras</span>
+                <span class="text-right">Jiwa</span>
+                <span class="text-right">Uang</span>
+                <span class="text-right">Beras</span>
             </div>
 
             <div x-show="items.length > 0" class="space-y-2">
@@ -71,13 +71,13 @@
                         <div class="min-w-0">
                             <p class="truncate text-[1.02rem] font-semibold text-neutral-950" x-text="formatCat(item.category)"></p>
                         </div>
-                        <div class="public-subcard public-subcard-sky px-3 py-2 text-center">
+                        <div class="public-subcard public-subcard-sky px-3 py-2 text-right">
                             <p class="text-[0.98rem] font-semibold text-sky-950 tabular-nums" x-text="formatJiwaPlain(item.total_jiwa)"></p>
                         </div>
-                        <div class="public-subcard public-subcard-brand px-3 py-2 text-center">
+                        <div class="public-subcard public-subcard-brand px-3 py-2 text-right">
                             <p class="text-[0.96rem] font-semibold text-brand-800 tabular-nums" x-text="formatUang(item.total_uang)"></p>
                         </div>
-                        <div class="public-subcard public-subcard-amber px-3 py-2 text-center">
+                        <div class="public-subcard public-subcard-amber px-3 py-2 text-right">
                             <p class="text-[0.96rem] font-semibold text-amber-800 tabular-nums" x-text="formatBeras(item.total_beras_kg)"></p>
                         </div>
                     </article>

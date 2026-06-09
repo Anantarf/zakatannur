@@ -68,7 +68,7 @@
                             <article class="ui-mobile-card">
                                 <div class="flex items-start justify-between gap-3">
                                     <div class="min-w-0">
-                                        <span class="inline-flex rounded-md bg-red-50 px-2 py-1 font-mono text-[11px] font-bold text-red-500">{!! \App\Support\Format::highlight($t->no_transaksi, $q) !!}</span>
+                                        <span class="inline-flex rounded-md bg-red-50 px-2 py-1 font-sans text-[11px] font-bold text-red-500">{!! \App\Support\Format::highlight($t->no_transaksi, $q) !!}</span>
                                         <div class="mt-2 text-sm font-semibold leading-tight text-gray-800">{!! \App\Support\Format::highlight($t->pembayar_nama, $q) !!}</div>
                                         @if($t->muzakki_total > 1)
                                             <div class="mt-1 text-[11px] text-gray-500">+ {{ $t->muzakki_total - 1 }} muzakki lainnya</div>
@@ -182,7 +182,7 @@
                                 @foreach ($transactions as $t)
                                 <tr class="hover:bg-gray-50 transition-colors">
                                     <td class="px-6 py-4 whitespace-nowrap">
-                                        <span class="font-mono text-xs font-bold text-red-500 bg-red-50 px-2 py-1 rounded-md">{!! \App\Support\Format::highlight($t->no_transaksi, $q) !!}</span>
+                                        <span class="font-sans text-xs font-bold text-red-500 bg-red-50 px-2 py-1 rounded-md">{!! \App\Support\Format::highlight($t->no_transaksi, $q) !!}</span>
                                     </td>
                                     <td class="px-6 py-4 text-gray-500 text-xs whitespace-nowrap">
                                         <div>{{ $t->deleted_at_formatted }}</div>
@@ -291,7 +291,7 @@
             @csrf
             @method('delete')
             <h2 class="text-lg font-medium text-gray-900">
-                Apakah Anda yakin ingin menghapus permanen transaksi <span x-text="no" class="font-bold font-mono text-red-600"></span>?
+                Apakah Anda yakin ingin menghapus permanen transaksi <span x-text="no" class="font-bold font-sans text-red-600"></span>?
             </h2>
             <p class="mt-1 text-sm text-gray-600">
                 Data yang dihapus permanen tidak akan bisa dipulihkan kembali dari sistem. Harap berhati-hati.

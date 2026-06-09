@@ -10,7 +10,7 @@
             <div class="mb-4 pb-4 border-b border-slate-700/50">
                 <div class="flex items-center justify-between mb-3">
                     <h4 class="text-xs font-black text-emerald-400 uppercase tracking-widest">Ringkasan Transaksi</h4>
-                    <span class="text-[10px] text-slate-500 font-mono">{{ $log->metadata['no_transaksi'] ?? '-' }}</span>
+                    <span class="text-[10px] text-slate-500 font-sans">{{ $log->metadata['no_transaksi'] ?? '-' }}</span>
                 </div>
                 <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
                     <div class="bg-slate-800/50 p-3 rounded-lg border border-slate-700/50">
@@ -66,12 +66,12 @@
                 </div>
                 <div class="space-y-1">
                     <div class="flex justify-between items-center text-[11px]">
-                        <span class="text-slate-500 italic">Periode Data</span>
-                        <span class="text-slate-200 font-mono">{{ $log->metadata['start_date'] }} s/d {{ $log->metadata['end_date'] }}</span>
+                        <span class="text-slate-500 not-italic">Periode Data</span>
+                        <span class="text-slate-200 font-sans">{{ $log->metadata['start_date'] }} s/d {{ $log->metadata['end_date'] }}</span>
                     </div>
                     <div class="flex justify-between items-center text-[11px]">
-                        <span class="text-slate-500 italic">Jumlah Dihapus</span>
-                        <span class="text-red-400 font-bold font-mono">{{ $log->metadata['count'] }} Transaksi</span>
+                        <span class="text-slate-500 not-italic">Jumlah Dihapus</span>
+                        <span class="text-red-400 font-bold font-sans">{{ $log->metadata['count'] }} Transaksi</span>
                     </div>
                 </div>
             </div>
@@ -86,7 +86,7 @@
                     </span>
                 </div>
                 <div class="flex justify-between items-center text-[11px]">
-                    <span class="text-slate-500 italic">Nama Muzakki</span>
+                    <span class="text-slate-500 not-italic">Nama Muzakki</span>
                     <span class="text-slate-200 font-bold">{{ $log->metadata['name'] ?? 'Data Lama' }}</span>
                 </div>
             </div>
@@ -115,7 +115,7 @@
                 <div class="grid grid-cols-1 gap-1 text-[11px]">
                     <div class="flex justify-between">
                         <span class="text-slate-500">No. Transaksi</span>
-                        <span class="text-slate-300 font-mono">{{ $log->metadata['no_transaksi'] ?? '-' }}</span>
+                        <span class="text-slate-300 font-sans">{{ $log->metadata['no_transaksi'] ?? '-' }}</span>
                     </div>
                     @if(isset($log->metadata['items_count']))
                         <div class="flex justify-between">
@@ -174,7 +174,7 @@
                     </div>
                     <div class="flex justify-between border-b border-slate-800/50 pb-1">
                         <span class="text-slate-500">No. Transaksi</span>
-                        <span class="text-slate-300 font-mono text-right capitalize">{{ $log->metadata['no_transaksi'] ?? '-' }}</span>
+                        <span class="text-slate-300 font-sans text-right capitalize">{{ $log->metadata['no_transaksi'] ?? '-' }}</span>
                     </div>
                 </div>
             </div>
@@ -188,12 +188,12 @@
                                 @foreach($val as $subKey => $subVal)
                                     <div class="flex flex-wrap gap-x-2 text-[10px]">
                                         <span class="text-slate-500">{{ Str::headline($subKey) }}:</span>
-                                        <span class="text-emerald-400 font-mono italic">{{ is_array($subVal) ? json_encode($subVal) : $subVal }}</span>
+                                        <span class="text-emerald-400 font-sans not-italic">{{ is_array($subVal) ? json_encode($subVal) : $subVal }}</span>
                                     </div>
                                 @endforeach
                             </div>
                         @else
-                            <span class="text-[11px] text-emerald-400 font-mono break-all">{{ $val }}</span>
+                            <span class="text-[11px] text-emerald-400 font-sans break-all">{{ $val }}</span>
                         @endif
                     </div>
                 @endforeach
@@ -208,7 +208,7 @@
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-2 w-2" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v2H7a1 1 0 100 2h2v2a1 1 0 102 0v-2h2a1 1 0 100-2h-2V7z" clip-rule="evenodd" /></svg>
                     Toggle Debug Info (JSON)
                 </button>
-                <pre class="hidden mt-4 text-[10px] text-emerald-400/40 font-mono leading-relaxed bg-slate-950 p-4 rounded-xl border border-slate-800 shadow-inner">{{ json_encode($log->metadata, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES) }}</pre>
+                <pre class="hidden mt-4 text-[10px] text-emerald-400/80 font-mono leading-relaxed bg-slate-950 p-4 rounded-xl border border-slate-800 shadow-inner">{{ json_encode($log->metadata, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES) }}</pre>
             </div>
         @endif
     </div>
