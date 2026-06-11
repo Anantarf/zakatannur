@@ -72,7 +72,7 @@
             </div>
 
             <div class="ui-card overflow-hidden shadow-md">
-                <div class="ui-card-header ui-card-header-neutral">
+                <div class="ui-card-header ui-card-header-slate">
                     <div class="ui-section-accent h-6 w-2"></div>
                     <div>
                         <h3 class="ui-card-header-title">Daftar Pengguna</h3>

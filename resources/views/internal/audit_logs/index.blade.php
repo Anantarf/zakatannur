@@ -34,7 +34,7 @@
             </div>
 
             <div class="ui-card overflow-hidden shadow-md">
-                <div class="ui-card-header ui-card-header-neutral justify-between">
+                <div class="ui-card-header ui-card-header-slate justify-between">
                     <div class="flex items-center gap-2">
                         <div class="ui-section-accent h-6 w-2"></div>
                         <div>

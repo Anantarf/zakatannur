@@ -113,7 +113,7 @@
             @endif
 
             <section class="ui-card overflow-hidden">
-                <div class="ui-card-header ui-card-header-neutral">
+                <div class="ui-card-header ui-card-header-slate">
                     <h3 class="ui-card-header-title text-slate-900">Ringkasan Per Periode</h3>
                 </div>
                 <div class="hidden overflow-x-auto md:block">

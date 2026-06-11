@@ -22,7 +22,7 @@ class ChatbotApiTest extends TestCase
             ->assertJson([
                 'status' => 'success',
             ])
-            ->assertJsonPath('data.reply', 'Halo! Saya adalah asisten virtual Zakat An-Nur (versi simulasi). Ada yang bisa saya bantu terkait informasi zakat?');
+            ->assertJsonPath('data.reply', 'Halo! Saya Zakky, asisten virtual Zakat An-Nur (versi simulasi). Ada yang bisa saya bantu terkait informasi zakat?');
     }
 
     public function test_chatbot_does_not_expose_internal_exception_messages(): void
@@ -32,6 +32,11 @@ class ChatbotApiTest extends TestCase
             public function sendMessage(string $message): string
             {
                 throw new \RuntimeException('secret failure details');
+            }
+
+            public function wasLastReplyFallback(): bool
+            {
+                return false;
             }
         });
 
@@ -52,25 +57,25 @@ class ChatbotApiTest extends TestCase
     {
         Http::fake([
             'generativelanguage.googleapis.com/*' => Http::response([
-                'candidates' => [[ 'content' => [ 'parts' => [[ 'text' => 'Halo dari Gemini' ]] ]]],
+                'candidates' => [[ 'content' => [ 'parts' => [[ 'text' => 'Halo, saya Zakky dari Gemini 2.5 Flash' ]] ]]],
             ], 200),
         ]);
 
         $this->app->bind(ChatbotServiceInterface::class, fn () => new GeminiChatbotProvider(
             'test-key',
-            'gemini-flash-latest',
+            'gemini-2.5-flash',
             'https://generativelanguage.googleapis.com/v1beta/models'
         ));
 
         $response = $this->postJson('/api/chatbot/message', ['message' => 'halo']);
 
         $response->assertOk()
-            ->assertJsonPath('data.reply', 'Halo dari Gemini');
+            ->assertJsonPath('data.reply', 'Halo, saya Zakky dari Gemini 2.5 Flash');
 
         Http::assertSentCount(1);
     }
 
-    public function test_chatbot_does_not_say_sibuk_when_model_missing(): void
+    public function test_chatbot_returns_503_when_gemini_model_missing(): void
     {
         Http::fake([
             'generativelanguage.googleapis.com/*' => Http::response([
@@ -80,15 +85,75 @@ class ChatbotApiTest extends TestCase
 
         $this->app->bind(ChatbotServiceInterface::class, fn () => new GeminiChatbotProvider(
             'test-key',
-            'gemini-flash-latest',
+            'gemini-2.5-flash',
             'https://generativelanguage.googleapis.com/v1beta/models'
         ));
 
         $response = $this->postJson('/api/chatbot/message', ['message' => 'halo']);
 
-        $response->assertOk()
-            ->assertJsonPath('data.reply', 'Mohon maaf, layanan asisten AI sedang tidak tersedia saat ini. Silakan coba beberapa saat lagi.');
+        $response->assertStatus(503)
+            ->assertJson([
+                'status' => 'error',
+                'retryable' => true,
+            ]);
 
         $this->assertStringNotContainsString('sibuk', $response->getContent());
+        $this->assertStringNotContainsString(ChatbotServiceInterface::FALLBACK_PREFIX, $response->getContent());
+    }
+
+    public function test_chatbot_returns_503_with_quota_message_when_gemini_rate_limited(): void
+    {
+        Http::fake([
+            'generativelanguage.googleapis.com/*' => Http::response([
+                'error' => [
+                    'code' => 429,
+                    'message' => 'Quota exceeded',
+                    'status' => 'RESOURCE_EXHAUSTED',
+                ],
+            ], 429),
+        ]);
+
+        $this->app->bind(ChatbotServiceInterface::class, fn () => new GeminiChatbotProvider(
+            'test-key',
+            'gemini-2.5-flash',
+            'https://generativelanguage.googleapis.com/v1beta/models'
+        ));
+
+        $response = $this->postJson('/api/chatbot/message', ['message' => 'halo']);
+
+        $response->assertStatus(503)
+            ->assertJsonPath('message', 'Kuota penggunaan AI harian sudah tercapai. Silakan coba lagi besok.');
+    }
+
+    public function test_chatbot_returns_503_when_gemini_returns_500(): void
+    {
+        Http::fake([
+            'generativelanguage.googleapis.com/*' => Http::response([
+                'error' => 'internal error',
+            ], 500),
+        ]);
+
+        $this->app->bind(ChatbotServiceInterface::class, fn () => new GeminiChatbotProvider(
+            'test-key',
+            'gemini-2.5-flash',
+            'https://generativelanguage.googleapis.com/v1beta/models'
+        ));
+
+        $response = $this->postJson('/api/chatbot/message', ['message' => 'halo']);
+
+        $response->assertStatus(503)
+            ->assertJsonPath('retryable', true);
+    }
+
+    public function test_chatbot_falls_back_to_mock_when_no_provider_key(): void
+    {
+        config()->set('services.gemini.api_key', null);
+
+        $this->app->forgetInstance(ChatbotServiceInterface::class);
+
+        $response = $this->postJson('/api/chatbot/message', ['message' => 'halo']);
+
+        $response->assertOk()
+            ->assertJsonPath('data.reply', 'Halo! Saya Zakky, asisten virtual Zakat An-Nur (versi simulasi). Ada yang bisa saya bantu terkait informasi zakat?');
     }
 }

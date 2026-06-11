@@ -10,24 +10,20 @@
                     <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" /></svg>
                 </div>
                 <div>
-                    <h2 class="text-[1rem] sm:text-[1.08rem] font-semibold text-neutral-900">Grafik penerimaan harian</h2>
-                    <p class="hidden text-[11px] text-neutral-500 sm:block">Pola harian sebagai insight pendukung setelah ringkasan utama.</p>
+                    <h2 class="text-[1rem] sm:text-[1.08rem] font-semibold text-slate-900">Grafik penerimaan harian</h2>
+                    <p class="hidden text-[11px] text-slate-500 sm:block">Pola harian sebagai insight pendukung setelah ringkasan utama.</p>
                 </div>
             </div>
 
             <div class="public-chart-filter" role="tablist" aria-label="Filter grafik">
                 <button type="button" role="tab"
-                    :aria-selected="chartFilter === 'uang'"
-                    :class="chartFilter === 'uang' ? 'public-chart-filter-active' : 'public-chart-filter-inactive'"
-                    @click="setChartFilter('uang')">Uang</button>
+                    :aria-selected="chartSlide === 0"
+                    :class="chartSlide === 0 ? 'public-chart-filter-active' : 'public-chart-filter-inactive'"
+                    @click="setChartSlide(0)">Uang</button>
                 <button type="button" role="tab"
-                    :aria-selected="chartFilter === 'beras'"
-                    :class="chartFilter === 'beras' ? 'public-chart-filter-active' : 'public-chart-filter-inactive'"
-                    @click="setChartFilter('beras')">Beras</button>
-                <button type="button" role="tab"
-                    :aria-selected="chartFilter === 'semua'"
-                    :class="chartFilter === 'semua' ? 'public-chart-filter-active' : 'public-chart-filter-inactive'"
-                    @click="setChartFilter('semua')">Semua</button>
+                    :aria-selected="chartSlide === 1"
+                    :class="chartSlide === 1 ? 'public-chart-filter-active' : 'public-chart-filter-inactive'"
+                    @click="setChartSlide(1)">Beras</button>
             </div>
 
             <span class="public-pill public-pill-brand hidden px-3 py-1 text-[10px] tracking-[0.08em] sm:inline-flex" x-text="dailyChartData.range?.label || ''"></span>
@@ -54,34 +50,26 @@
             </div>
         </div>
 
-        <div class="space-y-3">
-            <div x-show="chartFilter !== 'beras'" x-transition.opacity.duration.300ms
-                class="public-chart-card">
-                <div class="public-chart-card-head">
-                    <span class="public-chart-card-title">
-                        <span class="h-1.5 w-1.5 rounded-full bg-emerald-500"></span>
-                        Grafik Penerimaan Uang
-                    </span>
-                    <span class="public-chart-card-meta" id="chart-uang-range"></span>
-                </div>
-                <div class="h-[240px] w-full sm:h-[280px] relative">
-                    <canvas id="dailyChartUang"></canvas>
-                </div>
+        <div class="public-chart-card">
+            <div class="public-chart-card-head">
+                <span class="public-chart-card-title">
+                    <span class="h-1.5 w-1.5 rounded-full" :class="chartSlide === 0 ? 'bg-emerald-500' : 'bg-amber-500'"></span>
+                    <span x-text="chartSlide === 0 ? 'Grafik Penerimaan Uang' : 'Grafik Penerimaan Beras'"></span>
+                </span>
+                <span class="public-chart-card-meta" id="chart-range-label"></span>
             </div>
+            <div class="h-[340px] sm:h-[400px] w-full relative">
+                <canvas id="dailyChart"></canvas>
+            </div>
+        </div>
 
-            <div x-show="chartFilter !== 'uang'" x-transition.opacity.duration.300ms
-                class="public-chart-card">
-                <div class="public-chart-card-head">
-                    <span class="public-chart-card-title">
-                        <span class="h-1.5 w-1.5 rounded-full bg-amber-500"></span>
-                        Grafik Penerimaan Beras
-                    </span>
-                    <span class="public-chart-card-meta" id="chart-beras-range"></span>
-                </div>
-                <div class="h-[240px] w-full sm:h-[280px] relative">
-                    <canvas id="dailyChartBeras"></canvas>
-                </div>
-            </div>
+        <div class="public-chart-dots" role="tablist" aria-label="Navigasi slide grafik">
+            <template x-for="(dot, i) in [0,1]" :key="`dot-${i}`">
+                <button type="button" role="tab"
+                    :aria-selected="chartSlide === i"
+                    :class="chartSlide === i ? 'public-chart-dot-active' : 'public-chart-dot-inactive'"
+                    @click="setChartSlide(i)"></button>
+            </template>
         </div>
     </div>
 </div>

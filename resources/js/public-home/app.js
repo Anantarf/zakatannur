@@ -30,7 +30,8 @@ const initialState = (config) => ({
     clock: '',
     chartTimeouts: [],
     carouselIndex: 0,
-    chartFilter: 'semua',
+    chartSlide: 0,
+    chartSlideInterval: null,
     carouselImages: [
         '/images/beranda_annur_new.webp',
         '/images/dokumentasi_1.webp',
@@ -66,13 +67,26 @@ export const createPublicHomeApp = (config, chartService) => {
             this.clock = `${d.weekday}, ${d.day} ${d.month} ${d.year} ${d.hour}:${d.minute}:${d.second} WIB`;
         },
 
-        setChartFilter(filter) {
-            if (this.chartFilter === filter) {
+        setChartSlide(index) {
+            const total = 2;
+            const next = ((index % total) + total) % total;
+            if (this.chartSlide === next) {
+                this.resetChartSlideInterval();
                 return;
             }
 
-            this.chartFilter = filter;
-            chartService.applyFilter(filter);
+            this.chartSlide = next;
+            chartService.setSlide(next);
+            this.resetChartSlideInterval();
+        },
+
+        resetChartSlideInterval() {
+            if (this.chartSlideInterval) {
+                clearInterval(this.chartSlideInterval);
+            }
+            this.chartSlideInterval = setInterval(() => {
+                this.setChartSlide(this.chartSlide + 1);
+            }, 15000);
         },
 
         initTimers() {
@@ -120,7 +134,8 @@ export const createPublicHomeApp = (config, chartService) => {
                     this.loadChartJs().then((success) => {
                         if (success) {
                             chartService.initDailyChart();
-                            chartService.applyFilter(this.chartFilter);
+                            chartService.setSlide(this.chartSlide);
+                            this.resetChartSlideInterval();
                         }
                     });
                 }
@@ -164,6 +179,7 @@ export const createPublicHomeApp = (config, chartService) => {
             this.resetIdle();
             this.initWatchers();
             this.initRealtime();
+            this.resetChartSlideInterval();
         },
     });
 };

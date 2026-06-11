@@ -12,14 +12,14 @@
     </x-slot>
 
     <div class="py-4 sm:py-10">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-4 sm:space-y-8">
-            <div class="grid grid-cols-1 gap-4 xl:grid-cols-[minmax(0,1.2fr)_minmax(300px,0.8fr)]">
-                <div class="ui-card-strong p-5 sm:p-6">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6 sm:space-y-8">
+            <div class="grid grid-cols-1 gap-6 xl:grid-cols-[minmax(0,1.2fr)_minmax(300px,0.8fr)]">
+                <div class="rounded-card border border-slate-200 bg-white p-5 shadow-premium transition-all duration-300 hover:shadow-premium-hover sm:p-6 ring-1 ring-slate-200/60">
                     <div class="flex flex-col gap-5 sm:flex-row sm:items-start sm:justify-between">
                         <div class="space-y-2">
-                            <p class="text-[11px] font-black uppercase tracking-[0.24em] text-emerald-700">Overview</p>
-                            <h3 class="text-xl font-black leading-tight text-slate-950 sm:text-[1.7rem]">Manajemen Operasional Zakat</h3>
-                            <p class="max-w-2xl text-sm leading-6 text-slate-500">Kelola transaksi, pantau metrik penerimaan hari ini, dan akses aksi operasional dengan cepat dari satu tempat.</p>
+                            <p class="ui-kicker">Overview</p>
+                            <h3 class="text-xl font-black leading-tight text-slate-900 sm:text-[1.7rem]">Manajemen Operasional Zakat</h3>
+                            <p class="max-w-2xl text-sm leading-6 text-slate-600">Kelola transaksi, pantau metrik penerimaan hari ini, dan akses aksi operasional dengan cepat dari satu tempat.</p>
                         </div>
                         <div class="flex flex-wrap gap-2">
                             <a href="{{ route('internal.transactions.create') }}" class="ui-btn ui-btn-primary w-full sm:w-auto">Input Transaksi</a>
@@ -27,23 +27,23 @@
                         </div>
                     </div>
 
-                    <div class="mt-5 grid grid-cols-1 gap-3 sm:grid-cols-3">
-                        <div class="ui-kpi-card">
-                            <p class="ui-kpi-label">Total Transaksi</p>
-                            <p class="ui-kpi-value">{{ number_format($payload['totals']['jumlah_transaksi'] ?? 0, 0, ',', '.') }}</p>
-                            <p class="ui-kpi-note">Jumlah transaksi yang tampil di ringkasan dashboard.</p>
+                    <div class="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-3">
+                        <div class="rounded-2xl border border-slate-200 bg-slate-50 p-4 transition-all duration-300 hover:bg-slate-100">
+                            <p class="text-xs font-black uppercase tracking-wider text-slate-500">Total Transaksi</p>
+                            <p class="mt-2 text-3xl font-black tracking-tight text-slate-900">{{ number_format($payload['totals']['jumlah_transaksi'] ?? 0, 0, ',', '.') }}</p>
+                            <p class="mt-2 text-[11px] leading-relaxed text-slate-500">Jumlah transaksi yang tampil di ringkasan dashboard.</p>
                         </div>
-                        <div class="ui-kpi-card">
-                            <p class="ui-kpi-label">Transaksi Hari Ini</p>
-                            <p class="ui-kpi-value">{{ number_format($workspace['today_count'] ?? 0, 0, ',', '.') }}</p>
-                            <p class="ui-kpi-note">Transaksi valid yang tercatat hari ini.</p>
+                        <div class="rounded-2xl border border-slate-200 bg-slate-50 p-4 transition-all duration-300 hover:bg-slate-100">
+                            <p class="text-xs font-black uppercase tracking-wider text-slate-500">Transaksi Hari Ini</p>
+                            <p class="mt-2 text-3xl font-black tracking-tight text-emerald-400">{{ number_format($workspace['today_count'] ?? 0, 0, ',', '.') }}</p>
+                            <p class="mt-2 text-[11px] leading-relaxed text-slate-500">Transaksi valid yang tercatat hari ini.</p>
                         </div>
-                        <div class="ui-kpi-card">
-                            <p class="ui-kpi-label">Transaksi Terakhir</p>
-                            <p class="mt-2 text-lg font-black tracking-[-0.02em] text-slate-900">
+                        <div class="rounded-2xl border border-slate-200 bg-slate-50 p-4 transition-all duration-300 hover:bg-slate-100">
+                            <p class="text-xs font-black uppercase tracking-wider text-slate-500">Transaksi Terakhir</p>
+                            <p class="mt-2 text-xl font-black tracking-tight text-slate-900">
                                 {{ ($workspace['latest_transaction_at'] ?? null)?->format('d/m/Y H:i') ?? '-' }}
                             </p>
-                            <p class="ui-kpi-note">Waktu transaksi terbaru yang tercatat di sistem.</p>
+                            <p class="mt-2 text-[11px] leading-relaxed text-slate-500">Waktu transaksi terbaru yang tercatat di sistem.</p>
                         </div>
                     </div>
                 </div>
@@ -68,7 +68,7 @@
             </div>
 
             <!-- Daily Trend Chart -->
-            <div class="bg-white rounded-2xl shadow-md border border-gray-100 overflow-hidden">
+            <div class="ui-card overflow-hidden !p-0">
                 <div class="px-4 sm:px-6 py-3 sm:py-4 border-b border-gray-50 flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4">
                     <div class="flex items-center gap-2 flex-wrap">
                         <div class="w-1.5 h-5 sm:w-2 sm:h-6 bg-emerald-500 rounded-full flex-shrink-0"></div>
@@ -113,7 +113,7 @@
             </div>
 
             <!-- Rekap Table Section -->
-            <div class="bg-white rounded-2xl shadow-md border border-gray-100 overflow-hidden">
+            <div class="ui-card overflow-hidden !p-0">
                 <div class="px-4 sm:px-6 py-3 sm:py-4 border-b border-gray-50 flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4">
                     <div class="flex items-center gap-2">
                         <div class="w-1.5 h-5 sm:w-2 sm:h-6 bg-emerald-500 rounded-full"></div>
@@ -172,7 +172,7 @@
             </div>
 
             <!-- Latest Transactions Section -->
-            <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+            <div class="ui-card overflow-hidden !p-0">
                 <div class="px-4 sm:px-6 py-3 sm:py-4 border-b border-gray-50 flex items-center justify-between">
                     <div class="flex items-center gap-2">
                         <div class="w-1.5 h-5 sm:w-2 sm:h-6 bg-blue-500 rounded-full"></div>
@@ -300,7 +300,7 @@
                     scales: {
                         y: {
                             beginAtZero: true,
-                            grid: { color: 'rgba(226, 232, 240, 0.55)', drawBorder: false },
+                            grid: { display: false },
                             ticks: {
                                 stepSize: 1,
                                 color: '#334155',

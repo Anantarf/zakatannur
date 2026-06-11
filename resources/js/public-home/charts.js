@@ -41,8 +41,46 @@ const formatBerasCompact = (value) => {
 
 const sumRange = (values) => values.reduce((acc, v) => acc + (Number(v) || 0), 0);
 
-const buildLineConfig = ({ canvasId, type, config, palette }) => {
-    const canvas = document.getElementById(canvasId);
+const PALETTES = {
+    uang: {
+        type: 'uang',
+        border: '#10b981',
+        fillFrom: 'rgba(16, 185, 129, 0.32)',
+        fillTo: 'rgba(16, 185, 129, 0)',
+        pointFill: '#10b981',
+        pointDim: 'rgba(16, 185, 129, 0.35)',
+        labelColor: '#047857',
+        borderLabel: 'rgba(16, 185, 129, 0.45)',
+        axisColor: '#334155',
+        axisColorSecondary: '#94a3b8',
+        gridColor: 'rgba(226, 232, 240, 0.6)',
+        tickFormatter: (v) => formatRupiahCompact(v),
+        datalabelFormatter: (v) => formatRupiahCompact(v),
+        label: 'Uang Zakat',
+        yStep: 1000000,
+        yFloor: 1,
+    },
+    beras: {
+        type: 'beras',
+        border: '#f59e0b',
+        fillFrom: 'rgba(245, 158, 11, 0.30)',
+        fillTo: 'rgba(245, 158, 11, 0)',
+        pointFill: '#f59e0b',
+        pointDim: 'rgba(245, 158, 11, 0.35)',
+        labelColor: '#b45309',
+        borderLabel: 'rgba(245, 158, 11, 0.45)',
+        axisColor: '#92400e',
+        axisColorSecondary: '#94a3b8',
+        gridColor: 'rgba(226, 232, 240, 0.6)',
+        tickFormatter: (v) => v + ' Kg',
+        datalabelFormatter: (v) => formatBerasCompact(v),
+        label: 'Beras Zakat',
+        yStep: 25,
+        yFloor: 1,
+    },
+};
+
+const buildChart = (canvas, type, config, palette) => {
     if (!canvas || typeof Chart === 'undefined') {
         return null;
     }
@@ -61,7 +99,7 @@ const buildLineConfig = ({ canvasId, type, config, palette }) => {
     const data = dailyDatasetValues(config.dailyChartData, type);
     const labels = dailyLabels(config.dailyChartData);
 
-    const gradient = ctx.createLinearGradient(0, 0, 0, 280);
+    const gradient = ctx.createLinearGradient(0, 0, 0, 380);
     gradient.addColorStop(0, palette.fillFrom);
     gradient.addColorStop(1, palette.fillTo);
 
@@ -79,7 +117,6 @@ const buildLineConfig = ({ canvasId, type, config, palette }) => {
                     borderColor: palette.border,
                     backgroundColor: gradient,
                     borderWidth: 3,
-                    borderDash: palette.dash || undefined,
                     fill: true,
                     tension: 0.36,
                     pointBackgroundColor: pointColors,
@@ -89,17 +126,17 @@ const buildLineConfig = ({ canvasId, type, config, palette }) => {
                     pointHoverRadius: 7,
                     datalabels: {
                         display: (c) => Number(c.dataset.data[c.dataIndex]) > 0,
-                        align: palette.dash ? 'bottom' : 'top',
-                        anchor: palette.dash ? 'start' : 'end',
+                        align: 'top',
+                        anchor: 'end',
                         offset: 6,
                         color: palette.labelColor,
                         backgroundColor: 'rgba(255, 255, 255, 0.92)',
-                        borderColor: palette.border,
+                        borderColor: palette.borderLabel,
                         borderWidth: 1,
                         borderRadius: 6,
                         padding: { top: 3, bottom: 3, left: 6, right: 6 },
                         font: { family: publicChartFont, weight: '700', size: 10 },
-                        formatter: (value) => (type === 'uang' ? formatRupiahCompact(value) : formatBerasCompact(value)),
+                        formatter: (value) => palette.datalabelFormatter(value),
                         clamp: true,
                     },
                 },
@@ -109,18 +146,18 @@ const buildLineConfig = ({ canvasId, type, config, palette }) => {
             responsive: true,
             maintainAspectRatio: false,
             interaction: { mode: 'index', intersect: false },
-            animation: { duration: 950, easing: 'easeOutQuart' },
-            layout: { padding: { top: 32, right: 18, bottom: 6, left: 4 } },
+            animation: { duration: 1100, easing: 'easeOutQuart' },
+            layout: { padding: { top: 40, right: 20, bottom: 8, left: 4 } },
             scales: {
                 y: {
                     beginAtZero: true,
-                    suggestedMax: type === 'uang' ? dailySuggestedMax(data, 1, 1000000) : dailySuggestedMax(data, 1, 25),
-                    grid: { color: 'rgba(226, 232, 240, 0.6)', drawBorder: false },
+                    suggestedMax: dailySuggestedMax(data, palette.yFloor, palette.yStep),
+                    grid: { color: palette.gridColor, drawBorder: false },
                     ticks: {
                         font: { family: publicChartFont, weight: '600', size: 11 },
                         color: palette.axisColor,
                         padding: 8,
-                        callback: (v) => (type === 'uang' ? formatRupiahCompact(v) : v + ' Kg'),
+                        callback: (v) => palette.tickFormatter(v),
                     },
                 },
                 x: {
@@ -157,7 +194,7 @@ const buildLineConfig = ({ canvasId, type, config, palette }) => {
                             }
                             return ' ' + new Intl.NumberFormat('id-ID', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(c.parsed.y || 0) + ' Kg';
                         },
-                        afterBody: (items) => {
+                        afterBody: () => {
                             const total = sumRange(data);
                             const max = Math.max(...data, 0);
                             const avg = data.length ? total / data.length : 0;
@@ -183,8 +220,8 @@ const buildLineConfig = ({ canvasId, type, config, palette }) => {
 };
 
 export const createChartService = (config) => {
-    let uangChart = null;
-    let berasChart = null;
+    let dailyChart = null;
+    let dailyChartType = 'uang';
     let historicalChart = null;
     let scanTimeout = null;
 
@@ -195,94 +232,61 @@ export const createChartService = (config) => {
         }
     };
 
-    const uangPalette = {
-        label: 'Uang Zakat',
-        border: '#10b981',
-        fillFrom: 'rgba(16, 185, 129, 0.32)',
-        fillTo: 'rgba(16, 185, 129, 0)',
-        pointFill: '#10b981',
-        pointDim: 'rgba(16, 185, 129, 0.35)',
-        labelColor: '#047857',
-        axisColor: '#334155',
-    };
-
-    const berasPalette = {
-        label: 'Beras Zakat',
-        border: '#f59e0b',
-        fillFrom: 'rgba(245, 158, 11, 0.22)',
-        fillTo: 'rgba(245, 158, 11, 0)',
-        pointFill: '#f59e0b',
-        pointDim: 'rgba(245, 158, 11, 0.35)',
-        labelColor: '#b45309',
-        axisColor: '#92400e',
-        dash: [6, 4],
-    };
-
     return {
         updateDailyChart(newData) {
-            const uangData = dailyDatasetValues(newData, 'uang');
-            const berasData = dailyDatasetValues(newData, 'beras');
-            const labels = dailyLabels(newData);
-
-            if (uangChart) {
-                uangChart.data.labels = labels;
-                uangChart.data.datasets[0].data = uangData;
-                uangChart.options.scales.y.suggestedMax = dailySuggestedMax(uangData, 1, 1000000);
-                uangChart.update();
+            if (!newData) {
+                return;
             }
 
-            if (berasChart) {
-                berasChart.data.labels = labels;
-                berasChart.data.datasets[0].data = berasData;
-                berasChart.options.scales.y.suggestedMax = dailySuggestedMax(berasData, 1, 25);
-                berasChart.update();
+            const data = dailyDatasetValues(newData, dailyChartType);
+            const labels = dailyLabels(newData);
+
+            if (dailyChart) {
+                dailyChart.data.labels = labels;
+                dailyChart.data.datasets[0].data = data;
+                const palette = PALETTES[dailyChartType];
+                dailyChart.options.scales.y.suggestedMax = dailySuggestedMax(data, palette.yFloor, palette.yStep);
+                dailyChart.update();
             }
         },
 
         initDailyChart() {
-            uangChart = buildLineConfig({ canvasId: 'dailyChartUang', type: 'uang', config, palette: uangPalette });
-            berasChart = buildLineConfig({ canvasId: 'dailyChartBeras', type: 'beras', config, palette: berasPalette });
+            const canvas = document.getElementById('dailyChart');
+            if (!canvas) {
+                return;
+            }
+
+            dailyChartType = 'uang';
+            dailyChart = buildChart(canvas, dailyChartType, config, PALETTES[dailyChartType]);
 
             const rangeLabel = config.dailyChartData?.range?.label || '';
-            const uangRange = document.getElementById('chart-uang-range');
-            const berasRange = document.getElementById('chart-beras-range');
-            if (uangRange) {
-                uangRange.textContent = rangeLabel;
-            }
-            if (berasRange) {
-                berasRange.textContent = rangeLabel;
+            const rangeEl = document.getElementById('chart-range-label');
+            if (rangeEl) {
+                rangeEl.textContent = rangeLabel;
             }
 
             clearScanTimeout();
         },
 
+        setSlide(slideIndex) {
+            const type = slideIndex === 1 ? 'beras' : 'uang';
+            if (type === dailyChartType && dailyChart) {
+                return;
+            }
+
+            dailyChartType = type;
+            const canvas = document.getElementById('dailyChart');
+            dailyChart = buildChart(canvas, type, config, PALETTES[type]);
+        },
+
         getDailyChart() {
-            return uangChart || berasChart;
-        },
-
-        getUangChart() {
-            return uangChart;
-        },
-
-        getBerasChart() {
-            return berasChart;
+            return dailyChart;
         },
 
         clearScanTimeout,
 
-        applyFilter(filter) {
-            // Both charts render their own canvas; visibility is handled by Alpine x-show.
-            // This method stays for API compatibility and re-fits axis when data updates.
-            if (uangChart) {
-                const data = uangChart.data.datasets[0].data;
-                uangChart.options.scales.y.suggestedMax = dailySuggestedMax(data, 1, 1000000);
-                uangChart.update();
-            }
-            if (berasChart) {
-                const data = berasChart.data.datasets[0].data;
-                berasChart.options.scales.y.suggestedMax = dailySuggestedMax(data, 1, 25);
-                berasChart.update();
-            }
+        applyFilter(slideIndex) {
+            this.setSlide(slideIndex);
         },
 
         autoHover(chart) {

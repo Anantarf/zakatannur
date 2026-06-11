@@ -154,6 +154,10 @@ class ZakatService
     private function performSync(array $data, array $items, int $petugasId, Carbon $waktuTerima, ?string $noTransaksiOverride): array
     {
         $lockName = 'sync_tx_' . $waktuTerima->format('Ymd');
+
+        // NOTE: Cache::lock only serializes within a single host for file/database drivers.
+        // For multi-host deployments, set CACHE_DRIVER=redis in .env so this lock is shared.
+        // See .env.example for the full multi-host caveat.
         $lock = Cache::lock($lockName, (int) config('zakat.cache.lock_timeout_seconds', 30));
 
         try {

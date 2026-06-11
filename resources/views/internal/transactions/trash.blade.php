@@ -58,7 +58,7 @@
 
             {{-- Trash Table --}}
             <div class="ui-card overflow-hidden">
-                <div class="ui-card-header ui-card-header-neutral">
+                <div class="ui-card-header ui-card-header-slate">
                     <div class="h-6 w-2 rounded-full bg-red-400"></div>
                     <h3 class="font-bold text-gray-800">Transaksi Terhapus</h3>
                 </div>
@@ -266,7 +266,7 @@
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
                                             </svg>
                                             <span class="text-sm font-medium text-gray-400">
-                                                {{ ($q ?? '') ? 'Data tidak ditemukan.' : 'Sampah kosong — semua transaksi aman.' }}
+                                                {{ ($q ?? '') ? 'Data tidak ditemukan.' : 'Sampah kosong â€” semua transaksi aman.' }}
                                             </span>
                                         </div>
                                     </td>

@@ -24,11 +24,26 @@ class ChatbotController extends Controller
 
         try {
             $reply = $this->chatbotService->sendMessage($request->message);
-            
+
+            $wasFallback = method_exists($this->chatbotService, 'wasLastReplyFallback')
+                && $this->chatbotService->wasLastReplyFallback();
+
+            $cleanReply = $wasFallback && str_starts_with($reply, ChatbotServiceInterface::FALLBACK_PREFIX)
+                ? substr($reply, strlen(ChatbotServiceInterface::FALLBACK_PREFIX))
+                : $reply;
+
+            if ($wasFallback) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => $cleanReply,
+                    'retryable' => true,
+                ], 503);
+            }
+
             return response()->json([
                 'status' => 'success',
                 'data' => [
-                    'reply' => $reply
+                    'reply' => $cleanReply,
                 ]
             ]);
         } catch (\Throwable $e) {
@@ -38,7 +53,8 @@ class ChatbotController extends Controller
 
             return response()->json([
                 'status' => 'error',
-                'message' => 'Gagal memproses pesan. Silakan coba beberapa saat lagi.'
+                'message' => 'Gagal memproses pesan. Silakan coba beberapa saat lagi.',
+                'retryable' => true,
             ], 500);
         }
     }

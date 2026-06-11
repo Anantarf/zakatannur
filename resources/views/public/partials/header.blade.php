@@ -1,4 +1,4 @@
-<header class="mx-auto w-full max-w-6xl">
+<header class="ui-page-container">
     <div class="public-header-shell">
         <div class="grid grid-cols-1 items-stretch gap-4 lg:grid-cols-2">
             <div class="flex flex-col justify-center">
@@ -7,7 +7,7 @@
                 <div class="public-header-meta">
                     <span class="public-header-location">Komplek BPK V Gandul</span>
                     <span class="public-header-divider"></span>
-                    <span class="text-neutral-500">Laporan penerimaan zakat real-time yang transparan dan akuntabel.</span>
+                    <span class="text-slate-500">Laporan penerimaan zakat real-time yang transparan dan akuntabel.</span>
                 </div>
             </div>
 

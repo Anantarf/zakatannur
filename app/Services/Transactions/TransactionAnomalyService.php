@@ -16,31 +16,21 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
+use Illuminate\Support\Facades\Lang;
 
 class TransactionAnomalyService
 {
-    private const FLAG_META = [
-        'exact_duplicate' => [
-            'label' => 'Potensi transaksi ganda',
-            'summary' => 'Sistem menemukan transaksi lain yang sangat mirip dalam waktu berdekatan.',
-            'next_step' => 'Cek apakah ini transaksi dobel atau memang pembayaran terpisah.',
-        ],
-        'updated_after_receipt_printed' => [
-            'label' => 'Diubah setelah kwitansi tercetak',
-            'summary' => 'Data transaksi berubah setelah bukti cetak pernah keluar.',
-            'next_step' => 'Pastikan perubahan sah dan tidak menimbulkan selisih dengan bukti yang sudah beredar.',
-        ],
-        'significant_nominal_change' => [
-            'label' => 'Perubahan nominal signifikan',
-            'summary' => 'Total uang atau beras pada grup transaksi berubah cukup besar.',
-            'next_step' => 'Bandingkan nilai lama dan baru, lalu pastikan perubahan sesuai kebutuhan lapangan.',
-        ],
-        'statistical_outlier' => [
-            'label' => 'Outlier statistik',
-            'summary' => 'Nominal transaksi jauh di atas rata-rata kebiasaan penerimaan.',
-            'next_step' => 'Verifikasi apakah ada kesalahan ketik (typo) angka nol atau jamaah memang membayar dalam jumlah besar.',
-        ],
-    ];
+    /**
+     * Resolve flag metadata (label, summary, next_step) from lang files.
+     * Source of truth: lang/{locale}/anomaly.php under key 'flags'.
+     *
+     * @return array<string, array{label: string, summary: string, next_step: string}>
+     */
+    private static function flagMeta(): array
+    {
+        return (array) Lang::get('anomaly.flags', []);
+    }
+
 
     public function __construct(
         private GroupedTransactionQueryService $groupedQueryService,
@@ -59,7 +49,7 @@ class TransactionAnomalyService
             'scope' => ['nullable', 'string', Rule::in(['active', 'archived'])],
             'risk_level' => ['nullable', 'string', Rule::in(TransactionRiskReview::LEVELS)],
             'review_status' => ['nullable', 'string', Rule::in(TransactionRiskReview::REVIEW_STATUSES)],
-            'flag_type' => ['nullable', 'string', Rule::in(array_keys(self::FLAG_META))],
+            'flag_type' => ['nullable', 'string', Rule::in(array_keys(self::flagMeta()))],
             'petugas_id' => ['nullable', 'integer', 'exists:users,id'],
         ])->validate();
 
@@ -151,7 +141,7 @@ class TransactionAnomalyService
             'totalBeras' => (float) $transactions->where('metode', ZakatTransaction::METHOD_BERAS)->sum('jumlah_beras_kg'),
             'riskReview' => $riskReview,
             'riskMeta' => $riskMeta,
-            'flagMeta' => self::FLAG_META,
+            'flagMeta' => self::flagMeta(),
             'reviewStatuses' => TransactionRiskReview::REVIEW_STATUSES,
             'receiptPrintedAt' => $receiptPrintedAt ? Carbon::parse($receiptPrintedAt) : null,
             'receiptPrintedByName' => $receiptPrintedBy ? User::query()->find($receiptPrintedBy)?->name : null,
@@ -160,14 +150,14 @@ class TransactionAnomalyService
 
     public static function flagLabels(): array
     {
-        return collect(self::FLAG_META)
+        return collect(self::flagMeta())
             ->mapWithKeys(fn (array $meta, string $flag) => [$flag => $meta['label']])
             ->all();
     }
 
-    public static function flagMeta(): array
+    public static function flagMetaPublic(): array
     {
-        return self::FLAG_META;
+        return self::flagMeta();
     }
 
     private function overview(array $filters): array
@@ -228,7 +218,7 @@ class TransactionAnomalyService
                 $query->where('risk_reviews.review_severity', $this->reviewAssistantService->sqlReviewSeverity($reviewStatus));
             })
             ->when($matchingGroupNos !== null, function (Builder $query) use ($matchingGroupNos) {
-                $query->whereIn('zakat_transactions.no_transaksi', $matchingGroupNos === [] ? ['__no_matching_group__'] : $matchingGroupNos);
+                $matchingGroupNos === [] ? $query->whereRaw('1 = 0') : $query->whereIn('zakat_transactions.no_transaksi', $matchingGroupNos);
             })
             ->groupBy('no_transaksi');
     }

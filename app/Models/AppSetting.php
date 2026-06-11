@@ -25,43 +25,42 @@ class AppSetting extends Model
         'value',
     ];
 
-    protected static array $settingCache = [];
-
+    /**
+     * Read an app setting string from the configured cache store (typically file/redis).
+     *
+     * We intentionally do NOT keep an in-process static cache here: in long-running
+     * contexts (queue workers, scheduler) another process could update the row and
+     * call clearCache(), and a stale static copy would desync. Cache::remember is
+     * already fast and shared across the whole process pool.
+     */
     public static function getString(string $key, ?string $default = null): ?string
     {
-        if (isset(self::$settingCache[$key])) {
-            return self::$settingCache[$key];
-        }
-
-        $value = Cache::remember(self::cacheKeyForSetting($key), (int) config('zakat.cache.app_settings_ttl', 3600), function () use ($key, $default) {
-            $row = self::query()->where('key', $key)->first();
-            return $row ? (string) $row->value : $default;
-        });
-
-        self::$settingCache[$key] = $value;
-        return $value;
+        return Cache::remember(
+            self::cacheKeyForSetting($key),
+            (int) config('zakat.cache.app_settings_ttl', 3600),
+            function () use ($key, $default) {
+                $row = self::query()->where('key', $key)->first();
+                return $row ? (string) $row->value : $default;
+            }
+        );
     }
 
     public static function clearCache(?string $key = null): void
     {
         if ($key !== null) {
             Cache::forget(self::cacheKeyForSetting($key));
-            unset(self::$settingCache[$key]);
-        } else {
-            foreach (array_keys(self::$settingCache) as $k) {
-                Cache::forget(self::cacheKeyForSetting($k));
-            }
-            Cache::forget(self::cacheKeyForSetting(self::KEY_ACTIVE_YEAR));
-            Cache::forget(self::cacheKeyForSetting(self::KEY_ACTIVE_ZAKAT_PERIOD_ID));
-            Cache::forget(self::cacheKeyForSetting(self::KEY_PUBLIC_REFRESH_INTERVAL_SECONDS));
-            Cache::forget(self::cacheKeyForSetting(self::KEY_DASHBOARD_CHART_MODE));
-            Cache::forget(self::cacheKeyForSetting(self::KEY_DASHBOARD_CHART_PERIOD_ID));
-            Cache::forget(self::cacheKeyForSetting(self::KEY_DASHBOARD_CHART_STARTS_AT));
-            Cache::forget(self::cacheKeyForSetting(self::KEY_DASHBOARD_CHART_ENDS_AT));
-            Cache::forget(self::cacheKeyForSetting(self::KEY_DASHBOARD_CHART_SHOW_OFFSEASON_ARCHIVE));
-            Cache::forget(self::cacheKeyForSetting(self::KEY_DASHBOARD_CHART_AUTO_SWITCH_ON_NEW_ACTIVE_PERIOD));
-            self::$settingCache = [];
+            return;
         }
+
+        Cache::forget(self::cacheKeyForSetting(self::KEY_ACTIVE_YEAR));
+        Cache::forget(self::cacheKeyForSetting(self::KEY_ACTIVE_ZAKAT_PERIOD_ID));
+        Cache::forget(self::cacheKeyForSetting(self::KEY_PUBLIC_REFRESH_INTERVAL_SECONDS));
+        Cache::forget(self::cacheKeyForSetting(self::KEY_DASHBOARD_CHART_MODE));
+        Cache::forget(self::cacheKeyForSetting(self::KEY_DASHBOARD_CHART_PERIOD_ID));
+        Cache::forget(self::cacheKeyForSetting(self::KEY_DASHBOARD_CHART_STARTS_AT));
+        Cache::forget(self::cacheKeyForSetting(self::KEY_DASHBOARD_CHART_ENDS_AT));
+        Cache::forget(self::cacheKeyForSetting(self::KEY_DASHBOARD_CHART_SHOW_OFFSEASON_ARCHIVE));
+        Cache::forget(self::cacheKeyForSetting(self::KEY_DASHBOARD_CHART_AUTO_SWITCH_ON_NEW_ACTIVE_PERIOD));
     }
 
     public static function getInt(string $key, ?int $default = null): ?int
@@ -98,7 +97,7 @@ class AppSetting extends Model
             return $default;
         }
 
-        // Keputusan produk: 0 = off; selain itu 10–60 detik.
+        // Keputusan produk: 0 = off; selain itu 10-60 detik.
         if ($value === 0) {
             return 0;
         }

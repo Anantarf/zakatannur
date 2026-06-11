@@ -96,7 +96,7 @@
                 </div>
 
                 <div class="ui-card overflow-hidden shadow-md">
-                <div class="ui-card-header ui-card-header-neutral">
+                <div class="ui-card-header ui-card-header-slate">
                     <div>
                         <div class="text-sm font-black text-slate-900">Daftar Versi</div>
                         <div class="mt-1 text-xs text-gray-600">Aktifkan tepat 1 template untuk dipakai saat cetak.</div>

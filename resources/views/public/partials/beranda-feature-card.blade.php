@@ -1,4 +1,4 @@
-<article class="public-shell flex flex-col justify-between p-5 transition-colors group hover:border-brand-200 hover:bg-white">
+<article class="public-shell hover-lift flex flex-col justify-between p-5 group">
     <div class="mb-4 flex h-10 w-10 items-center justify-center rounded-xl bg-brand-100 text-brand-700 shadow-sm transition-all group-hover:bg-brand-700 group-hover:text-white">
         @switch($icon)
             @case('people')
@@ -21,7 +21,7 @@
         @endswitch
     </div>
     <div>
-        <h4 class="text-[0.98rem] font-black tracking-[-0.015em] text-neutral-950 sm:text-[1.02rem]">{{ $title }}</h4>
-        <p class="mt-1.5 text-[13px] font-medium leading-relaxed text-neutral-600 sm:text-[13.5px]">{{ $description }}</p>
+        <h4 class="text-[0.98rem] font-black tracking-[-0.015em] text-slate-950 sm:text-[1.02rem]">{{ $title }}</h4>
+        <p class="mt-1.5 text-[13px] font-medium leading-relaxed text-slate-600 sm:text-[13.5px]">{{ $description }}</p>
     </div>
 </article>
