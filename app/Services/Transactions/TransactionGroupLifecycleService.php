@@ -107,6 +107,11 @@ class TransactionGroupLifecycleService
             ->orderBy('id')
             ->get();
 
+        $restoredTransactions->each(function (ZakatTransaction $transaction): void {
+            $transaction->setAttribute('anomaly_context', [
+                'restored_after_delete' => true,
+            ]);
+        });
         $this->reviewAssistantService->syncForTransactions($restoredTransactions);
 
         return [

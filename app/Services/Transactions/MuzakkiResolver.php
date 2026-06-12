@@ -18,12 +18,22 @@ class MuzakkiResolver
 
     public function resolvePayer(array $data): Muzakki
     {
-        return Muzakki::firstOrCreateNormalized($this->payerData($data));
+        $payerData = $this->payerData($data);
+        return app(\App\Services\Muzakki\MuzakkiProfileBuilderService::class)->resolveProfile(
+            $payerData['muzakki_name'],
+            $payerData['muzakki_phone'],
+            $payerData['muzakki_address']
+        );
     }
 
     public function resolveItem(array $item, array $payerData): Muzakki
     {
-        return Muzakki::firstOrCreateNormalized($this->itemData($item, $payerData));
+        $itemData = $this->itemData($item, $payerData);
+        return app(\App\Services\Muzakki\MuzakkiProfileBuilderService::class)->resolveProfile(
+            $itemData['muzakki_name'],
+            $itemData['muzakki_phone'],
+            $itemData['muzakki_address']
+        );
     }
 
     /** @return array{muzakki_name:string,muzakki_phone:string,muzakki_address:string} */

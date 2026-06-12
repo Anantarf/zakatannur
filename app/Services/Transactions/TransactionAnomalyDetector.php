@@ -2,6 +2,7 @@
 
 namespace App\Services\Transactions;
 
+use App\Models\TransactionRiskReview;
 use App\Models\ZakatTransaction;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
@@ -20,6 +21,11 @@ class TransactionAnomalyDetector
         $reasons = [];
         $context = (array) ($transaction->getAttribute('anomaly_context') ?? []);
 
+        if (($context['restored_after_delete'] ?? false) === true) {
+            $score += TransactionRiskReview::ANOMALY_FLAG_RESTORE_SCORE;
+            $flags[] = TransactionRiskReview::FLAG_RESTORED_AFTER_DELETE;
+            $reasons[] = 'Transaksi ini dipulihkan setelah dihapus, perlu diverifikasi ulang kelengkapan datanya.';
+        }
         if (($context['updated_after_receipt_printed'] ?? false) === true) {
             $score += 30;
             $flags[] = 'updated_after_receipt_printed';

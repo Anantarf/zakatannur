@@ -112,6 +112,8 @@ class ZakatTransactionController extends Controller
             abort(Response::HTTP_FORBIDDEN);
         }
 
+        $this->authorize('printReceipt', $tx);
+
         $template = ReceiptPdf::getActiveLetterheadTemplate();
         if (!$template) {
             return redirect()->route('internal.transactions.create')

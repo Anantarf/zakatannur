@@ -22,7 +22,7 @@
                 Amanah Dalam<br><span class="text-emerald-400">Mengelola Kebaikan.</span>
             </h2>
             <p class="mt-3 max-w-xl text-[13px] sm:text-[15px] font-medium leading-relaxed text-emerald-50/90">
-                Sistem manajemen zakat terintegrasi untuk memberikan kemudahan, keamanan, dan transparansi penuh kepada jamaah.
+                Penerimaan zakat tercatat real-time. Laporan terbuka untuk jamaah.
             </p>
         </div>
     </div>

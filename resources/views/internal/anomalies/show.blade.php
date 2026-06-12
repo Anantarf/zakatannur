@@ -106,7 +106,7 @@
                                                     </div>
                                                     <div class="grid gap-2 text-left text-xs text-gray-500 sm:text-right">
                                                         <span class="rounded-full border border-slate-200 bg-white px-3 py-1 font-semibold text-slate-700">{{ $candidate['time_diff_minutes'] ?? 0 }} menit</span>
-                                                        <span class="font-semibold text-gray-600">{{ str_replace('_', ' ', ucfirst($candidate['match_type'] ?? '')) }}</span>
+                                                        <span class="font-semibold text-gray-600">{{ \App\Models\TransactionRiskReview::flagLabel($candidate['match_type'] ?? null) }}</span>
                                                     </div>
                                                 </div>
                                             </div>

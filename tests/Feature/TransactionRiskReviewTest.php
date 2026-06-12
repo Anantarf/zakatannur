@@ -269,6 +269,17 @@ class TransactionRiskReviewTest extends TestCase
         $this->assertContains('updated_after_receipt_printed', $review->risk_flags ?? []);
     }
 
+    public function test_flag_label_helper_resolves_localized_text(): void
+    {
+        $app = app();
+        $app->setLocale('id');
+        $this->assertSame('Potensi transaksi ganda', TransactionRiskReview::flagLabel('exact_duplicate'));
+        $this->assertSame('Dipulihkan setelah dihapus', TransactionRiskReview::flagLabel('restored_after_delete'));
+        $this->assertSame('-', TransactionRiskReview::flagLabel(null));
+        $this->assertSame('-', TransactionRiskReview::flagLabel(''));
+        $this->assertSame('Unknown flag', TransactionRiskReview::flagLabel('unknown_flag'));
+    }
+
     public function test_restore_transaction_creates_warning_review(): void
     {
         $admin = User::factory()->create(['role' => User::ROLE_ADMIN]);

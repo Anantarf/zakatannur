@@ -271,10 +271,10 @@ class TransactionAnomalyService
                 return [
                     'primary_flag' => $primaryFlag,
                     'primary_flag_label' => $primaryFlag
-                        ? (self::flagLabels()[$primaryFlag] ?? str_replace('_', ' ', $primaryFlag))
+                        ? TransactionRiskReview::flagLabel($primaryFlag)
                         : '-',
                     'flag_labels' => $uniqueFlags
-                        ->map(fn (string $flag) => self::flagLabels()[$flag] ?? str_replace('_', ' ', $flag))
+                        ->map(fn (string $flag) => TransactionRiskReview::flagLabel($flag))
                         ->all(),
                     'flags_count' => $uniqueFlags->count(),
                     'flag_keys' => $uniqueFlags->all(),

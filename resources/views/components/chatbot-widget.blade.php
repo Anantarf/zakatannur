@@ -75,7 +75,7 @@
                 <x-zakat-avatar size="sm" variant="solid" class="mr-2" />
                 <div class="flex max-w-[85%] flex-col items-start">
                     <div class="rounded-2xl rounded-tl-none border border-slate-200/80 bg-white p-3 text-sm leading-relaxed text-slate-800 shadow-sm break-words whitespace-pre-wrap">
-                        Assalamu'alaikum! Saya <span class="font-semibold text-emerald-700">Zakky</span>, asisten virtual Zakat An-Nur. Ada yang bisa saya bantu terkait zakat, cara pembayaran, nishab, atau operasional masjid?
+                        Assalamu'alaikum. Saya <span class="font-semibold text-emerald-700">Zakky</span>, asisten Zakat An-Nur. Pilih topik di bawah atau tulis pertanyaan Anda.
                     </div>
                     <span class="mt-1 px-1 text-[10px] text-slate-400" x-text="formatTime(welcomeAt)"></span>
                 </div>

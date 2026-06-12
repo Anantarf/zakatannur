@@ -18,6 +18,17 @@ class TransactionRiskReview extends Model
     public const REVIEW_AMAN = 'aman';
     public const REVIEW_PERLU_TINDAK_LANJUT = 'perlu_tindak_lanjut';
 
+    public const FLAG_RESTORED_AFTER_DELETE = 'restored_after_delete';
+    public const FLAG_UPDATED_AFTER_RECEIPT_PRINTED = 'updated_after_receipt_printed';
+    public const FLAG_SIGNIFICANT_NOMINAL_CHANGE = 'significant_nominal_change';
+    public const FLAG_STATISTICAL_OUTLIER = 'statistical_outlier';
+    public const FLAG_EXACT_DUPLICATE = 'exact_duplicate';
+    public const FLAG_TRANSFER_DUPLICATE_CANDIDATE = 'transfer_duplicate_candidate';
+    public const FLAG_PAYER_MATCH_SAME_BENEFICIARY = 'payer_match_same_beneficiary';
+    public const FLAG_PAYER_MATCH_DIFFERENT_BENEFICIARY = 'payer_match_different_beneficiary';
+
+    public const ANOMALY_FLAG_RESTORE_SCORE = 25;
+
     public const LEVELS = [
         self::LEVEL_NORMAL,
         self::LEVEL_WARNING,
@@ -79,6 +90,20 @@ class TransactionRiskReview extends Model
     public static function levelLabel(?string $level): string
     {
         return self::LEVEL_LABELS[$level] ?? 'Belum Analisis';
+    }
+
+    public static function flagLabel(?string $flag): string
+    {
+        if ($flag === null || $flag === '') {
+            return '-';
+        }
+
+        $meta = (array) \Illuminate\Support\Facades\Lang::get('anomaly.flags.' . $flag, []);
+        if (isset($meta['label']) && $meta['label'] !== '') {
+            return (string) $meta['label'];
+        }
+
+        return ucfirst(str_replace('_', ' ', $flag));
     }
 
     public static function reviewStatusLabel(?string $status): string

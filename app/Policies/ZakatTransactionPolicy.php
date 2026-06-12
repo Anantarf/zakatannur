@@ -43,4 +43,17 @@ class ZakatTransactionPolicy
 
         return Response::allow();
     }
+
+    /**
+     * Determine whether the user can print the receipt.
+     */
+    public function printReceipt(User $user, ZakatTransaction $zakatTransaction)
+    {
+        // 1. Can only print their own transactions unless admin/super_admin (handled by before hook)
+        if ((int)$zakatTransaction->petugas_id !== (int)$user->id) {
+            return Response::deny('Anda hanya dapat mencetak kwitansi untuk transaksi yang Anda layani sendiri.');
+        }
+
+        return Response::allow();
+    }
 }

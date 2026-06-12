@@ -11,7 +11,7 @@
     ])
     @include('public.partials.beranda-feature-card', [
         'title' => 'Amanah & Profesional',
-        'description' => 'Dikelola oleh Panitia Zakat dengan integritas tinggi.',
+        'description' => 'Disusun Panitia Zakat An-Nur per periode.',
         'icon' => 'committee',
     ])
 </section>

@@ -371,9 +371,7 @@
             </div>
             <h2 class="text-lg font-bold text-gray-900 mb-2">Akses Terbatas</h2>
             <p class="text-sm text-gray-600 mb-6 leading-relaxed">
-                Maaf, sesuai regulasi, <strong>Staf</strong> hanya diperbolehkan mengubah atau menghapus transaksi <strong>milik sendiri</strong> yang dibuat pada <strong>hari yang sama</strong>.
-                <br><br>
-                Silakan hubungi Admin atau Super Admin untuk bantuan lebih lanjut.
+                <strong>Staf</strong> hanya dapat mengubah atau menghapus transaksi <strong>miliknya sendiri</strong> yang dibuat <strong>hari ini</strong>. Hubungi Admin atau Super Admin untuk kasus lain.
             </p>
             <div class="flex justify-center">
                 <button type="button" x-on:click="$dispatch('close')" class="ui-btn ui-btn-secondary px-6 py-2.5">
