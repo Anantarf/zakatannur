@@ -13,7 +13,7 @@
 
             <div class="flex flex-col gap-3">
                 <div class="public-clock-pill">
-                    <span class="h-2 w-2 rounded-full bg-emerald-500"></span>
+                    <span class="h-2 w-2 rounded-full bg-brand-500"></span>
                     <span x-text="clock" class="public-clock-text"></span>
                 </div>
 
