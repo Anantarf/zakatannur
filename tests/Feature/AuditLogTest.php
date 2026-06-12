@@ -294,4 +294,25 @@ class AuditLogTest extends TestCase
             'subject_id' => $tx->id,
         ]);
     }
+
+    public function test_action_label_and_color_class_are_resolved_consistently(): void
+    {
+        $log = new \App\Models\AuditLog();
+        $log->action = 'login';
+        $this->assertSame('Login', $log->action_label);
+        $this->assertStringContainsString('blue', $log->action_color_class);
+
+        $log->action = 'transaction.delete';
+        $this->assertSame('Dipindah ke Sampah', $log->action_label);
+        $this->assertStringContainsString('pink', $log->action_color_class);
+
+        $log->action = 'Restored.Transaction';
+        $this->assertSame('Transaksi Dipulihkan', $log->action_label);
+        $this->assertStringContainsString('indigo', $log->action_color_class);
+
+        $log->action = 'unknown.action';
+        $this->assertSame('Unknown Action', $log->action_label);
+        $this->assertStringContainsString('slate', $log->action_color_class);
+    }
+
 }

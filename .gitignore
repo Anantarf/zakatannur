@@ -18,3 +18,5 @@ yarn-error.log
 /backups/*.sql
 /*.sql
 /tmp/
+/storage/framework/views/*.php
+/storage/framework/cache/
