@@ -85,7 +85,7 @@ class TransactionReviewAssistantService
             ]);
     }
 
-    public function historySummarySubquery()
+    public function historySummarySubquery(): Builder
     {
         [$reviewSeveritySql, $reviewSeverityBindings] = $this->reviewSeveritySummarySql();
 
@@ -123,11 +123,12 @@ class TransactionReviewAssistantService
         $riskLevel = $this->aggregateRiskLevel($reviews);
         $reviewStatus = $this->aggregateReviewStatus($reviews);
         $reviewedAt = $reviews->max('reviewed_at');
-        $reviewedByName = optional($reviews->sortByDesc('reviewed_at')->firstWhere('reviewed_at', '!=', null)?->reviewer)->name;
+
         $latestReviewed = $reviews
             ->filter(fn (TransactionRiskReview $review) => $review->reviewed_at !== null)
             ->sortByDesc(fn (TransactionRiskReview $review) => $review->reviewed_at?->getTimestamp() ?? 0)
             ->first();
+        $reviewedByName = optional($latestReviewed?->reviewer)->name;
         $latestReviewNote = $reviews
             ->filter(fn (TransactionRiskReview $review) => filled($review->review_note))
             ->sortByDesc(fn (TransactionRiskReview $review) => $review->reviewed_at?->getTimestamp() ?? $review->updated_at?->getTimestamp() ?? 0)
@@ -141,7 +142,7 @@ class TransactionReviewAssistantService
             'reasons' => $reviews->pluck('reasons')->flatten(1)->filter()->unique()->values()->all(),
             'duplicate_candidates' => $reviews->pluck('duplicate_candidates')->flatten(1)->filter()->unique(fn ($candidate) => ($candidate['transaction_id'] ?? '') . ':' . ($candidate['match_type'] ?? ''))->values()->all(),
             'summary_text' => $this->summaryText($riskLevel),
-            'reviewed_by_name' => $reviewedByName ?: optional($latestReviewed?->reviewer)->name,
+            'reviewed_by_name' => $reviewedByName,
             'reviewed_at' => $reviewedAt ? Carbon::parse($reviewedAt) : null,
         ];
     }
