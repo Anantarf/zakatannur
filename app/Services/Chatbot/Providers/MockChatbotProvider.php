@@ -6,7 +6,7 @@ use App\Services\Chatbot\ChatbotServiceInterface;
 
 class MockChatbotProvider implements ChatbotServiceInterface
 {
-    public function sendMessage(string $message): string
+    public function sendMessage(string $message, array $context = []): string
     {
         $message = strtolower($message);
         if (str_contains($message, 'zakat') || str_contains($message, 'bayar')) {

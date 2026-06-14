@@ -111,6 +111,16 @@ export const createPublicHomeApp = (config, chartService) => {
                 globalThis.addEventListener(eventName, () => this.resetIdle(), { passive: true });
             });
 
+            globalThis.addEventListener('public-home:set-tab', (event) => {
+                const tab = event?.detail?.tab;
+                if (!['beranda', 'laporan', 'grafik'].includes(tab)) {
+                    return;
+                }
+
+                this.activeTab = tab;
+                scrollToTop();
+            });
+
             this.$watch('openLogin', (value) => {
                 if (value) {
                     clearTimeout(this.idleTimeout);

@@ -6,8 +6,7 @@ test.describe('Halaman Utama Publik (Home)', () => {
         await page.goto('/');
 
         // 1. Verifikasi Copywriting & Trust Building
-        await expect(page.getByText('Portal Transparansi Zakat')).toBeVisible();
-        await expect(page.getByRole('heading', { name: 'Masjid An-Nur', level: 1 })).toBeVisible();
+        await expect(page.getByRole('heading', { name: 'Informasi zakat yang ringkas, terbuka, dan mudah dipantau.', level: 1 })).toBeVisible();
 
         // 2. Verifikasi Tab Navigasi Alpine.js
         const tabBeranda = page.getByRole('button', { name: 'Beranda' });
@@ -21,10 +20,10 @@ test.describe('Halaman Utama Publik (Home)', () => {
         // 3. Tes Interaksi UI: Pindah ke Tab Laporan
         await tabLaporan.click();
         
-        await expect(page.getByRole('heading', { name: 'Kategori utama dalam satu panel ringkas' })).toBeVisible();
+        await expect(page.getByRole('heading', { name: 'Ringkasan penerimaan', exact: true })).toBeVisible();
 
         // 4. Verifikasi tombol "Masuk" / Login
-        const btnLogin = page.getByRole('button', { name: /Masuk/ });
+        const btnLogin = page.getByTitle('MASUK');
         await expect(btnLogin).toBeVisible();
     });
 });

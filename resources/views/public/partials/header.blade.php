@@ -2,8 +2,8 @@
     <div class="public-header-shell">
         <div class="grid grid-cols-1 items-stretch gap-4 lg:grid-cols-2">
             <div class="flex flex-col justify-center">
-                <p class="public-header-kicker">Portal Transparansi Zakat</p>
-                <h1 class="public-header-title">Masjid An-Nur</h1>
+                <p class="public-header-kicker">Portal Zakat Masjid An-Nur</p>
+                <h1 class="public-header-title">Ringkasan penerimaan zakat.</h1>
                 <div class="public-header-meta">
                     <span class="public-header-location">Komplek BPK V Gandul</span>
                     <span class="public-header-divider"></span>

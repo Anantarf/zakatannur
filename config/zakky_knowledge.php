@@ -1,0 +1,68 @@
+<?php
+
+return [
+    [
+        'id' => 'cara-bayar-zakat',
+        'title' => 'Cara bayar zakat',
+        'keywords' => ['bayar', 'pembayaran', 'transfer', 'cara bayar'],
+        'answer' => 'Informasi cara pembayaran mengikuti arahan panitia zakat Masjid An-Nur. Jika belum tersedia di portal, silakan konfirmasi kepada panitia zakat.',
+        'source_label' => 'Panduan Zakat Masjid An-Nur',
+        'actions' => [],
+    ],
+    [
+        'id' => 'zakat-fitrah',
+        'title' => 'Zakat fitrah',
+        'keywords' => ['zakat fitrah', 'fitrah'],
+        'answer' => 'Zakat fitrah adalah zakat yang ditunaikan menjelang Idulfitri. Untuk ketentuan lokal Masjid An-Nur, ikuti arahan panitia zakat pada periode berjalan.',
+        'source_label' => 'Panduan Zakat Masjid An-Nur',
+        'actions' => [],
+    ],
+    [
+        'id' => 'zakat-mal',
+        'title' => 'Zakat mal',
+        'keywords' => ['zakat mal', 'mal', 'nishab', 'nisab'],
+        'answer' => 'Zakat mal berkaitan dengan harta yang telah memenuhi syarat. Untuk kasus khusus, jamaah sebaiknya berkonsultasi dengan panitia atau ustadz yang dipercaya.',
+        'source_label' => 'Panduan Zakat Masjid An-Nur',
+        'actions' => [],
+    ],
+    [
+        'id' => 'fidyah',
+        'title' => 'Fidyah',
+        'keywords' => ['fidyah'],
+        'answer' => 'Fidyah adalah pengganti bagi kondisi tertentu yang tidak dapat menjalankan puasa sesuai ketentuan. Untuk nominal dan tata cara lokal, ikuti arahan panitia zakat Masjid An-Nur.',
+        'source_label' => 'Panduan Zakat Masjid An-Nur',
+        'actions' => [],
+    ],
+    [
+        'id' => 'batas-waktu-zakat',
+        'title' => 'Batas waktu zakat',
+        'keywords' => ['batas waktu', 'deadline', 'kapan bayar', 'waktu zakat'],
+        'answer' => 'Batas waktu dan jadwal penerimaan zakat mengikuti ketentuan panitia pada periode berjalan. Jika jadwal belum tampil di portal, silakan konfirmasi kepada panitia.',
+        'source_label' => 'Panduan Zakat Masjid An-Nur',
+        'actions' => [],
+    ],
+    [
+        'id' => 'cara-baca-ringkasan',
+        'title' => 'Cara membaca ringkasan',
+        'keywords' => ['cara baca ringkasan', 'ringkasan penerimaan', 'laporan penerimaan'],
+        'answer' => 'Tab Ringkasan Penerimaan menampilkan total jiwa, uang, beras, dan rincian per kategori zakat agar jamaah bisa memantau data secara terbuka.',
+        'source_label' => 'Panduan Portal Zakat Masjid An-Nur',
+        'actions' => [['type' => 'open_tab', 'target' => 'laporan']],
+    ],
+    [
+        'id' => 'cara-baca-grafik',
+        'title' => 'Cara membaca grafik',
+        'keywords' => ['cara baca grafik', 'grafik harian', 'grafik'],
+        'answer' => 'Tab Grafik Harian membantu melihat pola penerimaan zakat per hari dalam periode aktif.',
+        'source_label' => 'Panduan Portal Zakat Masjid An-Nur',
+        'actions' => [['type' => 'open_tab', 'target' => 'grafik']],
+    ],
+    [
+        'id' => 'batas-kemampuan-zakky',
+        'title' => 'Batas kemampuan Zakky',
+        'keywords' => ['zakky bisa apa', 'batas kemampuan', 'ai salah', 'akurasi'],
+        'answer' => 'Zakky membantu membaca data publik dan menjawab panduan umum. Untuk keputusan penting, nominal pembayaran, atau kasus khusus, tetap konfirmasi kepada panitia zakat.',
+        'source_label' => 'Panduan Zakky',
+        'actions' => [],
+    ],
+];

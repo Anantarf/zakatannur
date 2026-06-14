@@ -24,7 +24,7 @@ class GeminiChatbotProvider implements ChatbotServiceInterface
         $this->timeout = $timeout;
     }
 
-    public function sendMessage(string $message): string
+    public function sendMessage(string $message, array $context = []): string
     {
         $this->lastReplyWasFallback = false;
 
@@ -32,6 +32,9 @@ class GeminiChatbotProvider implements ChatbotServiceInterface
     . "Saat memperkenalkan diri, sebutkan nama Anda sebagai Zakky dan bahwa Anda melayani Zakat An-Nur. "
     . "Tugas Anda adalah membantu pengguna (jamaah atau petugas) terkait pengelolaan zakat, cara pembayaran, panduan nishab, dan operasional masjid. "
     . "Gaya bicara: singkat, ramah, sopan, dan profesional layaknya agen Customer Service. "
+    . "Untuk informasi lokal Masjid An-Nur, gunakan hanya konteks resmi yang diberikan. "
+    . "Jika konteks tidak cukup, katakan informasi belum tersedia dan arahkan pengguna untuk konfirmasi kepada panitia. "
+    . "Jangan mengarang nomor rekening, jadwal, panitia, nominal, data penerimaan, atau kebijakan lokal. "
     . "Jika ditanya hal di luar topik zakat, agama Islam, atau operasional masjid, tolak dengan sopan dan kembalikan ke topik zakat. "
     . "Jika pengguna menyapa (halo, assalamualaikum, hai, dll), balas sapaan dengan hangat dan perkenalkan diri sebagai Zakky.";
 
@@ -50,7 +53,7 @@ class GeminiChatbotProvider implements ChatbotServiceInterface
                     'contents' => [
                         [
                             'parts' => [
-                                ['text' => $message]
+                                ['text' => $this->buildPrompt($message, $context)]
                             ]
                         ]
                     ],
@@ -60,7 +63,7 @@ class GeminiChatbotProvider implements ChatbotServiceInterface
                         ]
                     ],
                     'generationConfig' => [
-                        'temperature' => 0.7,
+                        'temperature' => 0.4,
                         'maxOutputTokens' => 500,
                     ]
                 ]);
@@ -116,5 +119,18 @@ class GeminiChatbotProvider implements ChatbotServiceInterface
     {
         $this->lastReplyWasFallback = true;
         return ChatbotServiceInterface::FALLBACK_PREFIX . $message;
+    }
+
+    private function buildPrompt(string $message, array $context): string
+    {
+        if ($context === []) {
+            return $message;
+        }
+
+        $contextText = collect($context)
+            ->map(fn ($item) => '- ' . ($item['title'] ?? 'Konteks') . ': ' . ($item['answer'] ?? ''))
+            ->implode("\n");
+
+        return "Konteks resmi:\n{$contextText}\n\nPertanyaan pengguna:\n{$message}";
     }
 }

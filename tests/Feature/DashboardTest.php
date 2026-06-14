@@ -105,14 +105,8 @@ class DashboardTest extends TestCase
     {
         AppSetting::query()->create(['key' => AppSetting::KEY_ACTIVE_YEAR, 'value' => '2026']);
         AppSetting::query()->create(['key' => AppSetting::KEY_DASHBOARD_CHART_MODE, 'value' => 'manual_period']);
-        AppSetting::query()->create(['key' => AppSetting::KEY_DASHBOARD_CHART_PERIOD_ID, 'value' => '1']);
-        AnnualSetting::query()->create([
-            'year' => 2025,
-            'chart_starts_at' => '2025-03-10',
-            'chart_ends_at' => '2025-03-11',
-        ]);
-        ZakatPeriod::query()->create([
-            'id' => 1,
+
+        $period = ZakatPeriod::query()->create([
             'code' => 'ramadan-2026-1',
             'label' => 'Ramadan 2026',
             'gregorian_year' => 2026,
@@ -120,6 +114,14 @@ class DashboardTest extends TestCase
             'hijri_month' => 9,
             'sequence' => 1,
             'is_active' => true,
+        ]);
+
+        AppSetting::query()->create(['key' => AppSetting::KEY_DASHBOARD_CHART_PERIOD_ID, 'value' => (string) $period->id]);
+
+        AnnualSetting::query()->create([
+            'year' => 2025,
+            'chart_starts_at' => '2025-03-10',
+            'chart_ends_at' => '2025-03-11',
         ]);
         AnnualSetting::query()->create([
             'year' => 2026,
@@ -300,10 +302,8 @@ class DashboardTest extends TestCase
     {
         AppSetting::query()->create(['key' => AppSetting::KEY_ACTIVE_YEAR, 'value' => '2026']);
         AppSetting::query()->create(['key' => AppSetting::KEY_DASHBOARD_CHART_MODE, 'value' => 'last_completed_period']);
-        AppSetting::query()->create(['key' => AppSetting::KEY_ACTIVE_ZAKAT_PERIOD_ID, 'value' => '1']);
 
-        ZakatPeriod::query()->create([
-            'id' => 1,
+        $period = ZakatPeriod::query()->create([
             'code' => 'ramadan-2026-1',
             'label' => 'Ramadan 2026',
             'gregorian_year' => 2026,
@@ -312,6 +312,8 @@ class DashboardTest extends TestCase
             'sequence' => 1,
             'is_active' => true,
         ]);
+
+        AppSetting::query()->create(['key' => AppSetting::KEY_ACTIVE_ZAKAT_PERIOD_ID, 'value' => (string) $period->id]);
 
         $staff = User::factory()->create(['role' => User::ROLE_STAFF]);
 
@@ -331,7 +333,6 @@ class DashboardTest extends TestCase
         $staff = User::factory()->create(['role' => User::ROLE_STAFF]);
 
         ZakatPeriod::query()->create([
-            'id' => 1,
             'code' => "ramadan-{$currentYear}-1",
             'label' => 'Ramadan Selesai',
             'gregorian_year' => $currentYear,
@@ -343,8 +344,7 @@ class DashboardTest extends TestCase
             'is_active' => false,
         ]);
 
-        ZakatPeriod::query()->create([
-            'id' => 2,
+        $activePeriod = ZakatPeriod::query()->create([
             'code' => "ramadan-{$currentYear}-2",
             'label' => 'Ramadan Aktif',
             'gregorian_year' => $currentYear,
@@ -355,7 +355,7 @@ class DashboardTest extends TestCase
             'is_active' => true,
         ]);
 
-        AppSetting::query()->create(['key' => AppSetting::KEY_ACTIVE_ZAKAT_PERIOD_ID, 'value' => '2']);
+        AppSetting::query()->create(['key' => AppSetting::KEY_ACTIVE_ZAKAT_PERIOD_ID, 'value' => (string) $activePeriod->id]);
 
         $this->actingAs($staff)
             ->get('/dashboard')

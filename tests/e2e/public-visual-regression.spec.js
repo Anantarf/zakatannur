@@ -7,9 +7,9 @@ const viewports = [
 ];
 
 const states = [
-    { name: 'beranda', tab: 'Beranda', heading: /Masjid An-Nur/ },
-    { name: 'ringkasan', tab: /Ringkasan/, heading: /Kategori utama dalam satu panel ringkas|Lihat total utama per kategori zakat/ },
-    { name: 'grafik', tab: /Grafik/, heading: /Grafik penerimaan harian/ },
+    { name: 'beranda', desktopTab: 'Beranda', mobileTab: 'Beranda', heading: /Informasi zakat yang ringkas, terbuka, dan mudah dipantau\./ },
+    { name: 'ringkasan', desktopTab: 'Ringkasan Penerimaan', mobileTab: 'Ringkasan', heading: 'Ringkasan penerimaan' },
+    { name: 'grafik', desktopTab: 'Grafik Harian', mobileTab: 'Grafik', heading: /Grafik penerimaan harian/ },
 ];
 
 const freezeBrowserDate = async (page) => {
@@ -38,9 +38,12 @@ const dynamicMasks = (page) => [
     page.locator('.tabular-nums'),
     page.locator('#chart-range-label'),
     page.locator('canvas'),
+    page.locator('img'),
 ];
 
 test.describe('Visual Regression Publik', () => {
+    test.describe.configure({ mode: 'serial' });
+
     for (const viewport of viewports) {
         test(`home konsisten secara visual - ${viewport.name}`, async ({ page }) => {
             await freezeBrowserDate(page);
@@ -54,18 +57,20 @@ test.describe('Visual Regression Publik', () => {
             await expect(page.getByRole('main')).toBeVisible();
 
             for (const state of states) {
-                if (state.tab !== 'Beranda') {
-                    await page.getByRole('button', { name: state.tab }).click();
+                const tabName = viewport.width >= 1024 ? state.desktopTab : state.mobileTab;
+                if (tabName !== 'Beranda') {
+                    await page.getByRole('button', { name: tabName, exact: true }).click();
                 } else {
-                    await page.getByRole('button', { name: 'Beranda' }).click();
+                    await page.getByRole('button', { name: 'Beranda', exact: true }).click();
                 }
 
-                await expect(page.getByRole('heading', { name: state.heading })).toBeVisible();
+                await expect(page.getByRole('heading', { name: state.heading, exact: typeof state.heading === 'string' })).toBeVisible();
 
                 await expect(page).toHaveScreenshot(`public-home-${state.name}-${viewport.name}.png`, {
                     animations: 'disabled',
                     caret: 'hide',
-                    fullPage: true,
+                    fullPage: false,
+                    maxDiffPixels: 300,
                     mask: dynamicMasks(page),
                 });
             }

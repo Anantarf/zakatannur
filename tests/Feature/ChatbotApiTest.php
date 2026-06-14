@@ -4,6 +4,10 @@ namespace Tests\Feature;
 
 use App\Services\Chatbot\ChatbotServiceInterface;
 use App\Services\Chatbot\Providers\GeminiChatbotProvider;
+use App\Services\Chatbot\Providers\MockChatbotProvider;
+use App\Models\Muzakki;
+use App\Models\User;
+use App\Models\ZakatTransaction;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Http;
 use Tests\TestCase;
@@ -14,6 +18,8 @@ class ChatbotApiTest extends TestCase
 
     public function test_chatbot_returns_success_payload(): void
     {
+        $this->app->bind(ChatbotServiceInterface::class, fn () => new MockChatbotProvider());
+
         $response = $this->postJson('/api/chatbot/message', [
             'message' => 'Halo',
         ]);
@@ -29,7 +35,7 @@ class ChatbotApiTest extends TestCase
     {
         $this->app->bind(ChatbotServiceInterface::class, fn () => new class implements ChatbotServiceInterface
         {
-            public function sendMessage(string $message): string
+            public function sendMessage(string $message, array $context = []): string
             {
                 throw new \RuntimeException('secret failure details');
             }
@@ -155,5 +161,75 @@ class ChatbotApiTest extends TestCase
 
         $response->assertOk()
             ->assertJsonPath('data.reply', 'Halo! Saya Zakky, asisten virtual Zakat An-Nur (versi simulasi). Ada yang bisa saya bantu terkait informasi zakat?');
+    }
+
+    public function test_chatbot_returns_summary_action_without_ai_call(): void
+    {
+        $response = $this->postJson('/api/chatbot/message', [
+            'message' => 'Buka ringkasan',
+        ]);
+
+        $response->assertOk()
+            ->assertJsonPath('data.source', 'action')
+            ->assertJsonPath('data.actions.0.type', 'open_tab')
+            ->assertJsonPath('data.actions.0.target', 'laporan');
+    }
+
+    public function test_chatbot_returns_chart_action_without_ai_call(): void
+    {
+        $response = $this->postJson('/api/chatbot/message', [
+            'message' => 'Lihat grafik harian',
+        ]);
+
+        $response->assertOk()
+            ->assertJsonPath('data.source', 'action')
+            ->assertJsonPath('data.actions.0.type', 'open_tab')
+            ->assertJsonPath('data.actions.0.target', 'grafik');
+    }
+
+    public function test_chatbot_answers_payment_from_knowledge(): void
+    {
+        $response = $this->postJson('/api/chatbot/message', [
+            'message' => 'Bagaimana cara bayar zakat?',
+        ]);
+
+        $response->assertOk()
+            ->assertJsonPath('data.source', 'knowledge')
+            ->assertJsonPath('data.citations.0.label', 'Panduan Zakat Masjid An-Nur');
+    }
+
+    public function test_chatbot_answers_total_from_public_data(): void
+    {
+        $petugas = User::factory()->create(['role' => User::ROLE_STAFF]);
+        $muzakki = Muzakki::query()->create(['name' => 'Ahmad']);
+
+        ZakatTransaction::query()->create([
+            'no_transaksi' => 'TRX-20260308-0001',
+            'muzakki_id' => $muzakki->id,
+            'pembayar_nama' => 'Hamba Allah',
+            'pembayar_phone' => '0812',
+            'pembayar_alamat' => 'Jakarta',
+            'shift' => ZakatTransaction::SHIFTS[0],
+            'category' => ZakatTransaction::CATEGORY_FITRAH,
+            'tahun_zakat' => 2026,
+            'metode' => ZakatTransaction::METHOD_UANG,
+            'nominal_uang' => 25000,
+            'jumlah_beras_kg' => null,
+            'jiwa' => 2,
+            'hari' => null,
+            'petugas_id' => $petugas->id,
+            'status' => ZakatTransaction::STATUS_VALID,
+            'waktu_terima' => now('Asia/Jakarta'),
+        ]);
+
+        $response = $this->postJson('/api/chatbot/message', [
+            'message' => 'Berapa total penerimaan zakat saat ini?',
+        ]);
+
+        $response->assertOk()
+            ->assertJsonPath('data.source', 'public_data')
+            ->assertJsonPath('data.actions.0.target', 'laporan');
+
+        $this->assertStringContainsString('Rp 25.000', $response->json('data.reply'));
     }
 }

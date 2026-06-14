@@ -11,8 +11,8 @@
          x-transition:leave-start="opacity-100 translate-y-0 sm:scale-100"
          x-transition:leave-end="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95">
         <!-- Close Button -->
-        <div class="absolute right-0 top-0 hidden pr-4 pt-4 sm:block">
-            <button type="button" @click="openLogin = false" class="ui-modal-close-btn">
+            <div class="absolute right-0 top-0 pr-3 pt-3 sm:pr-4 sm:pt-4">
+                <button type="button" @click="openLogin = false" class="ui-modal-close-btn" aria-label="Tutup modal login">
                 <span class="sr-only">Tutup</span>
                 <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />

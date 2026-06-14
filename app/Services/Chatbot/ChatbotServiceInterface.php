@@ -19,9 +19,10 @@ interface ChatbotServiceInterface
      * membedakan balasan normal dari kondisi error upstream.
      *
      * @param string $message
+     * @param array<int,array<string,mixed>> $context
      * @return string
      */
-    public function sendMessage(string $message): string;
+    public function sendMessage(string $message, array $context = []): string;
 
     /**
      * Apakah balasan terakhir merupakan fallback (layanan AI tidak tersedia).

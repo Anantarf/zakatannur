@@ -77,7 +77,7 @@
             </div>
         </div>
 
-        <p x-show="items.length === 0" class="px-6 py-10 text-center text-sm font-semibold text-slate-400">Belum ada data penerimaan masuk tahun ini.</p>
+        <p x-show="items.length === 0" class="px-6 py-10 text-center text-sm font-semibold text-slate-600">Belum ada data penerimaan masuk tahun ini.</p>
     </section>
 
     <p x-show="error" x-text="error" class="mt-4 rounded-xl border border-red-100 bg-red-50/50 p-3 text-center text-[10px] font-bold text-red-500" role="alert"></p>

@@ -4,16 +4,16 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use App\Services\Chatbot\ChatbotServiceInterface;
+use App\Services\Chatbot\ChatbotOrchestrator;
 use Illuminate\Support\Facades\Log;
 
 class ChatbotController extends Controller
 {
-    protected ChatbotServiceInterface $chatbotService;
+    protected ChatbotOrchestrator $chatbot;
 
-    public function __construct(ChatbotServiceInterface $chatbotService)
+    public function __construct(ChatbotOrchestrator $chatbot)
     {
-        $this->chatbotService = $chatbotService;
+        $this->chatbot = $chatbot;
     }
 
     public function chat(Request $request)
@@ -23,29 +23,9 @@ class ChatbotController extends Controller
         ]);
 
         try {
-            $reply = $this->chatbotService->sendMessage($request->message);
+            $response = $this->chatbot->handle($request->message);
 
-            $wasFallback = method_exists($this->chatbotService, 'wasLastReplyFallback')
-                && $this->chatbotService->wasLastReplyFallback();
-
-            $cleanReply = $wasFallback && str_starts_with($reply, ChatbotServiceInterface::FALLBACK_PREFIX)
-                ? substr($reply, strlen(ChatbotServiceInterface::FALLBACK_PREFIX))
-                : $reply;
-
-            if ($wasFallback) {
-                return response()->json([
-                    'status' => 'error',
-                    'message' => $cleanReply,
-                    'retryable' => true,
-                ], 503);
-            }
-
-            return response()->json([
-                'status' => 'success',
-                'data' => [
-                    'reply' => $cleanReply,
-                ]
-            ]);
+            return response()->json($response->toArray(), $response->statusCode);
         } catch (\Throwable $e) {
             Log::error('Chatbot request failed.', [
                 'message' => $e->getMessage(),

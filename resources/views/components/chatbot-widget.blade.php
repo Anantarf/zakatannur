@@ -1,10 +1,17 @@
 @php
     $quickReplies = [
-        ['label' => 'Apa itu zakat fitrah?', 'message' => 'Apa itu zakat fitrah?'],
+        ['label' => 'Buka ringkasan', 'action' => 'tab', 'target' => 'laporan'],
+        ['label' => 'Lihat grafik', 'action' => 'tab', 'target' => 'grafik'],
+        ['label' => 'Total penerimaan', 'message' => 'Berapa total penerimaan zakat saat ini?'],
         ['label' => 'Cara bayar zakat', 'message' => 'Bagaimana cara membayar zakat?'],
-        ['label' => 'Nishab zakat mal', 'message' => 'Berapa nishab zakat mal?'],
-        ['label' => 'Batas waktu zakat', 'message' => 'Kapan batas waktu membayar zakat?'],
     ];
+
+    $messageIcon = <<<'SVG'
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-[54%] w-[54%]" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true" stroke-width="2.25">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M8 10h8M8 14h5" />
+            <path stroke-linecap="round" stroke-linejoin="round" d="M5.5 18.5A7.5 7.5 0 1 1 12 21H7l-3 2 1.5-4.5Z" />
+        </svg>
+    SVG;
 @endphp
 
 <div
@@ -20,7 +27,9 @@
         aria-label="Buka chatbot Zakky"
     >
         <span class="zakky-fab-pulse absolute inset-0 rounded-full bg-brand-400/30" aria-hidden="true"></span>
-        <x-zakat-avatar size="md" variant="light" class="relative z-10" />
+        <span class="relative z-10 flex h-10 w-10 items-center justify-center rounded-full bg-brand-50 text-brand-700 ring-1 ring-brand-200/80">
+            {!! $messageIcon !!}
+        </span>
         <span
             x-show="unreadBadge"
             x-cloak
@@ -39,21 +48,23 @@
         x-transition:leave-end="translate-y-6 scale-95 opacity-0"
         @keydown.escape.window="closeChat()"
         class="flex w-[calc(100vw-1.5rem)] max-w-[24rem] origin-bottom-right flex-col overflow-hidden rounded-2xl border border-slate-200/80 bg-white shadow-[0_24px_60px_-20px_rgba(15,23,42,0.25)] ring-1 ring-slate-200/70 sm:w-96"
-        style="display: none; height: min(540px, 80vh); max-height: 80vh;"
+        style="display: none; height: min(500px, 78vh); max-height: 78vh;"
         role="dialog"
         aria-label="Chat dengan Zakky"
     >
-        <div class="z-10 flex items-center justify-between bg-gradient-to-r from-brand-600 via-brand-600 to-brand-700 p-4 text-white shadow-md">
+        <div class="z-10 flex items-center justify-between border-b border-slate-200/80 bg-white px-4 py-3 text-slate-900">
             <div class="flex items-center space-x-3 min-w-0">
-                <x-zakat-avatar size="md" variant="light" class="shadow-inner" />
+                <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-brand-50 text-brand-700 ring-1 ring-brand-100">
+                    {!! $messageIcon !!}
+                </span>
                 <div class="min-w-0">
-                    <h3 class="text-base font-bold leading-tight">Zakky</h3>
-                    <p class="flex items-center text-[11px] text-brand-50">
+                    <h3 class="text-[15px] font-bold leading-tight text-slate-950">Zakky</h3>
+                    <p class="flex items-center text-[11px] text-slate-500">
                         <span
-                            class="mr-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-brand-300"
+                            class="mr-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-brand-500"
                             :class="isOnline ? 'animate-pulse' : 'opacity-50'"
                         ></span>
-                        <span x-text="isOnline ? 'Online · siap membantu' : 'AI Asisten Zakat An-Nur'"></span>
+                        <span x-text="isOnline ? 'Online - siap membantu' : 'AI Asisten Zakat An-Nur'"></span>
                     </p>
                 </div>
             </div>
@@ -61,7 +72,7 @@
             <button
                 type="button"
                 @click="closeChat()"
-                class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-white/90 transition-colors hover:bg-white/15 hover:text-white focus:outline-none focus:ring-2 focus:ring-white/40"
+                class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-slate-500 transition-colors hover:bg-slate-100 hover:text-slate-800 focus:outline-none focus:ring-2 focus:ring-brand-500/30"
                 aria-label="Tutup chatbot"
             >
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true" stroke-width="2.5">
@@ -70,23 +81,25 @@
             </button>
         </div>
 
-        <div x-ref="chatContainer" class="flex flex-1 flex-col space-y-4 overflow-y-auto bg-slate-50/70 p-4">
+        <div x-ref="chatContainer" class="flex flex-1 flex-col space-y-3 overflow-y-auto bg-slate-50/70 p-4">
             <div class="flex items-start">
-                <x-zakat-avatar size="sm" variant="solid" class="mr-2" />
-                <div class="flex max-w-[85%] flex-col items-start">
-                    <div class="rounded-2xl rounded-tl-none border border-slate-200/80 bg-white p-3 text-sm leading-relaxed text-slate-800 shadow-sm break-words whitespace-pre-wrap">
-                        Assalamu'alaikum. Saya <span class="font-semibold text-brand-700">Zakky</span>, asisten Zakat An-Nur. Pilih topik di bawah atau tulis pertanyaan Anda.
+                <span class="mr-2 flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-brand-600 text-white shadow-sm">
+                    {!! $messageIcon !!}
+                </span>
+                <div class="flex max-w-[82%] flex-col items-start">
+                    <div class="rounded-2xl rounded-tl-none border border-slate-200/80 bg-white px-3 py-2.5 text-[13px] leading-6 text-slate-800 shadow-sm break-words whitespace-pre-wrap">
+                        Assalamu'alaikum. Saya <span class="font-semibold text-brand-700">Zakky</span>. Saya bisa bantu arahkan ke data zakat atau jawab pertanyaan umum.
                     </div>
                     <span class="mt-1 px-1 text-[10px] text-slate-400" x-text="formatTime(welcomeAt)"></span>
                 </div>
             </div>
 
-            <div x-show="quickReplies.length > 0 &amp;&amp; messages.length === 0" class="flex flex-wrap gap-1.5 pl-10">
+            <div x-show="quickReplies.length > 0 &amp;&amp; messages.length === 0" class="grid grid-cols-2 gap-1.5 pl-9">
                 <template x-for="(chip, i) in quickReplies" :key="`chip-${i}`">
                     <button
                         type="button"
-                        @click="useQuickReply(chip.message)"
-                        class="inline-flex items-center rounded-full border border-brand-200 bg-white px-2.5 py-1 text-[11px] font-semibold text-brand-700 shadow-sm transition-colors hover:bg-brand-50 hover:border-brand-300"
+                        @click="useQuickReply(chip)"
+                        class="min-w-0 rounded-full border border-brand-200 bg-white px-2.5 py-1.5 text-center text-[11px] font-semibold leading-4 text-brand-700 shadow-sm transition-colors hover:bg-brand-50 hover:border-brand-300"
                         x-text="chip.label"
                     ></button>
                 </template>
@@ -95,12 +108,14 @@
             <template x-for="(message, index) in messages" :key="`${message.role}-${index}`">
                 <div class="flex w-full" :class="message.role === 'user' ? 'justify-end' : 'justify-start items-start'">
                     <template x-if="message.role === 'bot'">
-                        <x-zakat-avatar size="sm" variant="solid" class="mr-2" />
+                        <span class="mr-2 flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-brand-600 text-white shadow-sm">
+                            {!! $messageIcon !!}
+                        </span>
                     </template>
 
-                    <div class="flex max-w-[85%] flex-col" :class="message.role === 'user' ? 'items-end' : 'items-start'">
+                    <div class="flex max-w-[82%] flex-col" :class="message.role === 'user' ? 'items-end' : 'items-start'">
                         <div
-                            class="p-3 text-sm leading-relaxed shadow-sm break-words whitespace-pre-wrap"
+                            class="px-3 py-2.5 text-[13px] leading-6 shadow-sm break-words whitespace-pre-wrap"
                             :class="message.role === 'user'
                                 ? 'rounded-2xl rounded-tr-none bg-brand-600 text-white'
                                 : (message.isError
@@ -110,6 +125,9 @@
                         ></div>
                         <div class="mt-1 flex items-center gap-1.5 px-1 text-[10px] text-slate-400">
                             <span x-text="formatTime(message.createdAt)"></span>
+                            <template x-if="message.citations && message.citations.length > 0">
+                                <span class="truncate" x-text="'Sumber: ' + message.citations[0].label"></span>
+                            </template>
                             <template x-if="message.role === 'user' &amp;&amp; !message.isError">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 text-brand-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true" stroke-width="2.5">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
@@ -133,7 +151,9 @@
             </template>
 
             <div x-show="isTyping" class="flex items-start">
-                <x-zakat-avatar size="sm" variant="solid" class="mr-2" />
+                <span class="mr-2 flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-brand-600 text-white shadow-sm">
+                    {!! $messageIcon !!}
+                </span>
                 <div class="flex items-center gap-1 rounded-2xl rounded-tl-none border border-slate-200/80 bg-white px-3 py-3 shadow-sm">
                     <span class="zakky-dot h-1.5 w-1.5 rounded-full bg-slate-400" style="animation-delay: 0ms"></span>
                     <span class="zakky-dot h-1.5 w-1.5 rounded-full bg-slate-400" style="animation-delay: 180ms"></span>
@@ -164,8 +184,7 @@
                 </button>
             </form>
             <div class="mt-2 flex items-center justify-between gap-2 px-2">
-                <span class="text-[10px] text-slate-400">Powered by Zakky</span>
-                <span class="hidden sm:inline text-[10px] italic text-slate-400">Jawaban AI dapat mengandung kesalahan, verifikasi untuk keputusan penting</span>
+                <span class="min-w-0 truncate text-[10px] text-slate-400">AI dapat keliru. Verifikasi informasi penting.</span>
                 <span class="font-sans tabular-nums text-[10px] text-slate-400" x-text="`${input.length}/500`"></span>
             </div>
         </div>

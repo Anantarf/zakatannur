@@ -1,4 +1,4 @@
-<section class="grid grid-cols-1 gap-6 md:grid-cols-3">
+<section class="grid grid-cols-1 gap-3 md:grid-cols-3">
     @include('public.partials.beranda-feature-card', [
         'title' => 'Transparan',
         'description' => 'Jamaah dapat membuka ringkasan penerimaan tanpa menunggu rekap manual.',

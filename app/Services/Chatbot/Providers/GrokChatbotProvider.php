@@ -23,7 +23,7 @@ class GrokChatbotProvider implements ChatbotServiceInterface
         $this->timeout = $timeout;
     }
 
-    public function sendMessage(string $message): string
+    public function sendMessage(string $message, array $context = []): string
     {
         $this->lastReplyWasFallback = false;
 

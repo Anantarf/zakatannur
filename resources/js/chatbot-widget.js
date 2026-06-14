@@ -84,8 +84,14 @@ document.addEventListener('alpine:init', () => {
             }
 
             const userMessage = this.input.trim();
+            const localAction = this.resolveLocalAction(userMessage);
             this.messages.push({ role: 'user', content: userMessage, createdAt: nowIso() });
             this.input = '';
+            if (localAction) {
+                this.openTab(localAction);
+                return;
+            }
+
             this.isTyping = true;
             this.lastError = null;
             this.$nextTick(() => this.scrollToBottom());
@@ -103,7 +109,16 @@ document.addEventListener('alpine:init', () => {
                 const payload = await this.parseResponse(response);
 
                 if (response.ok && payload?.status === 'success' && payload?.data?.reply) {
-                    this.messages.push({ role: 'bot', content: payload.data.reply, createdAt: nowIso() });
+                    const data = payload.data;
+                    this.messages.push({
+                        role: 'bot',
+                        content: data.reply,
+                        source: data.source,
+                        actions: data.actions || [],
+                        citations: data.citations || [],
+                        createdAt: nowIso(),
+                    });
+                    this.executeActions(data.actions || []);
                     this.isOnline = true;
                     return;
                 }
@@ -135,12 +150,53 @@ document.addEventListener('alpine:init', () => {
             }
         },
 
-        useQuickReply(text) {
+        useQuickReply(chip) {
             if (this.isTyping) {
                 return;
             }
+
+            if (chip?.action === 'tab' && chip?.target) {
+                this.openTab(chip.target);
+                return;
+            }
+
+            const text = typeof chip === 'string' ? chip : chip?.message;
+            if (!text) {
+                return;
+            }
+
             this.input = text;
             this.sendMessage();
+        },
+
+        openTab(tab) {
+            if (!['beranda', 'laporan', 'grafik'].includes(tab)) {
+                return;
+            }
+
+            window.dispatchEvent(new CustomEvent('public-home:set-tab', {
+                detail: { tab },
+            }));
+            this.closeChat();
+        },
+
+        executeActions(actions) {
+            actions.forEach((action) => {
+                if (action?.type === 'open_tab' && action?.target) {
+                    this.openTab(action.target);
+                }
+            });
+        },
+
+        resolveLocalAction(message) {
+            const normalized = message.toLowerCase();
+            if (normalized.includes('ringkasan') || normalized.includes('penerimaan') || normalized.includes('total zakat')) {
+                return 'laporan';
+            }
+            if (normalized.includes('grafik') || normalized.includes('harian') || normalized.includes('chart')) {
+                return 'grafik';
+            }
+            return null;
         },
 
         retryLastMessage() {
