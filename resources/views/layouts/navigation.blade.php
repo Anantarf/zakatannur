@@ -16,8 +16,12 @@
         || request()->routeIs('internal.templates.*');
 @endphp
 
-<nav x-data="{ open: false }" class="ui-topbar relative z-[120] isolate px-4 pt-4 sm:px-6 lg:px-8">
-    <div class="ui-topbar-panel">
+<nav x-data="{ open: false, scrolled: window.scrollY > 12 }"
+    x-init="scrolled = window.scrollY > 12"
+    @scroll.window="scrolled = window.scrollY > 12"
+    class="ui-topbar relative z-[120] isolate px-4 pt-4 transition-all duration-300 sm:px-6 lg:px-8">
+    <div class="ui-topbar-panel"
+        :class="scrolled ? 'bg-white/95 shadow-md shadow-slate-900/5' : 'bg-white/75 shadow-sm'">
         <div class="flex flex-1 items-center gap-4">
             <div class="shrink-0">
                 <a href="{{ route('dashboard') }}" class="ui-brand-lockup">

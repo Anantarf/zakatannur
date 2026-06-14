@@ -1,5 +1,5 @@
-<article class="public-shell hover-lift flex flex-col justify-between p-5 group">
-    <div class="mb-4 flex h-10 w-10 items-center justify-center rounded-xl bg-brand-100 text-brand-700 shadow-sm transition-all group-hover:bg-brand-700 group-hover:text-white">
+<article class="public-shell hover-lift flex items-start gap-4 p-4 group">
+    <div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-brand-100 text-brand-700 shadow-sm transition-all group-hover:bg-brand-700 group-hover:text-white">
         @switch($icon)
             @case('people')
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
@@ -20,8 +20,8 @@
                 @break
         @endswitch
     </div>
-    <div>
-        <h4 class="text-[0.98rem] font-black tracking-[-0.015em] text-slate-950 sm:text-[1.02rem]">{{ $title }}</h4>
+    <div class="min-w-0">
+        <h4 class="text-[0.98rem] font-bold tracking-[-0.01em] text-slate-950 sm:text-[1.02rem]">{{ $title }}</h4>
         <p class="mt-1.5 text-[13px] font-medium leading-relaxed text-slate-600 sm:text-[13.5px]">{{ $description }}</p>
     </div>
 </article>

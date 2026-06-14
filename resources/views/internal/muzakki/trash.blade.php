@@ -17,7 +17,7 @@
     </x-slot>
 
     <div class="py-10">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-6">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-4 sm:space-y-5">
             <div class="ui-alert ui-alert-warning">
                 <svg xmlns="http://www.w3.org/2000/svg" class="ui-alert-icon text-amber-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z" />
@@ -29,7 +29,7 @@
             </div>
             @if (session('status'))
                 <div class="ui-alert ui-alert-success">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="ui-alert-icon text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="ui-alert-icon text-brand-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
                     </svg>
                     <span class="font-medium">{{ session('status') }}</span>
@@ -60,7 +60,7 @@
                 <div class="ui-toolbar-soft">
                     <div class="flex items-center gap-2">
                         <div class="h-6 w-2 rounded-full bg-amber-500"></div>
-                        <h3 class="font-bold text-gray-800">Daftar Tempat Sampah</h3>
+                        <h3 class="font-bold text-slate-800">Daftar Tempat Sampah</h3>
                     </div>
 
                     <form method="GET" action="{{ route('internal.muzakki.trash') }}" class="flex w-full flex-col items-stretch gap-2 sm:w-auto sm:flex-row sm:items-center">
@@ -90,7 +90,7 @@
                                     <p class="text-xs font-medium text-slate-500">HP: {{ $m->phone ?? '-' }}</p>
                                 </div>
                                 @if($m->days_left !== null)
-                                    <span class="inline-flex items-center rounded-md px-2 py-1 text-[11px] font-bold {{ $m->days_left <= 7 ? 'bg-red-50 text-red-600' : 'bg-gray-50 text-gray-600' }}">
+                                    <span class="inline-flex items-center rounded-md px-2 py-1 text-[11px] font-bold {{ $m->days_left <= 7 ? 'bg-red-50 text-red-600' : 'bg-slate-50 text-slate-600' }}">
                                         {{ $m->days_left > 0 ? $m->days_left . ' Hari Lagi' : 'Hapus Hari Ini' }}
                                     </span>
                                 @endif
@@ -135,7 +135,7 @@
                     @empty
                         <div class="ui-empty-state-box">
                             <div class="flex flex-col items-center">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="mb-2 h-10 w-10 text-gray-200" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="mb-2 h-10 w-10 text-slate-200" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
                                 </svg>
                                 <span class="ui-empty-state-copy font-bold">
@@ -149,7 +149,7 @@
                 <div class="hidden overflow-x-auto w-full md:block">
                     <table class="min-w-full text-sm">
                         <thead>
-                            <tr class="bg-gray-50 text-left text-xs font-bold text-gray-400 uppercase tracking-widest border-b border-gray-100">
+                            <tr class="bg-slate-50 text-left text-xs font-bold text-slate-400 uppercase tracking-widest border-b border-slate-100">
                                 <th class="px-6 py-4">Nama</th>
                                 <th class="px-6 py-4">Alamat</th>
                                 <th class="px-6 py-4 text-center">Waktu Hapus</th>
@@ -157,21 +157,21 @@
                                 <th class="px-6 py-4 text-center">Aksi</th>
                             </tr>
                         </thead>
-                        <tbody class="divide-y divide-gray-50">
+                        <tbody class="divide-y divide-slate-50">
                             @if (count($muzakki) > 0)
                                 @foreach ($muzakki as $m)
                                 <tr class="transition-colors hover:bg-slate-50/70">
-                                    <td class="px-6 py-4 font-bold text-gray-800">
+                                    <td class="px-5 py-3 font-bold text-slate-800">
                                         {!! \App\Support\Format::highlight($m->name, $q) !!}
-                                        <div class="text-[10px] text-gray-400 font-medium">HP: {{ $m->phone ?? '-' }}</div>
+                                        <div class="text-[10px] text-slate-400 font-medium">HP: {{ $m->phone ?? '-' }}</div>
                                     </td>
-                                    <td class="px-6 py-4 text-gray-500 text-xs">{!! \App\Support\Format::highlight($m->address ?? '-', $q) !!}</td>
-                                    <td class="px-6 py-4 text-center text-gray-500 text-xs whitespace-nowrap">
+                                    <td class="px-5 py-3 text-slate-500 text-xs">{!! \App\Support\Format::highlight($m->address ?? '-', $q) !!}</td>
+                                    <td class="px-5 py-3 text-center text-slate-500 text-xs whitespace-nowrap">
                                         {{ $m->deleted_at_formatted }}
                                     </td>
                                     <td class="px-6 py-4 text-center text-xs whitespace-nowrap">
                                         @if($m->days_left !== null)
-                                            <span class="inline-flex items-center px-2 py-1 rounded-md font-bold {{ $m->days_left <= 7 ? 'bg-red-50 text-red-600' : 'bg-gray-50 text-gray-600' }}">
+                                            <span class="inline-flex items-center px-2 py-1 rounded-md font-bold {{ $m->days_left <= 7 ? 'bg-red-50 text-red-600' : 'bg-slate-50 text-slate-600' }}">
                                                 {{ $m->days_left > 0 ? $m->days_left . ' Hari Lagi' : 'Hapus Hari Ini' }}
                                             </span>
                                         @endif
@@ -202,7 +202,7 @@
                                 <tr>
                                     <td colspan="5" class="px-6 py-12 text-center">
                                         <div class="ui-empty-state-box flex flex-col items-center">
-                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 text-gray-200 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 text-slate-200 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
                                             </svg>
                                             <span class="ui-empty-state-copy font-bold">
@@ -216,7 +216,7 @@
                     </table>
                 </div>
                 @if ($muzakki->hasPages())
-                    <div class="px-6 py-4 border-t border-gray-50">
+                    <div class="px-5 py-3 border-t border-slate-50">
                         {{ $muzakki->links() }}
                     </div>
                 @endif
@@ -226,13 +226,13 @@
 
     <!-- Modal Konfirmasi Hapus Permanen -->
     <x-modal name="force-delete-muzakki-modal" focusable>
-        <form method="POST" x-data="{ id: '', name: '' }" x-on:open-force-delete-modal.window="id = $event.detail.id; name = $event.detail.name; $el.action = '{{ url('/internal/muzakki') }}/' + id + '/force-delete';" class="p-6">
+        <form method="POST" x-data="{ id: '', name: '' }" x-on:open-force-delete-modal.window="id = $event.detail.id; name = $event.detail.name; $el.action = '{{ url('/internal/muzakki') }}/' + id + '/force-delete';" class="p-5">
             @csrf
             @method('DELETE')
-            <h2 class="text-lg font-medium text-gray-900">
+            <h2 class="text-lg font-medium text-slate-900">
                 Hapus Permanen Muzakki <span x-text="name" class="font-bold text-red-600"></span>?
             </h2>
-            <p class="mt-1 text-sm text-gray-600">
+            <p class="mt-1 text-sm text-slate-600">
                 Data ini akan dihapus selamanya dari sistem dan tidak dapat dipulihkan kembali. Pastikan muzakki tidak memiliki riwayat transaksi aktif.
             </p>
             <div class="mt-6 flex justify-end">

@@ -1,8 +1,8 @@
 <x-app-layout>
     <x-slot name="header">
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-            <h2 class="font-bold text-xl sm:text-2xl text-emerald-800 leading-tight flex items-center justify-center sm:justify-start gap-2 text-center sm:text-left">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7 text-emerald-600 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <h2 class="font-bold text-xl sm:text-2xl text-brand-800 leading-tight flex items-center justify-center sm:justify-start gap-2 text-center sm:text-left">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7 text-brand-600 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
                 </svg>
                 Dashboard Pengelolaan
@@ -11,15 +11,15 @@
         </div>
     </x-slot>
 
-    <div class="py-4 sm:py-10">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6 sm:space-y-8">
-            <div class="grid grid-cols-1 gap-6 xl:grid-cols-[minmax(0,1.2fr)_minmax(300px,0.8fr)]">
-                <div class="rounded-card border border-slate-200 bg-white p-5 shadow-premium transition-all duration-300 hover:shadow-premium-hover sm:p-6 ring-1 ring-slate-200/60">
-                    <div class="flex flex-col gap-5 sm:flex-row sm:items-start sm:justify-between">
+    <div class="py-4 sm:py-6">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-4 sm:space-y-5">
+            <div class="grid grid-cols-1 gap-4 xl:grid-cols-[minmax(0,1.2fr)_minmax(300px,0.8fr)]">
+                <div class="rounded-card border border-slate-200 bg-white p-5 shadow-sm ring-1 ring-slate-200/60 sm:p-6">
+                    <div class="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
                         <div class="space-y-2">
                             <p class="ui-kicker">Overview</p>
-                            <h3 class="text-xl font-black leading-tight text-slate-900 sm:text-[1.7rem]">Manajemen Operasional Zakat</h3>
-                            <p class="max-w-2xl text-sm leading-6 text-slate-600">Kelola transaksi, pantau metrik penerimaan hari ini, dan akses aksi operasional dengan cepat dari satu tempat.</p>
+                            <h3 class="text-xl font-bold leading-tight text-slate-900 sm:text-2xl">Manajemen Operasional Zakat</h3>
+                            <p class="max-w-2xl text-sm leading-6 text-slate-600">Pantau transaksi dan akses kerja harian petugas.</p>
                         </div>
                         <div class="flex flex-wrap gap-2">
                             <a href="{{ route('internal.transactions.create') }}" class="ui-btn ui-btn-primary w-full sm:w-auto">Input Transaksi</a>
@@ -27,40 +27,40 @@
                         </div>
                     </div>
 
-                    <div class="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-3">
-                        <div class="rounded-2xl border border-slate-200 bg-slate-50 p-4 transition-all duration-300 hover:bg-slate-100">
-                            <p class="text-xs font-black uppercase tracking-wider text-slate-500">Total Transaksi</p>
-                            <p class="mt-2 text-3xl font-black tracking-tight text-slate-900">{{ number_format($payload['totals']['jumlah_transaksi'] ?? 0, 0, ',', '.') }}</p>
-                            <p class="mt-2 text-[11px] leading-relaxed text-slate-500">Jumlah transaksi yang tampil di ringkasan dashboard.</p>
+                    <div class="mt-5 grid grid-cols-1 gap-3 sm:grid-cols-3">
+                        <div class="rounded-2xl border border-slate-200 bg-slate-50 p-4">
+                            <p class="text-xs font-semibold uppercase tracking-wider text-slate-500">Total Transaksi</p>
+                            <p class="mt-2 text-3xl font-bold tracking-tight text-slate-900">{{ number_format($payload['totals']['jumlah_transaksi'] ?? 0, 0, ',', '.') }}</p>
+                            <p class="mt-2 text-[11px] leading-5 text-slate-500">Transaksi pada ringkasan dashboard.</p>
                         </div>
-                        <div class="rounded-2xl border border-slate-200 bg-slate-50 p-4 transition-all duration-300 hover:bg-slate-100">
-                            <p class="text-xs font-black uppercase tracking-wider text-slate-500">Transaksi Hari Ini</p>
-                            <p class="mt-2 text-3xl font-black tracking-tight text-emerald-400">{{ number_format($workspace['today_count'] ?? 0, 0, ',', '.') }}</p>
-                            <p class="mt-2 text-[11px] leading-relaxed text-slate-500">Transaksi valid yang tercatat hari ini.</p>
+                        <div class="rounded-2xl border border-slate-200 bg-slate-50 p-4">
+                            <p class="text-xs font-semibold uppercase tracking-wider text-slate-500">Transaksi Hari Ini</p>
+                            <p class="mt-2 text-3xl font-bold tracking-tight text-brand-500">{{ number_format($workspace['today_count'] ?? 0, 0, ',', '.') }}</p>
+                            <p class="mt-2 text-[11px] leading-5 text-slate-500">Transaksi valid hari ini.</p>
                         </div>
-                        <div class="rounded-2xl border border-slate-200 bg-slate-50 p-4 transition-all duration-300 hover:bg-slate-100">
-                            <p class="text-xs font-black uppercase tracking-wider text-slate-500">Transaksi Terakhir</p>
-                            <p class="mt-2 text-xl font-black tracking-tight text-slate-900">
+                        <div class="rounded-2xl border border-slate-200 bg-slate-50 p-4">
+                            <p class="text-xs font-semibold uppercase tracking-wider text-slate-500">Transaksi Terakhir</p>
+                            <p class="mt-2 text-xl font-bold tracking-tight text-slate-900">
                                 {{ ($workspace['latest_transaction_at'] ?? null)?->format('d/m/Y H:i') ?? '-' }}
                             </p>
-                            <p class="mt-2 text-[11px] leading-relaxed text-slate-500">Waktu transaksi terbaru yang tercatat di sistem.</p>
+                            <p class="mt-2 text-[11px] leading-5 text-slate-500">Waktu input terbaru.</p>
                         </div>
                     </div>
                 </div>
 
                 <div class="ui-card p-5 sm:p-6">
-                    <p class="text-[11px] font-black uppercase tracking-[0.24em] text-slate-400">Navigasi Cepat</p>
+                    <p class="text-[11px] font-bold uppercase tracking-[0.16em] text-slate-400">Navigasi Cepat</p>
                     <div class="mt-4 grid grid-cols-1 gap-3">
                         <a href="{{ route('internal.transactions.index', array_filter(['year' => $year, 'period_id' => $periodId, 'metode' => $metode])) }}" class="ui-action-tile">
-                            <p class="text-sm font-black text-slate-900">Riwayat Transaksi</p>
+                            <p class="text-sm font-bold text-slate-900">Riwayat Transaksi</p>
                             <p class="mt-1 text-sm leading-6 text-slate-600">Telusuri transaksi lengkap sesuai filter dashboard saat ini.</p>
                         </a>
                         <a href="{{ route('internal.muzakki.index') }}" class="ui-action-tile ui-action-tile-accent">
-                            <p class="text-sm font-black text-emerald-900">Data Muzakki</p>
-                            <p class="mt-1 text-sm leading-6 text-emerald-800">Cari data muzakki dan lihat riwayat yang sudah tercatat.</p>
+                            <p class="text-sm font-bold text-brand-900">Data Muzakki</p>
+                            <p class="mt-1 text-sm leading-6 text-brand-800">Cari data muzakki dan lihat riwayat yang sudah tercatat.</p>
                         </a>
                         <a href="{{ route('internal.transactions.trash') }}" class="ui-action-tile ui-action-tile-info">
-                            <p class="text-sm font-black text-blue-900">Trash Transaksi</p>
+                            <p class="text-sm font-bold text-blue-900">Trash Transaksi</p>
                             <p class="mt-1 text-sm leading-6 text-blue-800">Cek transaksi yang pernah dihapus dan masih tersimpan di trash.</p>
                         </a>
                     </div>
@@ -69,10 +69,10 @@
 
             <!-- Daily Trend Chart -->
             <div class="ui-card overflow-hidden !p-0">
-                <div class="px-4 sm:px-6 py-3 sm:py-4 border-b border-gray-50 flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4">
+                <div class="px-4 sm:px-6 py-3 sm:py-4 border-b border-slate-50 flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4">
                     <div class="flex items-center gap-2 flex-wrap">
-                        <div class="w-1.5 h-5 sm:w-2 sm:h-6 bg-emerald-500 rounded-full flex-shrink-0"></div>
-                        <h3 class="font-bold text-sm sm:text-base text-gray-800">Tren Penerimaan</h3>
+                        <div class="w-1.5 h-5 sm:w-2 sm:h-6 bg-brand-500 rounded-full flex-shrink-0"></div>
+                        <h3 class="font-bold text-sm sm:text-base text-slate-800">Tren Penerimaan</h3>
                         @if($chartPeriodLabel)
                             <span class="inline-flex items-center gap-1 rounded-full bg-amber-100 border border-amber-200 px-2.5 py-0.5 text-[10px] font-bold text-amber-700 uppercase tracking-wide whitespace-nowrap">
                                 <svg class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
@@ -87,7 +87,7 @@
                         @if(request('period_id')) <input type="hidden" name="period_id" value="{{ request('period_id') }}"> @endif
                         @if(request('metode')) <input type="hidden" name="metode" value="{{ request('metode') }}"> @endif
 
-                        <select name="days" onchange="this.form.submit()" class="appearance-none rounded-lg border-gray-200 bg-gray-50 pl-3 pr-8 py-1.5 text-[11px] sm:text-xs font-black text-gray-500 uppercase tracking-widest focus:border-emerald-500 focus:ring-emerald-500 transition-all cursor-pointer">
+                        <select name="days" onchange="this.form.submit()" class="appearance-none rounded-lg border-slate-200 bg-slate-50 pl-3 pr-8 py-1.5 text-[11px] sm:text-xs font-bold text-slate-500 uppercase tracking-widest focus:border-brand-500 focus:ring-brand-500 transition-all cursor-pointer">
                             <option value="7" @selected($activeDays == 7)>7 Hari</option>
                             <option value="14" @selected($activeDays == 14)>14 Hari</option>
                             <option value="30" @selected($activeDays == 30)>30 Hari</option>
@@ -114,16 +114,16 @@
 
             <!-- Rekap Table Section -->
             <div class="ui-card overflow-hidden !p-0">
-                <div class="px-4 sm:px-6 py-3 sm:py-4 border-b border-gray-50 flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4">
+                <div class="px-4 sm:px-6 py-3 sm:py-4 border-b border-slate-50 flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4">
                     <div class="flex items-center gap-2">
-                        <div class="w-1.5 h-5 sm:w-2 sm:h-6 bg-emerald-500 rounded-full"></div>
-                        <h3 class="font-bold text-sm sm:text-base text-gray-800">Rekapitulasi Zakat</h3>
+                        <div class="w-1.5 h-5 sm:w-2 sm:h-6 bg-brand-500 rounded-full"></div>
+                        <h3 class="font-bold text-sm sm:text-base text-slate-800">Rekapitulasi Zakat</h3>
                     </div>
 
                     <form method="GET" action="{{ route('dashboard') }}" class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 w-full sm:w-auto mt-2 sm:mt-0">
                         <!-- Filter Tahun -->
                         <div class="relative w-full sm:w-auto sm:min-w-[120px]">
-                            <select name="year" onchange="this.form.submit()" class="w-full appearance-none rounded-lg border-gray-200 bg-gray-50 pl-3 pr-8 py-2 text-sm font-bold text-gray-600 focus:border-emerald-500 focus:ring-emerald-500 transition-all cursor-pointer">
+                            <select name="year" onchange="this.form.submit()" class="w-full appearance-none rounded-lg border-slate-200 bg-slate-50 pl-3 pr-8 py-2 text-sm font-bold text-slate-600 focus:border-brand-500 focus:ring-brand-500 transition-all cursor-pointer">
                                 <option value="">Semua Waktu</option>
                                 @foreach ($years ?? [] as $y)
                                     <option value="{{ $y }}" @selected((string) $year === (string) $y)>Tahun {{ $y }}</option>
@@ -133,7 +133,7 @@
                         </div>
 
                         <div class="relative w-full sm:w-auto sm:min-w-[190px]">
-                            <select name="period_id" onchange="this.form.submit()" class="w-full appearance-none rounded-lg border-gray-200 bg-gray-50 pl-3 pr-8 py-2 text-sm font-bold text-gray-600 focus:border-emerald-500 focus:ring-emerald-500 transition-all cursor-pointer">
+                            <select name="period_id" onchange="this.form.submit()" class="w-full appearance-none rounded-lg border-slate-200 bg-slate-50 pl-3 pr-8 py-2 text-sm font-bold text-slate-600 focus:border-brand-500 focus:ring-brand-500 transition-all cursor-pointer">
                                 <option value="">Semua Periode</option>
                                 @foreach ($periods ?? [] as $period)
                                     <option value="{{ $period->id }}" @selected((string) ($periodId ?? '') === (string) $period->id)>
@@ -145,7 +145,7 @@
 
                         <!-- Filter Bentuk Zakat -->
                         <div class="relative w-full sm:w-auto sm:min-w-[140px]">
-                            <select name="metode" onchange="this.form.submit()" class="w-full appearance-none rounded-lg border-gray-200 bg-gray-50 pl-3 pr-8 py-2 text-sm font-bold text-gray-600 focus:border-emerald-500 focus:ring-emerald-500 transition-all cursor-pointer">
+                            <select name="metode" onchange="this.form.submit()" class="w-full appearance-none rounded-lg border-slate-200 bg-slate-50 pl-3 pr-8 py-2 text-sm font-bold text-slate-600 focus:border-brand-500 focus:ring-brand-500 transition-all cursor-pointer">
                                 <option value="">Semua Bentuk</option>
                                 @foreach ($methods ?? [] as $m)
                                     <option value="{{ $m }}" @selected((string) $metode === (string) $m)>{{ \App\Models\ZakatTransaction::METHOD_LABELS[$m] ?? strtoupper($m) }}</option>
@@ -157,7 +157,7 @@
                         @if(request('days')) <input type="hidden" name="days" value="{{ request('days') }}"> @endif
 
                         @if($year || $periodId || $metode)
-                            <a href="{{ route('dashboard') }}" class="inline-flex items-center justify-center gap-2 rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-semibold text-slate-500 transition-all hover:border-emerald-200 hover:text-emerald-700" title="Reset Filters">
+                            <a href="{{ route('dashboard') }}" class="inline-flex items-center justify-center gap-2 rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-semibold text-slate-500 transition-all hover:border-brand-200 hover:text-brand-700" title="Reset Filters">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
                                 </svg>
@@ -173,10 +173,10 @@
 
             <!-- Latest Transactions Section -->
             <div class="ui-card overflow-hidden !p-0">
-                <div class="px-4 sm:px-6 py-3 sm:py-4 border-b border-gray-50 flex items-center justify-between">
+                <div class="px-4 sm:px-6 py-3 sm:py-4 border-b border-slate-50 flex items-center justify-between">
                     <div class="flex items-center gap-2">
                         <div class="w-1.5 h-5 sm:w-2 sm:h-6 bg-blue-500 rounded-full"></div>
-                        <h3 class="font-bold text-sm sm:text-base text-gray-800">10 Transaksi Terakhir</h3>
+                        <h3 class="font-bold text-sm sm:text-base text-slate-800">10 Transaksi Terakhir</h3>
                     </div>
                     <a href="{{ route('internal.transactions.index', array_filter(['year' => $chartYear ?? $activeYear, 'period_id' => $periodId ?? null])) }}" class="text-xs sm:text-sm font-bold text-blue-600 hover:text-blue-700 transition-colors flex items-center gap-1">
                         Lengkap
@@ -199,10 +199,10 @@
 <script>
 (function() {
     const isOffSeason = {{ $offSeason ? 'true' : 'false' }};
-    const lineColor   = isOffSeason ? '#d97706' : '#10b981';
-    const lineColorSoft = isOffSeason ? 'rgba(217, 119, 6, 0.92)' : 'rgba(16, 185, 129, 0.92)';
-    const gradFrom    = isOffSeason ? 'rgba(217, 119, 6, 0.18)' : 'rgba(16, 185, 129, 0.22)';
-    const labelColor  = isOffSeason ? '#92400e' : '#047857';
+    const lineColor   = isOffSeason ? '#d97706' : '#0d9488';
+    const lineColorSoft = isOffSeason ? 'rgba(217, 119, 6, 0.92)' : 'rgba(13, 148, 136, 0.92)';
+    const gradFrom    = isOffSeason ? 'rgba(217, 119, 6, 0.18)' : 'rgba(20, 184, 166, 0.2)';
+    const labelColor  = isOffSeason ? '#92400e' : '#0f766e';
 
     function initChart() {
         try {

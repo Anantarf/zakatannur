@@ -15,9 +15,9 @@
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
             <div class="grid grid-cols-1 gap-3 sm:grid-cols-3">
                 <div class="ui-stat-card ui-stat-card-default">
-                    <div class="ui-stat-eyebrow text-emerald-700">Total Log</div>
-                    <div class="ui-stat-value text-emerald-950">{{ $totalLogs }}</div>
-                    <div class="ui-stat-description text-emerald-700">Total aktivitas yang tercatat di tabel audit.</div>
+                    <div class="ui-stat-eyebrow text-brand-700">Total Log</div>
+                    <div class="ui-stat-value text-brand-950">{{ $totalLogs }}</div>
+                    <div class="ui-stat-description text-brand-700">Total aktivitas yang tercatat di tabel audit.</div>
                 </div>
                 <div class="ui-stat-card ui-stat-card-muted">
                     <div class="ui-stat-eyebrow text-slate-500">Log Terbaru</div>
@@ -42,7 +42,7 @@
                             <p class="text-xs text-slate-500">Klik judul kolom untuk mengurutkan data.</p>
                         </div>
                     </div>
-                    <span class="hidden rounded-full border border-emerald-100 bg-emerald-50 px-3 py-1 text-[10px] font-black uppercase tracking-widest text-emerald-700 sm:inline-flex">
+                    <span class="hidden rounded-full border border-brand-100 bg-brand-50 px-3 py-1 text-[10px] font-black uppercase tracking-widest text-brand-700 sm:inline-flex">
                         Super Admin
                     </span>
                 </div>
@@ -93,7 +93,7 @@
                                     <th class="px-4 sm:px-6 py-4 text-xs font-bold uppercase tracking-widest border-b border-slate-100">
                                         <a href="{{ route('internal.audit_logs.index', ['sort_by' => 'created_at', 'sort_dir' => ($sortBy === 'created_at' && $sortDir === 'desc') ? 'asc' : 'desc']) }}" class="flex items-center gap-1 hover:text-slate-700 transition-colors group">
                                             Waktu
-                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 transition-colors {{ $sortBy === 'created_at' ? 'text-emerald-500' : 'text-slate-300' }} {{ $sortBy === 'created_at' && $sortDir === 'asc' ? 'rotate-180' : '' }}" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 transition-colors {{ $sortBy === 'created_at' ? 'text-brand-500' : 'text-slate-300' }} {{ $sortBy === 'created_at' && $sortDir === 'asc' ? 'rotate-180' : '' }}" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
                                             </svg>
                                         </a>
@@ -101,7 +101,7 @@
                                     <th class="px-4 sm:px-6 py-4 text-xs font-bold uppercase tracking-widest border-b border-slate-100">
                                         <a href="{{ route('internal.audit_logs.index', ['sort_by' => 'petugas', 'sort_dir' => ($sortBy === 'petugas' && $sortDir === 'asc') ? 'desc' : 'asc']) }}" class="flex items-center gap-1 hover:text-slate-700 transition-colors group">
                                             Petugas
-                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 transition-colors {{ $sortBy === 'petugas' ? 'text-emerald-500' : 'text-slate-300' }} {{ $sortBy === 'petugas' && $sortDir === 'desc' ? 'rotate-180' : '' }}" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 transition-colors {{ $sortBy === 'petugas' ? 'text-brand-500' : 'text-slate-300' }} {{ $sortBy === 'petugas' && $sortDir === 'desc' ? 'rotate-180' : '' }}" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
                                             </svg>
                                         </a>
@@ -109,7 +109,7 @@
                                     <th class="px-4 sm:px-6 py-4 text-xs font-bold uppercase tracking-widest border-b border-slate-100">
                                         <a href="{{ route('internal.audit_logs.index', ['sort_by' => 'action', 'sort_dir' => ($sortBy === 'action' && $sortDir === 'asc') ? 'desc' : 'asc']) }}" class="flex items-center gap-1 hover:text-slate-700 transition-colors group">
                                             Aksi
-                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 transition-colors {{ $sortBy === 'action' ? 'text-emerald-500' : 'text-slate-300' }} {{ $sortBy === 'action' && $sortDir === 'desc' ? 'rotate-180' : '' }}" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 transition-colors {{ $sortBy === 'action' ? 'text-brand-500' : 'text-slate-300' }} {{ $sortBy === 'action' && $sortDir === 'desc' ? 'rotate-180' : '' }}" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
                                             </svg>
                                         </a>

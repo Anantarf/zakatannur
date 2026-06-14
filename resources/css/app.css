@@ -33,20 +33,20 @@
  ============================================================ */
 
 :root {
- /* Brand Colors (Emerald Default)  
+ /* Brand Colors (Deep Teal)  
  Ganti nilai di sini untuk mengubah warna tema aplikasi.
  Format: "R G B" (spasi, bukan koma) */
  --color-brand-50-rgb: 240 253 244;
- --color-brand-100-rgb: 220 252 231;
+ --color-brand-100-rgb: 209 250 229;
  --color-brand-200-rgb: 167 243 208;
- --color-brand-300-rgb: 110 231 183;
- --color-brand-400-rgb: 52 211 153;
- --color-brand-500-rgb: 16 185 129;
- --color-brand-600-rgb: 5 150 105;
- --color-brand-700-rgb: 4 120 87;
- --color-brand-800-rgb: 6 95 70;
- --color-brand-900-rgb: 6 78 59;
- --color-brand-950-rgb: 2 44 34;
+ --color-brand-300-rgb: 94 234 212;
+ --color-brand-400-rgb: 45 212 191;
+ --color-brand-500-rgb: 20 184 166;
+ --color-brand-600-rgb: 13 148 136;
+ --color-brand-700-rgb: 15 118 110;
+ --color-brand-800-rgb: 17 94 89;
+ --color-brand-900-rgb: 19 78 74;
+ --color-brand-950-rgb: 4 47 46;
 
  /* Slate / Neutral Colors */
  --color-slate-50-rgb: 248 250 252;
@@ -96,7 +96,7 @@
  */
 
  .public-shell-gap {
- @apply pt-1.5 sm:pt-2;
+ @apply pt-3 sm:pt-4;
  }
 
  .public-header {
@@ -104,11 +104,11 @@
  }
 
  .public-kicker {
- @apply mb-2 inline-flex items-center rounded-full border border-brand-200 bg-white/80 px-4 py-1.5 text-[11px] font-black tracking-[0.24em] text-brand-700 shadow-sm;
+ @apply mb-2 inline-flex items-center rounded-full border border-brand-200 bg-white/80 px-4 py-1.5 text-[11px] font-bold tracking-[0.16em] text-brand-700 shadow-sm;
  }
 
  .public-title {
- @apply text-3xl sm:text-4xl lg:text-5xl font-bold text-slate-950 leading-[1.08] tracking-[-0.03em];
+ @apply text-3xl sm:text-4xl lg:text-5xl font-bold text-slate-950 leading-[1.08] tracking-[-0.025em];
  }
 
  .public-subtitle {
@@ -168,7 +168,7 @@
  }
 
  .public-section-title {
- @apply text-2xl sm:text-[2rem] font-bold tracking-[-0.03em] text-slate-950;
+ @apply text-2xl sm:text-[2rem] font-bold tracking-[-0.025em] text-slate-950;
  }
 
  .public-section-copy {
@@ -176,39 +176,39 @@
  }
 
  .public-tab-chip {
- @apply rounded-md px-3.5 py-2 text-[12px] font-semibold tracking-[0.02em] transition-colors duration-150 flex items-center justify-center text-center;
+ @apply inline-flex min-h-10 items-center justify-center rounded-full px-4 py-2.5 text-center text-sm font-semibold leading-5 transition duration-150 ease-in-out focus:outline-none;
  }
 
  .public-tab-chip-active {
- @apply bg-brand-600 text-white shadow-sm shadow-brand-700/30;
+ @apply bg-brand-600 text-white shadow-md shadow-brand-600/30;
  }
 
  .public-tab-chip-inactive {
- @apply text-slate-400 hover:bg-slate-800 hover:text-white;
+ @apply text-slate-600 hover:bg-white hover:text-slate-900 focus:bg-white focus:text-slate-900;
  }
 
  .public-tab-chip-mobile {
- @apply flex-1 rounded-lg py-2 text-[10px] font-semibold tracking-[0.03em] transition-all text-center;
+ @apply min-h-10 flex-1 rounded-card px-3 py-2 text-center text-xs font-semibold transition duration-150 ease-in-out focus:outline-none;
  }
 
  .public-tab-chip-mobile-active {
- @apply bg-brand-600 text-white shadow-sm ring-1 ring-brand-600/80;
+ @apply bg-brand-600 text-white shadow-md shadow-brand-600/30;
  }
 
  .public-tab-chip-mobile-inactive {
- @apply text-slate-400 hover:bg-slate-800 hover:text-white;
+ @apply text-slate-600 hover:bg-white hover:text-slate-900 focus:bg-white focus:text-slate-900;
  }
 
  .public-header-shell {
- @apply overflow-hidden rounded-card border border-white/80 bg-white/90 px-4 py-4 shadow-premium ring-1 ring-brand-100/40 backdrop-blur sm:px-5;
+ @apply overflow-hidden rounded-card border border-white/80 bg-white/[0.92] px-4 py-4 shadow-md shadow-brand-900/[0.05] ring-1 ring-brand-100/50 backdrop-blur sm:px-6 sm:py-5;
  }
 
  .public-header-kicker {
- @apply text-[10px] font-black tracking-[0.24em] text-brand-700;
+ @apply text-[10px] font-bold tracking-[0.16em] text-brand-700;
  }
 
  .public-header-title {
- @apply mt-1.5 text-[1.65rem] font-bold leading-none tracking-[-0.05em] text-slate-950 sm:text-[2.05rem];
+ @apply mt-1.5 text-[1.65rem] font-bold leading-none tracking-[-0.03em] text-slate-950 sm:text-[2.05rem];
  }
 
  .public-header-meta {
@@ -256,7 +256,7 @@
  }
 
  .public-report-shell {
- @apply rounded-card border border-white/80 bg-white/[0.92] px-4 py-4 shadow-lg shadow-brand-900/5 ring-1 ring-brand-100/40 backdrop-blur sm:px-5 sm:py-5;
+ @apply rounded-card border border-white/80 bg-white/[0.97] px-4 py-4 shadow-md shadow-brand-900/[0.05] ring-1 ring-slate-200/75 sm:px-6 sm:py-5;
  }
 
  .public-report-intro {
@@ -269,6 +269,38 @@
 
  .public-report-row {
  @apply grid items-center gap-2.5 rounded-[1.12rem] border border-slate-200/75 bg-white/[0.92] px-4 py-3 shadow-sm transition-colors hover:border-brand-100 hover:bg-brand-50/[0.12];
+ }
+
+ .public-report-mobile-row {
+ @apply rounded-[1.1rem] border border-slate-200/80 bg-white px-4 py-3 shadow-sm ring-1 ring-white/70;
+ }
+
+ .public-report-mobile-total {
+ @apply rounded-[1.1rem] border border-brand-100 bg-brand-50/50 px-4 py-3 shadow-sm;
+ }
+
+ .public-report-value-cell {
+ @apply rounded-xl border bg-white px-3 py-2 text-right;
+ }
+
+ .public-report-value-cell dt {
+ @apply text-[10px] font-semibold uppercase tracking-[0.1em];
+ }
+
+ .public-report-value-cell dd {
+ @apply mt-1 text-sm font-semibold tabular-nums;
+ }
+
+ .public-report-value-brand {
+ @apply border-brand-100 bg-brand-50/70 text-brand-800;
+ }
+
+ .public-report-value-amber {
+ @apply border-amber-100 bg-amber-50/70 text-amber-800;
+ }
+
+ .public-report-table-row {
+ @apply grid items-center gap-2.5 px-5 py-3 transition-colors hover:bg-brand-50/[0.16];
  }
 
  .public-chart-shell {
@@ -292,7 +324,7 @@
  }
 
  .public-quote-card {
- @apply relative mx-auto max-w-4xl overflow-hidden rounded-card border border-brand-100/70 bg-[linear-gradient(135deg,rgba(255,255,255,0.96),rgba(236,253,245,0.9))] p-4 text-slate-900 shadow-lg shadow-brand-900/5 ring-1 ring-white/80 sm:p-5;
+ @apply relative mx-auto max-w-3xl overflow-hidden rounded-card border border-brand-100/70 bg-[linear-gradient(135deg,rgba(255,255,255,0.96),rgba(236,253,245,0.9))] p-4 text-slate-900 shadow-lg shadow-brand-900/5 ring-1 ring-white/80 sm:p-5;
  }
 
  .public-cta-card {
@@ -300,19 +332,20 @@
  }
 
  .public-nav-shell {
- @apply relative mx-auto max-w-7xl rounded-card border border-slate-800 bg-slate-950/95 px-3 py-1.5 shadow-premium ring-1 ring-white/5 backdrop-blur-xl sm:px-4;
+ @apply relative mx-auto max-w-7xl rounded-card border border-slate-200/80 bg-white/90 px-4 py-3 ring-1 ring-white/70 backdrop-blur-md transition-all duration-300 sm:px-5;
+ box-shadow: var(--shadow-topbar);
  }
 
  .public-nav-tabs {
- @apply hidden shrink-0 items-center gap-3 lg:flex;
+ @apply hidden shrink-0 items-center gap-2 rounded-full border border-slate-200 bg-slate-100 p-1.5 lg:flex;
  }
 
  .public-nav-action {
- @apply inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-xl border border-brand-200/80 bg-brand-600 text-white shadow-sm shadow-brand-700/[0.12] transition-all duration-300 hover:bg-brand-700 sm:h-8 sm:w-auto sm:justify-start sm:px-3 sm:py-1.5;
+ @apply inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-slate-200 bg-slate-50 text-brand-700 shadow-sm transition hover:bg-slate-100 hover:text-brand-800 sm:w-auto sm:justify-start sm:gap-2 sm:px-3 sm:py-2;
  }
 
  .public-nav-mobile-tabs {
- @apply mt-1.5 flex items-center justify-center gap-1 border-t border-brand-900/5 pt-1.5 lg:hidden;
+ @apply mt-3 flex items-center justify-center gap-1.5 rounded-2xl border border-slate-200 bg-slate-100 p-1.5 lg:hidden;
  }
 
  .public-footer-shell {
@@ -338,7 +371,7 @@
  */
 
  .ui-shell {
- @apply min-h-screen bg-[radial-gradient(circle_at_top,_rgba(16,185,129,0.12),_transparent_38%),linear-gradient(180deg,_#f7faf7_0%,_#f2f6f3_45%,_#edf2ef_100%)] text-slate-900;
+ @apply min-h-screen bg-[radial-gradient(circle_at_top,_rgba(20,184,166,0.12),_transparent_38%),linear-gradient(180deg,_#f6faf8_0%,_#f1f7f5_45%,_#edf3f1_100%)] text-slate-900;
  }
 
  .ui-shell-main {
@@ -346,11 +379,11 @@
  }
 
  .ui-topbar {
- @apply border-b border-slate-200 bg-white/95 backdrop-blur-xl;
+ @apply sticky top-0 border-b border-transparent bg-transparent;
  }
 
  .ui-topbar-panel {
- @apply mx-auto flex max-w-7xl items-center justify-between gap-4 rounded-card border border-slate-200 bg-white px-4 py-3 ring-1 ring-slate-200/60 sm:px-5;
+ @apply mx-auto flex max-w-7xl items-center justify-between gap-4 rounded-card border border-slate-200/80 bg-white/90 px-4 py-3 ring-1 ring-white/70 backdrop-blur-md transition-all duration-300 sm:px-5;
  box-shadow: var(--shadow-topbar);
  }
 
@@ -367,12 +400,12 @@
  }
 
  .ui-page-header-card {
- @apply rounded-card border border-white/80 bg-white/90 px-5 py-5 ring-1 ring-brand-100/50 sm:px-6;
+ @apply rounded-card border border-white/80 bg-white/90 px-5 py-4 ring-1 ring-brand-100/50 sm:px-6;
  box-shadow: var(--shadow-page-header);
  }
 
  .ui-page-title {
- @apply flex items-center justify-center gap-2 text-center text-xl font-black leading-tight text-brand-900 sm:justify-start sm:text-left sm:text-2xl;
+ @apply flex items-center justify-center gap-2 text-center text-xl font-bold leading-tight text-brand-900 sm:justify-start sm:text-left sm:text-2xl;
  }
 
  .ui-page-title-icon {
@@ -390,15 +423,15 @@
  */
 
  .ui-card {
- @apply rounded-card border border-slate-100 bg-white shadow-premium transition-all duration-300 hover:shadow-premium-hover;
+ @apply rounded-card border border-slate-100 bg-white shadow-sm transition-all duration-300;
  }
 
  .ui-card-strong {
- @apply rounded-card border border-brand-100/30 bg-white shadow-premium transition-all duration-300 hover:shadow-premium-hover;
+ @apply rounded-card border border-brand-100/30 bg-white shadow-sm transition-all duration-300;
  }
 
  .ui-card-muted {
- @apply rounded-card border border-slate-200/80 bg-slate-50/70 shadow-premium transition-all duration-300 hover:shadow-premium-hover;
+ @apply rounded-card border border-slate-200/80 bg-slate-50/70 shadow-sm transition-all duration-300;
  }
 
  .ui-toolbar {
@@ -456,7 +489,7 @@
  }
 
  .ui-btn-primary {
- @apply bg-brand-600 px-4 py-2.5 text-sm text-white shadow-md shadow-brand-600/30 hover:bg-brand-500 hover:-translate-y-[2px] hover:shadow-glow-emerald focus:ring-brand-500;
+ @apply bg-brand-600 px-4 py-2.5 text-sm text-white shadow-md shadow-brand-600/30 hover:bg-brand-500 hover:-translate-y-[2px] hover:shadow-glow-brand focus:ring-brand-500;
  }
 
  .ui-btn-secondary {
@@ -582,7 +615,7 @@
  }
 
  .ui-mobile-meta-label {
- @apply text-[10px] font-black uppercase tracking-[0.16em] text-slate-400;
+ @apply text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-400;
  }
 
  .ui-mobile-meta-value {
@@ -770,7 +803,7 @@
  */
 
  .ui-settings-panel {
- @apply rounded-[1.35rem] border p-4 shadow-sm sm:p-5;
+ @apply rounded-card border p-3.5 shadow-sm sm:p-4;
  }
 
  .ui-settings-panel-white {
@@ -794,11 +827,11 @@
  }
 
  .ui-settings-summary-shell {
- @apply rounded-[1.35rem] border border-brand-100 bg-gradient-to-br from-brand-50 via-white to-brand-50/70 p-4 shadow-sm;
+ @apply rounded-[1.15rem] border border-brand-100 bg-gradient-to-br from-brand-50 via-white to-brand-50/70 p-3 shadow-sm sm:p-4;
  }
 
  .ui-settings-summary-card {
- @apply rounded-card border bg-white/80 p-4;
+ @apply h-full rounded-card border bg-white/75 px-3 py-2.5;
  }
 
  .ui-settings-summary-card-emerald {
@@ -806,19 +839,19 @@
  }
 
  .ui-settings-kicker {
- @apply text-xs font-black uppercase tracking-[0.18em];
+ @apply text-[11px] font-bold uppercase tracking-[0.14em];
  }
 
  .ui-settings-section-head {
- @apply mb-4 flex items-center gap-2;
+ @apply mb-3 flex items-center gap-2;
  }
 
  .ui-settings-section-title {
- @apply text-sm font-black text-slate-900;
+ @apply text-sm font-bold text-slate-900;
  }
 
  .ui-settings-section-copy {
- @apply text-xs leading-relaxed text-slate-500;
+ @apply text-xs leading-5 text-slate-500;
  }
 
  .ui-settings-note {
@@ -826,7 +859,7 @@
  }
 
  .ui-settings-choice {
- @apply rounded-card border bg-white/85 p-4 text-sm shadow-sm transition;
+ @apply rounded-card border bg-white/85 px-3 py-2.5 text-sm shadow-sm transition;
  }
 
  .ui-settings-choice-copy {
@@ -834,7 +867,7 @@
  }
 
  .ui-settings-check {
- @apply flex items-start gap-3 rounded-card border bg-white/80 p-4 text-sm;
+ @apply flex items-start gap-3 rounded-card border bg-white/80 p-3 text-sm;
  }
 
  .ui-nav-link {
@@ -880,7 +913,7 @@
  }
 
  .public-clock-pill {
- @apply inline-flex items-center gap-2 self-end rounded-full border border-slate-200 bg-white/90 px-3 py-1.5 shadow-sm;
+ @apply inline-flex items-center gap-2 self-end rounded-full border border-slate-200 bg-white/[0.92] px-3 py-1.5 shadow-sm ring-1 ring-white/70;
  }
 
  .public-clock-text {
@@ -888,15 +921,15 @@
  }
 
  .public-stat-card {
- @apply rounded-[1.1rem] border border-slate-200/80 bg-white px-4 py-3 shadow-sm;
+ @apply rounded-[1.1rem] border border-slate-200/80 bg-white/[0.95] px-4 py-3.5 shadow-sm ring-1 ring-white/70;
  }
 
  .public-stat-label {
- @apply text-[10px] font-medium tracking-[0.03em] text-slate-500;
+ @apply text-[10px] font-semibold uppercase tracking-[0.08em] text-slate-500;
  }
 
  .public-stat-value {
- @apply mt-1 text-[0.98rem] font-semibold tabular-nums text-slate-900 sm:text-[1.05rem];
+ @apply mt-1.5 text-[1.08rem] font-bold leading-tight tabular-nums text-slate-950 sm:text-[1.18rem];
  }
 
 
@@ -910,24 +943,24 @@
 
 
  .public-chart-filter {
- @apply inline-flex shrink-0 items-center gap-1 rounded-md border border-slate-200 bg-white p-0.5 shadow-sm;
+ @apply inline-flex shrink-0 items-center gap-1 rounded-full border border-slate-200 bg-slate-100 p-1 shadow-sm;
  }
 
  .public-chart-filter-active {
- @apply bg-brand-600 px-2.5 py-1 text-[11px] font-semibold text-white shadow-md shadow-brand-700/30;
+ @apply rounded-full bg-brand-600 px-4 py-2 text-xs font-semibold text-white shadow-sm shadow-brand-700/25;
  }
 
  .public-chart-filter-inactive {
- @apply px-2.5 py-1 text-[11px] font-semibold text-slate-500 transition-all hover:bg-slate-100 hover:text-slate-800 hover:shadow-sm;
+ @apply rounded-full px-4 py-2 text-xs font-semibold text-slate-500 transition-all hover:bg-white hover:text-slate-800;
  }
 
 
  .public-chart-card {
- @apply rounded-[1.1rem] border border-slate-200/80 bg-white/85 p-3 ring-1 ring-slate-200/60 sm:p-4;
+ @apply rounded-[1.1rem] border border-slate-200/80 bg-white/85 p-3 ring-1 ring-slate-200/60 sm:px-4 sm:py-3;
  }
 
  .public-chart-card-head {
- @apply mb-2 flex items-center justify-between;
+ @apply mb-1.5 flex items-center justify-between;
  }
 
  .public-chart-card-title {
@@ -979,19 +1012,19 @@
 
  /* ============================================================
  HOVER LIFT (standar dokumen: transition 300ms + translate)
- Kelas: .hover-lift, .hover-lift-sm, .hover-glow-emerald
+ Kelas: .hover-lift, .hover-lift-sm, .hover-glow-brand
  ============================================================ */
 
  .hover-lift {
- @apply transition-all duration-300 hover:-translate-y-1 hover:shadow-premium-hover;
+ @apply transition-all duration-200 hover:-translate-y-[2px] hover:shadow-md;
  }
 
  .hover-lift-sm {
  @apply transition-all duration-300 hover:-translate-y-[2px] hover:shadow-md;
  }
 
- .hover-glow-emerald {
- @apply transition-all duration-300 hover:shadow-glow-emerald;
+ .hover-glow-brand {
+ @apply transition-all duration-200 hover:shadow-md;
  }
 
  /* ============================================================
@@ -1021,11 +1054,11 @@
 }
 
 .ui-modal-box {
- @apply relative transform overflow-hidden rounded-3xl bg-white text-left shadow-2xl transition-all sm:my-8 sm:w-full sm:max-w-md border border-gray-100;
+ @apply relative transform overflow-hidden rounded-3xl bg-white text-left shadow-2xl transition-all sm:my-8 sm:w-full sm:max-w-md border border-slate-100;
 }
 
 .ui-modal-close-btn {
- @apply rounded-full bg-white p-2 text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:ring-offset-2 transition-all;
+ @apply rounded-full bg-white p-2 text-slate-400 hover:text-slate-500 hover:bg-slate-100 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:ring-offset-2 transition-all;
 }
 
 /* ============================================================
@@ -1044,11 +1077,11 @@
 }
 
 .skeleton-text {
- @apply h-4 w-full rounded bg-gray-200;
+ @apply h-4 w-full rounded bg-slate-200;
 }
 
 .skeleton-circle {
- @apply rounded-full bg-gray-200;
+ @apply rounded-full bg-slate-200;
 }
 
 

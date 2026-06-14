@@ -6,7 +6,7 @@
         <p class="ui-kicker text-brand-700/80">
             Pengingat
         </p>
-        <p class="max-w-3xl text-[1rem] font-semibold leading-[1.55] text-slate-800 sm:text-[1.2rem]">
+        <p class="max-w-3xl text-[0.95rem] font-semibold leading-[1.55] text-slate-800 sm:text-[1.08rem]">
             "Ambillah zakat dari harta mereka guna membersihkan dan mensucikan mereka, dan berdoalah untuk mereka..."
         </p>
         <div>

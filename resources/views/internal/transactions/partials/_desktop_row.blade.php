@@ -1,8 +1,8 @@
-<tr class="hover:bg-emerald-50/30 transition-colors">
-    <td class="px-3 py-4 whitespace-nowrap">
+<tr class="transition-colors hover:bg-brand-50/30">
+    <td class="whitespace-nowrap px-3 py-3 sm:px-5">
         <span class="font-sans text-xs font-semibold text-blue-600 bg-blue-50 px-2 py-1 rounded-md">{!! \App\Support\Format::highlight($t->no_transaksi, $q) !!}</span>
     </td>
-    <td class="px-3 py-4 text-gray-500 text-[13px] whitespace-nowrap">
+    <td class="whitespace-nowrap px-3 py-3 text-[13px] text-slate-500 sm:px-5">
         @if ($t->waktu_terima)
             <div class="leading-tight">
                 <div>{{ $t->waktu_terima->timezone('Asia/Jakarta')->format('d/m/Y') }}</div>
@@ -15,22 +15,22 @@
             </div>
         @endif
     </td>
-    <td class="px-3 py-4">
-        <div class="text-sm font-semibold text-gray-700 max-w-[180px] break-words whitespace-normal leading-tight">{!! \App\Support\Format::highlight($t->pembayar_nama, $q) !!}</div>
+    <td class="px-3 py-3 sm:px-5">
+        <div class="max-w-[180px] whitespace-normal break-words text-sm font-semibold leading-tight text-slate-700">{!! \App\Support\Format::highlight($t->pembayar_nama, $q) !!}</div>
         @if($t->muzakki_total > 1)
-            <div class="text-[11px] text-gray-400 mt-1 whitespace-nowrap">+ {{ $t->muzakki_total - 1 }} Muzakki Lainnya</div>
+            <div class="mt-1 whitespace-nowrap text-[11px] text-slate-400">+ {{ $t->muzakki_total - 1 }} Muzakki Lainnya</div>
         @endif
     </td>
-    <td class="px-2 py-4 text-center">
+    <td class="px-2 py-3 text-center">
         <x-zakat-category-tags :categories="$t->categories_list" />
     </td>
-    <td class="px-2 py-4">
+    <td class="px-2 py-3">
         <x-transaction-method-tags :methods="$t->methods_list" class="mx-auto max-w-[90px]" />
     </td>
-    <td class="px-3 py-4 text-right whitespace-nowrap">
+    <td class="whitespace-nowrap px-3 py-3 text-right sm:px-5">
         <div class="space-y-0.5">
             @if($t->total_uang > 0)
-                <div class="font-semibold text-gray-800 text-sm flex items-center justify-end gap-1">
+                <div class="flex items-center justify-end gap-1 text-sm font-semibold text-slate-800">
                     {{ $t->total_uang_display }}
                     @if($t->has_transfer)
                         <x-transfer-badge />
@@ -38,12 +38,12 @@
                 </div>
             @endif
             @if($t->total_beras > 0)
-                <div class="font-semibold text-gray-800 text-sm">{{ $t->total_beras_display }}</div>
+                <div class="text-sm font-semibold text-slate-800">{{ $t->total_beras_display }}</div>
             @endif
         </div>
     </td>
     @if ($canViewRisk)
-        <td class="px-2 sm:px-4 py-4 text-center whitespace-nowrap">
+        <td class="whitespace-nowrap px-2 py-3 text-center sm:px-4">
             @if ($t->risk_level === \App\Models\TransactionRiskReview::LEVEL_WARNING)
                 <a href="{{ route('internal.anomalies.show', ['noTransaksi' => $t->no_transaksi]) }}" class="flex flex-col items-center gap-1">
                     <x-risk-level-badge :level="$t->risk_level" />
@@ -57,15 +57,15 @@
             @endif
         </td>
     @endif
-    <td class="px-3 py-4 text-center text-gray-500 text-[13px] whitespace-nowrap">
+    <td class="whitespace-nowrap px-3 py-3 text-center text-[13px] text-slate-500 sm:px-5">
         <div class="flex flex-col items-center gap-1 text-center">
-            <span class="font-medium text-gray-700">{{ $t->petugas?->name ?? '-' }}</span>
-            <span class="inline-flex items-center justify-center rounded px-2 py-0.5 text-[11px] font-bold uppercase bg-emerald-50 text-emerald-700 border border-emerald-100 whitespace-nowrap leading-tight text-center">
+            <span class="font-medium text-slate-700">{{ $t->petugas?->name ?? '-' }}</span>
+            <span class="inline-flex items-center justify-center rounded px-2 py-0.5 text-[11px] font-bold uppercase bg-brand-50 text-brand-700 border border-brand-100 whitespace-nowrap leading-tight text-center">
                 {{ $t->shift_label }}
             </span>
         </div>
     </td>
-    <td class="px-3 py-4 text-center whitespace-nowrap">
+    <td class="whitespace-nowrap px-3 py-3 text-center">
         <div class="flex items-center justify-center gap-1.5">
             <a class="ui-icon-button ui-icon-button-slate px-2" href="{{ route('internal.transactions.show', ['transaction' => $t->id]) }}" title="Lihat" aria-label="Lihat transaksi">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>

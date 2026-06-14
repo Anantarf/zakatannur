@@ -2,24 +2,24 @@
     <x-slot name="header">
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div class="space-y-1 text-center sm:text-left">
-                <h2 class="font-bold text-xl sm:text-2xl text-emerald-900 leading-tight">
+                <h2 class="text-xl font-bold leading-tight text-brand-900 sm:text-2xl">
                     {{ isset($isEdit) ? 'Ubah Transaksi ' . $mainTx->no_transaksi : 'Input Transaksi' }}
                 </h2>
                 <p class="text-sm text-slate-500">
                     {{ isset($isEdit) ? 'Perbarui data transaksi dengan aman, lalu simpan perubahan setelah semua detail sesuai.' : 'Isi pembayar, pilih kategori zakat per jiwa, lalu simpan seluruh transaksi dalam satu proses.' }}
                 </p>
             </div>
-            <div class="inline-flex items-center justify-center rounded-full border border-emerald-100 bg-emerald-50 px-3 py-1.5 text-[10px] font-black uppercase tracking-[0.24em] text-emerald-700 shadow-sm w-fit mx-auto sm:mx-0">
+            <div class="mx-auto inline-flex w-fit items-center justify-center rounded-full border border-brand-100 bg-brand-50 px-3 py-1.5 text-[10px] font-bold uppercase tracking-[0.14em] text-brand-700 sm:mx-0">
                 Periode {{ $activeYear }}
             </div>
         </div>
     </x-slot>
 
-    <div class="py-8 sm:py-10" x-data="zakatForm()">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+    <div class="py-4 sm:py-6" x-data="zakatForm()">
+        <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             
             @if ($errors->any())
-                <div class="mb-6 rounded-xl border border-red-200 bg-red-50 p-5 text-red-900 shadow-sm">
+                <div class="mb-4 rounded-xl border border-red-200 bg-red-50 p-4 text-red-900 shadow-sm">
                     <div class="font-bold text-red-800 mb-3 border-b border-red-200 pb-2">Terdapat Kesalahan Input:</div>
                     <ul class="list-disc pl-5 text-sm space-y-1">
                         @foreach ($errors->all() as $error)
@@ -31,7 +31,7 @@
 
             @include('internal.transactions.partials.form-notice')
 
-            <form method="POST" action="{{ isset($isEdit) ? route('internal.transactions.update', ['transaction' => $mainTx->id]) : route('internal.transactions.store') }}" @submit="prepareSubmit" class="space-y-6">
+            <form method="POST" action="{{ isset($isEdit) ? route('internal.transactions.update', ['transaction' => $mainTx->id]) : route('internal.transactions.store') }}" @submit="prepareSubmit" class="space-y-4">
                 @csrf
                 @if(isset($isEdit))
                     @method('PATCH')
@@ -67,10 +67,10 @@
                     </div>
                 </template>
 
-                <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
+                <div class="grid grid-cols-1 gap-4 lg:grid-cols-4">
                     
                     <!-- Left Sidebar (Global Payer) -->
-                    <div class="lg:col-span-1 space-y-6">
+                    <div class="space-y-4 lg:col-span-1">
                         @include('internal.transactions.partials.payer-panel')
                         @include('internal.transactions.partials.transfer-panel')
                     </div>
@@ -80,11 +80,11 @@
                         <div class="ui-card-strong p-4 sm:p-5">
                             <div class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                                 <div>
-                                    <h3 class="font-bold text-xl text-gray-800">Detail Pembayaran</h3>
-                                    <p class="mt-1 text-sm text-gray-500">Satu kartu mewakili satu jiwa atau nama. Aktifkan jenis zakat yang relevan, lalu isi nominal atau beratnya.</p>
+                                    <h3 class="text-lg font-bold text-slate-800">Detail Pembayaran</h3>
+                                    <p class="mt-1 text-sm text-slate-500">Aktifkan jenis zakat, lalu isi nominal atau beratnya.</p>
                                 </div>
-                                <div class="inline-flex items-center rounded-full border border-emerald-100 bg-white px-3 py-1 text-[11px] font-semibold text-emerald-700 shadow-sm">
-                                    Input bertahap, satu keluarga dalam satu halaman
+                                <div class="inline-flex items-center rounded-full border border-brand-100 bg-white px-3 py-1 text-[11px] font-semibold text-brand-700">
+                                    Satu keluarga, satu halaman
                                 </div>
                             </div>
                         </div>
@@ -95,8 +95,8 @@
                         
                         <!-- Button Tambah Orang di Bawah Box Terakhir -->
                         <div class="pb-4">
-                            <button type="button" @click="addPerson()" class="w-full bg-emerald-50 text-emerald-700 hover:bg-emerald-100 px-4 py-4 rounded-2xl font-bold flex items-center justify-center gap-2 transition-all border-2 border-dashed border-emerald-200 hover:border-emerald-300 group">
-                                <div class="bg-emerald-500 text-white rounded-full p-1 group-hover:scale-110 transition-transform">
+                            <button type="button" @click="addPerson()" class="group flex w-full items-center justify-center gap-2 rounded-card border-2 border-dashed border-brand-200 bg-brand-50 px-4 py-3 font-bold text-brand-700 transition-all hover:border-brand-300 hover:bg-brand-100">
+                                <div class="rounded-full bg-brand-500 p-1 text-white transition-transform group-hover:scale-110">
                                     <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M12 4v16m8-8H4" />
                                     </svg>
@@ -112,7 +112,7 @@
                         
                         <!-- Realtime Info Badge -->
                         <div class="justify-end hidden">
-                            <span class="text-sm font-bold text-gray-500 bg-gray-100 px-3 py-1 rounded-full border border-gray-200" x-text="'Total Transaksi Dipilih: '+txs.length"></span>
+                            <span class="rounded-full border border-slate-200 bg-slate-100 px-3 py-1 text-sm font-bold text-slate-500" x-text="'Total Transaksi Dipilih: '+txs.length"></span>
                         </div>
 
                         @include('internal.transactions.partials.form-actions')

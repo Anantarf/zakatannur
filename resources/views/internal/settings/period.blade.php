@@ -8,15 +8,15 @@
                 </svg>
                 Pengaturan Periode
             </h2>
-            <p class="ui-page-title-copy">Kelola periode aktif, acuan zakat, dan grafik dashboard dari satu tempat.</p>
+            <p class="ui-page-title-copy">Kelola periode aktif, acuan zakat, dan grafik dashboard.</p>
         </div>
     </x-slot>
 
-    <div class="py-6 sm:py-10">
-        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
+    <div class="py-4 sm:py-6">
+        <div class="mx-auto max-w-7xl space-y-4 px-4 sm:px-6 lg:px-8">
             @if (session('status'))
                 <div class="ui-alert ui-alert-success">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="ui-alert-icon text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="ui-alert-icon text-brand-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
                     </svg>
                     <span class="font-medium">{{ session('status') }}</span>
@@ -43,49 +43,37 @@
 
             {{-- Settings Form --}}
             <div class="ui-card overflow-hidden">
-                <div class="ui-card-header ui-card-header-emerald">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="ui-card-header-icon text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <div class="ui-card-header ui-card-header-emerald px-5 py-3">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="ui-card-header-icon text-brand-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
-                    <h3 class="ui-card-header-title text-emerald-900">Konfigurasi Periode Aktif</h3>
+                    <h3 class="text-base font-bold text-brand-900">Konfigurasi Periode Aktif</h3>
                 </div>
-                <div class="p-5 sm:p-6">
-                    <div class="ui-settings-summary-shell mb-6">
+                <div class="p-4 sm:p-5">
+                    <div class="mb-4">
                         <div class="flex flex-col gap-1 sm:flex-row sm:items-end sm:justify-between">
                             <div>
-                                <div class="ui-settings-kicker text-emerald-700">Ringkasan Saat Ini</div>
-                                <p class="mt-1 text-xs leading-relaxed text-emerald-800">Cek cepat ini membantu memastikan mana pengaturan yang sedang dipakai sebelum kamu mengubah periode aktif atau grafik dashboard.</p>
+                                <div class="ui-settings-kicker text-brand-700">Ringkasan</div>
                             </div>
                         </div>
-                        <div class="mt-3 grid grid-cols-1 gap-3 text-sm sm:grid-cols-2">
+                        <div class="mt-3 grid grid-cols-1 gap-3 text-sm md:grid-cols-3">
                             <div class="ui-settings-summary-card ui-settings-summary-card-emerald">
-                                <div class="text-xs font-bold text-emerald-700">Periode Aktif</div>
-                                <div class="mt-1 text-2xl font-black text-emerald-950">{{ $activePeriod?->display_label ?? $activeYear }}</div>
-                                <div class="mt-0.5 text-[11px] text-emerald-700">Dipakai untuk input transaksi baru dan default zakat.</div>
+                                <div class="text-[11px] font-bold text-brand-700">Periode Aktif</div>
+                                <div class="mt-1 text-base font-bold text-brand-950">{{ $activePeriod?->display_label ?? $activeYear }}</div>
                             </div>
                             <div class="ui-settings-summary-card ui-settings-summary-card-emerald">
-                                <div class="text-xs font-bold text-emerald-700">Grafik Periode Aktif</div>
-                                <div class="mt-1 font-black text-emerald-950">{{ $chartRange['label'] ?? '-' }}</div>
-                                <div class="mt-0.5 text-[11px] text-emerald-700">
-                                    {{ ($chartRange['source'] ?? '') === 'configured' ? 'Sudah diatur manual untuk periode aktif.' : 'Masih mengikuti transaksi periode aktif.' }}
-                                </div>
+                                <div class="text-[11px] font-bold text-brand-700">Grafik Periode Aktif</div>
+                                <div class="mt-1 text-base font-bold text-brand-950">{{ $chartRange['label'] ?? '-' }}</div>
                             </div>
-                            <div class="ui-settings-summary-card ui-settings-summary-card-emerald sm:col-span-2">
-                                <div class="text-xs font-bold text-emerald-700">Grafik Dashboard</div>
-                                <div class="mt-1 font-black text-emerald-950">{{ $dashboardChartRange['period_label'] ?? 'Belum dipilih' }}</div>
-                                <div class="mt-0.5 text-[11px] text-emerald-700">
-                                    {{ $dashboardChartRange['label'] ?? '-' }}{{ $dashboardChartMode === \App\Services\Charts\ChartRangeResolver::DASHBOARD_MODE_MANUAL_PERIOD ? ' | Manual dari pengaturan admin.' : ($dashboardChartMode === \App\Services\Charts\ChartRangeResolver::DASHBOARD_MODE_LAST_COMPLETED_PERIOD ? ' | Mengikuti periode terakhir selesai.' : ' | Mengikuti mode periode aktif.') }}
-                                </div>
-                                @if (!empty($dashboardChartRange['fallback_note']))
-                                    <div class="mt-2 rounded-xl border border-amber-100 bg-amber-50 px-3 py-2 text-[11px] leading-relaxed text-amber-800">
-                                        {{ $dashboardChartRange['fallback_note'] }}
-                                    </div>
-                                @endif
+                            <div class="ui-settings-summary-card ui-settings-summary-card-emerald">
+                                <div class="text-[11px] font-bold text-brand-700">Grafik Dashboard</div>
+                                <div class="mt-1 text-base font-bold text-brand-950">{{ $dashboardChartRange['period_label'] ?? 'Belum dipilih' }}</div>
+                                <div class="mt-0.5 text-[11px] text-brand-700">{{ $dashboardChartRange['label'] ?? '-' }}</div>
                             </div>
                         </div>
                     </div>
 
-                    <form method="POST" action="{{ route('internal.settings.period.update') }}" class="space-y-6"
+                    <form method="POST" action="{{ route('internal.settings.period.update') }}" class="space-y-4"
                         x-data="{
                             dashboardMode: @js(old('dashboard_chart_mode', $dashboardChartMode)),
                             dashboardArchive: @js((bool) old('dashboard_chart_show_offseason_archive', $dashboardChartShowOffseasonArchive)),
@@ -100,25 +88,24 @@
                         }">
                         @csrf
 
+                        <div class="grid grid-cols-1 gap-4 lg:grid-cols-2">
+                            <div class="space-y-4">
                         <section class="ui-settings-panel ui-settings-panel-muted">
                             <div class="ui-settings-section-head">
                                 <span class="h-5 w-1 rounded-full bg-slate-500"></span>
                                 <div>
-                                    <h4 class="ui-settings-section-title">Kontrol Umum</h4>
-                                    <p class="ui-settings-section-copy">Pengaturan dasar yang paling sering dicek sebelum mengubah detail periode.</p>
+                                    <h4 class="ui-settings-section-title">Umum</h4>
                                 </div>
                             </div>
-                            <div class="grid grid-cols-1 gap-5 sm:grid-cols-2">
+                            <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
                                 <div>
                                     <label class="ui-form-label" for="active_year">Tahun Aktif</label>
-                                    <input id="active_year" name="active_year" type="number" min="2000" max="2100" value="{{ old('active_year', $activeYear) }}" class="ui-input w-full bg-gray-50" readonly required />
-                                    <p class="mt-1 text-xs text-gray-500">Tahun aktif hanya bisa diganti lewat tombol <strong>Mulai Periode Baru</strong>.</p>
+                                    <input id="active_year" name="active_year" type="number" min="2000" max="2100" value="{{ old('active_year', $activeYear) }}" class="ui-input w-full bg-slate-50" readonly required />
                                     <x-input-error class="mt-2" :messages="$errors->get('active_year')" />
                                 </div>
                                 <div>
                                     <label class="ui-form-label" for="public_refresh_interval_seconds">Refresh Data Publik (detik)</label>
                                     <input id="public_refresh_interval_seconds" name="public_refresh_interval_seconds" type="number" min="0" max="60" value="{{ old('public_refresh_interval_seconds', $publicRefreshIntervalSeconds ?? 15) }}" class="ui-input w-full" required />
-                                    <p class="mt-1 text-xs text-gray-500">`0` untuk mematikan. Rekomendasi stabil: `15` detik.</p>
                                     <x-input-error class="mt-2" :messages="$errors->get('public_refresh_interval_seconds')" />
                                 </div>
                             </div>
@@ -128,30 +115,23 @@
                             <div class="ui-settings-section-head">
                                 <span class="h-5 w-1 rounded-full bg-sky-500"></span>
                                 <div>
-                                    <h4 class="ui-settings-section-title">Identitas Periode</h4>
-                                    <p class="ui-settings-section-copy">Gunakan Hijriah untuk membedakan Ramadan yang jatuh di tahun Masehi yang sama.</p>
+                                    <h4 class="ui-settings-section-title">Periode</h4>
                                 </div>
                             </div>
-                            <div class="grid grid-cols-1 gap-5 sm:grid-cols-2">
+                            <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
                                 <div class="sm:col-span-2">
                                     <label class="ui-form-label" for="period_label">Nama Periode</label>
                                     <input id="period_label" name="period_label" type="text" maxlength="80" value="{{ old('period_label', $activePeriod?->label ?? ('Ramadan ' . $activeYear)) }}" class="ui-input w-full" />
-                                    <p class="mt-1 text-xs text-gray-500">Contoh: Ramadan 1451 H atau Ramadan Akhir 2030.</p>
                                     <x-input-error class="mt-2" :messages="$errors->get('period_label')" />
                                 </div>
                                 <div>
                                     <label class="ui-form-label" for="hijri_year">Tahun Hijriah</label>
                                     <input id="hijri_year" name="hijri_year" type="number" min="1300" max="1600" value="{{ old('hijri_year', $activePeriod?->hijri_year) }}" class="ui-input w-full" placeholder="Contoh: 1451" />
-                                    <p class="mt-1 text-xs text-gray-500">Cukup simpan tahun Hijriah. Ramadan tetap diasumsikan bulan ke-9.</p>
                                     <x-input-error class="mt-2" :messages="$errors->get('hijri_year')" />
                                 </div>
                                 <div>
                                     <label class="ui-form-label" for="period_starts_at">Mulai Periode</label>
                                     <input id="period_starts_at" name="period_starts_at" type="date" x-model="periodStartsAt" value="{{ old('period_starts_at', optional($activePeriod?->starts_at)->toDateString()) }}" class="ui-input w-full" />
-                                    <p class="mt-1 text-xs text-gray-500">
-                                        Bulan Masehi terbaca otomatis:
-                                        <span class="font-semibold text-slate-600" x-text="formatGregorianMonth(periodStartsAt)"></span>
-                                    </p>
                                     <x-input-error class="mt-2" :messages="$errors->get('period_starts_at')" />
                                 </div>
                                 <div>
@@ -164,13 +144,12 @@
 
                         <section class="ui-settings-panel ui-settings-panel-white">
                             <div class="ui-settings-section-head">
-                                <span class="h-5 w-1 rounded-full bg-emerald-500"></span>
+                                <span class="h-5 w-1 rounded-full bg-brand-500"></span>
                                 <div>
-                                    <h4 class="ui-settings-section-title">Nilai Default Zakat</h4>
-                                    <p class="ui-settings-section-copy">Dipakai sebagai acuan saat petugas menginput transaksi baru.</p>
+                                    <h4 class="ui-settings-section-title">Default Zakat</h4>
                                 </div>
                             </div>
-                            <div class="grid grid-cols-1 gap-5 sm:grid-cols-2">
+                            <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
                                 <div>
                                     <label class="ui-form-label" for="default_fitrah_cash_per_jiwa">Nominal Fitrah Uang / Jiwa (Rp)</label>
                                     <input id="default_fitrah_cash_per_jiwa" name="default_fitrah_cash_per_jiwa" type="number" min="0" value="{{ old('default_fitrah_cash_per_jiwa', $defaultFitrahCashPerJiwa) }}" class="ui-input w-full" required />
@@ -193,13 +172,15 @@
                                 </div>
                             </div>
                         </section>
+                            </div>
+
+                            <div class="space-y-4">
 
                         <div class="ui-settings-panel ui-settings-panel-emerald">
                             <div class="mb-4">
-                                <h4 class="ui-settings-section-title text-emerald-900">Grafik Periode Aktif</h4>
-                                <p class="mt-1 text-xs leading-relaxed text-emerald-700">Bagian ini khusus untuk grafik bawaan periode aktif. Tidak mengatur grafik utama di dashboard admin.</p>
+                                <h4 class="ui-settings-section-title text-brand-900">Grafik Periode</h4>
                             </div>
-                            <div class="grid grid-cols-1 gap-5 sm:grid-cols-3">
+                            <div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
                                 <div>
                                     <label class="ui-form-label" for="chart_starts_at">Mulai Grafik</label>
                                     <input id="chart_starts_at" name="chart_starts_at" type="date" value="{{ old('chart_starts_at', $chartStartsAt) }}" class="ui-input w-full" />
@@ -216,26 +197,24 @@
                                     <x-input-error class="mt-2" :messages="$errors->get('chart_fallback_buffer_days')" />
                                 </div>
                             </div>
-                            <p class="ui-settings-note border-emerald-100 text-emerald-700">Kosongkan tanggal jika ingin sistem memakai tanggal transaksi pertama-terakhir dengan tambahan hari otomatis untuk periode aktif ini.</p>
                         </div>
 
                         <div class="ui-settings-panel ui-settings-panel-sky">
                             <div class="mb-4">
                                 <h4 class="ui-settings-section-title text-sky-900">Grafik Dashboard</h4>
-                                <p class="mt-1 text-xs leading-relaxed text-sky-700">Bagian ini khusus untuk grafik utama di dashboard. Dashboard akan patuh ke pengaturan ini walau tabel rekap atau riwayat sedang difilter.</p>
                             </div>
                             <div class="ui-settings-summary-card border-sky-100 bg-white/80">
-                                <div class="ui-settings-kicker text-sky-700">Yang Tampil Sekarang</div>
-                                <div class="mt-2 text-base font-black text-slate-950">{{ $dashboardChartRange['period_label'] ?? 'Belum ada periode yang dipilih' }}</div>
+                                <div class="ui-settings-kicker text-sky-700">Tampil Sekarang</div>
+                                <div class="mt-2 text-base font-bold text-slate-950">{{ $dashboardChartRange['period_label'] ?? 'Belum ada periode yang dipilih' }}</div>
                                 <div class="mt-1 text-sm text-slate-600">{{ $dashboardChartRange['label'] ?? 'Range akan mengikuti pengaturan yang Anda simpan.' }}</div>
                                 @if (!empty($dashboardChartRange['fallback_note']))
-                                    <div class="mt-3 rounded-xl border border-amber-100 bg-amber-50 px-3 py-2 text-xs leading-relaxed text-amber-800">
+                                    <div class="mt-3 rounded-xl border border-amber-100 bg-amber-50 px-3 py-2 text-xs text-amber-800">
                                         {{ $dashboardChartRange['fallback_note'] }}
                                     </div>
                                 @endif
                             </div>
 
-                            <div class="mt-5">
+                            <div class="mt-4">
                                 <div class="ui-form-label mb-2">Cara Dashboard Mengambil Grafik</div>
                                 <div class="grid grid-cols-1 gap-3 sm:grid-cols-3">
                                     @foreach ($dashboardChartModes as $modeValue => $modeLabel)
@@ -245,22 +224,13 @@
                                                 : 'border-sky-100 hover:border-sky-200'">
                                             <input type="radio" name="dashboard_chart_mode" value="{{ $modeValue }}" x-model="dashboardMode" class="sr-only" />
                                             <span class="block font-bold text-slate-900">{{ $modeLabel }}</span>
-                                            <span class="ui-settings-choice-copy">
-                                                @if ($modeValue === \App\Services\Charts\ChartRangeResolver::DASHBOARD_MODE_ACTIVE_PERIOD)
-                                                    Pakai periode aktif sistem. Cocok saat musim zakat sedang berjalan.
-                                                @elseif ($modeValue === \App\Services\Charts\ChartRangeResolver::DASHBOARD_MODE_MANUAL_PERIOD)
-                                                    Pilih sendiri periode yang ingin tetap ditampilkan, termasuk arsip Ramadan sebelumnya.
-                                                @else
-                                                    Ambil periode terbaru yang sudah selesai. Cocok untuk masa di luar musim zakat.
-                                                @endif
-                                            </span>
                                         </label>
                                     @endforeach
                                 </div>
                                 <x-input-error class="mt-2" :messages="$errors->get('dashboard_chart_mode')" />
                             </div>
 
-                            <div class="mt-5 grid grid-cols-1 gap-5 sm:grid-cols-2">
+                            <div class="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
                                 <div x-show="dashboardMode === '{{ \App\Services\Charts\ChartRangeResolver::DASHBOARD_MODE_MANUAL_PERIOD }}'" x-cloak>
                                     <label class="ui-form-label" for="dashboard_chart_period_id">Pilih Periode</label>
                                     <select id="dashboard_chart_period_id" name="dashboard_chart_period_id" class="ui-select w-full">
@@ -271,58 +241,51 @@
                                             </option>
                                         @endforeach
                                     </select>
-                                    <p class="mt-1 text-xs text-slate-500">Dipakai saat Anda ingin dashboard tetap menampilkan periode tertentu.</p>
                                     <x-input-error class="mt-2" :messages="$errors->get('dashboard_chart_period_id')" />
                                 </div>
                                 <div class="ui-settings-note sm:col-span-2 border-sky-100 text-sky-800">
                                     <span x-show="dashboardMode === '{{ \App\Services\Charts\ChartRangeResolver::DASHBOARD_MODE_ACTIVE_PERIOD }}'">
-                                        Dashboard akan mengikuti periode aktif. Saat belum ada periode aktif, sistem bisa tetap menampilkan arsip jika opsi arsip dinyalakan.
+                                        Dashboard mengikuti periode aktif.
                                     </span>
                                     <span x-show="dashboardMode === '{{ \App\Services\Charts\ChartRangeResolver::DASHBOARD_MODE_MANUAL_PERIOD }}'" x-cloak>
-                                        Dashboard akan tetap menampilkan periode pilihan Anda sampai diubah lagi dari halaman ini.
+                                        Dashboard memakai periode pilihan sampai diubah lagi.
                                     </span>
                                     <span x-show="dashboardMode === '{{ \App\Services\Charts\ChartRangeResolver::DASHBOARD_MODE_LAST_COMPLETED_PERIOD }}'" x-cloak>
-                                        Dashboard akan otomatis mencari periode terakhir yang sudah selesai. Jika belum ada periode yang selesai, dashboard sementara memakai periode aktif lalu memberi catatan penjelas.
+                                        Dashboard memakai periode terakhir yang selesai.
                                     </span>
                                 </div>
                                 <div>
                                     <label class="ui-form-label" for="dashboard_chart_starts_at">Batasi Mulai Grafik</label>
                                     <input id="dashboard_chart_starts_at" name="dashboard_chart_starts_at" type="date" value="{{ old('dashboard_chart_starts_at', $dashboardChartStartsAt) }}" class="ui-input w-full" />
-                                    <p class="mt-1 text-xs text-slate-500">Opsional. Kosongkan jika ingin mengikuti range otomatis periode.</p>
                                     <x-input-error class="mt-2" :messages="$errors->get('dashboard_chart_starts_at')" />
                                 </div>
                                 <div>
                                     <label class="ui-form-label" for="dashboard_chart_ends_at">Batasi Selesai Grafik</label>
                                     <input id="dashboard_chart_ends_at" name="dashboard_chart_ends_at" type="date" value="{{ old('dashboard_chart_ends_at', $dashboardChartEndsAt) }}" class="ui-input w-full" />
-                                    <p class="mt-1 text-xs text-slate-500">Opsional. Cocok jika Anda ingin window grafik lebih pendek dan fokus.</p>
                                     <x-input-error class="mt-2" :messages="$errors->get('dashboard_chart_ends_at')" />
                                 </div>
                             </div>
-                            <div class="mt-5 grid grid-cols-1 gap-3 sm:grid-cols-2">
+                            <div class="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2">
                                 <label class="ui-settings-check border-sky-100 text-sky-900">
-                                    <input type="checkbox" name="dashboard_chart_show_offseason_archive" value="1" x-model="dashboardArchive" @checked(old('dashboard_chart_show_offseason_archive', $dashboardChartShowOffseasonArchive)) class="mt-0.5 rounded border-gray-300 text-sky-600 shadow-sm focus:ring-sky-500" />
+                                    <input type="checkbox" name="dashboard_chart_show_offseason_archive" value="1" x-model="dashboardArchive" @checked(old('dashboard_chart_show_offseason_archive', $dashboardChartShowOffseasonArchive)) class="mt-0.5 rounded border-slate-300 text-sky-600 shadow-sm focus:ring-sky-500" />
                                     <span>
                                         <span class="block font-bold">Tetap tampilkan arsip saat belum musim zakat</span>
-                                        <span class="mt-1 block text-xs text-sky-700">Agar dashboard tidak kosong di luar musim zakat dan masih bisa menampilkan grafik periode sebelumnya.</span>
                                     </span>
                                 </label>
                                 <label class="ui-settings-check border-sky-100 text-sky-900">
-                                    <input type="checkbox" name="dashboard_chart_auto_switch_on_new_active_period" value="1" x-model="dashboardAutoSwitch" @checked(old('dashboard_chart_auto_switch_on_new_active_period', $dashboardChartAutoSwitchOnNewActivePeriod)) class="mt-0.5 rounded border-gray-300 text-sky-600 shadow-sm focus:ring-sky-500" />
+                                    <input type="checkbox" name="dashboard_chart_auto_switch_on_new_active_period" value="1" x-model="dashboardAutoSwitch" @checked(old('dashboard_chart_auto_switch_on_new_active_period', $dashboardChartAutoSwitchOnNewActivePeriod)) class="mt-0.5 rounded border-slate-300 text-sky-600 shadow-sm focus:ring-sky-500" />
                                     <span>
                                         <span class="block font-bold">Ganti otomatis ke periode aktif baru</span>
-                                        <span class="mt-1 block text-xs text-sky-700">Nyalakan jika Anda ingin dashboard langsung pindah ke periode baru saat musim zakat berikutnya dimulai.</span>
                                     </span>
                                 </label>
                             </div>
-                            <p class="ui-settings-note border-sky-100 text-sky-700">
-                                Ringkasnya: pilih <strong>Periode Manual</strong> kalau Anda ingin kendali penuh atas grafik dashboard, atau biarkan <strong>Ikuti Periode Aktif</strong> bila dashboard memang harus selalu mengikuti musim berjalan.
-                            </p>
+                        </div>
+                            </div>
                         </div>
 
                         <div class="ui-settings-panel ui-settings-panel-muted sm:flex sm:items-center sm:justify-between">
                             <div class="mb-4 sm:mb-0">
-                                <div class="text-sm font-black text-slate-900">Siap menyimpan perubahan?</div>
-                                <p class="mt-1 text-xs leading-relaxed text-slate-500">Perubahan ini akan langsung memengaruhi periode aktif, default input zakat, dan grafik yang tampil di dashboard.</p>
+                                <div class="text-sm font-bold text-slate-900">Simpan perubahan periode</div>
                             </div>
                             <div class="flex flex-col items-stretch gap-3 sm:flex-row sm:items-center">
                                 <a href="{{ route('dashboard') }}" class="ui-btn ui-btn-secondary w-full sm:w-auto">Kembali</a>
@@ -335,7 +298,7 @@
                             </div>
                         </div>
 
-                        <p class="text-center text-xs text-gray-400 sm:text-left">
+                        <p class="text-center text-xs text-slate-400 sm:text-left">
                             Tahun yang tersedia saat ini: {{ implode(', ', $years) }}
                         </p>
                     </form>
@@ -343,45 +306,49 @@
             </div>
 
             {{-- New Period Section --}}
-            <div class="overflow-hidden rounded-2xl border border-amber-100 bg-white shadow-sm">
-                <div class="flex items-center gap-2 border-b border-amber-100 bg-amber-50 px-6 py-4">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="ui-card-header-icon text-amber-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z" />
-                    </svg>
-                    <h3 class="ui-card-header-title text-amber-900">Mulai Periode Baru</h3>
+            <div class="overflow-hidden rounded-2xl border border-amber-100 bg-white shadow-sm" x-data="{ open: false }">
+                <div class="flex flex-col gap-3 border-b border-amber-100 bg-amber-50 px-4 py-3 sm:flex-row sm:items-center sm:justify-between sm:px-5">
+                    <div class="flex items-center gap-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="ui-card-header-icon text-amber-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z" />
+                        </svg>
+                        <h3 class="ui-card-header-title text-amber-900">Mulai Periode Baru</h3>
+                    </div>
+                    <button type="button" class="ui-btn w-full bg-amber-600 px-4 py-2 text-white shadow-sm hover:bg-amber-700 focus:ring-amber-500 sm:w-auto" @click="open = !open">
+                        <span x-show="!open">Buka Form</span>
+                        <span x-show="open" x-cloak>Tutup Form</span>
+                    </button>
                 </div>
-                <div class="p-5 sm:p-6">
-                    <div class="ui-settings-panel ui-settings-panel-amber p-4 text-sm leading-relaxed text-amber-900 sm:p-4">
-                        <p class="font-bold">Gunakan bagian ini saat benar-benar masuk ke periode berikutnya.</p>
-                        <p class="mt-1 text-amber-800">Sistem akan menyiapkan periode baru, memindahkan tahun aktif, dan menyalin nilai awal dari periode yang sedang berjalan.</p>
-                        <p class="mt-2 text-xs text-amber-700">Sebaiknya backup database terlebih dahulu sebelum lanjut.</p>
+                <div class="p-4 sm:p-5" x-show="open" x-cloak>
+                    <div class="ui-settings-panel ui-settings-panel-amber p-3 text-sm text-amber-900 sm:p-4">
+                        <p class="font-bold">Untuk pergantian periode resmi.</p>
+                        <p class="mt-1 text-xs text-amber-700">Backup database sebelum lanjut.</p>
                     </div>
 
-                    <form method="POST" action="{{ route('internal.settings.period.startNew') }}" class="mt-5 space-y-5" x-data="{ year: @js((string) old('new_year', $activeYear + 1)), confirmYear: @js((string) old('new_year_confirmation')), backup: @js((bool) old('backup_confirmed')) }">
+                    <form method="POST" action="{{ route('internal.settings.period.startNew') }}" class="mt-4 space-y-4" x-data="{ year: @js((string) old('new_year', $activeYear + 1)), confirmYear: @js((string) old('new_year_confirmation')), backup: @js((bool) old('backup_confirmed')) }">
                         @csrf
 
-                        <div>
-                            <label class="block text-sm font-bold text-gray-700 mb-1" for="new_year">Tahun Baru</label>
-                            <input id="new_year" name="new_year" type="number" min="2000" max="2100" x-model="year" class="ui-input w-full" required />
-                            <p class="mt-1 text-xs text-gray-500">Boleh sama dengan tahun aktif jika ada Ramadan kedua dalam tahun Masehi yang sama.</p>
-                            <x-input-error class="mt-2" :messages="$errors->get('new_year')" />
-                        </div>
+                        <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                            <div>
+                                <label class="block text-sm font-bold text-slate-700 mb-1" for="new_year">Tahun Baru</label>
+                                <input id="new_year" name="new_year" type="number" min="2000" max="2100" x-model="year" class="ui-input w-full" required />
+                                <x-input-error class="mt-2" :messages="$errors->get('new_year')" />
+                            </div>
 
-                        <div>
-                            <label class="block text-sm font-bold text-gray-700 mb-1" for="new_year_confirmation">Ketik Tahun Baru untuk Konfirmasi</label>
-                            <input id="new_year_confirmation" name="new_year_confirmation" type="text" inputmode="numeric" x-model="confirmYear" class="ui-input w-full focus:border-red-500 focus:ring-red-500" placeholder="Contoh: {{ $activeYear + 1 }}" required />
-                            <p class="mt-1 text-xs text-gray-500">Konfirmasi ini membantu mencegah perubahan periode karena salah klik.</p>
-                            <x-input-error class="mt-2" :messages="$errors->get('new_year_confirmation')" />
+                            <div>
+                                <label class="block text-sm font-bold text-slate-700 mb-1" for="new_year_confirmation">Ketik Ulang Tahun</label>
+                                <input id="new_year_confirmation" name="new_year_confirmation" type="text" inputmode="numeric" x-model="confirmYear" class="ui-input w-full focus:border-red-500 focus:ring-red-500" placeholder="Contoh: {{ $activeYear + 1 }}" required />
+                                <x-input-error class="mt-2" :messages="$errors->get('new_year_confirmation')" />
+                            </div>
                         </div>
 
                         <label class="ui-settings-check rounded-xl border-amber-100 bg-amber-50 text-sm">
-                            <input type="checkbox" name="backup_confirmed" value="1" x-model="backup" class="mt-0.5 rounded border-gray-300 text-amber-600 shadow-sm focus:ring-amber-500" required />
+                            <input type="checkbox" name="backup_confirmed" value="1" x-model="backup" class="mt-0.5 rounded border-slate-300 text-amber-600 shadow-sm focus:ring-amber-500" required />
                             <span class="text-amber-900">Saya sudah backup database atau siap melanjutkan perubahan periode aktif ini.</span>
                         </label>
                         <x-input-error class="mt-2" :messages="$errors->get('backup_confirmed')" />
 
-                        <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                            <p class="text-xs text-amber-700 sm:max-w-xs">Tombol aktif jika tahun konfirmasi cocok dan checklist backup sudah dicentang.</p>
+                        <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-end">
                             <button type="submit" :disabled="String(year) !== String(confirmYear) || !backup" class="ui-btn w-full bg-amber-600 px-5 py-3 text-white shadow-sm hover:bg-amber-700 focus:ring-amber-500 sm:w-auto">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />

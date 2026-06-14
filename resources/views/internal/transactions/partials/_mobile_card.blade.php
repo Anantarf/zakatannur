@@ -2,17 +2,17 @@
     <div class="flex items-start justify-between gap-3">
         <div class="min-w-0">
             <span class="inline-flex rounded-md bg-blue-50 px-2 py-1 font-sans text-[11px] font-semibold text-blue-600">{!! \App\Support\Format::highlight($t->no_transaksi, $q) !!}</span>
-            <div class="mt-2 text-sm font-semibold leading-tight text-gray-800">{!! \App\Support\Format::highlight($t->pembayar_nama, $q) !!}</div>
+            <div class="mt-2 text-sm font-semibold leading-tight text-slate-800">{!! \App\Support\Format::highlight($t->pembayar_nama, $q) !!}</div>
             @if($t->muzakki_total > 1)
-                <div class="mt-1 text-[11px] text-gray-500">+ {{ $t->muzakki_total - 1 }} muzakki lainnya</div>
+                <div class="mt-1 text-[11px] text-slate-500">+ {{ $t->muzakki_total - 1 }} muzakki lainnya</div>
             @endif
         </div>
         <div class="shrink-0 text-right">
             @if ($t->waktu_terima)
-                <div class="text-[11px] font-semibold text-gray-500">{{ $t->waktu_terima->timezone('Asia/Jakarta')->format('d/m/Y') }}</div>
+                <div class="text-[11px] font-semibold text-slate-500">{{ $t->waktu_terima->timezone('Asia/Jakarta')->format('d/m/Y') }}</div>
                 <div class="mt-1 text-xs font-bold text-slate-700">{{ $t->waktu_terima->timezone('Asia/Jakarta')->format('H:i') }}</div>
             @else
-                <div class="text-[11px] font-semibold text-gray-500">{{ $t->created_at->timezone('Asia/Jakarta')->format('d/m/Y') }}</div>
+                <div class="text-[11px] font-semibold text-slate-500">{{ $t->created_at->timezone('Asia/Jakarta')->format('d/m/Y') }}</div>
                 <div class="mt-1 text-xs font-bold text-slate-700">{{ $t->created_at->timezone('Asia/Jakarta')->format('H:i') }}</div>
             @endif
         </div>
@@ -34,7 +34,7 @@
         <div class="ui-mobile-meta-item">
             <p class="ui-mobile-meta-label">Petugas</p>
             <div class="ui-mobile-meta-value">{{ $t->petugas?->name ?? '-' }}</div>
-            <span class="mt-1 inline-flex items-center justify-center rounded px-2 py-0.5 text-[11px] font-bold uppercase bg-emerald-50 text-emerald-700 border border-emerald-100 whitespace-nowrap leading-tight text-center">
+            <span class="mt-1 inline-flex items-center justify-center rounded px-2 py-0.5 text-[11px] font-bold uppercase bg-brand-50 text-brand-700 border border-brand-100 whitespace-nowrap leading-tight text-center">
                 {{ $t->shift_label }}
             </span>
         </div>
@@ -43,14 +43,14 @@
             <div class="mt-1 text-right">
                 @if($t->total_uang > 0)
                     <div class="flex items-center justify-end gap-1">
-                        <span class="text-sm font-semibold text-gray-800">{{ $t->total_uang_display }}</span>
+                        <span class="text-sm font-semibold text-slate-800">{{ $t->total_uang_display }}</span>
                         @if($t->has_transfer)
                             <x-transfer-badge />
                         @endif
                     </div>
                 @endif
                 @if($t->total_beras > 0)
-                    <div class="mt-1 text-sm font-semibold text-gray-800">{{ $t->total_beras_display }}</div>
+                    <div class="mt-1 text-sm font-semibold text-slate-800">{{ $t->total_beras_display }}</div>
                 @endif
             </div>
         </div>
@@ -93,10 +93,10 @@
                 Hapus
             </button>
         @else
-            <button type="button" x-data x-on:click="$dispatch('open-modal', 'restricted-modal')" class="ui-btn ui-btn-secondary px-3 py-3 text-xs text-gray-400">
+            <button type="button" x-data x-on:click="$dispatch('open-modal', 'restricted-modal')" class="ui-btn ui-btn-secondary px-3 py-3 text-xs text-slate-400">
                 Ubah
             </button>
-            <button type="button" x-data x-on:click="$dispatch('open-modal', 'restricted-modal')" class="ui-btn ui-btn-secondary px-3 py-3 text-xs text-gray-400">
+            <button type="button" x-data x-on:click="$dispatch('open-modal', 'restricted-modal')" class="ui-btn ui-btn-secondary px-3 py-3 text-xs text-slate-400">
                 Hapus
             </button>
         @endcan

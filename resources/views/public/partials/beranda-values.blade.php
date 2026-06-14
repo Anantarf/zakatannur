@@ -1,17 +1,17 @@
 <section class="grid grid-cols-1 gap-6 md:grid-cols-3">
     @include('public.partials.beranda-feature-card', [
-        'title' => 'Manajemen Muzakki',
-        'description' => 'Pencatatan data jamaah muzakki yang rapi dan amanah.',
+        'title' => 'Transparan',
+        'description' => 'Jamaah dapat membuka ringkasan penerimaan tanpa menunggu rekap manual.',
         'icon' => 'people',
     ])
     @include('public.partials.beranda-feature-card', [
-        'title' => 'Laporan Real-Time',
-        'description' => 'Transparansi penuh melalui rekapitulasi otomatis publik.',
+        'title' => 'Mudah Dipantau',
+        'description' => 'Kategori zakat, total uang, beras, dan jiwa disusun dalam tampilan ringkas.',
         'icon' => 'report',
     ])
     @include('public.partials.beranda-feature-card', [
-        'title' => 'Amanah & Profesional',
-        'description' => 'Disusun Panitia Zakat An-Nur per periode.',
+        'title' => 'Amanah',
+        'description' => 'Dikelola panitia zakat Masjid An-Nur untuk kebutuhan periode berjalan.',
         'icon' => 'committee',
     ])
 </section>

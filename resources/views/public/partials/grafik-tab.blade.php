@@ -15,17 +15,6 @@
                 </div>
             </div>
 
-            <div class="public-chart-filter" role="tablist" aria-label="Filter grafik">
-                <button type="button" role="tab"
-                    :aria-selected="chartSlide === 0"
-                    :class="chartSlide === 0 ? 'public-chart-filter-active' : 'public-chart-filter-inactive'"
-                    @click="setChartSlide(0)">Uang</button>
-                <button type="button" role="tab"
-                    :aria-selected="chartSlide === 1"
-                    :class="chartSlide === 1 ? 'public-chart-filter-active' : 'public-chart-filter-inactive'"
-                    @click="setChartSlide(1)">Beras</button>
-            </div>
-
             <span class="public-pill public-pill-brand hidden px-3 py-1 text-[10px] tracking-[0.08em] sm:inline-flex" x-text="dailyChartData.range?.label || ''"></span>
         </div>
 
@@ -58,18 +47,22 @@
                 </span>
                 <span class="public-chart-card-meta" id="chart-range-label"></span>
             </div>
-            <div class="h-[340px] sm:h-[400px] w-full relative">
+            <div class="h-[300px] sm:h-[340px] w-full relative">
                 <canvas id="dailyChart"></canvas>
             </div>
         </div>
 
-        <div class="public-chart-dots" role="tablist" aria-label="Navigasi slide grafik">
-            <template x-for="(dot, i) in [0,1]" :key="`dot-${i}`">
+        <div class="mt-3 flex items-center justify-center">
+            <div class="public-chart-filter" role="tablist" aria-label="Filter grafik">
                 <button type="button" role="tab"
-                    :aria-selected="chartSlide === i"
-                    :class="chartSlide === i ? 'public-chart-dot-active' : 'public-chart-dot-inactive'"
-                    @click="setChartSlide(i)"></button>
-            </template>
+                    :aria-selected="chartSlide === 0"
+                    :class="chartSlide === 0 ? 'public-chart-filter-active' : 'public-chart-filter-inactive'"
+                    @click="setChartSlide(0)">Uang</button>
+                <button type="button" role="tab"
+                    :aria-selected="chartSlide === 1"
+                    :class="chartSlide === 1 ? 'public-chart-filter-active' : 'public-chart-filter-inactive'"
+                    @click="setChartSlide(1)">Beras</button>
+            </div>
         </div>
     </div>
 </div>

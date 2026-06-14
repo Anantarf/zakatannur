@@ -19,7 +19,7 @@
         'danger' => 'text-red-700',
         'muted' => 'text-slate-600',
         'info' => 'text-blue-700',
-        default => 'text-gray-400',
+        default => 'text-slate-400',
     };
 
     $descriptionClass = match($tone) {
@@ -27,7 +27,7 @@
         'danger' => 'text-red-700/80',
         'muted' => 'text-slate-600',
         'info' => 'text-blue-700/80',
-        default => 'text-gray-500',
+        default => 'text-slate-500',
     };
 @endphp
 

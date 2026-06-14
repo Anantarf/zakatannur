@@ -28,7 +28,7 @@
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
             @if (session('status'))
                 <div class="ui-alert ui-alert-success">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="ui-alert-icon text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="ui-alert-icon text-brand-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
                     </svg>
                     <span class="font-medium">{{ session('status') }}</span>
@@ -55,9 +55,9 @@
 
             <div class="grid grid-cols-1 gap-3 sm:grid-cols-3">
                 <div class="ui-stat-card ui-stat-card-default">
-                    <div class="ui-stat-eyebrow text-emerald-700">Total Akun</div>
-                    <div class="ui-stat-value text-emerald-950">{{ $totalUsers }}</div>
-                    <div class="ui-stat-description text-emerald-700">Jumlah akun yang tampil di daftar saat ini.</div>
+                    <div class="ui-stat-eyebrow text-brand-700">Total Akun</div>
+                    <div class="ui-stat-value text-brand-950">{{ $totalUsers }}</div>
+                    <div class="ui-stat-description text-brand-700">Jumlah akun yang tampil di daftar saat ini.</div>
                 </div>
                 <div class="ui-stat-card ui-stat-card-info">
                     <div class="ui-stat-eyebrow text-blue-700">Akses Anda</div>
@@ -85,8 +85,8 @@
                             <article class="ui-mobile-card">
                                 <div class="flex items-start justify-between gap-3">
                                     <div class="min-w-0">
-                                        <div class="text-sm font-bold leading-tight text-gray-800">{{ $u->name }}</div>
-                                        <div class="mt-1 font-sans text-xs text-gray-500">{{ $u->username }}</div>
+                                        <div class="text-sm font-bold leading-tight text-slate-800">{{ $u->name }}</div>
+                                        <div class="mt-1 font-sans text-xs text-slate-500">{{ $u->username }}</div>
                                     </div>
                                     <span class="ui-role-badge {{ $u->role === 'super_admin' ? 'ui-role-badge-super' : ($u->role === 'admin' ? 'ui-role-badge-admin' : 'ui-role-badge-staff') }}">
                                         {{ $roleLabels[$u->role] ?? ucfirst($u->role) }}
@@ -99,7 +99,7 @@
                                             Ubah Pengguna
                                         </a>
                                     @else
-                                        <div class="rounded-xl border border-dashed border-gray-200 px-4 py-3 text-center text-xs font-bold text-gray-300">
+                                        <div class="rounded-xl border border-dashed border-slate-200 px-4 py-3 text-center text-xs font-bold text-slate-300">
                                             Tidak ada aksi
                                         </div>
                                     @endif
@@ -109,7 +109,7 @@
                     @else
                         <div class="ui-empty-state">
                             <div class="flex flex-col items-center">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 text-gray-200 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 text-slate-200 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
                                 </svg>
                                 <span class="ui-empty-state-copy">Belum ada pengguna.</span>
@@ -121,19 +121,19 @@
                 <div class="hidden overflow-x-auto w-full md:block">
                     <table class="min-w-full text-sm">
                         <thead>
-                            <tr class="bg-gray-50 text-left text-xs font-bold text-gray-400 uppercase tracking-widest border-b border-gray-100">
+                            <tr class="bg-slate-50 text-left text-xs font-bold text-slate-400 uppercase tracking-widest border-b border-slate-100">
                                 <th class="px-6 py-4">Nama</th>
                                 <th class="px-6 py-4">Username</th>
                                 <th class="px-6 py-4">Role</th>
                                 <th class="px-6 py-4 text-center">Aksi</th>
                             </tr>
                         </thead>
-                        <tbody class="divide-y divide-gray-50">
+                        <tbody class="divide-y divide-slate-50">
                             @if (count($users) > 0)
                                 @foreach ($users as $u)
-                                <tr class="hover:bg-gray-50 transition-colors">
-                                    <td class="px-6 py-4 font-bold text-gray-800">{{ $u->name }}</td>
-                                    <td class="px-6 py-4 text-gray-500 font-sans text-xs">{{ $u->username }}</td>
+                                <tr class="hover:bg-slate-50 transition-colors">
+                                    <td class="px-6 py-4 font-bold text-slate-800">{{ $u->name }}</td>
+                                    <td class="px-6 py-4 text-slate-500 font-sans text-xs">{{ $u->username }}</td>
                                     <td class="px-6 py-4">
                                         <span class="ui-role-badge {{ $u->role === 'super_admin' ? 'ui-role-badge-super' : ($u->role === 'admin' ? 'ui-role-badge-admin' : 'ui-role-badge-staff') }}">
                                             {{ $roleLabels[$u->role] ?? ucfirst($u->role) }}
@@ -148,7 +148,7 @@
                                                 Ubah
                                             </a>
                                         @else
-                                            <span class="inline-flex rounded-full border border-dashed border-gray-200 px-3 py-1 text-xs font-bold text-gray-300">Tidak tersedia</span>
+                                            <span class="inline-flex rounded-full border border-dashed border-slate-200 px-3 py-1 text-xs font-bold text-slate-300">Tidak tersedia</span>
                                         @endif
                                     </td>
                                 </tr>
@@ -157,10 +157,10 @@
                                 <tr>
                                     <td colspan="4" class="px-6 py-12 text-center">
                                         <div class="flex flex-col items-center">
-                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 text-gray-200 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 text-slate-200 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
                                             </svg>
-                                            <span class="text-sm font-medium text-gray-400">Belum ada pengguna.</span>
+                                            <span class="text-sm font-medium text-slate-400">Belum ada pengguna.</span>
                                         </div>
                                     </td>
                                 </tr>
@@ -169,7 +169,7 @@
                     </table>
                 </div>
                 @if ($users->hasPages())
-                    <div class="px-6 py-4 border-t border-gray-50">
+                    <div class="px-6 py-4 border-t border-slate-50">
                         {{ $users->links() }}
                     </div>
                 @endif

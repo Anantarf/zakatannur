@@ -1,5 +1,5 @@
 <div x-data="{ open: false }">
-    <button @click="open = !open" class="flex items-center gap-1 text-xs font-bold text-emerald-600 transition-colors hover:text-emerald-700">
+    <button @click="open = !open" class="flex items-center gap-1 text-xs font-bold text-brand-600 transition-colors hover:text-brand-700">
         <span>Lihat Detail</span>
         <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 transform transition-transform" :class="open ? 'rotate-180' : ''" viewBox="0 0 20 20" fill="currentColor">
             <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
@@ -9,13 +9,13 @@
         @if(in_array($log->action, ['Updated.Transaction', 'Created.Transaction']))
             <div class="mb-4 pb-4 border-b border-slate-700/50">
                 <div class="flex items-center justify-between mb-3">
-                    <h4 class="text-xs font-black text-emerald-400 uppercase tracking-widest">Ringkasan Transaksi</h4>
+                    <h4 class="text-xs font-black text-brand-400 uppercase tracking-widest">Ringkasan Transaksi</h4>
                     <span class="text-[10px] text-slate-500 font-sans">{{ $log->metadata['no_transaksi'] ?? '-' }}</span>
                 </div>
                 <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
                     <div class="bg-slate-800/50 p-3 rounded-lg border border-slate-700/50">
                         <div class="text-[9px] text-slate-500 uppercase font-bold mb-1">Tambah</div>
-                        <div class="text-lg font-black text-emerald-500">{{ $log->metadata['summary']['added'] ?? 0 }}</div>
+                        <div class="text-lg font-black text-brand-500">{{ $log->metadata['summary']['added'] ?? 0 }}</div>
                     </div>
                     <div class="bg-slate-800/50 p-3 rounded-lg border border-slate-700/50">
                         <div class="text-[9px] text-slate-500 uppercase font-bold mb-1">Update</div>
@@ -34,10 +34,10 @@
                         <span class="text-slate-400 font-medium">Total Uang</span>
                         <div class="flex items-center gap-2">
                             <span class="text-slate-500 line-through">{{ \App\Support\Format::rupiah((int)($log->metadata['totals']['old']['uang'] ?? 0)) }}</span>
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 text-brand-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6" />
                             </svg>
-                            <span class="text-emerald-400 font-black">{{ \App\Support\Format::rupiah((int)($log->metadata['totals']['new']['uang'] ?? 0)) }}</span>
+                            <span class="text-brand-400 font-black">{{ \App\Support\Format::rupiah((int)($log->metadata['totals']['new']['uang'] ?? 0)) }}</span>
                         </div>
                     </div>
                 @endif
@@ -46,10 +46,10 @@
                         <span class="text-slate-400 font-medium">Total Beras</span>
                         <div class="flex items-center gap-2">
                             <span class="text-slate-500 line-through text-[10px]">{{ \App\Support\Format::kg((float)($log->metadata['totals']['old']['beras'] ?? 0)) }}</span>
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 text-brand-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6" />
                             </svg>
-                            <span class="text-emerald-400 font-black">{{ \App\Support\Format::kg((float)($log->metadata['totals']['new']['beras'] ?? 0)) }}</span>
+                            <span class="text-brand-400 font-black">{{ \App\Support\Format::kg((float)($log->metadata['totals']['new']['beras'] ?? 0)) }}</span>
                         </div>
                     </div>
                 @endif
@@ -188,18 +188,18 @@
                                 @foreach($val as $subKey => $subVal)
                                     <div class="flex flex-wrap gap-x-2 text-[10px]">
                                         <span class="text-slate-500">{{ Str::headline($subKey) }}:</span>
-                                        <span class="text-emerald-400 font-sans not-italic">{{ is_array($subVal) ? json_encode($subVal) : $subVal }}</span>
+                                        <span class="text-brand-400 font-sans not-italic">{{ is_array($subVal) ? json_encode($subVal) : $subVal }}</span>
                                     </div>
                                 @endforeach
                             </div>
                         @else
-                            <span class="text-[11px] text-emerald-400 font-sans break-all">{{ $val }}</span>
+                            <span class="text-[11px] text-brand-400 font-sans break-all">{{ $val }}</span>
                         @endif
                     </div>
                 @endforeach
             </div>
         @else
-            <pre class="text-[10px] text-emerald-400 font-mono leading-relaxed bg-slate-800/50 p-3 rounded border border-slate-700/30">No Data Available</pre>
+            <pre class="text-[10px] text-brand-400 font-mono leading-relaxed bg-slate-800/50 p-3 rounded border border-slate-700/30">No Data Available</pre>
         @endif
 
         @if(is_array($log->metadata) && count($log->metadata) > 0)
@@ -208,7 +208,7 @@
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-2 w-2" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v2H7a1 1 0 100 2h2v2a1 1 0 102 0v-2h2a1 1 0 100-2h-2V7z" clip-rule="evenodd" /></svg>
                     Toggle Debug Info (JSON)
                 </button>
-                <pre class="hidden mt-4 text-[10px] text-emerald-400/80 font-mono leading-relaxed bg-slate-950 p-4 rounded-xl border border-slate-800 shadow-inner">{{ json_encode($log->metadata, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES) }}</pre>
+                <pre class="hidden mt-4 text-[10px] text-brand-400/80 font-mono leading-relaxed bg-slate-950 p-4 rounded-xl border border-slate-800 shadow-inner">{{ json_encode($log->metadata, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES) }}</pre>
             </div>
         @endif
     </div>

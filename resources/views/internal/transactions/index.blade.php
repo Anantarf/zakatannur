@@ -8,7 +8,7 @@
                     </svg>
                     Riwayat Transaksi
                 </h2>
-                <p class="text-sm text-slate-500">Pantau transaksi masuk, cari data yang dibutuhkan, lalu buka aksi operasional per transaksi.</p>
+                <p class="text-sm text-slate-500">Cari, pantau, dan buka aksi transaksi.</p>
             </div>
 
             <div class="flex flex-col sm:flex-row items-center gap-2 w-full sm:w-auto">
@@ -19,11 +19,11 @@
 
                 @if (auth()->check() && in_array(auth()->user()->role, ['admin', 'super_admin'], true))
                     <div class="flex items-center gap-1.5 w-full sm:w-auto">
-                        <button type="button" x-data x-on:click="$dispatch('open-modal', 'export-daily-modal')" class="ui-btn ui-btn-secondary flex-1 px-3 py-2.5 text-xs text-emerald-700 hover:text-emerald-700 sm:flex-none sm:py-2">
+                        <button type="button" x-data x-on:click="$dispatch('open-modal', 'export-daily-modal')" class="ui-btn ui-btn-secondary flex-1 px-3 py-2.5 text-xs text-brand-700 hover:text-brand-700 sm:flex-none sm:py-2">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
                             Ekspor
                         </button>
-                        <a href="{{ route('internal.transactions.trash') }}" class="ui-btn ui-btn-secondary flex-none px-3 py-2.5 text-gray-400 hover:text-red-600 sm:px-2.5 sm:py-2" title="Sampah">
+                        <a href="{{ route('internal.transactions.trash') }}" class="ui-btn ui-btn-secondary flex-none px-3 py-2.5 text-slate-400 hover:text-red-600 sm:px-2.5 sm:py-2" title="Sampah">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
                         </a>
                     </div>
@@ -32,20 +32,20 @@
         </div>
     </x-slot>
 
-    <div class="py-6 sm:py-10">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-6">
+    <div class="py-4 sm:py-6">
+        <div class="mx-auto max-w-7xl space-y-4 px-4 sm:px-6 lg:px-8">
             @if ($errors->any())
                 <x-form-errors />
             @endif
             {{-- Transactions Table --}}
-            <div class="ui-card overflow-hidden shadow-md">
+            <div class="ui-card overflow-hidden">
                 <div class="ui-toolbar-soft xl:flex-row xl:items-start">
                     <div class="max-w-full space-y-1 xl:max-w-[260px] xl:flex-none">
                         <div class="ui-section-title">
-                            <div class="h-6 w-2 rounded-full bg-emerald-500"></div>
-                            <h3 class="font-semibold text-gray-800">Daftar Transaksi</h3>
+                            <div class="h-5 w-1.5 rounded-full bg-brand-500"></div>
+                            <h3 class="font-semibold text-slate-800">Daftar Transaksi</h3>
                         </div>
-                        <p class="text-sm leading-6 text-slate-500">Filter, cari, lalu buka aksi cepat per transaksi dari tabel ini.</p>
+                        <p class="text-sm leading-6 text-slate-500">Filter dan aksi cepat per transaksi.</p>
                     </div>
 
                     @include('internal.transactions.partials.history-filters')
@@ -56,7 +56,7 @@
                     @empty
                         <div class="ui-empty-state">
                             <div class="flex flex-col items-center">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 text-gray-200 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 text-slate-200 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                                 </svg>
                                 <span class="ui-empty-state-copy">
@@ -71,31 +71,31 @@
                 <div class="hidden overflow-x-auto w-full md:block">
                     <table class="min-w-full text-sm">
                         <thead>
-                            <tr class="bg-gray-50 text-left text-[11px] sm:text-xs font-bold text-gray-400 uppercase tracking-widest border-b border-gray-100">
-                                <th class="px-2 sm:px-6 py-4">No. Transaksi</th>
-                                <th class="px-2 sm:px-6 py-4">Waktu</th>
-                                <th class="px-2 sm:px-6 py-4">Pembayar</th>
-                                <th class="px-2 py-4 text-center">Kategori</th>
-                                <th class="px-2 py-4 text-center">Bentuk</th>
-                                <th class="px-2 sm:px-6 py-4 text-right">Total Nominal</th>
+                            <tr class="border-b border-slate-100 bg-slate-50 text-left text-[11px] font-semibold uppercase tracking-[0.14em] text-slate-400 sm:text-xs">
+                                <th class="px-3 py-3 sm:px-5">No. Transaksi</th>
+                                <th class="px-3 py-3 sm:px-5">Waktu</th>
+                                <th class="px-3 py-3 sm:px-5">Pembayar</th>
+                                <th class="px-2 py-3 text-center">Kategori</th>
+                                <th class="px-2 py-3 text-center">Bentuk</th>
+                                <th class="px-3 py-3 text-right sm:px-5">Total Nominal</th>
                                 @if ($canViewRisk)
-                                    <th class="px-2 sm:px-4 py-4 text-center">Risiko</th>
+                                    <th class="px-2 py-3 text-center sm:px-4">Risiko</th>
                                 @endif
-                                <th class="px-2 sm:px-6 py-4 text-center">Petugas</th>
-                                <th class="px-3 py-4 text-center min-w-[120px]">Aksi</th>
+                                <th class="px-3 py-3 text-center sm:px-5">Petugas</th>
+                                <th class="min-w-[120px] px-3 py-3 text-center">Aksi</th>
                             </tr>
                         </thead>
-                        <tbody class="divide-y divide-gray-100/80">
+                        <tbody class="divide-y divide-slate-100/80">
                             @forelse ($transactions as $t)
                                 @include("internal.transactions.partials._desktop_row", ["t" => $t])
                             @empty
                                 <tr>
                                     <td colspan="{{ $canViewRisk ? 9 : 8 }}" class="px-6 py-12 text-center">
                                         <div class="flex flex-col items-center">
-                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 text-gray-200 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 text-slate-200 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                                             </svg>
-                                            <span class="text-sm font-medium text-gray-400">
+                                            <span class="text-sm font-medium text-slate-400">
                                                 {{ ($q || $year || $category) ? "Data tidak ditemukan." : "Belum ada transaksi ditemukan." }}
                                             </span>
                                         </div>
@@ -108,7 +108,7 @@
                 </div>
 
                 @if ($transactions->hasPages())
-                    <div class="px-6 py-4 border-t border-gray-50">
+                    <div class="border-t border-slate-100 px-6 py-4">
                         {{ $transactions->links() }}
                     </div>
                 @endif
@@ -120,10 +120,10 @@
     <x-modal name="trash-modal" :show="$errors->has('deleted_reason')" focusable>
         <form method="POST" x-data="{ id: '', no: '' }" x-on:open-trash-modal.window="id = $event.detail.id; no = $event.detail.no; $el.action = '{{ url('/internal/transactions') }}/' + id + '/trash';" class="p-6">
             @csrf
-            <h2 class="text-lg font-medium text-gray-900">
+            <h2 class="text-lg font-medium text-slate-900">
                 Yakin ingin memindahkan transaksi <span x-text="no" class="font-bold font-sans text-red-600"></span> ke Sampah?
             </h2>
-            <p class="mt-1 text-sm text-gray-600">
+            <p class="mt-1 text-sm text-slate-600">
                 Transaksi akan otomatis dihapus permanen dari sistem setelah 30 hari.
             </p>
             <div class="mt-4">
@@ -156,8 +156,8 @@
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
                 </svg>
             </div>
-            <h2 class="text-lg font-bold text-gray-900 mb-2">Akses Terbatas</h2>
-            <p class="text-sm text-gray-600 mb-6 leading-relaxed">
+            <h2 class="text-lg font-bold text-slate-900 mb-2">Akses Terbatas</h2>
+            <p class="text-sm text-slate-600 mb-6 leading-relaxed">
                 <strong>Staf</strong> hanya dapat mengubah atau menghapus transaksi <strong>miliknya sendiri</strong> yang dibuat <strong>hari ini</strong>. Hubungi Admin atau Super Admin untuk kasus lain.
             </p>
             <div class="flex justify-center">
@@ -171,11 +171,11 @@
     <!-- Modal Export Harian -->
     <x-modal name="export-daily-modal" focusable maxWidth="sm">
         <form method="GET" action="{{ route('internal.rekap.export.daily') }}" class="p-6">
-            <h2 class="text-lg font-semibold text-gray-900 flex items-center gap-2 mb-4">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
+            <h2 class="text-lg font-semibold text-slate-900 flex items-center gap-2 mb-4">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-brand-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
                 Pilih Tanggal (Rekap Harian)
             </h2>
-            <p class="mt-1 text-sm text-gray-600 mb-6">
+            <p class="mt-1 text-sm text-slate-600 mb-6">
                 Silakan pilih tanggal transaksi yang ingin diekspor. Opsi yang tersedia hanya menyesuaikan dengan data transaksi tervalidasi di sistem.
             </p>
 
@@ -189,7 +189,7 @@
                             @endforeach
                         </select>
                 @else
-                    <div class="p-4 bg-gray-50 border border-gray-200 rounded-lg text-sm text-gray-500 not-italic text-center">
+                    <div class="p-4 bg-slate-50 border border-slate-200 rounded-lg text-sm text-slate-500 not-italic text-center">
                         Belum ada transaksi valid yang tersedia untuk diekspor.
                     </div>
                 @endif
@@ -210,11 +210,11 @@
     <!-- Modal Export Tahunan -->
     <x-modal name="export-yearly-modal" focusable maxWidth="sm">
         <form method="GET" action="{{ route('internal.rekap.export.yearly') }}" class="p-6">
-            <h2 class="text-lg font-semibold text-gray-900 flex items-center gap-2 mb-4">
+            <h2 class="text-lg font-semibold text-slate-900 flex items-center gap-2 mb-4">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
                 Pilih Tahun (Rekap Tahunan)
             </h2>
-            <p class="mt-1 text-sm text-gray-600 mb-6">
+            <p class="mt-1 text-sm text-slate-600 mb-6">
                 Silakan pilih tahun periode Zakat. Sistem akan mengakumulasi seluruh transaksi per hari pada tahun tersebut.
             </p>
 
@@ -228,7 +228,7 @@
                             @endforeach
                         </select>
                 @else
-                    <div class="p-4 bg-gray-50 border border-gray-200 rounded-lg text-sm text-gray-500 not-italic text-center">
+                    <div class="p-4 bg-slate-50 border border-slate-200 rounded-lg text-sm text-slate-500 not-italic text-center">
                         Belum ada transaksi valid yang tersedia untuk diekspor.
                     </div>
                 @endif

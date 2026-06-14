@@ -15,11 +15,11 @@
     <button
         type="button"
         @click="toggleChat()"
-        class="zakky-fab group relative flex h-14 w-14 items-center justify-center rounded-full bg-white p-3 text-emerald-700 ring-1 ring-emerald-200/80 shadow-[0_18px_40px_-12px_rgba(4,120,87,0.45)] transition-transform duration-300 ease-out hover:scale-105 hover:shadow-[0_22px_48px_-12px_rgba(4,120,87,0.55)] focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2"
+        class="zakky-fab group relative flex h-14 w-14 items-center justify-center rounded-full bg-white p-3 text-brand-700 ring-1 ring-brand-200/80 shadow-[0_18px_40px_-12px_rgba(15,118,110,0.42)] transition-transform duration-300 ease-out hover:scale-105 hover:shadow-[0_22px_48px_-12px_rgba(15,118,110,0.5)] focus:outline-none focus:ring-2 focus:ring-brand-500 focus:ring-offset-2"
         :class="isOpen ? 'scale-0 opacity-0 pointer-events-none' : 'scale-100 opacity-100'"
         aria-label="Buka chatbot Zakky"
     >
-        <span class="zakky-fab-pulse absolute inset-0 rounded-full bg-emerald-400/30" aria-hidden="true"></span>
+        <span class="zakky-fab-pulse absolute inset-0 rounded-full bg-brand-400/30" aria-hidden="true"></span>
         <x-zakat-avatar size="md" variant="light" class="relative z-10" />
         <span
             x-show="unreadBadge"
@@ -43,14 +43,14 @@
         role="dialog"
         aria-label="Chat dengan Zakky"
     >
-        <div class="z-10 flex items-center justify-between bg-gradient-to-r from-emerald-600 via-emerald-600 to-emerald-700 p-4 text-white shadow-md">
+        <div class="z-10 flex items-center justify-between bg-gradient-to-r from-brand-600 via-brand-600 to-brand-700 p-4 text-white shadow-md">
             <div class="flex items-center space-x-3 min-w-0">
                 <x-zakat-avatar size="md" variant="light" class="shadow-inner" />
                 <div class="min-w-0">
                     <h3 class="text-base font-bold leading-tight">Zakky</h3>
-                    <p class="flex items-center text-[11px] text-emerald-50">
+                    <p class="flex items-center text-[11px] text-brand-50">
                         <span
-                            class="mr-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-emerald-300"
+                            class="mr-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-brand-300"
                             :class="isOnline ? 'animate-pulse' : 'opacity-50'"
                         ></span>
                         <span x-text="isOnline ? 'Online · siap membantu' : 'AI Asisten Zakat An-Nur'"></span>
@@ -75,7 +75,7 @@
                 <x-zakat-avatar size="sm" variant="solid" class="mr-2" />
                 <div class="flex max-w-[85%] flex-col items-start">
                     <div class="rounded-2xl rounded-tl-none border border-slate-200/80 bg-white p-3 text-sm leading-relaxed text-slate-800 shadow-sm break-words whitespace-pre-wrap">
-                        Assalamu'alaikum. Saya <span class="font-semibold text-emerald-700">Zakky</span>, asisten Zakat An-Nur. Pilih topik di bawah atau tulis pertanyaan Anda.
+                        Assalamu'alaikum. Saya <span class="font-semibold text-brand-700">Zakky</span>, asisten Zakat An-Nur. Pilih topik di bawah atau tulis pertanyaan Anda.
                     </div>
                     <span class="mt-1 px-1 text-[10px] text-slate-400" x-text="formatTime(welcomeAt)"></span>
                 </div>
@@ -86,7 +86,7 @@
                     <button
                         type="button"
                         @click="useQuickReply(chip.message)"
-                        class="inline-flex items-center rounded-full border border-emerald-200 bg-white px-2.5 py-1 text-[11px] font-semibold text-emerald-700 shadow-sm transition-colors hover:bg-emerald-50 hover:border-emerald-300"
+                        class="inline-flex items-center rounded-full border border-brand-200 bg-white px-2.5 py-1 text-[11px] font-semibold text-brand-700 shadow-sm transition-colors hover:bg-brand-50 hover:border-brand-300"
                         x-text="chip.label"
                     ></button>
                 </template>
@@ -102,7 +102,7 @@
                         <div
                             class="p-3 text-sm leading-relaxed shadow-sm break-words whitespace-pre-wrap"
                             :class="message.role === 'user'
-                                ? 'rounded-2xl rounded-tr-none bg-emerald-600 text-white'
+                                ? 'rounded-2xl rounded-tr-none bg-brand-600 text-white'
                                 : (message.isError
                                     ? 'rounded-2xl rounded-tl-none border border-amber-200 bg-amber-50 text-amber-900'
                                     : 'rounded-2xl rounded-tl-none border border-slate-200/80 bg-white text-slate-800')"
@@ -111,7 +111,7 @@
                         <div class="mt-1 flex items-center gap-1.5 px-1 text-[10px] text-slate-400">
                             <span x-text="formatTime(message.createdAt)"></span>
                             <template x-if="message.role === 'user' &amp;&amp; !message.isError">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true" stroke-width="2.5">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 text-brand-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true" stroke-width="2.5">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
                                 </svg>
                             </template>
@@ -148,13 +148,13 @@
                     type="text"
                     x-model="input"
                     maxlength="500"
-                    class="w-full rounded-full border border-slate-200 bg-slate-50 py-3 pl-4 pr-12 text-sm text-slate-800 transition-colors placeholder:text-slate-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-emerald-500 disabled:opacity-60"
+                    class="w-full rounded-full border border-slate-200 bg-slate-50 py-3 pl-4 pr-12 text-sm text-slate-800 transition-colors placeholder:text-slate-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-brand-500 disabled:opacity-60"
                     placeholder="Tulis pesan untuk Zakky..."
                     :disabled="isTyping"
                 >
                 <button
                     type="submit"
-                    class="absolute right-1 flex h-10 w-10 items-center justify-center rounded-full bg-emerald-600 text-white transition-all hover:bg-emerald-700 active:scale-95 disabled:cursor-not-allowed disabled:opacity-50"
+                    class="absolute right-1 flex h-10 w-10 items-center justify-center rounded-full bg-brand-600 text-white transition-all hover:bg-brand-700 active:scale-95 disabled:cursor-not-allowed disabled:opacity-50"
                     :disabled="isTyping || isInputEmpty"
                     aria-label="Kirim pesan"
                 >

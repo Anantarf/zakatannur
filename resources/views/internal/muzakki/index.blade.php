@@ -12,7 +12,7 @@
             </div>
             <div class="flex items-center justify-center sm:justify-end gap-3 w-full sm:w-auto">
                 @if (auth()->check() && in_array(auth()->user()->role, ['admin', 'super_admin'], true))
-                    <a href="{{ route('internal.muzakki.trash') }}" class="ui-btn ui-btn-secondary px-4 py-2 text-sm text-gray-500 hover:text-red-600">
+                    <a href="{{ route('internal.muzakki.trash') }}" class="ui-btn ui-btn-secondary px-4 py-2 text-sm text-slate-500 hover:text-red-600">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                         </svg>
@@ -23,11 +23,11 @@
         </div>
     </x-slot>
 
-    <div class="py-6 sm:py-10">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
+    <div class="py-5 sm:py-8">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-4 sm:space-y-5">
             @if (session('status'))
                 <div class="ui-alert ui-alert-success">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="ui-alert-icon text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="ui-alert-icon text-brand-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
                     </svg>
                     <span class="font-medium">{{ session('status') }}</span>
@@ -51,7 +51,7 @@
                     </div>
                 </div>
             @endif
-            <div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
+            <div class="grid grid-cols-1 gap-3 sm:grid-cols-3">
                 <x-ui-stat-card title="Total Muzakki" :value="number_format($totalMuzakki ?? 0, 0, ',', '.')" description="Kontak aktif di master data." />
                 <x-ui-stat-card title="Pernah Transaksi" :value="number_format($activeMuzakki ?? 0, 0, ',', '.')" tone="info" description="Memiliki riwayat transaksi valid." />
                 <x-ui-stat-card title="Hasil Pencarian" :value="number_format($muzakki->total(), 0, ',', '.')" tone="muted" description="{{ $q ? 'Filter: ' . $q : 'Menampilkan semua data.' }}" />
@@ -62,7 +62,7 @@
                 <div class="ui-toolbar-soft">
                     <div class="flex items-center gap-2">
                         <div class="ui-section-accent h-6 w-2"></div>
-                        <h3 class="font-bold text-gray-800">Daftar Muzakki</h3>
+                        <h3 class="font-bold text-slate-800">Daftar Muzakki</h3>
                     </div>
 
                     <form method="GET" action="{{ route('internal.muzakki.index') }}" class="flex w-full flex-col items-stretch gap-2 sm:w-auto sm:flex-row sm:items-center">
@@ -83,18 +83,18 @@
                         </div>
                     </form>
                 </div>
-                <div class="space-y-3 p-4 md:hidden">
+                <div class="space-y-2.5 p-3 md:hidden">
                     @if (count($muzakki) > 0)
                         @foreach ($muzakki as $m)
                             <article class="ui-mobile-card">
                                 <div class="min-w-0">
-                                    <div class="text-sm font-bold leading-tight text-gray-800">{!! \App\Support\Format::highlight($m->name, $q) !!}</div>
-                                    <div class="mt-1 text-xs text-gray-500">{{ $m->phone ?? '-' }}</div>
-                                    <div class="mt-2 text-sm leading-relaxed text-gray-600">{!! \App\Support\Format::highlight($m->address ?? '-', $q) !!}</div>
+                                    <div class="text-sm font-bold leading-tight text-slate-800">{!! \App\Support\Format::highlight($m->name, $q) !!}</div>
+                                    <div class="mt-1 text-xs text-slate-500">{{ $m->phone ?? '-' }}</div>
+                                    <div class="mt-2 text-sm leading-relaxed text-slate-600">{!! \App\Support\Format::highlight($m->address ?? '-', $q) !!}</div>
                                     <div class="mt-3 grid grid-cols-2 gap-2 text-xs">
-                                        <div class="rounded-xl bg-emerald-50 px-3 py-2 text-emerald-800">
+                                        <div class="rounded-xl bg-brand-50 px-3 py-2 text-brand-800">
                                             <div class="font-black">{{ (int) ($m->valid_transactions_count ?? 0) }} transaksi</div>
-                                            <div class="text-emerald-700">Riwayat valid</div>
+                                            <div class="text-brand-700">Riwayat valid</div>
                                         </div>
                                         <div class="rounded-xl bg-slate-50 px-3 py-2 text-slate-700">
                                             <div class="font-black">{{ $m->last_transaction_at ? \Carbon\Carbon::parse($m->last_transaction_at)->timezone(config('zakat.timezone'))->translatedFormat('d M Y') : '-' }}</div>
@@ -119,7 +119,7 @@
                     @else
                         <div class="ui-empty-state">
                             <div class="flex flex-col items-center">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 text-gray-200 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 text-slate-200 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
                                 </svg>
                                 <span class="ui-empty-state-copy font-bold">
@@ -133,31 +133,31 @@
                 <div class="hidden overflow-x-auto w-full md:block">
                     <table class="min-w-full text-sm">
                         <thead>
-                            <tr class="bg-gray-50 text-left text-xs font-bold text-gray-400 uppercase tracking-widest border-b border-gray-100">
-                                <th class="px-3 sm:px-6 py-4">Nama</th>
-                                <th class="px-3 sm:px-6 py-4">No HP</th>
-                                <th class="px-3 sm:px-6 py-4">Alamat</th>
-                                <th class="px-3 sm:px-6 py-4">CRM Ringkas</th>
-                                <th class="px-3 sm:px-6 py-4 text-center">Aksi</th>
+                            <tr class="bg-slate-50 text-left text-xs font-bold text-slate-400 uppercase tracking-widest border-b border-slate-100">
+                                <th class="px-3 sm:px-5 py-3">Nama</th>
+                                <th class="px-3 sm:px-5 py-3">No HP</th>
+                                <th class="px-3 sm:px-5 py-3">Alamat</th>
+                                <th class="px-3 sm:px-5 py-3">CRM Ringkas</th>
+                                <th class="px-3 sm:px-5 py-3 text-center">Aksi</th>
                             </tr>
                         </thead>
-                        <tbody class="divide-y divide-gray-50">
+                        <tbody class="divide-y divide-slate-50">
                             @if (count($muzakki) > 0)
                                 @foreach ($muzakki as $m)
                                 <tr class="transition-colors hover:bg-slate-50/70">
-                                    <td class="px-3 sm:px-6 py-4 font-bold text-gray-800">{!! \App\Support\Format::highlight($m->name, $q) !!}</td>
-                                    <td class="px-3 sm:px-6 py-4 text-gray-500">{{ $m->phone ?? '-' }}</td>
-                                    <td class="px-3 sm:px-6 py-4 text-gray-500 text-sm">{!! \App\Support\Format::highlight($m->address ?? '-', $q) !!}</td>
-                                    <td class="px-3 sm:px-6 py-4">
+                                    <td class="px-3 sm:px-5 py-3 font-bold text-slate-800">{!! \App\Support\Format::highlight($m->name, $q) !!}</td>
+                                    <td class="px-3 sm:px-5 py-3 text-slate-500">{{ $m->phone ?? '-' }}</td>
+                                    <td class="px-3 sm:px-5 py-3 text-slate-500 text-sm">{!! \App\Support\Format::highlight($m->address ?? '-', $q) !!}</td>
+                                    <td class="px-3 sm:px-5 py-3">
                                         <div class="space-y-1 text-xs">
                                             <div class="font-black text-slate-800">{{ (int) ($m->valid_transactions_count ?? 0) }} transaksi</div>
                                             <div class="text-slate-500">{{ \App\Support\Format::rupiah((int) ($m->valid_total_uang ?? 0)) }} / {{ \App\Support\Format::kg((float) ($m->valid_total_beras ?? 0)) }}</div>
                                             <div class="text-slate-400">Terakhir: {{ $m->last_transaction_at ? \Carbon\Carbon::parse($m->last_transaction_at)->timezone(config('zakat.timezone'))->translatedFormat('d M Y') : '-' }}</div>
                                         </div>
                                     </td>
-                                    <td class="px-3 sm:px-6 py-4 text-center whitespace-nowrap">
-                                        <div class="flex items-center justify-center gap-3">
-                                            <a class="ui-btn ui-btn-secondary px-3 py-2 text-xs border-emerald-200 text-emerald-700 hover:bg-emerald-50" href="{{ route('internal.muzakki.show', ['muzakki' => $m->id]) }}">
+                                    <td class="px-3 sm:px-5 py-3 text-center whitespace-nowrap">
+                                        <div class="flex items-center justify-center gap-2">
+                                            <a class="ui-btn ui-btn-secondary px-3 py-2 text-xs border-brand-200 text-brand-700 hover:bg-brand-50" href="{{ route('internal.muzakki.show', ['muzakki' => $m->id]) }}">
                                                 Profil
                                             </a>
                                             <a class="ui-btn ui-btn-secondary px-3 py-2 text-xs text-blue-600 hover:text-blue-800" href="{{ route('internal.muzakki.edit', ['muzakki' => $m->id]) }}">
@@ -181,7 +181,7 @@
                                 <tr>
                                     <td colspan="5" class="px-6 py-12 text-center">
                                         <div class="ui-empty-state-box flex flex-col items-center">
-                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 text-gray-200 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 text-slate-200 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
                                             </svg>
                                             <span class="ui-empty-state-copy font-bold">
@@ -195,7 +195,7 @@
                     </table>
                 </div>
                 @if ($muzakki->hasPages())
-                    <div class="px-6 py-4 border-t border-gray-50">
+                    <div class="px-5 py-3 border-t border-slate-50">
                         {{ $muzakki->links() }}
                     </div>
                 @endif
@@ -205,13 +205,13 @@
 
     <!-- Modal Konfirmasi Hapus Muzakki -->
     <x-modal name="delete-muzakki-modal" focusable>
-        <form method="POST" x-data="{ id: '', name: '' }" x-on:open-delete-modal.window="id = $event.detail.id; name = $event.detail.name; $el.action = '{{ url('/internal/muzakki') }}/' + id;" class="p-6">
+        <form method="POST" x-data="{ id: '', name: '' }" x-on:open-delete-modal.window="id = $event.detail.id; name = $event.detail.name; $el.action = '{{ url('/internal/muzakki') }}/' + id;" class="p-5">
             @csrf
             @method('DELETE')
-            <h2 class="text-lg font-medium text-gray-900">
-                Pindahkan Muzakki <span x-text="name" class="font-bold text-emerald-700"></span> ke Tempat Sampah?
+            <h2 class="text-lg font-medium text-slate-900">
+                Pindahkan Muzakki <span x-text="name" class="font-bold text-brand-700"></span> ke Tempat Sampah?
             </h2>
-            <p class="mt-1 text-sm text-gray-600">
+            <p class="mt-1 text-sm text-slate-600">
                 Data muzakki akan dipindahkan ke folder sampah. <span class="font-bold">Data akan otomatis dihapus permanen dari sistem setelah 30 hari.</span>
             </p>
             <div class="mt-6 flex justify-end">

@@ -10,37 +10,37 @@
         </div>
     </x-slot>
 
-    <div class="py-8">
-        <div class="max-w-4xl mx-auto sm:px-6 lg:px-8">
+    <div class="py-4 sm:py-6">
+        <div class="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
             
             {{-- session('status') is handled globally by the app layout toast --}}
 
             <div class="ui-card-strong overflow-hidden">
                 <div>
                     <!-- Penyetor & Meta Header -->
-                    <div class="px-6 py-5 sm:px-8 sm:py-6 border-b border-gray-100/80">
-                         <div class="flex flex-col sm:flex-row justify-between items-center sm:items-start gap-3 sm:gap-4 mb-6 text-center sm:text-left">
+                    <div class="border-b border-slate-100 px-4 py-4 sm:px-6">
+                         <div class="mb-5 flex flex-col items-center justify-between gap-3 text-center sm:flex-row sm:items-start sm:text-left">
                             <div class="w-full sm:w-auto">
-                                <p class="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-1">Nomor Transaksi</p>
-                                <h3 class="text-base sm:text-lg font-bold text-emerald-700 tabular-nums bg-emerald-50 px-3 py-1 rounded-lg border border-emerald-100 inline-block">{{ $noTransaksi }}</h3>
+                                <p class="mb-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-slate-400">Nomor Transaksi</p>
+                                <h3 class="inline-block rounded-lg border border-brand-100 bg-brand-50 px-3 py-1 font-sans text-base font-bold tabular-nums text-brand-700 sm:text-lg">{{ $noTransaksi }}</h3>
                             </div>
                             <div class="w-full sm:w-auto sm:text-right">
-                                <p class="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-1">Waktu Transaksi</p>
-                                <p class="text-sm font-bold text-gray-600 tabular-nums">{{ ($mainTx->waktu_terima ?? $mainTx->created_at)->format('d/m/Y H:i') }} WIB</p>
+                                <p class="mb-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-slate-400">Waktu Transaksi</p>
+                                <p class="text-sm font-bold tabular-nums text-slate-600">{{ ($mainTx->waktu_terima ?? $mainTx->created_at)->format('d/m/Y H:i') }} WIB</p>
                             </div>
                         </div>
                         
                         <div class="text-center sm:text-left">
-                            <p class="text-[10px] font-black text-emerald-600 uppercase tracking-[0.2em] mb-1">Nama Pembayar (Muzakki)</p>
-                            <p class="text-lg sm:text-xl font-black text-slate-800 tracking-tight leading-tight">{{ $mainTx->pembayar_nama }}</p>
+                            <p class="mb-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-brand-600">Nama Pembayar</p>
+                            <p class="text-lg font-bold leading-tight text-slate-800 sm:text-xl">{{ $mainTx->pembayar_nama }}</p>
                         </div>
                     </div>
 
                     <!-- List Rincian Anggota -->
-                    <div class="px-6 py-5 sm:px-8 sm:py-6">
-                        <div class="flex items-center gap-2 mb-4">
-                            <span class="w-1 h-5 bg-emerald-500 rounded-full"></span>
-                            <h4 class="text-sm font-bold text-gray-800 uppercase tracking-wide">Rincian Pembayaran</h4>
+                    <div class="px-4 py-4 sm:px-6">
+                        <div class="mb-4 flex items-center gap-2">
+                            <span class="h-5 w-1 rounded-full bg-brand-500"></span>
+                            <h4 class="text-sm font-bold uppercase tracking-[0.08em] text-slate-800">Rincian Pembayaran</h4>
                         </div>
                         <div class="space-y-3 md:hidden">
                             @php $rowNo = 1; @endphp
@@ -49,10 +49,10 @@
                                     <article class="ui-mobile-card">
                                         <div class="flex items-start justify-between gap-3">
                                             <div class="min-w-0">
-                                                <div class="text-[10px] font-black uppercase tracking-widest text-gray-400">Muzakki {{ $rowNo++ }}</div>
-                                                <p class="mt-1 text-sm font-bold leading-tight text-gray-900">{{ $muzakkiName }}</p>
+                                                <div class="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-400">Muzakki {{ $rowNo++ }}</div>
+                                                <p class="mt-1 text-sm font-bold leading-tight text-slate-900">{{ $muzakkiName }}</p>
                                             </div>
-                                            <span class="inline-flex items-center px-2.5 py-1 rounded text-[11px] font-bold uppercase tracking-wider {{ $tx->metode === 'beras' ? 'bg-amber-100 text-amber-700' : 'bg-emerald-100 text-emerald-700' }}">
+                                            <span class="inline-flex items-center rounded px-2.5 py-1 text-[11px] font-bold uppercase tracking-wide {{ $tx->metode === 'beras' ? 'bg-amber-100 text-amber-700' : 'bg-brand-100 text-brand-700' }}">
                                                 {{ $tx->metode_label }}
                                             </span>
                                         </div>
@@ -66,11 +66,11 @@
                                             </div>
                                             <div class="ui-mobile-meta-item">
                                                 <p class="ui-mobile-meta-label">Keterangan</p>
-                                                <div class="mt-1 text-right text-xs font-medium text-gray-500">
+                                                <div class="mt-1 text-right text-xs font-medium text-slate-500">
                                                     @if($tx->category === 'fitrah' && $tx->jiwa)
-                                                        <span class="px-2 py-1 bg-white rounded-md border border-gray-100 font-bold text-gray-600">{{ $tx->jiwa }} Jiwa</span>
+                                                        <span class="rounded-md border border-slate-100 bg-white px-2 py-1 font-bold text-slate-600">{{ $tx->jiwa }} Jiwa</span>
                                                     @elseif($tx->category === 'fidyah' && $tx->hari)
-                                                        <span class="px-2 py-1 bg-white rounded-md border border-gray-100 font-bold text-gray-600">{{ $tx->hari }} Hari</span>
+                                                        <span class="rounded-md border border-slate-100 bg-white px-2 py-1 font-bold text-slate-600">{{ $tx->hari }} Hari</span>
                                                     @else
                                                         -
                                                     @endif
@@ -79,9 +79,9 @@
                                             <div class="ui-mobile-meta-item">
                                                 <p class="ui-mobile-meta-label">Nominal</p>
                                                 <div class="mt-1 text-right">
-                                                    <p class="text-sm font-bold tabular-nums text-gray-900">
+                                                    <p class="text-sm font-bold tabular-nums text-slate-900">
                                                         @if($tx->metode === 'beras')
-                                                            {{ rtrim(rtrim(number_format($tx->jumlah_beras_kg, 2, ',', '.'), '0'), ',') }} <span class="ml-0.5 text-[10px] font-bold text-gray-400">kg</span>
+                                                            {{ rtrim(rtrim(number_format($tx->jumlah_beras_kg, 2, ',', '.'), '0'), ',') }} <span class="ml-0.5 text-[10px] font-bold text-slate-400">kg</span>
                                                         @else
                                                             {{ \App\Support\Format::rupiah((int)$tx->nominal_uang) }}
                                                             @if($tx->is_transfer)
@@ -97,54 +97,54 @@
                             @endforeach
                         </div>
 
-                        <div class="hidden overflow-x-auto w-full border border-gray-100 rounded-xl bg-white shadow-sm md:block">
+                        <div class="hidden w-full overflow-x-auto rounded-xl border border-slate-100 bg-white md:block">
                             <table class="min-w-full text-sm">
                                 <thead>
-                                    <tr class="bg-gray-50 border-b border-gray-100 text-left text-[11px] sm:text-xs font-semibold text-gray-400 uppercase tracking-wider">
-                                        <th class="px-6 py-4">Nama Muzakki</th>
-                                        <th class="px-3 sm:px-6 py-4">Kategori</th>
-                                        <th class="px-3 sm:px-6 py-4">Bentuk</th>
-                                        <th class="px-3 sm:px-6 py-4 text-right">Keterangan</th>
-                                        <th class="px-3 sm:px-6 py-4 text-right">Nominal</th>
+                                    <tr class="border-b border-slate-100 bg-slate-50 text-left text-[11px] font-semibold uppercase tracking-[0.14em] text-slate-400 sm:text-xs">
+                                        <th class="px-5 py-3">Nama Muzakki</th>
+                                        <th class="px-3 py-3 sm:px-5">Kategori</th>
+                                        <th class="px-3 py-3 sm:px-5">Bentuk</th>
+                                        <th class="px-3 py-3 text-right sm:px-5">Keterangan</th>
+                                        <th class="px-3 py-3 text-right sm:px-5">Nominal</th>
                                     </tr>
                                 </thead>
-                                <tbody class="divide-y divide-gray-50">
+                                <tbody class="divide-y divide-slate-100">
                                     @php $rowNo = 1; @endphp
                                     @foreach ($groupedArr as $muzakkiName => $txsArr)
                                         @php $txCount = count($txsArr); @endphp
                                         @foreach ($txsArr as $i => $tx)
                                             {{-- @var \App\Models\ZakatTransaction $tx --}}
-                                            <tr class="hover:bg-emerald-50/30 transition-colors {{ $i > 0 ? 'border-t border-dashed border-gray-100' : '' }}">
+                                            <tr class="transition-colors hover:bg-brand-50/30 {{ $i > 0 ? 'border-t border-dashed border-slate-100' : '' }}">
                                                 {{-- Nama hanya muncul di baris pertama --}}
                                                 @if($i === 0)
-                                                    <td class="px-3 sm:px-6 py-4 align-top" rowspan="{{ $txCount }}">
+                                                    <td class="px-3 py-3 align-top sm:px-5" rowspan="{{ $txCount }}">
                                                         <div class="flex items-start gap-3">
-                                                            <span class="text-xs font-semibold text-gray-400 mt-0.5 min-w-[1.25rem]">{{ $rowNo++ }}.</span>
-                                                            <p class="text-sm font-bold text-gray-900 leading-tight">{{ $muzakkiName }}</p>
+                                                            <span class="mt-0.5 min-w-[1.25rem] text-xs font-semibold text-slate-400">{{ $rowNo++ }}.</span>
+                                                            <p class="text-sm font-bold leading-tight text-slate-900">{{ $muzakkiName }}</p>
                                                         </div>
                                                     </td>
                                                 @endif
-                                                <td class="px-3 sm:px-6 py-4">
+                                                <td class="px-3 py-3 sm:px-5">
                                                     <x-zakat-category-tags :categories="[$tx->category]" />
                                                 </td>
-                                                <td class="px-3 sm:px-6 py-4">
-                                                    <span class="inline-flex items-center px-2.5 py-1 rounded text-[11px] font-bold uppercase tracking-wider {{ $tx->metode === 'beras' ? 'bg-amber-100 text-amber-700' : 'bg-emerald-100 text-emerald-700' }}">
+                                                <td class="px-3 py-3 sm:px-5">
+                                                    <span class="inline-flex items-center rounded px-2.5 py-1 text-[11px] font-bold uppercase tracking-wide {{ $tx->metode === 'beras' ? 'bg-amber-100 text-amber-700' : 'bg-brand-100 text-brand-700' }}">
                                                         {{ $tx->metode_label }}
                                                     </span>
                                                 </td>
-                                                <td class="px-3 sm:px-6 py-4 text-right font-medium text-gray-500 text-xs">
+                                                <td class="px-3 py-3 text-right text-xs font-medium text-slate-500 sm:px-5">
                                                     @if($tx->category === 'fitrah' && $tx->jiwa)
-                                                        <span class="px-2 py-1 bg-gray-50 rounded-md border border-gray-100 font-bold text-gray-600">{{ $tx->jiwa }} Jiwa</span>
+                                                        <span class="rounded-md border border-slate-100 bg-slate-50 px-2 py-1 font-bold text-slate-600">{{ $tx->jiwa }} Jiwa</span>
                                                     @elseif($tx->category === 'fidyah' && $tx->hari)
-                                                        <span class="px-2 py-1 bg-gray-50 rounded-md border border-gray-100 font-bold text-gray-600">{{ $tx->hari }} Hari</span>
+                                                        <span class="rounded-md border border-slate-100 bg-slate-50 px-2 py-1 font-bold text-slate-600">{{ $tx->hari }} Hari</span>
                                                     @else
                                                         -
                                                     @endif
                                                 </td>
-                                                <td class="px-2 sm:px-6 py-4 text-right">
-                                                    <p class="text-[10px] sm:text-sm font-bold text-gray-900 tabular-nums whitespace-nowrap">
+                                                <td class="px-2 py-3 text-right sm:px-5">
+                                                    <p class="whitespace-nowrap text-[10px] font-bold tabular-nums text-slate-900 sm:text-sm">
                                                         @if($tx->metode === 'beras')
-                                                            {{ rtrim(rtrim(number_format($tx->jumlah_beras_kg, 2, ',', '.'), '0'), ',') }} <span class="text-[9px] sm:text-xs font-bold text-gray-400 ml-0.5">kg</span>
+                                                            {{ rtrim(rtrim(number_format($tx->jumlah_beras_kg, 2, ',', '.'), '0'), ',') }} <span class="ml-0.5 text-[9px] font-bold text-slate-400 sm:text-xs">kg</span>
                                                         @else
                                                             {{ \App\Support\Format::rupiah((int)$tx->nominal_uang) }}
                                                             @if($tx->is_transfer)
@@ -162,43 +162,43 @@
 
                         <!-- Info Petugas & Shift -->
                         <div class="ui-panel-note mt-3">
-                            <span class="text-[10px] font-bold text-gray-400 uppercase tracking-widest block mb-1">Penerima/Shift</span>
-                            <div class="flex items-center gap-2 mt-1">
-                                <div class="flex h-6 w-6 items-center justify-center rounded-full border border-emerald-200 bg-emerald-100 text-emerald-600">
+                            <span class="mb-1 block text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-400">Penerima/Shift</span>
+                            <div class="mt-1 flex items-center gap-2">
+                                <div class="flex h-6 w-6 items-center justify-center rounded-full border border-brand-200 bg-brand-100 text-brand-600">
                                     <svg class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                                     </svg>
                                 </div>
-                                <span class="text-sm font-semibold text-gray-800">
+                                <span class="text-sm font-semibold text-slate-800">
                                     {{ $mainTx->petugas ? $mainTx->petugas->name : 'Sistem' }} / {{ $shiftLabel }}
                                 </span>
                             </div>
                         </div>
 
                         <!-- Ringkasan Total Akhir -->
-                        <div class="mt-6 pt-5 border-t-2 border-gray-100">
-                            <div class="rounded-2xl border border-emerald-100 bg-emerald-50/60 px-6 py-5">
+                        <div class="mt-4 border-t border-slate-100 pt-4">
+                            <div class="rounded-card border border-brand-100 bg-brand-50/50 px-4 py-4 sm:px-5">
                                 @if($totalUang > 0)
                                     <div class="flex w-full items-center justify-between gap-4 sm:justify-end">
-                                        <span class="text-[10px] sm:text-[11px] font-black text-gray-400 uppercase tracking-[0.2em]">Total Uang</span>
+                                        <span class="text-[10px] font-semibold uppercase tracking-[0.14em] text-slate-400 sm:text-[11px]">Total Uang</span>
                                         <div class="flex flex-col items-center sm:items-end">
-                                            <p class="text-base sm:text-xl font-black text-slate-900 tabular-nums bg-white px-3 py-1 rounded-lg border border-emerald-100 shadow-sm">
+                                            <p class="rounded-lg border border-brand-100 bg-white px-3 py-1 text-base font-bold tabular-nums text-slate-900 sm:text-xl">
                                                 {{ \App\Support\Format::rupiah((int)$totalUang) }}
                                             </p>
                                             @if($totalTf > 0)
-                                                <div class="flex items-center gap-2 mt-1.5 text-[10px] sm:text-[11px] font-bold text-gray-500 uppercase tracking-tight">
-                                                    <span>Cash: <span class="text-gray-800">Rp {{ number_format($totalCash, 0, ',', '.') }}</span></span>
-                                                    <span class="text-emerald-300 font-normal">/</span>
-                                                    <span class="text-emerald-600">TF: <span class="font-black">Rp {{ number_format($totalTf, 0, ',', '.') }}</span></span>
+                                                <div class="mt-1.5 flex items-center gap-2 text-[10px] font-bold uppercase tracking-tight text-slate-500 sm:text-[11px]">
+                                                    <span>Cash: <span class="text-slate-800">Rp {{ number_format($totalCash, 0, ',', '.') }}</span></span>
+                                                    <span class="font-normal text-brand-300">/</span>
+                                                    <span class="text-brand-600">TF: <span class="font-bold">Rp {{ number_format($totalTf, 0, ',', '.') }}</span></span>
                                                 </div>
                                             @endif
                                         </div>
                                     </div>
                                 @endif
                                 @if($totalBeras > 0)
-                                    <div class="flex w-full items-center justify-between gap-4 sm:justify-end {{ $totalUang > 0 ? 'mt-3 border-t border-emerald-100/70 pt-3' : '' }}">
-                                        <span class="text-[10px] sm:text-[11px] font-black text-gray-400 uppercase tracking-[0.2em]">Total Beras</span>
-                                        <p class="text-base sm:text-xl font-black text-amber-700 tabular-nums bg-white px-3 py-1 rounded-lg border border-amber-100 shadow-sm">
+                                    <div class="flex w-full items-center justify-between gap-4 sm:justify-end {{ $totalUang > 0 ? 'mt-3 border-t border-brand-100/70 pt-3' : '' }}">
+                                        <span class="text-[10px] font-semibold uppercase tracking-[0.14em] text-slate-400 sm:text-[11px]">Total Beras</span>
+                                        <p class="rounded-lg border border-amber-100 bg-white px-3 py-1 text-base font-bold tabular-nums text-amber-700 sm:text-xl">
                                             {{ \App\Support\Format::kg((float)$totalBeras) }}
                                         </p>
                                     </div>
@@ -207,17 +207,17 @@
                         </div>
 
                         <!-- Footer Action Buttons -->
-                        <div class="mt-8 grid gap-3 border-t border-gray-100 px-2 pt-6 sm:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_auto] sm:px-0">
-                             <a href="{{ route('internal.transactions.receipt', ['transaction' => $mainTx->id]) }}" target="_blank" class="ui-btn ui-btn-primary px-6 py-4 text-base font-black">
-                                 <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" /></svg>
+                        <div class="mt-5 grid gap-3 border-t border-slate-100 px-2 pt-4 sm:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_auto] sm:px-0">
+                             <a href="{{ route('internal.transactions.receipt', ['transaction' => $mainTx->id]) }}" target="_blank" class="ui-btn ui-btn-primary px-5 py-3 text-sm font-bold">
+                                 <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" /></svg>
                                  Cetak Tanda Terima
                              </a>
-                             <a href="{{ route('internal.transactions.create') }}" class="ui-btn ui-btn-accent px-6 py-4 text-base font-black">
-                                 <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4" /></svg>
+                             <a href="{{ route('internal.transactions.create') }}" class="ui-btn ui-btn-accent px-5 py-3 text-sm font-bold">
+                                 <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4" /></svg>
                                  Input Baru
                              </a>
                              @can('update', $mainTx)
-                                 <a href="{{ route('internal.transactions.edit', ['transaction' => $mainTx->id]) }}" class="ui-btn ui-btn-secondary px-6 py-4 text-xs font-black uppercase tracking-widest">
+                                 <a href="{{ route('internal.transactions.edit', ['transaction' => $mainTx->id]) }}" class="ui-btn ui-btn-secondary px-5 py-3 text-xs font-bold uppercase tracking-[0.12em]">
                                      <svg class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h14a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
                                      Ubah
                                  </a>
@@ -227,7 +227,7 @@
                 </div>
             </div>
             
-            <p class="mt-6 text-center text-xs font-semibold uppercase tracking-[0.3em] text-gray-400/80">Dokumentasi Administrasi Masjid An-Nur</p>
+            <p class="mt-4 text-center text-xs font-semibold uppercase tracking-[0.18em] text-slate-400/80">Dokumentasi Administrasi Masjid An-Nur</p>
         </div>
     </div>
 </x-app-layout>

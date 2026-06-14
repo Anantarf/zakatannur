@@ -1,4 +1,4 @@
-<header class="ui-page-container">
+<header>
     <div class="public-header-shell">
         <div class="grid grid-cols-1 items-stretch gap-4 lg:grid-cols-2">
             <div class="flex flex-col justify-center">

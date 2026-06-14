@@ -1,10 +1,10 @@
-<div class="ui-card-strong sticky bottom-4 z-10 mt-6 bg-white/95 p-4 pt-4 backdrop-blur-md">
+<div class="ui-card-strong sticky bottom-4 z-10 mt-4 bg-white/95 p-3 backdrop-blur-md sm:p-4">
     <div class="mb-3 flex flex-col gap-3 border-b border-slate-100 pb-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
             <p class="text-sm font-bold text-slate-900">{{ isset($isEdit) ? 'Selesaikan perubahan transaksi' : 'Simpan transaksi yang sudah diperiksa' }}</p>
-            <p class="text-xs text-slate-500">{{ isset($isEdit) ? 'Pastikan nominal, kategori, dan pembayar sudah sesuai sebelum menyimpan.' : 'Gunakan tombol ini setelah semua anggota dan kategori zakat terisi.' }}</p>
+            <p class="text-xs text-slate-500">{{ isset($isEdit) ? 'Cek nominal, kategori, dan pembayar.' : 'Simpan setelah data anggota terisi.' }}</p>
         </div>
-        <div class="inline-flex w-full justify-center rounded-full border border-emerald-100 bg-emerald-50 px-3 py-1 text-[11px] font-semibold text-emerald-700 sm:w-auto">
+        <div class="inline-flex w-full justify-center rounded-full border border-brand-100 bg-brand-50 px-3 py-1 text-[11px] font-semibold text-brand-700 sm:w-auto">
             <span x-text="submitting ? 'Sedang menyimpan' : 'Siap diproses'"></span>
         </div>
     </div>
@@ -12,13 +12,13 @@
     @if(isset($isEdit))
         <div class="flex flex-col items-stretch gap-3 sm:flex-row">
             <a href="{{ route('internal.transactions.index') }}"
-                class="ui-btn w-full bg-slate-100 px-6 py-4 text-sm text-slate-600 hover:bg-slate-200 focus:ring-slate-300 sm:flex-1">
+                class="ui-btn w-full bg-slate-100 px-5 py-3 text-sm text-slate-600 hover:bg-slate-200 focus:ring-slate-300 sm:flex-1">
                 Kembali
             </a>
             <x-emerald-button
                 x-bind:disabled="submitting || !hasChanged"
                 x-bind:class="{'opacity-50 cursor-not-allowed': submitting || !hasChanged}"
-                class="w-full py-4 text-base sm:flex-[2]">
+                class="w-full py-3 text-sm sm:flex-[2]">
                 <template x-if="submitting">
                     <div class="flex items-center gap-2">
                         <svg class="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
@@ -41,7 +41,7 @@
         <x-emerald-button
             x-bind:disabled="submitting"
             x-bind:class="{'opacity-50 cursor-not-allowed': submitting}"
-            class="w-full py-4 text-base">
+            class="w-full py-3 text-sm">
             <template x-if="submitting">
                 <div class="flex items-center gap-2">
                     <svg class="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
@@ -63,8 +63,8 @@
         </x-emerald-button>
     @endif
 
-    <p class="mt-3 text-center text-[11px] font-semibold text-gray-400">
+    <p class="mt-3 text-center text-[11px] font-semibold text-slate-400">
         <span x-show="!submitting">{{ isset($isEdit) ? 'Perubahan akan menggantikan data lama pada transaksi ini.' : 'Satu kali simpan akan merekam seluruh data anggota yang sedang aktif.' }}</span>
-        <span x-show="submitting" class="text-emerald-600">Mohon tunggu sebentar, jangan tutup halaman ini...</span>
+        <span x-show="submitting" class="text-brand-600">Mohon tunggu sebentar, jangan tutup halaman ini...</span>
     </p>
 </div>

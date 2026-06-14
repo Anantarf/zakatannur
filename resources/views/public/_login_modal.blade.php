@@ -1,6 +1,6 @@
 <div x-show="openLogin" style="display: none;" class="ui-modal-panel" aria-labelledby="modal-title" role="dialog" aria-modal="true">
     <!-- Backdrop -->
-    <div class="fixed inset-0 bg-gray-900/50 backdrop-blur-sm transition-opacity"></div>
+    <div class="fixed inset-0 bg-slate-950/50 backdrop-blur-sm transition-opacity"></div>
 
     <!-- Dialog -->
     <div class="ui-modal-box" x-show="openLogin" @click.away="openLogin = false"
@@ -25,8 +25,8 @@
                 <div class="mx-auto flex h-24 w-24 items-center justify-center rounded-full bg-white mb-4 border border-brand-100 shadow-sm overflow-hidden p-1">
                     <img src="/images/logo_zakatannur.png" alt="Logo Zakat Annur" class="w-full h-full object-contain" />
                 </div>
-                <h2 class="text-2xl font-black tracking-tight text-gray-900">Masuk ke Sistem</h2>
-                <p class="mt-2 text-sm text-gray-500 font-medium">Silakan masuk dengan akun panitia Anda</p>
+                <h2 class="text-2xl font-bold tracking-[-0.02em] text-slate-900">Masuk ke Sistem</h2>
+                <p class="mt-2 text-sm text-slate-500 font-medium">Silakan masuk dengan akun panitia Anda</p>
             </div>
 
             @if ($errors->any())
@@ -41,15 +41,15 @@
             <form method="POST" action="{{ route('login') }}" class="space-y-5" x-init="$watch('openLogin', value => { if(value) setTimeout(() => $refs.username.focus(), 100) })">
                 @csrf
                 <div>
-                    <label for="username" class="block text-sm font-bold text-gray-700 mb-1">Nama Pengguna</label>
-                    <input id="username" type="text" name="username" x-ref="username" value="{{ old('username') }}" required autocomplete="username" class="block w-full rounded-xl border-gray-200 px-4 py-3 text-gray-900 placeholder-gray-400 shadow-sm focus:border-brand-500 focus:ring-brand-500 transition-all font-medium" placeholder="Masukkan username" />
+                    <label for="username" class="block text-sm font-bold text-slate-700 mb-1">Nama Pengguna</label>
+                    <input id="username" type="text" name="username" x-ref="username" value="{{ old('username') }}" required autocomplete="username" class="block w-full rounded-xl border-slate-200 px-4 py-3 text-slate-900 placeholder-slate-400 shadow-sm focus:border-brand-500 focus:ring-brand-500 transition-all font-medium" placeholder="Masukkan username" />
                 </div>
 
                 <div x-data="{ showPass: false }">
-                    <label for="password" class="block text-sm font-bold text-gray-700 mb-1">Kata Sandi</label>
+                    <label for="password" class="block text-sm font-bold text-slate-700 mb-1">Kata Sandi</label>
                     <div class="relative">
-                        <input id="password" :type="showPass ? 'text' : 'password'" name="password" required class="block w-full rounded-xl border-gray-200 px-4 py-3 pr-12 text-gray-900 placeholder-gray-400 shadow-sm focus:border-brand-500 focus:ring-brand-500 transition-all font-medium" placeholder="Kata sandi" />
-                        <button type="button" @click="showPass = !showPass" aria-label="Tampilkan kata sandi" class="absolute inset-y-0 right-0 flex items-center pr-4 text-gray-400 hover:text-gray-600 transition-colors">
+                        <input id="password" :type="showPass ? 'text' : 'password'" name="password" required class="block w-full rounded-xl border-slate-200 px-4 py-3 pr-12 text-slate-900 placeholder-slate-400 shadow-sm focus:border-brand-500 focus:ring-brand-500 transition-all font-medium" placeholder="Kata sandi" />
+                        <button type="button" @click="showPass = !showPass" aria-label="Tampilkan kata sandi" class="absolute inset-y-0 right-0 flex items-center pr-4 text-slate-400 hover:text-slate-600 transition-colors">
                             <svg x-show="!showPass" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
                             <svg x-show="showPass" x-cloak xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.878 9.878L6.59 6.59m7.532 7.532l3.29 3.29M3 3l18 18" /></svg>
                         </button>
@@ -58,8 +58,8 @@
 
                 <div class="flex items-center justify-between">
                     <label for="remember_me" class="flex items-center gap-2 cursor-pointer">
-                        <input id="remember_me" type="checkbox" name="remember" class="rounded border-gray-300 text-brand-600 shadow-sm focus:ring-brand-500" />
-                        <span class="text-sm font-medium text-gray-600">Ingat Saya</span>
+                        <input id="remember_me" type="checkbox" name="remember" class="rounded border-slate-300 text-brand-600 shadow-sm focus:ring-brand-500" />
+                        <span class="text-sm font-medium text-slate-600">Ingat Saya</span>
                     </label>
                 </div>
 

@@ -17,11 +17,11 @@
         </div>
     </x-slot>
 
-    <div class="py-6 sm:py-10">
+    <div class="py-5 sm:py-8">
         <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
             @if (session('status'))
                 <div class="ui-alert ui-alert-success mb-6">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="ui-alert-icon text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="ui-alert-icon text-brand-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
                     </svg>
                     <span class="text-sm font-medium">{{ session('status') }}</span>
@@ -47,16 +47,16 @@
             @endif
 
             <div class="ui-card mb-6 overflow-hidden shadow-md">
-                <div class="p-5 sm:p-6">
+                <div class="p-5">
                     <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                         <div>
-                            <div class="text-xs font-black uppercase tracking-[0.18em] text-emerald-700">Template Aktif</div>
+                            <div class="text-xs font-black uppercase tracking-[0.18em] text-brand-700">Template Aktif</div>
                             @if ($activeTemplate)
                                 <div class="mt-1 text-lg font-black text-slate-900">v{{ $activeTemplate->version }} - {{ $activeTemplate->original_filename }}</div>
-                                <div class="mt-1 text-xs text-slate-500">Dipakai untuk cetak dokumen dan tanda terima.</div>
+                                <div class="mt-1 text-xs text-slate-500">Dipakai saat cetak dokumen.</div>
                             @else
                                 <div class="mt-1 text-lg font-black text-amber-800">Belum ada template aktif</div>
-                                <div class="mt-1 text-xs text-amber-700">Aktifkan satu template agar cetak dokumen siap digunakan.</div>
+                                <div class="mt-1 text-xs text-amber-700">Aktifkan satu template untuk cetak.</div>
                             @endif
                         </div>
                         @if ($activeTemplate)
@@ -66,24 +66,24 @@
                 </div>
             </div>
 
-            <div class="grid grid-cols-1 gap-6 lg:grid-cols-2">
+            <div class="grid grid-cols-1 gap-4 lg:grid-cols-2">
                 <div class="ui-card overflow-hidden shadow-md">
-                    <div class="ui-inline-note rounded-none border-b border-emerald-100/70">
+                    <div class="ui-inline-note rounded-none border-b border-brand-100/70">
                         <div class="text-sm font-black text-slate-900">Upload Template Baru</div>
-                        <div class="mt-1 text-xs text-gray-600">Hanya PDF. Ukuran maks 10MB.</div>
+                        <div class="mt-1 text-xs text-slate-600">Hanya PDF. Ukuran maks 10MB.</div>
                     </div>
-                    <div class="p-6 text-gray-900">
+                    <div class="p-5 text-slate-900">
                         <form method="POST" action="{{ route('internal.templates.letterhead.store') }}" enctype="multipart/form-data" class="space-y-4">
                             @csrf
 
-                            <div class="ui-settings-panel border-dashed border-emerald-200 bg-emerald-50/50">
+                            <div class="ui-settings-panel border-dashed border-brand-200 bg-brand-50/50">
                                 <label class="ui-form-label" for="file">File PDF</label>
                                 <input id="file" name="file" type="file" accept="application/pdf" class="ui-file-input" required />
-                                <p class="mt-2 text-xs text-emerald-700">Upload tidak otomatis mengaktifkan template. Aktifkan versi yang benar setelah preview.</p>
+                                <p class="mt-2 text-xs text-brand-700">Preview dulu, lalu aktifkan versi yang benar.</p>
                             </div>
 
                             <div class="ui-settings-panel ui-settings-panel-muted sm:flex sm:items-center sm:justify-between">
-                                <p class="mb-3 text-xs font-semibold text-slate-500 sm:mb-0">Upload dulu, lalu preview dan aktifkan versi yang benar.</p>
+                                <p class="mb-3 text-xs font-semibold text-slate-500 sm:mb-0">Upload PDF, preview, lalu aktifkan.</p>
                                 <div class="flex flex-col-reverse gap-3 sm:flex-row sm:items-center">
                                     <a href="{{ route('dashboard') }}" class="ui-btn ui-btn-secondary w-full sm:w-auto">Kembali</a>
                                     <button type="submit" class="ui-btn ui-btn-primary w-full sm:w-auto">
@@ -99,53 +99,53 @@
                 <div class="ui-card-header ui-card-header-slate">
                     <div>
                         <div class="text-sm font-black text-slate-900">Daftar Versi</div>
-                        <div class="mt-1 text-xs text-gray-600">Aktifkan tepat 1 template untuk dipakai saat cetak.</div>
+                        <div class="mt-1 text-xs text-slate-600">Aktifkan tepat 1 template untuk dipakai saat cetak.</div>
                     </div>
                 </div>
-                    <div class="p-6 text-gray-900">
+                    <div class="p-5 text-slate-900">
 
-                        <div class="space-y-3 md:hidden">
+                        <div class="space-y-2.5 md:hidden">
                             @if (count($templates) > 0)
                                 @foreach ($templates as $t)
                                     <article class="ui-mobile-card">
                                         <div class="flex items-start justify-between gap-3">
                                             <div class="min-w-0">
-                                                <div class="text-sm font-bold text-gray-800">v{{ $t->version }}</div>
-                                                <div class="mt-1 truncate text-sm text-gray-600" title="{{ $t->original_filename }}">{{ $t->original_filename }}</div>
-                                                <div class="mt-1 text-xs text-gray-500">{{ $t->created_at->timezone('Asia/Jakarta')->format('d/m/Y H:i') }} WIB</div>
+                                                <div class="text-sm font-bold text-slate-800">v{{ $t->version }}</div>
+                                                <div class="mt-1 truncate text-sm text-slate-600" title="{{ $t->original_filename }}">{{ $t->original_filename }}</div>
+                                                <div class="mt-1 text-xs text-slate-500">{{ $t->created_at->timezone('Asia/Jakarta')->format('d/m/Y H:i') }} WIB</div>
                                             </div>
                                             @if ($t->is_active)
-                                                <span class="ui-role-badge ui-role-badge-super bg-emerald-100 text-emerald-800">AKTIF</span>
+                                                <span class="ui-role-badge ui-role-badge-super bg-brand-100 text-brand-800">AKTIF</span>
                                             @else
                                                 <span class="ui-role-badge ui-role-badge-staff">NONAKTIF</span>
                                             @endif
                                         </div>
 
-                                        <div class="mt-4 grid grid-cols-1 gap-2">
-                                            <a href="{{ route('internal.templates.preview', $t) }}" target="_blank" class="ui-btn ui-btn-secondary w-full px-4 py-3 text-sm text-indigo-700">Preview</a>
+                                        <div class="mt-3 grid grid-cols-1 gap-2">
+                                            <a href="{{ route('internal.templates.preview', $t) }}" target="_blank" class="ui-btn ui-btn-secondary w-full px-4 py-2.5 text-sm text-indigo-700">Preview</a>
                                             @if (!$t->is_active)
                                                 <form method="POST" action="{{ route('internal.templates.activate', $t) }}">
                                                     @csrf
-                                                    <button type="submit" class="ui-btn ui-btn-primary w-full px-4 py-3 text-sm">Aktifkan</button>
+                                                    <button type="submit" class="ui-btn ui-btn-primary w-full px-4 py-2.5 text-sm">Aktifkan</button>
                                                 </form>
                                                 <form method="POST" action="{{ route('internal.templates.destroy', $t) }}" onsubmit="return confirm('Hapus template ini secara permanen?')">
                                                     @csrf
                                                     @method('DELETE')
-                                                    <button type="submit" class="ui-btn ui-btn-danger w-full px-4 py-3 text-sm">Hapus</button>
+                                                    <button type="submit" class="ui-btn ui-btn-danger w-full px-4 py-2.5 text-sm">Hapus</button>
                                                 </form>
                                             @endif
                                         </div>
                                     </article>
                                 @endforeach
                             @else
-                                <div class="ui-empty-state-box text-sm text-gray-600">Belum ada template.</div>
+                                <div class="ui-empty-state-box text-sm text-slate-600">Belum ada template.</div>
                             @endif
                         </div>
 
-                        <div class="mt-4 hidden overflow-x-auto w-full md:block">
+                        <div class="mt-3 hidden overflow-x-auto w-full md:block">
                             <table class="min-w-full text-sm">
                                 <thead>
-                                    <tr class="border-b text-left text-gray-600">
+                                    <tr class="border-b text-left text-slate-600">
                                         <th class="py-2 pr-4">Versi</th>
                                         <th class="py-2 pr-4">Status</th>
                                         <th class="py-2 pr-4">Nama File</th>
@@ -159,16 +159,16 @@
                                             <td class="py-2 pr-4 font-semibold">v{{ $t->version }}</td>
                                             <td class="py-2 pr-4">
                                                 @if ($t->is_active)
-                                                    <span class="ui-role-badge ui-role-badge-super bg-emerald-100 text-emerald-800">AKTIF</span>
+                                                    <span class="ui-role-badge ui-role-badge-super bg-brand-100 text-brand-800">AKTIF</span>
                                                 @else
                                                     <span class="ui-role-badge ui-role-badge-staff">NONAKTIF</span>
                                                 @endif
                                             </td>
                                             <td class="py-2 pr-4">
                                                 <div class="max-w-[240px] truncate" title="{{ $t->original_filename }}">{{ $t->original_filename }}</div>
-                                                <div class="text-xs text-gray-500">{{ $t->created_at->timezone('Asia/Jakarta')->format('d/m/Y H:i') }} WIB</div>
+                                                <div class="text-xs text-slate-500">{{ $t->created_at->timezone('Asia/Jakarta')->format('d/m/Y H:i') }} WIB</div>
                                             </td>
-                                            <td class="py-3">
+                                            <td class="py-2.5">
                                                 <div class="flex flex-wrap items-center gap-2">
                                                     <a href="{{ route('internal.templates.preview', $t) }}" target="_blank" class="ui-btn ui-btn-secondary px-3 py-2 text-xs text-indigo-700">Preview</a>
 
@@ -193,8 +193,8 @@
                                         @endforeach
                                     @else
                                         <tr>
-                                            <td colspan="4" class="py-6 text-center text-sm text-gray-600">
-                                                <div class="ui-empty-state-box py-5">Belum ada template.</div>
+                                            <td colspan="4" class="py-5 text-center text-sm text-slate-600">
+                                                <div class="ui-empty-state-box py-4">Belum ada template.</div>
                                             </td>
                                         </tr>
                                     @endif

@@ -16,19 +16,19 @@
         </div>
     </x-slot>
 
-    <div class="py-10">
-        <div class="max-w-3xl mx-auto sm:px-6 lg:px-8">
+    <div class="py-6 sm:py-8">
+        <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
             <x-form-errors />
 
             <div class="ui-card overflow-hidden">
                 <div class="ui-card-header ui-card-header-emerald">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="ui-card-header-icon text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="ui-card-header-icon text-brand-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                     </svg>
-                    <h3 class="ui-card-header-title text-emerald-900">Data Muzakki</h3>
+                    <h3 class="ui-card-header-title text-brand-900">Data Muzakki</h3>
                 </div>
-                <div class="p-6">
-                    <form method="POST" action="{{ $mode === 'create' ? route('internal.muzakki.store') : route('internal.muzakki.update', ['muzakki' => $muzakki->id]) }}" class="space-y-5">
+                <div class="p-5">
+                    <form method="POST" action="{{ $mode === 'create' ? route('internal.muzakki.store') : route('internal.muzakki.update', ['muzakki' => $muzakki->id]) }}" class="space-y-4">
                         @csrf
                         @if ($mode === 'edit')
                             @method('PATCH')

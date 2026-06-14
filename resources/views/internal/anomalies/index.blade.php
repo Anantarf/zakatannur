@@ -19,8 +19,8 @@
         </div>
     </x-slot>
 
-    <div class="py-6 sm:py-10">
-        <div class="mx-auto max-w-7xl space-y-6 sm:px-6 lg:px-8">
+    <div class="py-5 sm:py-8">
+        <div class="mx-auto max-w-7xl space-y-4 sm:space-y-5 px-4 sm:px-6 lg:px-8">
             <div class="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-5">
                 <x-ui-stat-card title="Total Kasus" :value="$overview['totalGroups']" description="Grup transaksi sesuai filter." />
                 <x-ui-stat-card title="Warning" :value="$overview['warningGroups']" description="Kasus yang perlu dicek admin." tone="warning" />
@@ -30,12 +30,12 @@
             </div>
 
             <div class="ui-card overflow-hidden shadow-md">
-                <div class="border-b border-gray-100 px-4 py-4 sm:px-6">
+                <div class="border-b border-slate-100 px-4 py-3 sm:px-5">
                     <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                         <div class="flex flex-wrap gap-2">
                             <a
                                 href="{{ route('internal.anomalies.index', array_filter(['scope' => 'active'])) }}"
-                                class="inline-flex items-center rounded-full border px-4 py-2 text-sm font-semibold transition {{ ($scope ?? 'active') === 'active' ? 'border-emerald-600 bg-emerald-600 text-white shadow-sm' : 'border-slate-200 bg-white text-slate-600 hover:border-emerald-200 hover:text-emerald-700' }}"
+                                class="inline-flex items-center rounded-full border px-4 py-2 text-sm font-semibold transition {{ ($scope ?? 'active') === 'active' ? 'border-brand-600 bg-brand-600 text-white shadow-sm' : 'border-slate-200 bg-white text-slate-600 hover:border-brand-200 hover:text-brand-700' }}"
                                 aria-current="{{ ($scope ?? 'active') === 'active' ? 'page' : 'false' }}"
                             >
                                 Kasus Aktif
@@ -61,7 +61,7 @@
                     <div class="max-w-full space-y-1 xl:max-w-[280px] xl:flex-none">
                         <div class="ui-section-title">
                             <div class="h-6 w-2 rounded-full bg-amber-500"></div>
-                            <h3 class="font-semibold text-gray-800">{{ ($scope ?? 'active') === 'archived' ? 'Riwayat Review' : 'Daftar Kasus Aktif' }}</h3>
+                            <h3 class="font-semibold text-slate-800">{{ ($scope ?? 'active') === 'archived' ? 'Riwayat Review' : 'Daftar Kasus Aktif' }}</h3>
                         </div>
                         <p class="text-sm leading-6 text-slate-500">
                             {{ ($scope ?? 'active') === 'archived'
@@ -81,7 +81,7 @@
                                     <option value="{{ $y }}" @selected((string) ($year ?? '') === (string) $y)>{{ $y }}</option>
                                 @endforeach
                             </select>
-                            <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-gray-400">
+                            <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-slate-400">
                                 <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
                             </div>
                         </div>
@@ -95,7 +95,7 @@
                                     </option>
                                 @endforeach
                             </select>
-                            <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-gray-400">
+                            <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-slate-400">
                                 <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
                             </div>
                         </div>
@@ -107,7 +107,7 @@
                                     <option value="{{ $flagValue }}" @selected(($flag_type ?? '') === $flagValue)>{{ $flagLabel }}</option>
                                 @endforeach
                             </select>
-                            <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-gray-400">
+                            <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-slate-400">
                                 <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
                             </div>
                         </div>
@@ -119,7 +119,7 @@
                                     <option value="{{ $level }}" @selected(($risk_level ?? '') === $level)>{{ \App\Models\TransactionRiskReview::levelLabel($level) }}</option>
                                 @endforeach
                             </select>
-                            <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-gray-400">
+                            <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-slate-400">
                                 <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
                             </div>
                         </div>
@@ -131,7 +131,7 @@
                                     <option value="{{ $statusValue }}" @selected(($review_status ?? '') === $statusValue)>{{ \App\Models\TransactionRiskReview::reviewStatusLabel($statusValue) }}</option>
                                 @endforeach
                             </select>
-                            <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-gray-400">
+                            <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-slate-400">
                                 <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
                             </div>
                         </div>
@@ -150,12 +150,12 @@
                 </div>
 
                 @if (($scope ?? 'active') === 'active')
-                    <div class="border-t border-gray-100 bg-amber-50/60 px-4 py-3 text-sm leading-6 text-amber-900 sm:px-6">
+                    <div class="border-t border-slate-100 bg-amber-50/60 px-4 py-3 text-sm leading-6 text-amber-900 sm:px-5">
                         Warning bukan berarti transaksi salah. Halaman ini dipakai untuk memeriksa sinyal sistem, lalu memutuskan apakah kasus cukup ditutup aman atau perlu tindak lanjut.
                     </div>
                 @endif
 
-                <div class="space-y-4 p-4 md:hidden">
+                <div class="space-y-3 p-3 md:hidden">
                     @forelse ($groups as $group)
                         @include('internal.anomalies.partials._mobile_card', ['group' => $group])
                     @empty
@@ -166,19 +166,19 @@
                 <div class="hidden overflow-x-auto md:block">
                     <table class="min-w-full text-sm">
                         <thead>
-                            <tr class="border-b border-gray-100 bg-gray-50 text-left text-[11px] font-bold uppercase tracking-widest text-gray-400 sm:text-xs">
-                                <th class="px-3 py-4 sm:px-6">No. Transaksi</th>
-                                <th class="px-3 py-4 sm:px-6">Waktu</th>
-                                <th class="px-3 py-4 sm:px-6">Pembayar</th>
-                                <th class="px-3 py-4 text-center">Kategori</th>
-                                <th class="px-3 py-4 text-center">Risiko</th>
-                                <th class="px-3 py-4 sm:px-6">Flag Utama</th>
-                                <th class="px-3 py-4 text-center">Review</th>
-                                <th class="px-3 py-4 text-center">Petugas</th>
-                                <th class="px-3 py-4 text-center">Aksi</th>
+                            <tr class="border-b border-slate-100 bg-slate-50 text-left text-[11px] font-bold uppercase tracking-widest text-slate-400 sm:text-xs">
+                                <th class="px-3 py-3 sm:px-5">No. Transaksi</th>
+                                <th class="px-3 py-3 sm:px-5">Waktu</th>
+                                <th class="px-3 py-3 sm:px-5">Pembayar</th>
+                                <th class="px-3 py-3 text-center">Kategori</th>
+                                <th class="px-3 py-3 text-center">Risiko</th>
+                                <th class="px-3 py-3 sm:px-5">Flag Utama</th>
+                                <th class="px-3 py-3 text-center">Review</th>
+                                <th class="px-3 py-3 text-center">Petugas</th>
+                                <th class="px-3 py-3 text-center">Aksi</th>
                             </tr>
                         </thead>
-                        <tbody class="divide-y divide-gray-100/80">
+                        <tbody class="divide-y divide-slate-100/80">
                             @forelse ($groups as $group)
                                 @include('internal.anomalies.partials._desktop_row', ['group' => $group])
                             @empty
@@ -193,7 +193,7 @@
                 </div>
 
                 @if ($groups->hasPages())
-                    <div class="border-t border-gray-50 px-6 py-4">
+                    <div class="border-t border-slate-50 px-5 py-3">
                         {{ $groups->links() }}
                     </div>
                 @endif

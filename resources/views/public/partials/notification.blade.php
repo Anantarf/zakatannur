@@ -7,7 +7,7 @@
     x-transition:leave-start="translate-y-0 opacity-100 scale-100"
     x-transition:leave-end="-translate-y-10 opacity-0 scale-95"
     class="fixed top-20 right-4 sm:right-6 lg:right-8 z-[60] w-[90%] sm:w-auto max-w-sm origin-top-right">
-    <div class="bg-brand-600/95 text-white px-5 py-4 rounded-xl shadow-[0_15px_40px_rgba(16,185,129,0.3)] border border-brand-500/50 flex flex-col gap-1 backdrop-blur-sm">
+    <div class="bg-brand-600/95 text-white px-5 py-4 rounded-xl shadow-[0_15px_40px_rgba(20,184,166,0.28)] border border-brand-500/50 flex flex-col gap-1 backdrop-blur-sm">
         <div class="flex items-start gap-4">
             <div class="w-8 h-8 rounded-full bg-white flex items-center justify-center shrink-0 shadow-sm ring-1 ring-brand-200 mt-1">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-brand-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">

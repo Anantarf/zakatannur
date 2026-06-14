@@ -45,7 +45,7 @@ module.exports = {
             boxShadow: {
                 'premium': '0 20px 40px -15px rgba(0, 0, 0, 0.05)',
                 'premium-hover': '0 25px 50px -12px rgba(0, 0, 0, 0.10)',
-                'glow-emerald': '0 0 20px rgba(16, 185, 129, 0.4)',
+                'glow-brand': '0 0 20px rgba(20, 184, 166, 0.34)',
             },
             borderRadius: {
                 'card': 'var(--radius-card)',

@@ -26,7 +26,7 @@
 @endif
 
 @if ($isAdmin && $mobile)
-    <div class="border-t border-gray-100 bg-slate-50/50 pb-1 pt-4">
+    <div class="border-t border-slate-100 bg-slate-50/50 pb-1 pt-4">
         <div class="px-4 py-2 text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Area Admin</div>
         <x-dynamic-component :component="$linkComponent" :href="route('internal.users.index')" :active="request()->routeIs('internal.users.*')">
             {{ __('Manajemen Pengguna') }}
