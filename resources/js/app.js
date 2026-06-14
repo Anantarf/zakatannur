@@ -1,5 +1,4 @@
 import './bootstrap';
-import './chatbot-widget';
 
 import Alpine from 'alpinejs';
 import collapse from '@alpinejs/collapse'
@@ -16,6 +15,10 @@ const bootPageModules = async () => {
 
     if (document.getElementById('transaction-form-config')) {
         imports.push(import('./transaction-form'));
+    }
+
+    if (document.querySelector('[data-chatbot-widget]')) {
+        imports.push(import('./chatbot-widget'));
     }
 
     await Promise.all(imports);

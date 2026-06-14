@@ -379,11 +379,11 @@
  }
 
  .ui-topbar {
- @apply sticky top-0 border-b border-transparent bg-transparent;
+ @apply sticky top-3 border-b border-transparent bg-transparent;
  }
 
  .ui-topbar-panel {
- @apply mx-auto flex max-w-7xl items-center justify-between gap-4 rounded-card border border-slate-200/80 bg-white/90 px-4 py-3 ring-1 ring-white/70 backdrop-blur-md transition-all duration-300 sm:px-5;
+ @apply mx-auto flex max-w-7xl flex-col items-center justify-between gap-3 rounded-card border border-slate-200/80 bg-white/90 px-4 py-3 ring-1 ring-white/70 backdrop-blur-md transition-all duration-300 sm:px-5 xl:flex-row xl:gap-4;
  box-shadow: var(--shadow-topbar);
  }
 
@@ -871,27 +871,27 @@
  }
 
  .ui-nav-link {
- @apply inline-flex items-center rounded-full px-4 py-2.5 text-sm font-semibold leading-5 transition duration-150 ease-in-out focus:outline-none;
+ @apply inline-flex min-h-10 items-center justify-center rounded-full px-4 py-2.5 text-center text-sm font-semibold leading-5 transition duration-150 ease-in-out focus:outline-none;
  }
 
  .ui-nav-link-active {
- @apply bg-brand-600 text-white shadow-md shadow-brand-600/30;
+ @apply bg-brand-700 text-white shadow-md shadow-brand-700/30;
  }
 
  .ui-nav-link-inactive {
- @apply text-slate-600 hover:bg-slate-100 hover:text-slate-900 focus:bg-slate-100 focus:text-slate-900;
+ @apply text-slate-700 hover:bg-white hover:text-slate-950 focus:bg-white focus:text-slate-950;
  }
 
  .ui-nav-link-mobile {
- @apply block w-full rounded-card px-4 py-3 text-left text-sm font-semibold transition duration-150 ease-in-out focus:outline-none;
+ @apply inline-flex min-h-10 flex-none items-center justify-center rounded-card px-3 py-2 text-center text-xs font-semibold transition duration-150 ease-in-out focus:outline-none sm:px-4 sm:text-sm;
  }
 
  .ui-nav-link-mobile-active {
- @apply bg-brand-600 text-white shadow-md shadow-brand-600/30;
+ @apply bg-brand-700 text-white shadow-md shadow-brand-700/30;
  }
 
  .ui-nav-link-mobile-inactive {
- @apply text-slate-600 hover:bg-slate-100 hover:text-slate-900 focus:bg-slate-100 focus:text-slate-900;
+ @apply text-slate-700 hover:bg-white hover:text-slate-950 focus:bg-white focus:text-slate-950;
  }
 
  .ui-dropdown-panel {
@@ -900,6 +900,15 @@
 
  .ui-dropdown-link {
  @apply block w-full px-4 py-2 text-left text-sm text-slate-700 transition duration-150 ease-in-out hover:bg-brand-50 hover:text-brand-700 focus:bg-brand-50 focus:text-brand-700 focus:outline-none;
+ }
+
+ .ui-admin-mobile-tabs {
+ @apply flex w-full items-center gap-1.5 overflow-x-auto rounded-2xl border border-slate-200 bg-slate-100 p-1.5;
+ scrollbar-width: none;
+ }
+
+ .ui-admin-mobile-tabs::-webkit-scrollbar {
+ display: none;
  }
 
  .ui-toast-enter {

@@ -6,8 +6,6 @@
     <title>{{ $brand }}</title>
     <link rel="icon" type="image/png" href="{{ asset('images/logo_zakatannur.png') }}">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/pusher/7.0.3/pusher.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/laravel-echo@1.11.3/dist/echo.iife.js"></script>
     <script id="public-home-config" type="application/json">
         {!! json_encode([
             'openLogin' => $errors->any() || request()->has('login'),

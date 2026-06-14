@@ -76,13 +76,21 @@ export const createPublicHomeApp = (config, chartService) => {
             }
 
             this.chartSlide = next;
-            chartService.setSlide(next);
+            if (this.activeTab === 'grafik') {
+                this.ensureDailyChart().then(() => chartService.setSlide(next));
+            } else {
+                chartService.setSlide(next);
+            }
             this.resetChartSlideInterval();
         },
 
         resetChartSlideInterval() {
             if (this.chartSlideInterval) {
                 clearInterval(this.chartSlideInterval);
+            }
+            if (this.activeTab !== 'grafik') {
+                this.chartSlideInterval = null;
+                return;
             }
             this.chartSlideInterval = setInterval(() => {
                 this.setChartSlide(this.chartSlide + 1);
@@ -141,19 +149,30 @@ export const createPublicHomeApp = (config, chartService) => {
 
                 if (value === 'grafik') {
                     scrollToTop();
-                    this.loadChartJs().then((success) => {
-                        if (success) {
-                            chartService.initDailyChart();
-                            chartService.setSlide(this.chartSlide);
-                            this.resetChartSlideInterval();
-                        }
-                    });
+                    this.ensureDailyChart();
+                    return;
                 }
+
+                this.resetChartSlideInterval();
             });
         },
 
-        initRealtime() {
-            const echo = getEcho();
+        ensureDailyChart() {
+            return this.loadChartJs().then((success) => {
+                if (!success) {
+                    return false;
+                }
+
+                chartService.initDailyChart();
+                chartService.setSlide(this.chartSlide);
+                this.resetChartSlideInterval();
+
+                return true;
+            });
+        },
+
+        async initRealtime() {
+            const echo = await getEcho();
             if (!echo) {
                 return;
             }
@@ -178,18 +197,9 @@ export const createPublicHomeApp = (config, chartService) => {
             this.pollLatest();
             this.refreshSummary();
 
-            this.loadChartJs().then((success) => {
-                if (!success) {
-                    return;
-                }
-                chartService.initHistoricalChart();
-                chartService.initDailyChart();
-            });
-
             this.resetIdle();
             this.initWatchers();
             this.initRealtime();
-            this.resetChartSlideInterval();
         },
     });
 };

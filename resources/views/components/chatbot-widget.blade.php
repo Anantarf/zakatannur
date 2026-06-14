@@ -15,6 +15,7 @@
 @endphp
 
 <div
+    data-chatbot-widget
     x-data="chatbotWidget({ endpoint: '{{ url('/api/chatbot/message') }}', quickReplies: {{ json_encode($quickReplies) }} })"
     x-cloak
     class="fixed bottom-4 right-4 z-50 sm:bottom-6 sm:right-6"

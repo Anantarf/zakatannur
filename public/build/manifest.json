@@ -1,6 +1,6 @@
 {
   "resources/css/app.css": {
-    "file": "assets/app-B9aY7O1D.css",
+    "file": "assets/app-DGRG4RHz.css",
     "name": "app",
     "names": [
       "app.css"
@@ -9,17 +9,24 @@
     "isEntry": true
   },
   "resources/js/app.js": {
-    "file": "assets/app-CstiA96_.js",
+    "file": "assets/app-BXinuLkG.js",
     "name": "app",
     "src": "resources/js/app.js",
     "isEntry": true,
     "dynamicImports": [
       "resources/js/public-home.js",
-      "resources/js/transaction-form.js"
+      "resources/js/transaction-form.js",
+      "resources/js/chatbot-widget.js"
     ]
   },
+  "resources/js/chatbot-widget.js": {
+    "file": "assets/chatbot-widget-DCHIdLWw.js",
+    "name": "chatbot-widget",
+    "src": "resources/js/chatbot-widget.js",
+    "isDynamicEntry": true
+  },
   "resources/js/public-home.js": {
-    "file": "assets/public-home-Djw-CmtU.js",
+    "file": "assets/public-home-CUohMOq-.js",
     "name": "public-home",
     "src": "resources/js/public-home.js",
     "isDynamicEntry": true,
@@ -28,7 +35,7 @@
     ]
   },
   "resources/js/transaction-form.js": {
-    "file": "assets/transaction-form-IovfWrAS.js",
+    "file": "assets/transaction-form-kMgG-gp2.js",
     "name": "transaction-form",
     "src": "resources/js/transaction-form.js",
     "isDynamicEntry": true

@@ -29,7 +29,11 @@
                 x-transition:leave-start="opacity-100"
                 x-transition:leave-end="opacity-0"
                 class="absolute inset-0">
-                <img :src="img" alt="Dokumentasi Masjid An-Nur" class="h-full w-full object-cover object-center transition duration-[3s] group-hover:scale-[1.02]">
+                <img :src="img" alt="Dokumentasi Masjid An-Nur"
+                    :loading="i === 0 ? 'eager' : 'lazy'"
+                    :fetchpriority="i === 0 ? 'high' : 'auto'"
+                    decoding="async"
+                    class="h-full w-full object-cover object-center transition duration-[3s] group-hover:scale-[1.02]">
             </div>
         </template>
         <div class="absolute inset-0 bg-gradient-to-t from-slate-950/30 via-transparent to-transparent"></div>
