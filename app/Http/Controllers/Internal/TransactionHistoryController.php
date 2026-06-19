@@ -60,10 +60,10 @@ class TransactionHistoryController extends Controller
 
     public function restore(
         Request $request,
-        int $transactionId,
+        ZakatTransaction $transaction,
         TransactionGroupLifecycleService $lifecycleService
     ): RedirectResponse {
-        $result = $lifecycleService->restoreGroup($request, $transactionId);
+        $result = $lifecycleService->restoreGroup($request, $transaction->id);
 
         if (!$result['restored']) {
             return redirect()->route('internal.transactions.trash')
@@ -75,10 +75,10 @@ class TransactionHistoryController extends Controller
 
     public function forceDelete(
         Request $request,
-        int $transactionId,
+        ZakatTransaction $transaction,
         TransactionGroupLifecycleService $lifecycleService
     ): RedirectResponse {
-        $noTransaksi = $lifecycleService->forceDeleteGroup($request, $transactionId);
+        $noTransaksi = $lifecycleService->forceDeleteGroup($request, $transaction->id);
 
         return redirect()->route('internal.transactions.trash')
             ->with('status', 'Transaksi ' . $noTransaksi . ' berhasil dihapus permanen.');

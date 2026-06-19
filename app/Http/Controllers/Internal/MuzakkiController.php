@@ -141,19 +141,15 @@ class MuzakkiController extends Controller
         ]);
     }
 
-    public function restore(Request $request, $muzakkiId)
+    public function restore(Muzakki $muzakki)
     {
-        $muzakki = Muzakki::onlyTrashed()->findOrFail($muzakkiId);
         $muzakki->restore();
 
         return back()->with('status', 'Muzakki berhasil dipulihkan.');
     }
 
-    public function forceDelete(Request $request, $muzakkiId)
+    public function forceDelete(Muzakki $muzakki)
     {
-        $muzakki = Muzakki::onlyTrashed()->findOrFail($muzakkiId);
-        
-        // Guard: prevent hard-deletion if any transaction (including trashed) still references this muzakki
         $hasTransactions = ZakatTransaction::withTrashed()->where('muzakki_id', $muzakki->id)->exists();
         if ($hasTransactions) {
             return back()->with('error', 'Muzakki tidak bisa dihapus permanen karena masih memiliki riwayat transaksi.');

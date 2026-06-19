@@ -49,9 +49,9 @@ class ZakatTransactionController extends Controller
             ->with('status', 'Transaksi berhasil disimpan!');
     }
 
-    public function show(Request $request, int $transaction): View
+    public function show(Request $request, ZakatTransaction $transaction): View
     {
-        $tx = ZakatTransaction::withTrashed()->findOrFail($transaction);
+        $tx = $transaction;
         $groupNumber = $tx->no_transaksi;
 
         if ($tx->trashed() && !in_array($request->user()->role, [User::ROLE_ADMIN, User::ROLE_SUPER_ADMIN], true)) {
@@ -86,10 +86,10 @@ class ZakatTransactionController extends Controller
         ]);
     }
 
-    public function receipt(Request $request, int $transaction, TransactionReceiptLifecycleService $receiptLifecycleService): Response
+    public function receipt(Request $request, ZakatTransaction $transaction, TransactionReceiptLifecycleService $receiptLifecycleService): Response
     {
         $user = $request->user();
-        $tx = ZakatTransaction::withTrashed()->findOrFail($transaction);
+        $tx = $transaction;
         $groupNumber = $tx->no_transaksi;
 
         $groupItems = ZakatTransaction::query()
@@ -137,9 +137,9 @@ class ZakatTransactionController extends Controller
         ]);
     }
 
-    public function edit(Request $request, int $transaction): View
+    public function edit(Request $request, ZakatTransaction $transaction): View
     {
-        $tx = ZakatTransaction::findOrFail($transaction);
+        $tx = $transaction;
         $this->authorize('update', $tx);
 
         $groupItems = ZakatTransaction::transactionGroupItems($tx->no_transaksi, false, [
@@ -157,10 +157,10 @@ class ZakatTransactionController extends Controller
         ));
     }
 
-    public function update(StoreZakatTransactionRequest $request, int $transaction, ZakatService $service): RedirectResponse
+    public function update(StoreZakatTransactionRequest $request, ZakatTransaction $transaction, ZakatService $service): RedirectResponse
     {
         $data = $request->validated();
-        $tx = ZakatTransaction::findOrFail($transaction);
+        $tx = $transaction;
 
         $this->authorize('update', $tx);
 
@@ -171,7 +171,7 @@ class ZakatTransactionController extends Controller
 
         $service->validateNominalDefaults($data);
         $results = $service->storeTransaction($data, $request->user()->id, $tx->no_transaksi);
-        $targetId = count($results) > 0 ? $results[0]->id : $transaction;
+        $targetId = count($results) > 0 ? $results[0]->id : $transaction->id;
 
         return redirect()->route('internal.transactions.show', ['transaction' => $targetId])
             ->with('status', 'Transaksi berhasil diupdate!');

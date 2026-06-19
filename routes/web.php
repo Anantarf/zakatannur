@@ -31,16 +31,16 @@ Route::middleware(['auth', 'role:staff,admin,super_admin'])
         Route::middleware(['role:admin,super_admin'])->group(function () {
             Route::get('/transactions/trash', [TransactionHistoryController::class, 'trash'])->name('transactions.trash');
             Route::post('/transactions/{transaction}/trash', [TransactionHistoryController::class, 'destroy'])->name('transactions.destroy');
-            Route::post('/transactions/{transactionId}/restore', [TransactionHistoryController::class, 'restore'])->name('transactions.restore');
-            Route::delete('/transactions/{transactionId}/force-delete', [TransactionHistoryController::class, 'forceDelete'])->name('transactions.forceDelete');
+            Route::post('/transactions/{transaction}/restore', [TransactionHistoryController::class, 'restore'])->withTrashed()->name('transactions.restore');
+            Route::delete('/transactions/{transaction}/force-delete', [TransactionHistoryController::class, 'forceDelete'])->withTrashed()->name('transactions.forceDelete');
             Route::get('/anomalies', [TransactionAnomalyController::class, 'index'])->name('anomalies.index');
             Route::get('/anomalies/{noTransaksi}', [TransactionAnomalyController::class, 'show'])->name('anomalies.show');
             Route::patch('/anomalies/{noTransaksi}/review-status', [TransactionAnomalyController::class, 'updateReviewStatus'])->name('anomalies.review_status');
 
             Route::get('/muzakki/trash', [MuzakkiController::class, 'trash'])->name('muzakki.trash');
             Route::post('/muzakki/{muzakki}/merge', [MuzakkiController::class, 'merge'])->name('muzakki.merge');
-            Route::post('/muzakki/{muzakki}/restore', [MuzakkiController::class, 'restore'])->name('muzakki.restore');
-            Route::delete('/muzakki/{muzakki}/force-delete', [MuzakkiController::class, 'forceDelete'])->name('muzakki.forceDelete');
+            Route::post('/muzakki/{muzakki}/restore', [MuzakkiController::class, 'restore'])->withTrashed()->name('muzakki.restore');
+            Route::delete('/muzakki/{muzakki}/force-delete', [MuzakkiController::class, 'forceDelete'])->withTrashed()->name('muzakki.forceDelete');
 
             // Excel Exports
             Route::get('/rekap/export/daily', [ExportController::class, 'exportDaily'])->name('rekap.export.daily');
@@ -56,10 +56,10 @@ Route::middleware(['auth', 'role:staff,admin,super_admin'])
         // Internal transactions
         Route::get('/transactions/create', [ZakatTransactionController::class, 'create'])->name('transactions.create');
         Route::post('/transactions', [ZakatTransactionController::class, 'store'])->name('transactions.store');
-        Route::get('/transactions/{transaction}', [ZakatTransactionController::class, 'show'])->name('transactions.show');
+        Route::get('/transactions/{transaction}', [ZakatTransactionController::class, 'show'])->withTrashed()->name('transactions.show');
         Route::get('/transactions/{transaction}/edit', [ZakatTransactionController::class, 'edit'])->name('transactions.edit');
         Route::patch('/transactions/{transaction}', [ZakatTransactionController::class, 'update'])->name('transactions.update');
-        Route::get('/transactions/{transaction}/receipt', [ZakatTransactionController::class, 'receipt'])->name('transactions.receipt');
+        Route::get('/transactions/{transaction}/receipt', [ZakatTransactionController::class, 'receipt'])->withTrashed()->name('transactions.receipt');
 
         Route::middleware(['role:admin,super_admin'])->group(function () {
             Route::get('/users', [UserManagementController::class, 'index'])->name('users.index');

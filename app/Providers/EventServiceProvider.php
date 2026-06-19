@@ -7,6 +7,7 @@ use Illuminate\Auth\Listeners\SendEmailVerificationNotification;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
 use Illuminate\Support\Facades\Event;
 use App\Models\ZakatTransaction;
+use App\Observers\ZakatTransactionCacheObserver;
 use App\Observers\ZakatTransactionObserver;
 
 class EventServiceProvider extends ServiceProvider
@@ -30,5 +31,6 @@ class EventServiceProvider extends ServiceProvider
     public function boot()
     {
         ZakatTransaction::observe(ZakatTransactionObserver::class);
+        ZakatTransaction::observe(ZakatTransactionCacheObserver::class);
     }
 }

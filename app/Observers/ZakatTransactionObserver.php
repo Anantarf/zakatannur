@@ -2,23 +2,14 @@
 
 namespace App\Observers;
 
-use App\Models\ZakatTransaction;
 use App\Models\AuditLog;
+use App\Models\ZakatTransaction;
 use Illuminate\Support\Facades\Request;
 
 class ZakatTransactionObserver
 {
-    private function clearPublicCache(ZakatTransaction $model)
+    private function log(ZakatTransaction $model, string $action, array $metadata = []): void
     {
-        $year = $model->tahun_zakat;
-        \Illuminate\Support\Facades\Cache::forget(\App\Models\AppSetting::cacheKeyForPublicSummary($year));
-        \Illuminate\Support\Facades\Cache::forget(\App\Models\AppSetting::cacheKeyForPublicHomeStats($year));
-    }
-
-    private function log(ZakatTransaction $model, string $action, array $metadata = [])
-    {
-        $this->clearPublicCache($model);
-
         AuditLog::create([
             'actor_user_id' => auth()->id() ?? $model->petugas_id,
             'action'        => $action,
@@ -30,16 +21,15 @@ class ZakatTransactionObserver
         ]);
     }
 
-    public function created(ZakatTransaction $zakatTransaction)
+    public function created(ZakatTransaction $zakatTransaction): void
     {
         $this->log($zakatTransaction, 'created', [
-            'new' => $zakatTransaction->getAttributes()
+            'new' => $zakatTransaction->getAttributes(),
         ]);
     }
 
-    public function updated(ZakatTransaction $zakatTransaction)
+    public function updated(ZakatTransaction $zakatTransaction): void
     {
-        // wasChanged is appropriate for the 'updated' event as it fires AFTER save
         if ($zakatTransaction->wasChanged()) {
             $this->log($zakatTransaction, 'updated', [
                 'old' => array_intersect_key($zakatTransaction->getOriginal(), $zakatTransaction->getChanges()),
@@ -48,21 +38,20 @@ class ZakatTransactionObserver
         }
     }
 
-    public function deleted(ZakatTransaction $zakatTransaction)
+    public function deleted(ZakatTransaction $zakatTransaction): void
     {
         $this->log($zakatTransaction, 'deleted', [
-            'old' => $zakatTransaction->getAttributes()
+            'old' => $zakatTransaction->getAttributes(),
         ]);
     }
 
-    public function restored(ZakatTransaction $zakatTransaction)
+    public function restored(ZakatTransaction $zakatTransaction): void
     {
         $this->log($zakatTransaction, 'restored');
     }
 
-    public function forceDeleted(ZakatTransaction $zakatTransaction)
+    public function forceDeleted(ZakatTransaction $zakatTransaction): void
     {
         $this->log($zakatTransaction, 'force_deleted');
     }
 }
-
