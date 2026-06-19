@@ -20,7 +20,7 @@ class TransactionRiskReviewTest extends TestCase
     {
         $staff = $this->seedDefaultsAndStaff();
 
-        $response = $this->actingAs($staff)->post('/internal/transactions/store', $this->storePayload([
+        $response = $this->actingAs($staff)->post('/internal/transactions', $this->storePayload([
             'pembayar_nama' => 'Pembayar Baru',
             'muzakki_name' => 'Ahmad',
             'jiwa' => 2,
@@ -62,7 +62,7 @@ class TransactionRiskReviewTest extends TestCase
             'waktu_terima' => now(config('zakat.timezone')),
         ]);
 
-        $this->actingAs($staff)->post('/internal/transactions/store', $this->storePayload([
+        $this->actingAs($staff)->post('/internal/transactions', $this->storePayload([
             'pembayar_nama' => 'Pembayar Awal',
             'muzakki_name' => 'Calon Update',
             'jiwa' => 1,
@@ -89,7 +89,7 @@ class TransactionRiskReviewTest extends TestCase
         ];
 
         $this->actingAs($staff)
-            ->patch('/internal/transactions/' . $transaction->id . '/update', $payload)
+            ->patch('/internal/transactions/' . $transaction->id , $payload)
             ->assertRedirect();
 
         $review = TransactionRiskReview::query()->where('zakat_transaction_id', $transaction->id)->firstOrFail();
@@ -136,7 +136,7 @@ class TransactionRiskReviewTest extends TestCase
         ]);
 
         $this->actingAs($admin)
-            ->patch('/internal/transactions/' . $transaction->id . '/update', [
+            ->patch('/internal/transactions/' . $transaction->id , [
                 'pembayar_nama' => 'Pembayar Persist',
                 'pembayar_phone' => '08120001',
                 'pembayar_alamat' => 'Jakarta',
@@ -185,7 +185,7 @@ class TransactionRiskReviewTest extends TestCase
             'waktu_terima' => Carbon::parse('2025-05-16 10:00:00', config('zakat.timezone')),
         ]);
 
-        $this->actingAs($staff)->post('/internal/transactions/store', $this->storePayload([
+        $this->actingAs($staff)->post('/internal/transactions', $this->storePayload([
             'pembayar_nama' => 'Pembayar Tahun',
             'muzakki_name' => 'Ahmad Tahun Baru',
             'jiwa' => 1,
@@ -202,13 +202,13 @@ class TransactionRiskReviewTest extends TestCase
     {
         $staff = $this->seedDefaultsAndStaff();
 
-        $this->actingAs($staff)->post('/internal/transactions/store', $this->storePayload([
+        $this->actingAs($staff)->post('/internal/transactions', $this->storePayload([
             'pembayar_nama' => 'Satu Pembayar',
             'muzakki_name' => 'Beneficiary A',
             'jiwa' => 1,
         ]))->assertRedirect();
 
-        $this->actingAs($staff)->post('/internal/transactions/store', $this->storePayload([
+        $this->actingAs($staff)->post('/internal/transactions', $this->storePayload([
             'pembayar_nama' => 'Satu Pembayar',
             'muzakki_name' => 'Beneficiary B',
             'jiwa' => 1,
@@ -246,7 +246,7 @@ class TransactionRiskReviewTest extends TestCase
         ]);
 
         $this->actingAs($admin)
-            ->patch('/internal/transactions/' . $transaction->id . '/update', [
+            ->patch('/internal/transactions/' . $transaction->id , [
                 'pembayar_nama' => 'Pembayar Printed',
                 'pembayar_phone' => '0812',
                 'pembayar_alamat' => 'Jakarta',
@@ -341,7 +341,7 @@ class TransactionRiskReviewTest extends TestCase
         ]);
 
         $this->actingAs($admin)
-            ->patch('/internal/transactions/' . $transaction->id . '/update', [
+            ->patch('/internal/transactions/' . $transaction->id , [
                 'pembayar_nama' => 'Pembayar Delta',
                 'pembayar_phone' => '0812',
                 'pembayar_alamat' => 'Jakarta',
@@ -388,7 +388,7 @@ class TransactionRiskReviewTest extends TestCase
             ]);
         }
 
-        $this->actingAs($staff)->post('/internal/transactions/store', [
+        $this->actingAs($staff)->post('/internal/transactions', [
             'muzakki_name' => 'Outlier Infaq',
             'muzakki_address' => 'Jl. Contoh',
             'muzakki_phone' => '08999',
@@ -433,7 +433,7 @@ class TransactionRiskReviewTest extends TestCase
             ]);
         }
 
-        $this->actingAs($staff)->post('/internal/transactions/store', [
+        $this->actingAs($staff)->post('/internal/transactions', [
             'muzakki_name' => 'Outlier Mini',
             'muzakki_address' => 'Jl. Contoh',
             'muzakki_phone' => '08888',

@@ -47,16 +47,18 @@ Route::middleware(['auth', 'role:staff,admin,super_admin'])
             Route::get('/rekap/export/yearly', [ExportController::class, 'exportYearly'])->name('rekap.export.yearly');
         });
 
-        Route::resource('muzakki', MuzakkiController::class)->names('muzakki');
+        Route::resource('muzakki', MuzakkiController::class)
+            ->only(['index', 'show', 'edit', 'update', 'destroy'])
+            ->names('muzakki');
         Route::get('/muzakki-autocomplete', [MuzakkiController::class, 'autocomplete'])->name('muzakki.autocomplete');
         Route::get('/history', [TransactionHistoryController::class, 'index'])->name('transactions.index');
         
         // Internal transactions
         Route::get('/transactions/create', [ZakatTransactionController::class, 'create'])->name('transactions.create');
-        Route::post('/transactions/store', [ZakatTransactionController::class, 'store'])->name('transactions.store');
+        Route::post('/transactions', [ZakatTransactionController::class, 'store'])->name('transactions.store');
         Route::get('/transactions/{transaction}', [ZakatTransactionController::class, 'show'])->name('transactions.show');
         Route::get('/transactions/{transaction}/edit', [ZakatTransactionController::class, 'edit'])->name('transactions.edit');
-        Route::patch('/transactions/{transaction}/update', [ZakatTransactionController::class, 'update'])->name('transactions.update');
+        Route::patch('/transactions/{transaction}', [ZakatTransactionController::class, 'update'])->name('transactions.update');
         Route::get('/transactions/{transaction}/receipt', [ZakatTransactionController::class, 'receipt'])->name('transactions.receipt');
 
         Route::middleware(['role:admin,super_admin'])->group(function () {

@@ -269,7 +269,7 @@ class AuditLogTest extends TestCase
         ]);
 
         $this->actingAs($admin)
-            ->patch('/internal/transactions/' . $tx->id . '/update', [
+            ->patch('/internal/transactions/' . $tx->id , [
                 'pembayar_nama' => 'Pembayar Update',
                 'pembayar_phone' => '08123',
                 'pembayar_alamat' => 'Jakarta',

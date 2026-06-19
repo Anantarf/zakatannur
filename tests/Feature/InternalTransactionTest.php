@@ -65,7 +65,7 @@ class InternalTransactionTest extends TestCase
             // waktu_terima intentionally omitted
         ];
 
-        $response = $this->actingAs($staff)->post('/internal/transactions/store', $payload);
+        $response = $this->actingAs($staff)->post('/internal/transactions', $payload);
 
         $this->assertStringContainsString('/internal/transactions/', $response->headers->get('Location'));
 
@@ -105,7 +105,7 @@ class InternalTransactionTest extends TestCase
             // jumlah_beras_kg intentionally omitted; should be computed.
         ];
 
-        $response = $this->actingAs($staff)->from('/internal/transactions/create')->post('/internal/transactions/store', $payload);
+        $response = $this->actingAs($staff)->from('/internal/transactions/create')->post('/internal/transactions', $payload);
 
         $this->assertStringContainsString('/internal/transactions/', $response->headers->get('Location'));
 
@@ -145,7 +145,7 @@ class InternalTransactionTest extends TestCase
             'nominal_uang' => null,
         ];
 
-        $response = $this->actingAs($staff)->from('/internal/transactions/create')->post('/internal/transactions/store', $payload);
+        $response = $this->actingAs($staff)->from('/internal/transactions/create')->post('/internal/transactions', $payload);
 
         $response->assertRedirect('/internal/transactions/create');
         $response->assertSessionHasErrors(['nominal_uang']);
@@ -177,7 +177,7 @@ class InternalTransactionTest extends TestCase
             'nominal_uang' => null,
         ];
 
-        $response = $this->actingAs($staff)->from('/internal/transactions/create')->post('/internal/transactions/store', $payload);
+        $response = $this->actingAs($staff)->from('/internal/transactions/create')->post('/internal/transactions', $payload);
 
         $response->assertRedirect('/internal/transactions/create');
         $response->assertSessionHasErrors(['nominal_uang']);
@@ -208,7 +208,7 @@ class InternalTransactionTest extends TestCase
             'nominal_uang' => 50000,
         ];
 
-        $response = $this->actingAs($staff)->from('/internal/transactions/create')->post('/internal/transactions/store', $payload);
+        $response = $this->actingAs($staff)->from('/internal/transactions/create')->post('/internal/transactions', $payload);
 
         $response->assertRedirect('/internal/transactions/create');
         $response->assertSessionHasErrors(['tahun_zakat']);
@@ -259,7 +259,7 @@ class InternalTransactionTest extends TestCase
             'nominal_uang' => null,
         ];
 
-        $response = $this->actingAs($staff)->from('/internal/transactions/create')->post('/internal/transactions/store', $payload);
+        $response = $this->actingAs($staff)->from('/internal/transactions/create')->post('/internal/transactions', $payload);
 
         $this->assertStringContainsString('/internal/transactions/', $response->headers->get('Location'));
 
@@ -294,7 +294,7 @@ class InternalTransactionTest extends TestCase
             'nominal_uang' => 90000,
         ];
 
-        $response = $this->actingAs($staff)->from('/internal/transactions/create')->post('/internal/transactions/store', $payload);
+        $response = $this->actingAs($staff)->from('/internal/transactions/create')->post('/internal/transactions', $payload);
 
         $this->assertStringContainsString('/internal/transactions/', $response->headers->get('Location'));
         $this->assertDatabaseCount('zakat_transactions', 1);
@@ -328,7 +328,7 @@ class InternalTransactionTest extends TestCase
             'jumlah_beras_kg' => 4.75,
         ];
 
-        $response = $this->actingAs($staff)->from('/internal/transactions/create')->post('/internal/transactions/store', $payload);
+        $response = $this->actingAs($staff)->from('/internal/transactions/create')->post('/internal/transactions', $payload);
 
         $this->assertStringContainsString('/internal/transactions/', $response->headers->get('Location'));
         $this->assertDatabaseCount('zakat_transactions', 1);
@@ -372,7 +372,7 @@ class InternalTransactionTest extends TestCase
             'jumlah_beras_kg' => null,
         ];
 
-        $response = $this->actingAs($staff)->from('/internal/transactions/create')->post('/internal/transactions/store', $payload);
+        $response = $this->actingAs($staff)->from('/internal/transactions/create')->post('/internal/transactions', $payload);
         $this->assertStringContainsString('/internal/transactions/', $response->headers->get('Location'));
 
         $this->assertSame(
@@ -424,7 +424,7 @@ class InternalTransactionTest extends TestCase
 
         $response = $this->actingAs($staff)
             ->from('/internal/transactions/create')
-            ->post('/internal/transactions/store', $payload);
+            ->post('/internal/transactions', $payload);
             
         $response->assertStatus(302);
         $this->assertStringContainsString('/internal/transactions/', $response->headers->get('Location'));
@@ -496,7 +496,7 @@ class InternalTransactionTest extends TestCase
 
         $this->actingAs($staff)
             ->from('/internal/transactions/' . $mainTx->id . '/edit')
-            ->patch('/internal/transactions/' . $mainTx->id . '/update', $payload)
+            ->patch('/internal/transactions/' . $mainTx->id, $payload)
             ->assertRedirect('/internal/transactions/' . $mainTx->id . '/edit')
             ->assertSessionHasErrors(['items.0.id']);
 
@@ -553,7 +553,7 @@ class InternalTransactionTest extends TestCase
         ];
 
         $this->actingAs($staff)
-            ->patch('/internal/transactions/' . $trx->id . '/update', $payload)
+            ->patch('/internal/transactions/' . $trx->id, $payload)
             ->assertForbidden();
     }
 
@@ -606,7 +606,7 @@ class InternalTransactionTest extends TestCase
         ];
 
         $this->actingAs($admin)
-            ->patch('/internal/transactions/' . $trx->id . '/update', $payload)
+            ->patch('/internal/transactions/' . $trx->id, $payload)
             ->assertRedirect();
 
         $this->assertDatabaseHas('zakat_transactions', [

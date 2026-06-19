@@ -16,7 +16,6 @@ class MuzakkiCrudTest extends TestCase
     public function test_muzakki_pages_require_auth(): void
     {
         $this->get('/internal/muzakki')->assertRedirect(route('home', ['login' => 'true']));
-        $this->get('/internal/muzakki/create')->assertRedirect(route('home', ['login' => 'true']));
     }
 
     public function test_unallowed_role_cannot_access_muzakki(): void
