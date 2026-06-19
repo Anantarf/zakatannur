@@ -62,6 +62,7 @@
                     :aria-selected="chartSlide === 1"
                     :class="chartSlide === 1 ? 'public-chart-filter-active' : 'public-chart-filter-inactive'"
                     @click="setChartSlide(1)">Beras</button>
+                <span class="public-chart-filter-thumb" :class="chartSlide === 1 ? 'translate-x-full bg-amber-600 shadow-amber-700/25' : 'translate-x-0 bg-brand-700 shadow-brand-700/25'"></span>
             </div>
         </div>
     </div>
