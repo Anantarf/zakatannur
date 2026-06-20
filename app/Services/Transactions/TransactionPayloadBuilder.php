@@ -32,8 +32,8 @@ class TransactionPayloadBuilder
             'hijri_year' => $period?->hijri_year,
             'hijri_month' => $period?->hijri_month,
             'metode' => $metode,
-            'nominal_uang' => ZakatTransaction::computeNominalUang($itemForComputation, $defaults->fitrahCashPerJiwa, $defaults->fidyahPerHari),
-            'jumlah_beras_kg' => ZakatTransaction::computeJumlahBerasKg($itemForComputation, $defaults->fitrahBerasPerJiwa, $defaults->fidyahBerasPerHari),
+            'nominal_uang' => self::computeNominalUang($itemForComputation, $defaults->fitrahCashPerJiwa, $defaults->fidyahPerHari),
+            'jumlah_beras_kg' => self::computeJumlahBerasKg($itemForComputation, $defaults->fitrahBerasPerJiwa, $defaults->fidyahBerasPerHari),
             'jiwa' => $item['jiwa'] ?? $data['jiwa'] ?? null,
             'hari' => $item['hari'] ?? $data['hari'] ?? null,
             'is_khusus' => $this->isSpecialValue($itemForComputation, $defaults),
@@ -49,6 +49,32 @@ class TransactionPayloadBuilder
             'pembayar_alamat' => $payerData['muzakki_address'],
             'pembayar_phone' => $payerData['muzakki_phone'],
         ];
+    }
+
+    public static function computeNominalUang(array $data, int $defaultFitrah, int $defaultFidyah): ?int
+    {
+        if ($data['metode'] === ZakatTransaction::METHOD_BERAS) return null;
+        if (isset($data['nominal_uang']) && $data['nominal_uang'] !== '') return (int) $data['nominal_uang'];
+
+        if ($data['category'] === ZakatTransaction::CATEGORY_FITRAH && $defaultFitrah > 0) return ((int) ($data['jiwa'] ?? 1)) * $defaultFitrah;
+        if ($data['category'] === ZakatTransaction::CATEGORY_FIDYAH && $defaultFidyah > 0) return ((int) ($data['hari'] ?? 0)) * $defaultFidyah;
+
+        return null;
+    }
+
+    public static function computeJumlahBerasKg(array $data, float $defaultBerasKg, float $defaultFidyahBeras): ?float
+    {
+        if (isset($data['jumlah_beras_kg']) && $data['jumlah_beras_kg'] !== null && $data['jumlah_beras_kg'] !== '') return (float) $data['jumlah_beras_kg'];
+
+        if ($data['category'] === ZakatTransaction::CATEGORY_FITRAH && $data['metode'] === ZakatTransaction::METHOD_BERAS) {
+            return round(((int) ($data['jiwa'] ?? 1)) * $defaultBerasKg, 2);
+        }
+
+        if ($data['category'] === ZakatTransaction::CATEGORY_FIDYAH && $data['metode'] === ZakatTransaction::METHOD_BERAS) {
+            return round(((int) ($data['hari'] ?? 0)) * $defaultFidyahBeras, 2);
+        }
+
+        return null;
     }
 
     private function isSpecialValue(array $data, AnnualZakatDefaults $defaults): bool

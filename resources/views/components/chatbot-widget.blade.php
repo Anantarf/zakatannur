@@ -49,7 +49,7 @@
         x-transition:leave-end="translate-y-6 scale-95 opacity-0"
         @keydown.escape.window="closeChat()"
         class="flex w-[calc(100vw-1.5rem)] max-w-[24rem] origin-bottom-right flex-col overflow-hidden rounded-2xl border border-slate-200/80 bg-white shadow-[0_24px_60px_-20px_rgba(15,23,42,0.25)] ring-1 ring-slate-200/70 sm:w-96"
-        style="display: none; height: min(500px, 78vh); max-height: 78vh;"
+        style="height: min(500px, 78vh); max-height: 78vh;"
         role="dialog"
         aria-label="Chat dengan Zakky"
     >
@@ -156,9 +156,9 @@
                     {!! $messageIcon !!}
                 </span>
                 <div class="flex items-center gap-1 rounded-2xl rounded-tl-none border border-slate-200/80 bg-white px-3 py-3 shadow-sm">
-                    <span class="zakky-dot h-1.5 w-1.5 rounded-full bg-slate-400" style="animation-delay: 0ms"></span>
-                    <span class="zakky-dot h-1.5 w-1.5 rounded-full bg-slate-400" style="animation-delay: 180ms"></span>
-                    <span class="zakky-dot h-1.5 w-1.5 rounded-full bg-slate-400" style="animation-delay: 360ms"></span>
+                    <span class="zakky-dot zakky-dot-1 h-1.5 w-1.5 rounded-full bg-slate-400"></span>
+                    <span class="zakky-dot zakky-dot-2 h-1.5 w-1.5 rounded-full bg-slate-400"></span>
+                    <span class="zakky-dot zakky-dot-3 h-1.5 w-1.5 rounded-full bg-slate-400"></span>
                 </div>
             </div>
         </div>

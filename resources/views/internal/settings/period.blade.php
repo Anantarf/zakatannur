@@ -325,7 +325,7 @@
                         <p class="mt-1 text-xs text-amber-700">Backup database sebelum lanjut.</p>
                     </div>
 
-                    <form method="POST" action="{{ route('internal.settings.period.startNew') }}" class="mt-4 space-y-4" x-data="{ year: @js((string) old('new_year', $activeYear + 1)), confirmYear: @js((string) old('new_year_confirmation')), backup: @js((bool) old('backup_confirmed')) }">
+                    <form method="POST" action="{{ route('internal.settings.period.start_new') }}" class="mt-4 space-y-4" x-data="{ year: @js((string) old('new_year', $activeYear + 1)), confirmYear: @js((string) old('new_year_confirmation')), backup: @js((bool) old('backup_confirmed')) }">
                         @csrf
 
                         <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">

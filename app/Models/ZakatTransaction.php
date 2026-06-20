@@ -79,17 +79,22 @@ class ZakatTransaction extends Model
 
     public static function isValidCategory(?string $value): bool
     {
-        return $value !== null && in_array($value, self::CATEGORIES, true);
+        return self::isValidValue($value, self::CATEGORIES);
     }
 
     public static function isValidMethod(?string $value): bool
     {
-        return $value !== null && in_array($value, self::METHODS, true);
+        return self::isValidValue($value, self::METHODS);
     }
 
     public static function isValidStatus(?string $value): bool
     {
-        return $value !== null && in_array($value, self::STATUSES, true);
+        return self::isValidValue($value, self::STATUSES);
+    }
+
+    private static function isValidValue(?string $value, array $allowed): bool
+    {
+        return $value !== null && in_array($value, $allowed, true);
     }
 
     public static function getShiftLabel(?string $shift): string
@@ -199,7 +204,7 @@ class ZakatTransaction extends Model
 
     protected function shiftLabel(): Attribute
     {
-        return Attribute::get(fn() => self::SHIFT_LABELS[$this->shift] ?? '-');
+        return Attribute::get(fn() => self::SHIFT_LABELS[$this->shift] ?? strtoupper((string) $this->shift) ?: '-');
     }
 
     protected function nominalUangDisplay(): Attribute
@@ -220,32 +225,6 @@ class ZakatTransaction extends Model
     protected function totalBerasDisplay(): Attribute
     {
         return Attribute::get(fn() => \App\Support\Format::kg((float)($this->total_beras ?? $this->jumlah_beras_kg ?? 0)));
-    }
-
-    public static function computeNominalUang(array $data, int $defaultFitrah, int $defaultFidyah): ?int
-    {
-        if ($data['metode'] === self::METHOD_BERAS) return null;
-        if (isset($data['nominal_uang']) && $data['nominal_uang'] !== '') return (int) $data['nominal_uang'];
-
-        if ($data['category'] === self::CATEGORY_FITRAH && $defaultFitrah > 0) return ((int) ($data['jiwa'] ?? 1)) * $defaultFitrah;
-        if ($data['category'] === self::CATEGORY_FIDYAH && $defaultFidyah > 0) return ((int) ($data['hari'] ?? 0)) * $defaultFidyah;
-
-        return null;
-    }
-
-    public static function computeJumlahBerasKg(array $data, float $defaultBerasKg, float $defaultFidyahBeras): ?float
-    {
-        if (isset($data['jumlah_beras_kg']) && $data['jumlah_beras_kg'] !== null && $data['jumlah_beras_kg'] !== '') return (float) $data['jumlah_beras_kg'];
-
-        if ($data['category'] === self::CATEGORY_FITRAH && $data['metode'] === self::METHOD_BERAS) {
-            return round(((int) ($data['jiwa'] ?? 1)) * $defaultBerasKg, 2);
-        }
-        
-        if ($data['category'] === self::CATEGORY_FIDYAH && $data['metode'] === self::METHOD_BERAS) {
-            return round(((int) ($data['hari'] ?? 0)) * $defaultFidyahBeras, 2);
-        }
-
-        return null;
     }
 
     public function scopeFilter(Builder $query, array $filters): Builder

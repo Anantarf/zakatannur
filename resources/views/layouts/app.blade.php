@@ -31,7 +31,8 @@
     @endif
 
     <body class="ui-shell font-sans antialiased text-slate-900" x-data>
-        <div class="fixed top-4 right-4 z-[9999] w-full max-w-lg pointer-events-none">
+        <div class="fixed top-4 right-4 z-[9999] w-full max-w-lg pointer-events-none"
+             role="status" aria-live="polite" aria-atomic="true">
             <div x-show="$store.toast.show"
                  x-transition:enter="transition ease-out duration-300"
                  x-transition:enter-start="opacity-0 -translate-y-2"
@@ -42,8 +43,8 @@
                  style="display: none;"
                  class="pointer-events-auto flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 rounded-2xl border border-brand-200 bg-brand-50/95 backdrop-blur-sm p-4 text-brand-900 shadow-2xl">
                 <div class="flex items-center gap-3">
-                    <div class="bg-brand-500 text-white rounded-full p-1 shadow-sm">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <div class="bg-brand-500 text-white rounded-full p-1 shadow-sm" aria-hidden="true">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" />
                         </svg>
                     </div>

@@ -19,6 +19,7 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Database\QueryException;
 use Illuminate\Validation\ValidationException;
 use App\Events\ZakatTransactionCreated;
+use App\Exceptions\DuplicateTransactionNumberException;
 use Illuminate\Database\Eloquent\Collection;
 
 class ZakatService
@@ -172,7 +173,7 @@ class ZakatService
                 ->exists();
 
             if (!$noTransaksiOverride && ZakatTransaction::where('no_transaksi', $noTransaksi)->exists()) {
-                throw new \RuntimeException("Nomor Transaksi {$noTransaksi} sudah terpakai. Sila klik simpan sekali lagi untuk mendapatkan nomor baru.");
+                throw new DuplicateTransactionNumberException("Nomor Transaksi {$noTransaksi} sudah terpakai. Sila klik simpan sekali lagi untuk mendapatkan nomor baru.");
             }
 
             $oldTotals = $this->getExistingTransactionTotals($noTransaksi);
@@ -392,10 +393,9 @@ class ZakatService
                 if ($e->getCode() === '40001' || $e->errorInfo[1] === 1213) continue;
                 
                 throw $e;
+            } catch (DuplicateTransactionNumberException) {
+                continue;
             } catch (\RuntimeException $e) {
-                if (str_contains($e->getMessage(), 'Nomor Transaksi') && str_contains($e->getMessage(), 'sudah terpakai')) {
-                    continue; 
-                }
                 throw $e;
             }
         }

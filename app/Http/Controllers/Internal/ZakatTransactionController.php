@@ -58,15 +58,7 @@ class ZakatTransactionController extends Controller
             abort(Response::HTTP_FORBIDDEN);
         }
 
-        $groupItems = ZakatTransaction::transactionGroupItems($groupNumber, false, [
-            'muzakki' => fn($q) => $q->withTrashed(),
-        ]);
-
-        if ($groupItems->isEmpty()) {
-            $groupItems = ZakatTransaction::transactionGroupItems($groupNumber, true, [
-                'muzakki' => fn($q) => $q->withTrashed(),
-            ]);
-        }
+        $groupItems = $this->resolveGroupItems($groupNumber);
 
         $totalUang = $groupItems->where('metode', '!=', ZakatTransaction::METHOD_BERAS)->sum('nominal_uang');
         $totalTf = $groupItems->where('metode', ZakatTransaction::METHOD_UANG)->where('is_transfer', true)->sum('nominal_uang');
@@ -92,21 +84,7 @@ class ZakatTransactionController extends Controller
         $tx = $transaction;
         $groupNumber = $tx->no_transaksi;
 
-        $groupItems = ZakatTransaction::query()
-            ->with(['muzakki' => fn($q) => $q->withTrashed()])
-            ->forTransactionGroup($groupNumber)
-            ->valid()
-            ->orderBy('id', 'asc')
-            ->get();
-
-        if ($groupItems->isEmpty()) {
-            $groupItems = ZakatTransaction::withTrashed()
-                ->with(['muzakki' => fn($q) => $q->withTrashed()])
-                ->forTransactionGroup($groupNumber)
-                ->valid()
-                ->orderBy('id', 'asc')
-                ->get();
-        }
+        $groupItems = $this->resolveGroupItemsForReceipt($groupNumber);
 
         if ($tx->trashed() && !in_array($user->role, [User::ROLE_ADMIN, User::ROLE_SUPER_ADMIN], true)) {
             abort(Response::HTTP_FORBIDDEN);
@@ -204,5 +182,29 @@ class ZakatTransactionController extends Controller
             ],
             $overrides
         );
+    }
+
+    private function resolveGroupItems(string $groupNumber): \Illuminate\Support\Collection
+    {
+        $relations = ['muzakki' => fn($q) => $q->withTrashed()];
+        $items = ZakatTransaction::transactionGroupItems($groupNumber, false, $relations);
+
+        return $items->isEmpty()
+            ? ZakatTransaction::transactionGroupItems($groupNumber, true, $relations)
+            : $items;
+    }
+
+    private function resolveGroupItemsForReceipt(string $groupNumber): \Illuminate\Support\Collection
+    {
+        $query = fn(bool $withTrashed) => ($withTrashed ? ZakatTransaction::withTrashed() : ZakatTransaction::query())
+            ->with(['muzakki' => fn($q) => $q->withTrashed()])
+            ->forTransactionGroup($groupNumber)
+            ->valid()
+            ->orderBy('id', 'asc')
+            ->get();
+
+        $items = $query(false);
+
+        return $items->isEmpty() ? $query(true) : $items;
     }
 }

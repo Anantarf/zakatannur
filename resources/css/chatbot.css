@@ -25,6 +25,10 @@
  animation: zakkyTyping 1.4s cubic-bezier(0.4, 0, 0.2, 1) infinite;
 }
 
+.zakky-dot-1 { animation-delay: 0ms; }
+.zakky-dot-2 { animation-delay: 180ms; }
+.zakky-dot-3 { animation-delay: 360ms; }
+
 .zakky-avatar {
  isolation: isolate;
 }

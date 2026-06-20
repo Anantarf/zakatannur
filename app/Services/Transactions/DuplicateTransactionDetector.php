@@ -36,7 +36,7 @@ class DuplicateTransactionDetector
             $candidateScore = 0;
             $matchType = null;
 
-            if ($this->sameTransactionShape($transaction, $candidate) && (int) $candidate->muzakki_id === (int) $transaction->muzakki_id) {
+            if ($this->samePayerAndAmount($transaction, $candidate) && (int) $candidate->muzakki_id === (int) $transaction->muzakki_id) {
                 $candidateScore = 60;
                 $matchType = 'exact_duplicate';
             } elseif ($this->samePayerByNameOnly($transaction, $candidate) && $this->sameAmount($transaction, $candidate) && (int) $candidate->muzakki_id === (int) $transaction->muzakki_id) {
@@ -88,12 +88,6 @@ class DuplicateTransactionDetector
         return $transaction->waktu_terima ?? $transaction->created_at;
     }
 
-    private function sameTransactionShape(ZakatTransaction $left, ZakatTransaction $right): bool
-    {
-        return $this->sameAmount($left, $right)
-            && $this->samePayer($left, $right);
-    }
-
     private function samePayerAndAmount(ZakatTransaction $left, ZakatTransaction $right): bool
     {
         return $this->samePayer($left, $right)
@@ -107,18 +101,23 @@ class DuplicateTransactionDetector
 
         if ($leftPhone !== '' && $rightPhone !== '') {
             return $leftPhone === $rightPhone
-                && mb_strtolower(trim((string) $left->pembayar_nama)) === mb_strtolower(trim((string) $right->pembayar_nama));
+                && $this->normalizeName($left->pembayar_nama) === $this->normalizeName($right->pembayar_nama);
         }
 
-        return mb_strtolower(trim((string) $left->pembayar_nama)) === mb_strtolower(trim((string) $right->pembayar_nama));
+        return $this->normalizeName($left->pembayar_nama) === $this->normalizeName($right->pembayar_nama);
     }
 
     private function samePayerByNameOnly(ZakatTransaction $left, ZakatTransaction $right): bool
     {
-        $leftName = mb_strtolower(trim((string) ($left->pembayar_nama ?? '')));
-        $rightName = mb_strtolower(trim((string) ($right->pembayar_nama ?? '')));
+        $leftName = $this->normalizeName($left->pembayar_nama);
+        $rightName = $this->normalizeName($right->pembayar_nama);
 
         return $leftName !== '' && $leftName === $rightName;
+    }
+
+    private function normalizeName(?string $value): string
+    {
+        return mb_strtolower(trim((string) ($value ?? '')));
     }
 
     private function sameAmount(ZakatTransaction $left, ZakatTransaction $right): bool

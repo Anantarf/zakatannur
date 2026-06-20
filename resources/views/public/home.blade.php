@@ -43,7 +43,7 @@
                 @include('public.partials.laporan-tab')
                 @include('public.partials.grafik-tab')
 
-                <div style="display: none !important;">
+                <div class="hidden">
                     <canvas id="historicalChart"></canvas>
                 </div>
             </div>

@@ -44,6 +44,8 @@ const bootPageModules = async () => {
     await Promise.all(imports);
 };
 
-bootPageModules().finally(() => {
-    Alpine.start();
-});
+bootPageModules()
+    .catch(err => console.error('[App] Module load failed:', err))
+    .finally(() => {
+        Alpine.start();
+    });

@@ -36,15 +36,15 @@
         viewBox="0 0 32 32"
         width="{{ $iconSize }}"
         height="{{ $iconSize }}"
-        class="relative z-10 drop-shadow-sm"
+        class="relative z-10 drop-shadow-sm {{ $variant === 'light' ? 'text-brand-700' : 'text-white' }}"
         fill="none"
     >
-        <g stroke="{{ $variant === 'light' ? '#0f766e' : '#ffffff' }}" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+        <g stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
             <path d="M5 20 Q16 14 27 20" />
             <path d="M5 20 V24 H27 V20" />
             <path d="M11 20 V16 Q11 12 16 12 Q21 12 21 16 V20" />
             <path d="M16 9.5 V4" />
-            <path d="M12.5 5.5 Q16 3.5 19.5 5.5 Q19.5 7.2 16 9 Q12.5 7.2 12.5 5.5 Z" fill="{{ $variant === 'light' ? '#0f766e' : '#ffffff' }}" />
+            <path d="M12.5 5.5 Q16 3.5 19.5 5.5 Q19.5 7.2 16 9 Q12.5 7.2 12.5 5.5 Z" fill="currentColor" />
         </g>
     </svg>
 </span>

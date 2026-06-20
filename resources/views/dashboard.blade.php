@@ -199,10 +199,20 @@
 <script>
 (function() {
     const isOffSeason = {{ $offSeason ? 'true' : 'false' }};
-    const lineColor   = isOffSeason ? '#d97706' : '#0d9488';
-    const lineColorSoft = isOffSeason ? 'rgba(217, 119, 6, 0.92)' : 'rgba(13, 148, 136, 0.92)';
-    const gradFrom    = isOffSeason ? 'rgba(217, 119, 6, 0.18)' : 'rgba(20, 184, 166, 0.2)';
-    const labelColor  = isOffSeason ? '#92400e' : '#0f766e';
+    const _t = getComputedStyle(document.documentElement);
+    const _b6 = _t.getPropertyValue('--color-brand-600-rgb').trim();
+    const _b7 = _t.getPropertyValue('--color-brand-700-rgb').trim();
+    const _b5 = _t.getPropertyValue('--color-brand-500-rgb').trim();
+
+    const CHART_COLORS = {
+        brand:     { line: `rgb(${_b6})`,            lineSoft: `rgba(${_b6}, 0.92)`, gradFrom: `rgba(${_b5}, 0.2)`, label: `rgb(${_b7})` },
+        offSeason: { line: '#d97706', lineSoft: 'rgba(217, 119, 6, 0.92)', gradFrom: 'rgba(217, 119, 6, 0.18)', label: '#92400e' },
+    };
+
+    const lineColor     = isOffSeason ? CHART_COLORS.offSeason.line     : CHART_COLORS.brand.line;
+    const lineColorSoft = isOffSeason ? CHART_COLORS.offSeason.lineSoft : CHART_COLORS.brand.lineSoft;
+    const gradFrom      = isOffSeason ? CHART_COLORS.offSeason.gradFrom : CHART_COLORS.brand.gradFrom;
+    const labelColor    = isOffSeason ? CHART_COLORS.offSeason.label    : CHART_COLORS.brand.label;
 
     function initChart() {
         try {
