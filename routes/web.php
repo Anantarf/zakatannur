@@ -32,7 +32,7 @@ Route::middleware(['auth', 'role:staff,admin,super_admin'])
             Route::get('/transactions/trash', [TransactionHistoryController::class, 'trash'])->name('transactions.trash');
             Route::post('/transactions/{transaction}/trash', [TransactionHistoryController::class, 'destroy'])->name('transactions.destroy');
             Route::post('/transactions/{transaction}/restore', [TransactionHistoryController::class, 'restore'])->withTrashed()->name('transactions.restore');
-            Route::delete('/transactions/{transaction}/force-delete', [TransactionHistoryController::class, 'forceDelete'])->withTrashed()->name('transactions.forceDelete');
+            Route::delete('/transactions/{transaction}/force-delete', [TransactionHistoryController::class, 'forceDelete'])->withTrashed()->name('transactions.force_delete');
             Route::get('/anomalies', [TransactionAnomalyController::class, 'index'])->name('anomalies.index');
             Route::get('/anomalies/{noTransaksi}', [TransactionAnomalyController::class, 'show'])->name('anomalies.show');
             Route::patch('/anomalies/{noTransaksi}/review-status', [TransactionAnomalyController::class, 'updateReviewStatus'])->name('anomalies.review_status');
@@ -40,7 +40,7 @@ Route::middleware(['auth', 'role:staff,admin,super_admin'])
             Route::get('/muzakki/trash', [MuzakkiController::class, 'trash'])->name('muzakki.trash');
             Route::post('/muzakki/{muzakki}/merge', [MuzakkiController::class, 'merge'])->name('muzakki.merge');
             Route::post('/muzakki/{muzakki}/restore', [MuzakkiController::class, 'restore'])->withTrashed()->name('muzakki.restore');
-            Route::delete('/muzakki/{muzakki}/force-delete', [MuzakkiController::class, 'forceDelete'])->withTrashed()->name('muzakki.forceDelete');
+            Route::delete('/muzakki/{muzakki}/force-delete', [MuzakkiController::class, 'forceDelete'])->withTrashed()->name('muzakki.force_delete');
 
             // Excel Exports
             Route::get('/rekap/export/daily', [ExportController::class, 'exportDaily'])->name('rekap.export.daily');

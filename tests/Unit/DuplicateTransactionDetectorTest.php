@@ -166,6 +166,57 @@ class DuplicateTransactionDetectorTest extends TestCase
         $this->assertContains('exact_duplicate', $result['flags']);
     }
 
+
+    public function test_payer_match_same_beneficiary_when_phone_differs(): void
+    {
+        // Same payer name, different phone, same muzakki, same amount => payer_match_same_beneficiary (not exact_duplicate)
+        $this->makeTx(['pembayar_nama' => 'Ahmad Fauzi', 'pembayar_phone' => '08111111111']);
+        $tx = $this->makeTx([
+            'pembayar_nama' => 'Ahmad Fauzi',
+            'pembayar_phone' => '08222222222',
+            'waktu_terima' => now()->addMinutes(5),
+        ]);
+
+        $result = $this->detector->analyze($tx);
+
+        $this->assertContains('payer_match_same_beneficiary', $result['flags']);
+        $this->assertSame(40, $result['score']);
+        $this->assertNotContains('exact_duplicate', $result['flags']);
+    }
+
+    public function test_exact_duplicate_takes_priority_when_both_phone_empty(): void
+    {
+        // When both phones are empty, name+amount match collapses to exact_duplicate (priority branch)
+        $this->makeTx(['pembayar_nama' => 'Ahmad Fauzi', 'pembayar_phone' => '']);
+        $tx = $this->makeTx([
+            'pembayar_nama' => 'Ahmad Fauzi',
+            'pembayar_phone' => '',
+            'waktu_terima' => now()->addMinutes(5),
+        ]);
+
+        $result = $this->detector->analyze($tx);
+
+        $this->assertContains('exact_duplicate', $result['flags']);
+        $this->assertSame(60, $result['score']);
+        $this->assertNotContains('payer_match_same_beneficiary', $result['flags']);
+    }
+
+    public function test_payer_match_same_beneficiary_skips_when_names_differ(): void
+    {
+        // Phone empty, names differ => no flag (pembayar tidak cocok)
+        $this->makeTx(['pembayar_nama' => 'Ahmad Fauzi', 'pembayar_phone' => '']);
+        $tx = $this->makeTx([
+            'pembayar_nama' => 'Budi Santoso',
+            'pembayar_phone' => '',
+            'waktu_terima' => now()->addMinutes(5),
+        ]);
+
+        $result = $this->detector->analyze($tx);
+
+        $this->assertSame(0, $result['score']);
+        $this->assertEmpty($result['flags']);
+    }
+
     public function test_payer_name_comparison_is_case_insensitive(): void
     {
         $this->makeTx(['pembayar_nama' => 'AHMAD FAUZI', 'pembayar_phone' => '']);
@@ -176,3 +227,4 @@ class DuplicateTransactionDetectorTest extends TestCase
         $this->assertGreaterThan(0, $result['score']);
     }
 }
+

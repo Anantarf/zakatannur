@@ -1,0 +1,53 @@
+/* ============================================================
+ SHARED UTILITIES
+ Scope: skeleton loading, tabel action label, footer logo,
+        dan override global yang tidak masuk kategori lain.
+ ============================================================ */
+
+@keyframes shimmer {
+ 0% { background-position: -200% 0; }
+ 100% { background-position: 200% 0; }
+}
+
+@layer components {
+
+ .skeleton {
+  background: linear-gradient(90deg, #f0f0f0 25%, #e5e5e5 37%, #f0f0f0 63%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+ }
+
+ .skeleton-text {
+  @apply h-4 w-full rounded bg-slate-200;
+ }
+
+ .skeleton-circle {
+  @apply rounded-full bg-slate-200;
+ }
+
+ .ui-skeleton {
+  @apply animate-pulse rounded bg-slate-200;
+ }
+
+}
+
+/* Wide-screen table label: tampil hanya di > 1800px */
+.ui-table-action-label {
+ display: none;
+}
+
+@media (min-width: 1800px) {
+ .ui-table-action-label {
+  display: inline;
+ }
+}
+
+/* Footer logo hover lift */
+.footer-logo {
+ transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.footer-item-group:hover .footer-logo {
+ opacity: 1;
+ transform: translateY(-1px);
+}

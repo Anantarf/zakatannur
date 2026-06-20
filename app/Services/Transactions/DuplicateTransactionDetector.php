@@ -39,7 +39,7 @@ class DuplicateTransactionDetector
             if ($this->sameTransactionShape($transaction, $candidate) && (int) $candidate->muzakki_id === (int) $transaction->muzakki_id) {
                 $candidateScore = 60;
                 $matchType = 'exact_duplicate';
-            } elseif ($this->samePayerAndAmount($transaction, $candidate) && (int) $candidate->muzakki_id === (int) $transaction->muzakki_id) {
+            } elseif ($this->samePayerByNameOnly($transaction, $candidate) && $this->sameAmount($transaction, $candidate) && (int) $candidate->muzakki_id === (int) $transaction->muzakki_id) {
                 $candidateScore = 40;
                 $matchType = 'payer_match_same_beneficiary';
             } elseif ($this->samePayerAndAmount($transaction, $candidate) && $this->isTransferPair($transaction, $candidate)) {
@@ -62,7 +62,7 @@ class DuplicateTransactionDetector
             } elseif ($matchType === 'transfer_duplicate_candidate') {
                 $reasons[] = 'Kandidat duplikasi transfer ditemukan dengan nominal dan pembayar yang sama dalam rentang waktu dekat.';
             } elseif ($matchType === 'payer_match_same_beneficiary') {
-                $reasons[] = 'Transaksi mirip ditemukan dengan pembayar dan muzakki yang sama dalam rentang waktu dekat.';
+                $reasons[] = 'Transaksi dengan nama pembayar yang sama dan muzakki yang sama ditemukan dalam rentang waktu dekat.';
             }
 
             $candidates[] = [
@@ -111,6 +111,14 @@ class DuplicateTransactionDetector
         }
 
         return mb_strtolower(trim((string) $left->pembayar_nama)) === mb_strtolower(trim((string) $right->pembayar_nama));
+    }
+
+    private function samePayerByNameOnly(ZakatTransaction $left, ZakatTransaction $right): bool
+    {
+        $leftName = mb_strtolower(trim((string) ($left->pembayar_nama ?? '')));
+        $rightName = mb_strtolower(trim((string) ($right->pembayar_nama ?? '')));
+
+        return $leftName !== '' && $leftName === $rightName;
     }
 
     private function sameAmount(ZakatTransaction $left, ZakatTransaction $right): bool

@@ -93,7 +93,7 @@
                         </x-dropdown-link>
 
                         <!-- Authentication -->
-                        <form method="POST" action="{{ route('logout') }}" x-data>
+                        <form method="POST" action="{{ route('logout') }}">
                             @csrf
                             <x-dropdown-link :href="route('logout')" @click.prevent="$el.closest('form').submit()">
                                 {{ __('Keluar') }}

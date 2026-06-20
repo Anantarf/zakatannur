@@ -1,0 +1,355 @@
+/* ============================================================
+ PUBLIC LANDING PAGE
+ Prefix: .public-*
+ Scope: halaman transparansi publik (guest), header, nav,
+        tab chip, metric card, chart, report, footer.
+ ============================================================ */
+
+@layer components {
+
+ .public-shell-gap {
+  @apply pt-3 sm:pt-4;
+ }
+
+ .public-header {
+  @apply py-1 sm:py-2;
+ }
+
+ .public-kicker {
+  @apply mb-2 inline-flex items-center rounded-full border border-brand-200 bg-white/80 px-4 py-1.5 text-[11px] font-bold tracking-[0.16em] text-brand-700 shadow-sm;
+ }
+
+ .public-title {
+  @apply text-3xl sm:text-4xl lg:text-5xl font-bold text-slate-950 leading-[1.08] tracking-[-0.025em];
+ }
+
+ .public-subtitle {
+  @apply mt-1 block text-[12px] sm:text-[14px] font-medium tracking-[0.08em] text-slate-500;
+ }
+
+ .public-panel {
+  @apply rounded-card sm:rounded-[2rem] border border-white/80 bg-white/[0.88] p-3 shadow-xl shadow-brand-900/5 ring-1 ring-brand-900/5 backdrop-blur sm:p-4 lg:p-5;
+ }
+
+ .public-shell {
+  @apply rounded-card border border-white/80 bg-white/[0.92] shadow-lg shadow-brand-900/5 ring-1 ring-brand-100/40 backdrop-blur;
+ }
+
+ .public-shell-muted {
+  @apply bg-[linear-gradient(135deg,rgba(255,255,255,0.96),rgba(240,253,244,0.84))];
+ }
+
+ .public-section {
+  @apply rounded-card border border-brand-900/[0.08] bg-white/75 p-5 shadow-sm shadow-brand-900/5 ring-1 ring-white/60 sm:p-6;
+ }
+
+ .public-section-muted {
+  @apply bg-gradient-to-br from-white/80 via-white/70 to-brand-50/70;
+ }
+
+ .public-subcard {
+  @apply rounded-[1.1rem] border border-slate-200/80 bg-white/[0.92] px-4 py-3 shadow-sm;
+ }
+
+ .public-subcard-brand {
+  @apply border-brand-100/90 bg-brand-50/[0.78] text-brand-900;
+ }
+
+ .public-subcard-amber {
+  @apply border-amber-100/90 bg-amber-50/[0.82] text-amber-900;
+ }
+
+ .public-subcard-sky {
+  @apply border-sky-100/90 bg-sky-50/[0.82] text-sky-900;
+ }
+
+ .public-pill {
+  @apply inline-flex items-center gap-2 rounded-full border bg-white/90 px-3 py-1.5 text-[11px] font-semibold shadow-sm;
+ }
+
+ .public-pill-brand {
+  @apply border-brand-100 text-brand-800;
+ }
+
+ .public-pill-sky {
+  @apply border-sky-100 bg-sky-50 text-sky-900;
+ }
+
+ .public-pill-amber {
+  @apply border-amber-100 bg-amber-50 text-amber-800;
+ }
+
+ .public-section-title {
+  @apply text-2xl sm:text-[2rem] font-bold tracking-[-0.025em] text-slate-950;
+ }
+
+ .public-section-copy {
+  @apply text-sm sm:text-base leading-relaxed text-slate-600 font-medium;
+ }
+
+ .public-tab-chip {
+  @apply inline-flex min-h-10 items-center justify-center rounded-full px-4 py-2.5 text-center text-sm font-semibold leading-5 transition duration-150 ease-in-out focus:outline-none;
+ }
+
+ .public-tab-chip-active {
+  @apply bg-brand-700 text-white shadow-md shadow-brand-700/30;
+ }
+
+ .public-tab-chip-inactive {
+  @apply text-slate-700 hover:bg-white hover:text-slate-950 focus:bg-white focus:text-slate-950;
+ }
+
+ .public-tab-chip-mobile {
+  @apply min-h-10 flex-1 rounded-card px-3 py-2 text-center text-xs font-semibold transition duration-150 ease-in-out focus:outline-none;
+ }
+
+ .public-tab-chip-mobile-active {
+  @apply bg-brand-700 text-white shadow-md shadow-brand-700/30;
+ }
+
+ .public-tab-chip-mobile-inactive {
+  @apply text-slate-700 hover:bg-white hover:text-slate-950 focus:bg-white focus:text-slate-950;
+ }
+
+ .public-header-shell {
+  @apply overflow-hidden rounded-card border border-white/80 bg-white/[0.92] px-4 py-4 shadow-md shadow-brand-900/[0.05] ring-1 ring-brand-100/50 backdrop-blur sm:px-6 sm:py-5;
+ }
+
+ .public-header-kicker {
+  @apply text-[10px] font-bold uppercase tracking-[0.16em] text-brand-700;
+ }
+
+ .public-header-title {
+  @apply mt-2 max-w-2xl text-[1.45rem] font-extrabold leading-[1.1] tracking-[-0.015em] text-slate-950 sm:text-[1.85rem] lg:text-[2.05rem];
+ }
+
+ .public-header-meta {
+  @apply mt-2 flex flex-wrap items-center gap-x-2 gap-y-1 text-[12.5px] font-medium text-slate-600 sm:text-[14px];
+ }
+
+ .public-header-divider {
+  @apply hidden h-1 w-1 rounded-full bg-slate-300 sm:inline-block;
+ }
+
+ .public-header-location {
+  @apply text-[15px] font-semibold leading-[1.4] text-slate-900 sm:text-[16px];
+ }
+
+ .public-metric-card {
+  @apply rounded-[1.1rem] border border-slate-200/80 bg-white/[0.92] px-4 py-3 shadow-sm;
+ }
+
+ .public-metric-card-brand {
+  @apply rounded-[1.1rem] border border-brand-100/90 bg-brand-50/[0.78] px-4 py-3 text-brand-900 shadow-sm;
+ }
+
+ .public-metric-card-amber {
+  @apply rounded-[1.1rem] border border-amber-100/90 bg-amber-50/[0.82] px-4 py-3 text-amber-900 shadow-sm;
+ }
+
+ .public-metric-label {
+  @apply text-[10px] font-medium tracking-[0.03em] text-slate-500;
+ }
+
+ .public-metric-label-brand {
+  @apply text-brand-700;
+ }
+
+ .public-metric-label-amber {
+  @apply text-amber-700;
+ }
+
+ .public-metric-value {
+  @apply mt-1 text-[0.98rem] font-semibold tabular-nums text-slate-900 sm:text-[1.05rem];
+ }
+
+ .public-metric-value-brand {
+  @apply text-brand-800;
+ }
+
+ .public-metric-value-amber {
+  @apply text-amber-800;
+ }
+
+ .public-stat-card {
+  @apply rounded-[1.1rem] border border-slate-200/80 bg-white/[0.95] px-4 py-3.5 shadow-sm ring-1 ring-white/70;
+ }
+
+ .public-stat-label {
+  @apply text-[10px] font-semibold uppercase tracking-[0.08em] text-slate-500;
+ }
+
+ .public-stat-value {
+  @apply mt-1.5 text-[1.08rem] font-bold leading-tight tabular-nums text-slate-950 sm:text-[1.18rem];
+ }
+
+ .public-report-shell {
+  @apply rounded-card border border-white/80 bg-white/[0.97] px-4 py-4 shadow-md shadow-brand-900/[0.05] ring-1 ring-slate-200/75 sm:px-6 sm:py-5;
+ }
+
+ .public-report-intro {
+  @apply rounded-card border border-brand-900/[0.08] bg-gradient-to-br from-white/80 via-white/70 to-brand-50/70 p-5 shadow-sm shadow-brand-900/5 ring-1 ring-white/60;
+ }
+
+ .public-report-card {
+  @apply rounded-card border border-white/80 bg-white/[0.92] px-5 py-5 shadow-lg shadow-brand-900/5 ring-1 ring-brand-100/40 backdrop-blur;
+ }
+
+ .public-report-row {
+  @apply grid items-center gap-2.5 rounded-[1.12rem] border border-slate-200/75 bg-white/[0.92] px-4 py-3 shadow-sm transition-colors hover:border-brand-100 hover:bg-brand-50/[0.12];
+ }
+
+ .public-report-mobile-row {
+  @apply rounded-[1.1rem] border border-slate-200/80 bg-white px-4 py-3 shadow-sm ring-1 ring-white/70;
+ }
+
+ .public-report-mobile-total {
+  @apply rounded-[1.1rem] border border-brand-100 bg-brand-50/50 px-4 py-3 shadow-sm;
+ }
+
+ .public-report-value-cell {
+  @apply rounded-xl border bg-white px-3 py-2 text-right;
+ }
+
+ .public-report-value-cell dt {
+  @apply text-[10px] font-semibold uppercase tracking-[0.1em];
+ }
+
+ .public-report-value-cell dd {
+  @apply mt-1 text-sm font-semibold tabular-nums;
+ }
+
+ .public-report-value-brand {
+  @apply border-brand-100 bg-brand-50/70 text-brand-800;
+ }
+
+ .public-report-value-amber {
+  @apply border-amber-100 bg-amber-50/70 text-amber-800;
+ }
+
+ .public-report-table-row {
+  @apply grid items-center gap-2.5 px-5 py-3 transition-colors hover:bg-brand-50/[0.16];
+ }
+
+ .public-report-eyebrow {
+  @apply text-[12px] font-medium tracking-[0.04em] text-slate-500;
+ }
+
+ .public-report-copy {
+  @apply mt-2 text-[13px] leading-relaxed text-slate-500;
+ }
+
+ .public-chart-shell {
+  @apply w-full max-w-6xl rounded-card sm:rounded-[2rem] border border-slate-200/80 bg-white/[0.96] p-3 ring-1 ring-slate-200/70 backdrop-blur sm:p-4 lg:p-5;
+ }
+
+ .public-chart-icon {
+  @apply rounded-xl bg-brand-800 p-1.5 text-white shadow-sm;
+ }
+
+ .public-chart-metric {
+  @apply relative overflow-hidden rounded-[1.2rem] border px-4 py-2.5 shadow-sm;
+ }
+
+ .public-chart-metric-brand {
+  @apply border-brand-100 bg-brand-50 text-brand-950;
+ }
+
+ .public-chart-metric-amber {
+  @apply border-amber-100 bg-amber-50 text-amber-950;
+ }
+
+ .public-chart-filter {
+  @apply relative inline-grid shrink-0 grid-cols-2 items-center rounded-full border border-slate-200 bg-slate-100 p-1 shadow-sm;
+ }
+
+ .public-chart-filter-active {
+  @apply relative z-10 min-h-8 rounded-full px-4 py-2 text-xs font-semibold text-white transition-colors duration-300;
+ }
+
+ .public-chart-filter-inactive {
+  @apply relative z-10 min-h-8 rounded-full px-4 py-2 text-xs font-semibold text-slate-600 transition-colors duration-300 hover:text-slate-800;
+ }
+
+ .public-chart-filter-thumb {
+  @apply pointer-events-none absolute left-1 top-1 z-0 h-[calc(100%-0.5rem)] w-[calc(50%-0.25rem)] rounded-full shadow-sm transition-all duration-300 ease-out;
+ }
+
+ .public-chart-card {
+  @apply rounded-[1.1rem] border border-slate-200/80 bg-white/85 p-3 ring-1 ring-slate-200/60 sm:px-4 sm:py-3;
+ }
+
+ .public-chart-card-head {
+  @apply mb-1.5 flex items-center justify-between;
+ }
+
+ .public-chart-card-title {
+  @apply inline-flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-[0.06em] text-slate-700;
+ }
+
+ .public-chart-card-meta {
+  @apply text-[10px] font-semibold text-slate-400;
+ }
+
+ .public-chart-dots {
+  @apply mt-3 flex items-center justify-center gap-2;
+ }
+
+ .public-chart-dot-active {
+  @apply h-2.5 w-6 rounded-full bg-brand-600 shadow-sm shadow-brand-700/30;
+ }
+
+ .public-chart-dot-inactive {
+  @apply h-2.5 w-2.5 rounded-full bg-slate-300 transition-all hover:bg-slate-400;
+ }
+
+ .public-quote-card {
+  @apply relative mx-auto max-w-3xl overflow-hidden rounded-card border border-brand-100/70 bg-[linear-gradient(135deg,rgba(255,255,255,0.96),rgba(236,253,245,0.9))] p-4 text-slate-900 shadow-lg shadow-brand-900/5 ring-1 ring-white/80 sm:p-5;
+ }
+
+ .public-cta-card {
+  @apply flex cursor-pointer items-center justify-between gap-3 rounded-card border border-brand-100/90 bg-white/[0.95] px-4 py-3.5 text-slate-900 shadow-lg shadow-brand-900/5 ring-1 ring-white/80 transition-all hover:border-brand-200 hover:bg-white sm:px-5;
+ }
+
+ .public-nav-shell {
+  @apply relative mx-auto max-w-7xl rounded-card border border-slate-200/80 bg-white/90 px-4 py-3 ring-1 ring-white/70 backdrop-blur-md transition-all duration-300 sm:px-5;
+  box-shadow: var(--shadow-topbar);
+ }
+
+ .public-nav-tabs {
+  @apply hidden shrink-0 items-center gap-2 rounded-full border border-slate-200 bg-slate-100 p-1.5 lg:flex;
+ }
+
+ .public-nav-action {
+  @apply inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-slate-200 bg-slate-50 text-brand-700 shadow-sm transition hover:bg-slate-100 hover:text-brand-800 sm:w-auto sm:justify-start sm:gap-2 sm:px-3 sm:py-2;
+ }
+
+ .public-nav-mobile-tabs {
+  @apply mt-3 flex items-center justify-center gap-1.5 rounded-2xl border border-slate-200 bg-slate-100 p-1.5 lg:hidden;
+ }
+
+ .public-clock-pill {
+  @apply inline-flex items-center gap-2 self-end rounded-full border border-slate-200 bg-white/[0.92] px-3 py-1.5 shadow-sm ring-1 ring-white/70;
+ }
+
+ .public-clock-text {
+  @apply text-[11px] font-semibold text-slate-800 tabular-nums sm:text-[12px];
+ }
+
+ .public-footer-shell {
+  @apply relative z-10 mt-8 border-t border-brand-900/10 bg-white/60 backdrop-blur-sm sm:mt-10;
+ }
+
+ .public-footer-credit {
+  @apply mx-auto flex max-w-5xl flex-col items-center justify-center gap-1.5 px-6 pb-10 pt-4 text-center sm:flex-row sm:gap-2.5 sm:py-5;
+ }
+
+ .public-footer-kicker {
+  @apply text-[10px] font-medium tracking-[0.08em] text-brand-900/55;
+ }
+
+ .public-footer-brand {
+  @apply text-[10px] font-medium tracking-[0.08em] text-brand-800/85 transition-colors duration-300 group-hover:text-brand-900;
+ }
+
+}

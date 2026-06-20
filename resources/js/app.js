@@ -2,9 +2,29 @@ import './bootstrap';
 
 import Alpine from 'alpinejs';
 import collapse from '@alpinejs/collapse'
- 
+
 Alpine.plugin(collapse)
 window.Alpine = Alpine;
+
+Alpine.store('toast', {
+    show: false,
+    message: '',
+    undoRoute: null,
+    _timer: null,
+
+    flash(message, undoRoute = null) {
+        clearTimeout(this._timer);
+        this.message = message;
+        this.undoRoute = undoRoute;
+        this.show = true;
+        this._timer = setTimeout(() => { this.show = false; }, 5000);
+    },
+
+    dismiss() {
+        clearTimeout(this._timer);
+        this.show = false;
+    },
+});
 
 const bootPageModules = async () => {
     const imports = [];

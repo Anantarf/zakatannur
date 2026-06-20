@@ -1,0 +1,73 @@
+/* ============================================================
+ DESIGN TOKENS
+ Satu-satunya tempat mengubah aspek visual utama aplikasi.
+
+ WARNA BRAND: Ubah nilai RGB untuk mengganti warna dominan.
+ Format: "R G B" (spasi, bukan koma, bukan #)
+
+ BORDER RADIUS:
+ --radius-card   : kelengkungan panel/card utama
+ --radius-button : kelengkungan tombol dan input
+
+ BAYANGAN:
+ --shadow-topbar       : bayangan di topbar navigasi
+ --shadow-page-header  : bayangan di header halaman
+
+ TIPOGRAFI:
+ --text-eyebrow : label uppercase kecil (badge, kicker)
+ --text-caption : teks metadata kecil (nomor tabel)
+ --text-body-sm : teks baris tabel dan deskripsi
+ ============================================================ */
+
+:root {
+ /* Brand Colors (Deep Teal) */
+ --color-brand-50-rgb: 240 253 244;
+ --color-brand-100-rgb: 209 250 229;
+ --color-brand-200-rgb: 167 243 208;
+ --color-brand-300-rgb: 94 234 212;
+ --color-brand-400-rgb: 45 212 191;
+ --color-brand-500-rgb: 20 184 166;
+ --color-brand-600-rgb: 13 148 136;
+ --color-brand-700-rgb: 15 118 110;
+ --color-brand-800-rgb: 17 94 89;
+ --color-brand-900-rgb: 19 78 74;
+ --color-brand-950-rgb: 4 47 46;
+
+ /* Slate / Neutral Colors */
+ --color-slate-50-rgb: 248 250 252;
+ --color-slate-100-rgb: 241 245 249;
+ --color-slate-200-rgb: 226 232 240;
+ --color-slate-300-rgb: 203 213 225;
+ --color-slate-400-rgb: 148 163 184;
+ --color-slate-500-rgb: 100 116 139;
+ --color-slate-600-rgb: 71 85 105;
+ --color-slate-700-rgb: 51 65 85;
+ --color-slate-800-rgb: 30 41 59;
+ --color-slate-900-rgb: 15 23 42;
+ --color-slate-950-rgb: 2 6 23;
+
+ /* Border Radius */
+ --radius-card: 1.75rem;
+ --radius-button: 1rem;
+
+ /* Shadows */
+ --shadow-topbar: 0 20px 40px -15px rgba(0, 0, 0, 0.08);
+ --shadow-page-header: 0 25px 50px -12px rgba(0, 0, 0, 0.06);
+
+ /* Typography Scale */
+ --text-eyebrow: 10px; /* label badge, kicker, kolom uppercase */
+ --text-caption: 11px; /* nomor tabel kecil, metadata compact */
+ --text-body-sm: 13px; /* teks baris tabel, deskripsi pendek */
+}
+
+@keyframes slideInRight {
+ from {
+  transform: translateX(100%);
+  opacity: 0;
+ }
+
+ to {
+  transform: translateX(0);
+  opacity: 1;
+ }
+}
