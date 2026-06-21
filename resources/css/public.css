@@ -29,44 +29,44 @@
  }
 
  .public-panel {
-  @apply rounded-card sm:rounded-[2rem] border border-white/80 bg-white/[0.88] p-3 shadow-xl shadow-brand-900/5 ring-1 ring-brand-900/5 backdrop-blur sm:p-4 lg:p-5;
+  @apply rounded-card sm:rounded-[2rem] border border-[#d7e5df] bg-[rgb(248_251_249_/_0.90)] p-3 shadow-xl shadow-brand-950/5 ring-1 ring-white/70 backdrop-blur sm:p-4 lg:p-5;
  }
 
  .public-shell {
-  @apply rounded-card border border-white/80 bg-white/[0.92] shadow-lg shadow-brand-900/5 ring-1 ring-brand-100/40 backdrop-blur;
+  @apply rounded-card border border-[#d7e5df] bg-[rgb(248_251_249_/_0.92)] shadow-lg shadow-brand-950/5 ring-1 ring-white/70 backdrop-blur;
  }
 
  .public-shell-muted {
-  @apply bg-[linear-gradient(135deg,rgba(255,255,255,0.96),rgba(240,253,244,0.84))];
+  @apply bg-[linear-gradient(135deg,rgba(248,251,249,0.96),rgba(226,240,234,0.78))];
  }
 
  .public-section {
-  @apply rounded-card border border-brand-900/[0.08] bg-white/75 p-5 shadow-sm shadow-brand-900/5 ring-1 ring-white/60 sm:p-6;
+  @apply rounded-card border border-[#d7e5df] bg-[rgb(248_251_249_/_0.78)] p-5 shadow-sm shadow-brand-950/5 ring-1 ring-white/70 sm:p-6;
  }
 
  .public-section-muted {
-  @apply bg-gradient-to-br from-white/80 via-white/70 to-brand-50/70;
+  @apply bg-[linear-gradient(135deg,rgba(248,251,249,0.86),rgba(232,240,236,0.72),rgba(223,243,235,0.68))];
  }
 
  .public-subcard {
-  @apply border border-slate-200/80 bg-white/[0.92] px-4 py-3 shadow-sm;
+  @apply border border-[#d7e5df] bg-[rgb(248_251_249_/_0.92)] px-4 py-3 shadow-sm shadow-brand-950/5;
   border-radius: var(--radius-subcard);
  }
 
  .public-subcard-brand {
-  @apply border-brand-100/90 bg-brand-50/[0.78] text-brand-900;
+  @apply border-brand-100/90 bg-[rgb(223_243_235_/_0.78)] text-brand-900;
  }
 
  .public-subcard-amber {
-  @apply border-amber-100/90 bg-amber-50/[0.82] text-amber-900;
+  @apply border-amber-100/90 bg-amber-50/[0.72] text-amber-900;
  }
 
  .public-subcard-sky {
-  @apply border-sky-100/90 bg-sky-50/[0.82] text-sky-900;
+  @apply border-sky-100/90 bg-sky-50/[0.76] text-sky-900;
  }
 
  .public-pill {
-  @apply inline-flex items-center gap-2 rounded-full border bg-white/90 px-3 py-1.5 text-[11px] font-semibold shadow-sm;
+  @apply inline-flex items-center gap-2 rounded-full border bg-[rgb(255_255_255_/_0.86)] px-3 py-1.5 text-[11px] font-semibold shadow-sm;
  }
 
  .public-pill-brand {
@@ -89,32 +89,18 @@
   @apply text-sm sm:text-base leading-relaxed text-slate-600 font-medium;
  }
 
- .public-tab-chip {
-  @apply inline-flex min-h-10 items-center justify-center rounded-full px-4 py-2.5 text-center text-sm font-semibold leading-5 transition duration-150 ease-in-out focus:outline-none;
- }
+ /* Tab chip classes — delegated to .ui-nav-link for single source of truth */
+ .public-tab-chip         { @apply ui-nav-link; }
+ .public-tab-chip-active  { @apply ui-nav-link-active; }
+ .public-tab-chip-inactive { @apply ui-nav-link-inactive; }
 
- .public-tab-chip-active {
-  @apply bg-brand-700 text-white shadow-md shadow-brand-700/30;
- }
-
- .public-tab-chip-inactive {
-  @apply text-slate-700 hover:bg-white hover:text-slate-950 focus:bg-white focus:text-slate-950;
- }
-
- .public-tab-chip-mobile {
-  @apply min-h-10 flex-1 rounded-card px-3 py-2 text-center text-xs font-semibold transition duration-150 ease-in-out focus:outline-none;
- }
-
- .public-tab-chip-mobile-active {
-  @apply bg-brand-700 text-white shadow-md shadow-brand-700/30;
- }
-
- .public-tab-chip-mobile-inactive {
-  @apply text-slate-700 hover:bg-white hover:text-slate-950 focus:bg-white focus:text-slate-950;
- }
+ /* Mobile variant — delegated to .ui-nav-link-mobile */
+ .public-tab-chip-mobile  { @apply ui-nav-link-mobile; }
+ .public-tab-chip-mobile-active   { @apply ui-nav-link-mobile-active; }
+ .public-tab-chip-mobile-inactive { @apply ui-nav-link-mobile-inactive; }
 
  .public-header-shell {
-  @apply overflow-hidden rounded-card border border-white/80 bg-white/[0.92] px-4 py-4 shadow-md shadow-brand-900/[0.05] ring-1 ring-brand-100/50 backdrop-blur sm:px-6 sm:py-5;
+  @apply overflow-hidden rounded-card border border-[#d7e5df] bg-[rgb(248_251_249_/_0.92)] px-4 py-4 shadow-md shadow-brand-950/5 ring-1 ring-white/70 backdrop-blur sm:px-6 sm:py-5;
  }
 
  .public-header-kicker {
@@ -139,17 +125,17 @@
  }
 
  .public-metric-card {
-  @apply border border-slate-200/80 bg-white/[0.92] px-4 py-3 shadow-sm;
+  @apply border border-[#d7e5df] bg-[rgb(248_251_249_/_0.92)] px-4 py-3 shadow-sm shadow-brand-950/5;
   border-radius: var(--radius-subcard);
  }
 
  .public-metric-card-brand {
-  @apply border border-brand-100/90 bg-brand-50/[0.78] px-4 py-3 text-brand-900 shadow-sm;
+  @apply border border-brand-100/90 bg-[rgb(223_243_235_/_0.78)] px-4 py-3 text-brand-900 shadow-sm shadow-brand-950/5;
   border-radius: var(--radius-subcard);
  }
 
  .public-metric-card-amber {
-  @apply border border-amber-100/90 bg-amber-50/[0.82] px-4 py-3 text-amber-900 shadow-sm;
+  @apply border border-amber-100/90 bg-amber-50/[0.74] px-4 py-3 text-amber-900 shadow-sm shadow-brand-950/5;
   border-radius: var(--radius-subcard);
  }
 
@@ -178,7 +164,7 @@
  }
 
  .public-stat-card {
-  @apply border border-slate-200/80 bg-white/[0.95] px-4 py-3.5 shadow-sm ring-1 ring-white/70;
+  @apply border border-[#d7e5df] bg-[rgb(248_251_249_/_0.94)] px-4 py-3.5 shadow-sm shadow-brand-950/5 ring-1 ring-white/70;
   border-radius: var(--radius-subcard);
  }
 
@@ -192,34 +178,34 @@
  }
 
  .public-report-shell {
-  @apply rounded-card border border-white/80 bg-white/[0.97] px-4 py-4 shadow-md shadow-brand-900/[0.05] ring-1 ring-slate-200/75 sm:px-6 sm:py-5;
+  @apply rounded-card border border-[#d7e5df] bg-[rgb(248_251_249_/_0.96)] px-4 py-4 shadow-md shadow-brand-950/5 ring-1 ring-white/70 sm:px-6 sm:py-5;
  }
 
  .public-report-intro {
-  @apply rounded-card border border-brand-900/[0.08] bg-gradient-to-br from-white/80 via-white/70 to-brand-50/70 p-5 shadow-sm shadow-brand-900/5 ring-1 ring-white/60;
+  @apply rounded-card border border-[#d7e5df] bg-[linear-gradient(135deg,rgba(248,251,249,0.86),rgba(232,240,236,0.72),rgba(223,243,235,0.68))] p-5 shadow-sm shadow-brand-950/5 ring-1 ring-white/70;
  }
 
  .public-report-card {
-  @apply rounded-card border border-white/80 bg-white/[0.92] px-5 py-5 shadow-lg shadow-brand-900/5 ring-1 ring-brand-100/40 backdrop-blur;
+  @apply rounded-card border border-[#d7e5df] bg-[rgb(248_251_249_/_0.92)] px-5 py-5 shadow-lg shadow-brand-950/5 ring-1 ring-white/70 backdrop-blur;
  }
 
  .public-report-row {
-  @apply grid items-center gap-2.5 border border-slate-200/75 bg-white/[0.92] px-4 py-3 shadow-sm transition-colors hover:border-brand-100 hover:bg-brand-50/[0.12];
+  @apply grid items-center gap-2.5 border border-[#d7e5df] bg-[rgb(248_251_249_/_0.92)] px-4 py-3 shadow-sm shadow-brand-950/5 transition-colors hover:border-brand-200 hover:bg-[rgb(223_243_235_/_0.35)];
   border-radius: var(--radius-subcard);
  }
 
  .public-report-mobile-row {
-  @apply border border-slate-200/80 bg-white px-4 py-3 shadow-sm ring-1 ring-white/70;
+  @apply border border-[#d7e5df] bg-[#f8fbf9] px-4 py-3 shadow-sm shadow-brand-950/5 ring-1 ring-white/70;
   border-radius: var(--radius-subcard);
  }
 
  .public-report-mobile-total {
-  @apply border border-brand-100 bg-brand-50/50 px-4 py-3 shadow-sm;
+  @apply border border-brand-100 bg-[rgb(223_243_235_/_0.60)] px-4 py-3 shadow-sm shadow-brand-950/5;
   border-radius: var(--radius-subcard);
  }
 
  .public-report-value-cell {
-  @apply rounded-xl border bg-white px-3 py-2 text-right;
+  @apply rounded-xl border bg-[rgb(255_255_255_/_0.86)] px-3 py-2 text-right;
  }
 
  .public-report-value-cell dt {
@@ -231,7 +217,7 @@
  }
 
  .public-report-value-brand {
-  @apply border-brand-100 bg-brand-50/70 text-brand-800;
+  @apply border-brand-100 bg-[rgb(223_243_235_/_0.70)] text-brand-800;
  }
 
  .public-report-value-amber {
@@ -239,7 +225,7 @@
  }
 
  .public-report-table-row {
-  @apply grid items-center gap-2.5 px-5 py-3 transition-colors hover:bg-brand-50/[0.16];
+  @apply grid items-center gap-2.5 px-5 py-3 transition-colors hover:bg-[rgb(223_243_235_/_0.35)];
  }
 
  .public-report-eyebrow {
@@ -251,7 +237,7 @@
  }
 
  .public-chart-shell {
-  @apply w-full max-w-6xl rounded-card sm:rounded-[2rem] border border-slate-200/80 bg-white/[0.96] p-3 ring-1 ring-slate-200/70 backdrop-blur sm:p-4 lg:p-5;
+  @apply w-full max-w-6xl rounded-card sm:rounded-[2rem] border border-[#d7e5df] bg-[rgb(248_251_249_/_0.96)] p-3 ring-1 ring-white/70 backdrop-blur sm:p-4 lg:p-5;
  }
 
  .public-chart-icon {
@@ -259,12 +245,12 @@
  }
 
  .public-chart-metric {
-  @apply relative overflow-hidden border px-4 py-2.5 shadow-sm;
+  @apply relative overflow-hidden border px-4 py-2.5 shadow-sm shadow-brand-950/5;
   border-radius: var(--radius-subcard);
  }
 
  .public-chart-metric-brand {
-  @apply border-brand-100 bg-brand-50 text-brand-950;
+  @apply border-brand-100 bg-[#dff3eb] text-brand-950;
  }
 
  .public-chart-metric-amber {
@@ -272,7 +258,7 @@
  }
 
  .public-chart-filter {
-  @apply relative inline-grid shrink-0 grid-cols-2 items-center rounded-full border border-slate-200 bg-slate-100 p-1 shadow-sm;
+  @apply relative inline-grid shrink-0 grid-cols-2 items-center rounded-full border border-[#d7e5df] bg-[#e8f0ec] p-1 shadow-sm;
  }
 
  .public-chart-filter-active {
@@ -288,7 +274,7 @@
  }
 
  .public-chart-card {
-  @apply border border-slate-200/80 bg-white/85 p-3 ring-1 ring-slate-200/60 sm:px-4 sm:py-3;
+  @apply border border-[#d7e5df] bg-white/70 p-3 ring-1 ring-white/70 sm:px-4 sm:py-3;
   border-radius: var(--radius-subcard);
  }
 
@@ -317,32 +303,32 @@
  }
 
  .public-quote-card {
-  @apply relative mx-auto max-w-3xl overflow-hidden rounded-card border border-brand-100/70 bg-[linear-gradient(135deg,rgba(255,255,255,0.96),rgba(236,253,245,0.9))] p-4 text-slate-900 shadow-lg shadow-brand-900/5 ring-1 ring-white/80 sm:p-5;
+  @apply relative mx-auto max-w-3xl overflow-hidden rounded-card border border-brand-100/70 bg-[linear-gradient(135deg,rgba(248,251,249,0.96),rgba(223,243,235,0.86))] p-4 text-slate-900 shadow-lg shadow-brand-950/5 ring-1 ring-white/80 sm:p-5;
  }
 
  .public-cta-card {
-  @apply flex cursor-pointer items-center justify-between gap-3 rounded-card border border-brand-100/90 bg-white/[0.95] px-4 py-3.5 text-slate-900 shadow-lg shadow-brand-900/5 ring-1 ring-white/80 transition-all hover:border-brand-200 hover:bg-white sm:px-5;
+  @apply flex cursor-pointer items-center justify-between gap-3 rounded-card border border-brand-100/90 bg-[rgb(248_251_249_/_0.95)] px-4 py-3.5 text-slate-900 shadow-lg shadow-brand-950/5 ring-1 ring-white/80 transition-all hover:border-brand-200 hover:bg-white sm:px-5;
  }
 
  .public-nav-shell {
-  @apply relative mx-auto max-w-7xl rounded-card border border-slate-200/80 bg-white/90 px-4 py-3 ring-1 ring-white/70 backdrop-blur-md transition-all duration-300 sm:px-5;
+  @apply relative mx-auto max-w-7xl rounded-card border border-[#d7e5df] bg-[rgb(248_251_249_/_0.90)] px-4 py-3 ring-1 ring-white/70 backdrop-blur-md transition-all duration-300 sm:px-5;
   box-shadow: var(--shadow-topbar);
  }
 
  .public-nav-tabs {
-  @apply hidden shrink-0 items-center gap-2 rounded-full border border-slate-200 bg-slate-100 p-1.5 lg:flex;
+  @apply hidden shrink-0 items-center gap-2 rounded-full border border-[#d7e5df] bg-[#e8f0ec] p-1.5 lg:flex;
  }
 
  .public-nav-action {
-  @apply inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-slate-200 bg-slate-50 text-brand-700 shadow-sm transition hover:bg-slate-100 hover:text-brand-800 sm:w-auto sm:justify-start sm:gap-2 sm:px-3 sm:py-2;
+  @apply inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-[#d7e5df] bg-white/75 text-brand-700 shadow-sm transition hover:bg-[#dff3eb] hover:text-brand-800 sm:w-auto sm:justify-start sm:gap-2 sm:px-3 sm:py-2;
  }
 
  .public-nav-mobile-tabs {
-  @apply mt-3 flex items-center justify-center gap-1.5 rounded-2xl border border-slate-200 bg-slate-100 p-1.5 lg:hidden;
+  @apply mt-3 flex items-center justify-center gap-1.5 rounded-2xl border border-[#d7e5df] bg-[#e8f0ec] p-1.5 lg:hidden;
  }
 
  .public-clock-pill {
-  @apply inline-flex items-center gap-2 self-end rounded-full border border-slate-200 bg-white/[0.92] px-3 py-1.5 shadow-sm ring-1 ring-white/70;
+  @apply inline-flex items-center gap-2 self-end rounded-full border border-[#d7e5df] bg-[rgb(255_255_255_/_0.86)] px-3 py-1.5 shadow-sm ring-1 ring-white/70;
  }
 
  .public-clock-text {
@@ -350,21 +336,29 @@
  }
 
  .public-footer-shell {
-  @apply relative z-10 mt-8 border-t border-brand-900/10 bg-white/60 backdrop-blur-sm sm:mt-10;
+  @apply relative z-10 mt-4 border-t border-brand-900/5 bg-[rgb(255_255_255_/_0.42)] backdrop-blur-sm sm:mt-5;
  }
 
- .public-footer-credit {
-  @apply mx-auto flex max-w-5xl flex-col items-center justify-center gap-1.5 px-6 pb-10 pt-4 text-center sm:flex-row sm:gap-2.5 sm:py-5;
+.public-footer-credit {
+  @apply mx-auto flex max-w-5xl flex-wrap items-center justify-center gap-1.5 px-5 py-2 text-center sm:gap-2;
  }
 
  .public-footer-kicker {
-  @apply text-[10px] font-medium text-brand-900/55;
+  @apply text-[10px] font-medium leading-none text-brand-900/45;
   letter-spacing: var(--tracking-caption);
  }
 
  .public-footer-brand {
-  @apply text-[10px] font-medium text-brand-800/85 transition-colors duration-300 group-hover:text-brand-900;
+  @apply text-[10px] font-medium leading-none text-brand-800/75 transition-colors duration-300 group-hover:text-brand-900;
   letter-spacing: var(--tracking-caption);
+ }
+
+ .public-login-modal-box {
+  @apply border-[#d7e5df] bg-[#f8fbf9] text-slate-900 ring-1 ring-white/70;
+ }
+
+ .public-login-modal-close {
+  @apply bg-white text-slate-400 hover:bg-[#e8f0ec] hover:text-slate-600 focus:ring-brand-500 focus:ring-offset-[#f8fbf9];
  }
 
 }
