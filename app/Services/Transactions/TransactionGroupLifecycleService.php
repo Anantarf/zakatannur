@@ -6,9 +6,9 @@ use App\Models\User;
 use App\Models\TransactionRiskReview;
 use App\Models\ZakatTransaction;
 use App\Support\Audit;
+use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Symfony\Component\HttpFoundation\Response;
 
 class TransactionGroupLifecycleService
 {
@@ -24,16 +24,16 @@ class TransactionGroupLifecycleService
         }
 
         if ((int) $transaction->petugas_id !== (int) $user->id) {
-            abort(Response::HTTP_FORBIDDEN, 'Anda hanya dapat menghapus transaksi yang Anda layani sendiri.');
+            throw new AuthorizationException('Anda hanya dapat menghapus transaksi yang Anda layani sendiri.');
         }
 
         if ($transaction->receipt_printed_at !== null) {
-            abort(Response::HTTP_FORBIDDEN, 'Transaksi yang kwitansinya sudah dicetak hanya dapat dihapus oleh Admin.');
+            throw new AuthorizationException('Transaksi yang kwitansinya sudah dicetak hanya dapat dihapus oleh Admin.');
         }
 
         $transactionDate = ($transaction->waktu_terima ?? $transaction->created_at)->timezone(config('zakat.timezone'));
         if (!$transactionDate->isToday()) {
-            abort(Response::HTTP_FORBIDDEN, 'Batas waktu penghapusan harian telah berakhir. Silakan hubungi Admin untuk menghapus data hari sebelumnya.');
+            throw new AuthorizationException('Batas waktu penghapusan harian telah berakhir. Silakan hubungi Admin untuk menghapus data hari sebelumnya.');
         }
     }
 

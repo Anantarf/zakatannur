@@ -87,6 +87,7 @@ class TransactionAnomalyDetector
         return Cache::remember('anomaly:avg_nominal_uang', self::AVG_CACHE_TTL_SECONDS, function () {
             $stats = DB::table('zakat_transactions')
                 ->whereNull('deleted_at')
+                ->where('status', ZakatTransaction::STATUS_VALID)
                 ->where('metode', '!=', ZakatTransaction::METHOD_BERAS)
                 ->where('nominal_uang', '>', 0)
                 ->selectRaw('AVG(nominal_uang) as avg_nominal, COUNT(*) as total')

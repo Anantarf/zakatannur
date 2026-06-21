@@ -27,12 +27,18 @@ class GrokChatbotProvider implements ChatbotServiceInterface
     {
         $this->lastReplyWasFallback = false;
 
-        $systemInstruction = "Anda adalah 'Annur Support', asisten virtual resmi untuk sistem manajemen Zakat An-Nur. "
+        $systemInstruction = "Nama Anda adalah 'Zakky', asisten virtual resmi untuk sistem manajemen Zakat An-Nur. "
+            . "Saat memperkenalkan diri, sebutkan nama Anda sebagai Zakky dan bahwa Anda melayani Zakat An-Nur. "
             . "Tugas Anda adalah membantu pengguna (jamaah atau petugas) terkait pengelolaan zakat, cara pembayaran, panduan nishab, dan operasional masjid. "
-            . "Berikan jawaban yang singkat, ramah, dan profesional layaknya agen Customer Service SaaS. "
-            . "Jika ditanya hal di luar topik zakat, agama Islam, atau operasional masjid, tolak dengan sopan dan kembalikan ke topik zakat.";
+            . "Gaya bicara: singkat, ramah, sopan, dan profesional layaknya agen Customer Service. "
+            . "Untuk informasi lokal Masjid An-Nur, gunakan hanya konteks resmi yang diberikan. "
+            . "Jika konteks tidak cukup, katakan informasi belum tersedia dan arahkan pengguna untuk konfirmasi kepada panitia. "
+            . "Jangan mengarang nomor rekening, jadwal, panitia, nominal, data penerimaan, atau kebijakan lokal. "
+            . "Jika ditanya hal di luar topik zakat, agama Islam, atau operasional masjid, tolak dengan sopan dan kembalikan ke topik zakat. "
+            . "Jika pengguna menyapa (halo, assalamualaikum, hai, dll), balas sapaan dengan hangat dan perkenalkan diri sebagai Zakky.";
 
         $url = "{$this->baseUrl}/chat/completions";
+        $userMessage = $this->buildPrompt($message, $context);
 
         try {
             $response = Http::withToken($this->apiKey)
@@ -47,7 +53,7 @@ class GrokChatbotProvider implements ChatbotServiceInterface
                     'model' => $this->model,
                     'messages' => [
                         ['role' => 'system', 'content' => $systemInstruction],
-                        ['role' => 'user', 'content' => $message],
+                        ['role' => 'user', 'content' => $userMessage],
                     ],
                     'temperature' => 0.7,
                     'max_tokens' => 500,
@@ -85,6 +91,19 @@ class GrokChatbotProvider implements ChatbotServiceInterface
     public function wasLastReplyFallback(): bool
     {
         return $this->lastReplyWasFallback;
+    }
+
+    private function buildPrompt(string $message, array $context): string
+    {
+        if ($context === []) {
+            return $message;
+        }
+
+        $contextText = collect($context)
+            ->map(fn ($item) => '- ' . ($item['title'] ?? 'Konteks') . ': ' . ($item['answer'] ?? ''))
+            ->implode("\n");
+
+        return "Konteks resmi:\n{$contextText}\n\nPertanyaan pengguna:\n{$message}";
     }
 
     private function fallback(string $message): string
