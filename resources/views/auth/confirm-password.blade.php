@@ -26,9 +26,9 @@
         </div>
 
         <div class="flex justify-end mt-4">
-            <x-emerald-button class="w-full">
+            <x-primary-button class="w-full">
                 {{ __('Confirm') }}
-            </x-emerald-button>
+            </x-primary-button>
         </div>
     </form>
 </x-guest-layout>

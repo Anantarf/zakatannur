@@ -15,9 +15,9 @@
                 class="ui-btn w-full bg-slate-100 px-5 py-3 text-sm text-slate-600 hover:bg-slate-200 focus:ring-slate-300 sm:flex-1">
                 Kembali
             </a>
-            <x-emerald-button
+            <x-primary-button
                 x-bind:disabled="submitting || !hasChanged"
-                x-bind:class="{'opacity-50 cursor-not-allowed': submitting || !hasChanged}"
+                x-bind:class="{'ui-btn-loading': submitting, 'opacity-50 cursor-not-allowed': !submitting && !hasChanged}"
                 class="w-full py-3 text-sm sm:flex-[2]">
                 <template x-if="submitting">
                     <div class="flex items-center gap-2">
@@ -35,12 +35,12 @@
                         <span x-text="hasChanged ? 'Simpan Perubahan' : 'Tidak Ada Perubahan'"></span>
                     </div>
                 </template>
-            </x-emerald-button>
+            </x-primary-button>
         </div>
     @else
-        <x-emerald-button
+        <x-primary-button
             x-bind:disabled="submitting"
-            x-bind:class="{'opacity-50 cursor-not-allowed': submitting}"
+            x-bind:class="{'ui-btn-loading': submitting}"
             class="w-full py-3 text-sm">
             <template x-if="submitting">
                 <div class="flex items-center gap-2">
@@ -60,7 +60,7 @@
                     <span>Proses & Simpan Transaksi</span>
                 </div>
             </template>
-        </x-emerald-button>
+        </x-primary-button>
     @endif
 
     <p class="mt-3 text-center text-[11px] font-semibold text-slate-400">

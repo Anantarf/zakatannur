@@ -5,7 +5,7 @@
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7 text-brand-600 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
                 </svg>
-                Dashboard Pengelolaan
+                Pusat Pengelolaan Zakat
             </h2>
             <div class="hidden sm:block"></div>
         </div>
@@ -17,21 +17,38 @@
                 <div class="rounded-card border border-slate-200 bg-white p-5 shadow-sm ring-1 ring-slate-200/60 sm:p-6">
                     <div class="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
                         <div class="space-y-2">
-                            <p class="ui-kicker">Overview</p>
+                            <p class="ui-kicker">Ringkasan</p>
                             <h3 class="text-xl font-bold leading-tight text-slate-900 sm:text-2xl">Manajemen Operasional Zakat</h3>
-                            <p class="max-w-2xl text-sm leading-6 text-slate-600">Pantau transaksi dan akses kerja harian petugas.</p>
+                            <p class="max-w-2xl text-sm leading-6 text-slate-600">Pantau penerimaan zakat dan kelola operasional harian.</p>
                         </div>
                         <div class="flex flex-wrap gap-2">
-                            <a href="{{ route('internal.transactions.create') }}" class="ui-btn ui-btn-primary w-full sm:w-auto">Input Transaksi</a>
+                            <a href="{{ route('internal.transactions.create') }}" class="ui-btn ui-btn-primary w-full sm:w-auto">Catat Transaksi</a>
                             <a href="{{ route('internal.transactions.index', array_filter(['year' => $year, 'period_id' => $periodId, 'metode' => $metode])) }}" class="ui-btn ui-btn-secondary w-full sm:w-auto">Buka Riwayat</a>
                         </div>
                     </div>
+
+                    @if (($workspace['warning_groups'] ?? 0) > 0)
+                        <div class="mt-5 flex flex-col gap-3 rounded-2xl border border-amber-200 bg-amber-50/85 p-4 sm:flex-row sm:items-center sm:justify-between">
+                            <div class="flex items-start gap-3">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="mt-0.5 h-5 w-5 shrink-0 text-amber-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.25" d="M12 9v4m0 4h.01M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" />
+                                </svg>
+                                <div>
+                                    <p class="text-sm font-bold text-amber-950">{{ number_format($workspace['warning_groups'], 0, ',', '.') }} kelompok transaksi perlu review</p>
+                                    <p class="mt-0.5 text-xs leading-5 text-amber-800">Tinjau anomali aktif agar data operasional tetap bersih.</p>
+                                </div>
+                            </div>
+                            <a href="{{ route('internal.anomalies.index', ['review_status' => \App\Models\TransactionRiskReview::REVIEW_BELUM_DITINJAU]) }}" class="ui-btn shrink-0 border border-amber-300 bg-amber-100 px-4 py-2 text-sm text-amber-900 hover:bg-amber-200 focus:ring-amber-400">
+                                Review Sekarang
+                            </a>
+                        </div>
+                    @endif
 
                     <div class="mt-5 grid grid-cols-1 gap-3 sm:grid-cols-3">
                         <div class="rounded-2xl border border-slate-200 bg-slate-50 p-4">
                             <p class="text-xs font-semibold uppercase tracking-wider text-slate-500">Total Transaksi</p>
                             <p class="mt-2 text-3xl font-bold tracking-tight text-slate-900">{{ number_format($payload['totals']['jumlah_transaksi'] ?? 0, 0, ',', '.') }}</p>
-                            <p class="mt-2 text-[11px] leading-5 text-slate-500">Transaksi pada ringkasan dashboard.</p>
+                            <p class="mt-2 text-[11px] leading-5 text-slate-500">Total transaksi dalam filter aktif.</p>
                         </div>
                         <div class="rounded-2xl border border-slate-200 bg-slate-50 p-4">
                             <p class="text-xs font-semibold uppercase tracking-wider text-slate-500">Transaksi Hari Ini</p>
@@ -43,7 +60,7 @@
                             <p class="mt-2 text-xl font-bold tracking-tight text-slate-900">
                                 {{ ($workspace['latest_transaction_at'] ?? null)?->format('d/m/Y H:i') ?? '-' }}
                             </p>
-                            <p class="mt-2 text-[11px] leading-5 text-slate-500">Waktu input terbaru.</p>
+                            <p class="mt-2 text-[11px] leading-5 text-slate-500">Waktu catat terbaru.</p>
                         </div>
                     </div>
                 </div>

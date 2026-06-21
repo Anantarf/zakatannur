@@ -145,7 +145,31 @@ class TransactionAnomalyService
             'reviewStatuses' => TransactionRiskReview::REVIEW_STATUSES,
             'receiptPrintedAt' => $receiptPrintedAt ? Carbon::parse($receiptPrintedAt) : null,
             'receiptPrintedByName' => $receiptPrintedBy ? User::query()->find($receiptPrintedBy)?->name : null,
+            'nextNoTransaksi' => $this->nextPendingGroupNo($noTransaksi),
         ];
+    }
+
+    public function nextPendingGroupNo(string $currentNoTransaksi): ?string
+    {
+        $pendingGroups = DB::query()
+            ->fromSub($this->reviewAssistantService->historySummarySubquery(), 'risk_reviews')
+            ->where('risk_severity', '>=', $this->reviewAssistantService->sqlRiskSeverity(TransactionRiskReview::LEVEL_WARNING))
+            ->where('review_severity', $this->reviewAssistantService->sqlReviewSeverity(TransactionRiskReview::REVIEW_BELUM_DITINJAU))
+            ->orderByDesc('risk_score_max')
+            ->orderBy('group_no_transaksi')
+            ->pluck('group_no_transaksi')
+            ->values();
+
+        if ($pendingGroups->isEmpty()) {
+            return null;
+        }
+
+        $currentIndex = $pendingGroups->search($currentNoTransaksi);
+        if ($currentIndex === false) {
+            return $pendingGroups->first();
+        }
+
+        return $pendingGroups->get($currentIndex + 1) ?? $pendingGroups->first();
     }
 
     public static function flagLabels(): array

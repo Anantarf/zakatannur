@@ -37,4 +37,9 @@
     @if ($description)
         <p class="ui-stat-description {{ $descriptionClass }}">{{ $description }}</p>
     @endif
+    @if ($slot->isNotEmpty())
+        <div class="mt-3 border-t border-slate-100 pt-3">
+            {{ $slot }}
+        </div>
+    @endif
 </div>

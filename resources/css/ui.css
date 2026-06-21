@@ -31,7 +31,8 @@
  }
 
  .ui-brand-kicker {
-  @apply text-[11px] font-black uppercase tracking-[0.24em] text-brand-700;
+  @apply text-[11px] font-black uppercase text-brand-700;
+  letter-spacing: var(--tracking-eyebrow);
  }
 
  .ui-page-header {
@@ -155,6 +156,14 @@
   @apply bg-red-600 px-4 py-2.5 text-sm text-white shadow-sm hover:bg-red-500 hover:-translate-y-[2px] hover:shadow-md focus:ring-red-500;
  }
 
+ .ui-btn-loading {
+  @apply cursor-not-allowed opacity-75;
+ }
+
+ .ui-btn-loading svg {
+  @apply animate-spin;
+ }
+
  .ui-btn-pill {
   @apply rounded-full border border-brand-100 bg-brand-50 px-4 py-2 text-sm leading-4 text-brand-700 hover:bg-brand-100 focus:ring-brand-500;
  }
@@ -254,7 +263,8 @@
  }
 
  .ui-mobile-meta-label {
-  @apply text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-400;
+  @apply text-[10px] font-semibold uppercase text-slate-400;
+  letter-spacing: var(--tracking-caption);
  }
 
  .ui-mobile-meta-value {
@@ -378,7 +388,8 @@
  }
 
  .ui-stat-eyebrow {
-  @apply text-[11px] font-black uppercase tracking-widest;
+  @apply text-[11px] font-black uppercase;
+  letter-spacing: var(--tracking-caption);
  }
 
  .ui-stat-value {
@@ -394,7 +405,8 @@
  }
 
  .ui-kpi-label {
-  @apply text-[10px] font-black uppercase tracking-[0.18em] text-slate-400;
+  @apply text-[10px] font-black uppercase text-slate-400;
+  letter-spacing: var(--tracking-label);
  }
 
  .ui-kpi-value {
@@ -450,7 +462,8 @@
  }
 
  .ui-settings-summary-shell {
-  @apply rounded-[1.15rem] border border-brand-100 bg-gradient-to-br from-brand-50 via-white to-brand-50/70 p-3 shadow-sm sm:p-4;
+  @apply border border-brand-100 bg-gradient-to-br from-brand-50 via-white to-brand-50/70 p-3 shadow-sm sm:p-4;
+  border-radius: var(--radius-subcard);
  }
 
  .ui-settings-summary-card {
@@ -462,7 +475,8 @@
  }
 
  .ui-settings-kicker {
-  @apply text-[11px] font-bold uppercase tracking-[0.14em];
+  @apply text-[11px] font-bold uppercase;
+  letter-spacing: var(--tracking-label);
  }
 
  .ui-settings-section-head {
@@ -539,7 +553,8 @@
  /* Kicker & Eyebrow */
 
  .ui-kicker {
-  @apply inline-flex items-center text-[11px] font-black uppercase tracking-[0.24em] text-brand-700;
+  @apply inline-flex items-center text-[11px] font-black uppercase text-brand-700;
+  letter-spacing: var(--tracking-eyebrow);
  }
 
  .ui-kicker-dark {
@@ -567,7 +582,7 @@
  }
 
  .ui-modal-box {
-  @apply relative transform overflow-hidden rounded-3xl bg-white text-left shadow-2xl transition-all sm:my-8 sm:w-full sm:max-w-md border border-slate-100;
+  @apply relative transform overflow-hidden rounded-3xl bg-white text-left shadow-2xl transition-all sm:my-8 sm:w-full border border-slate-100;
  }
 
  .ui-modal-close-btn {

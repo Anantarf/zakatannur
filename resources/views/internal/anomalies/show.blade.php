@@ -6,14 +6,19 @@
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7 shrink-0 text-amber-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01M5.07 19h13.86c1.54 0 2.5-1.67 1.73-3L13.73 4c-.77-1.33-2.69-1.33-3.46 0L3.34 16c-.77 1.33.19 3 1.73 3z" />
                     </svg>
-                    Detail Review Anomali
+                    Tinjau Anomali
                 </h2>
-                <p class="text-sm text-slate-500">Tinjau sinyal sistem, verifikasi detail transaksi, lalu putuskan apakah kasus ini aman atau perlu tindak lanjut.</p>
+                <p class="text-sm text-slate-500">Verifikasi sinyal sistem dan putuskan apakah kasus ini perlu tindak lanjut.</p>
             </div>
             <div class="flex flex-col gap-2 sm:flex-row">
                 <a href="{{ route('internal.transactions.show', ['transaction' => $mainTx->id]) }}" class="ui-btn ui-btn-secondary w-full sm:w-auto">
                     Buka Transaksi Asli
                 </a>
+                @if (!empty($nextNoTransaksi) && $nextNoTransaksi !== $noTransaksi)
+                    <a href="{{ route('internal.anomalies.show', ['noTransaksi' => $nextNoTransaksi]) }}" class="ui-btn ui-btn-secondary w-full sm:w-auto">
+                        Kasus Berikutnya
+                    </a>
+                @endif
                 <a href="{{ route('internal.anomalies.index') }}" class="ui-btn ui-btn-secondary w-full sm:w-auto">
                     Kembali
                 </a>
@@ -21,17 +26,8 @@
         </div>
     </x-slot>
 
-    <div class="py-8">
+    <div class="py-8" x-data x-init="@if (session('status')) $nextTick(() => Alpine.store('toast').flash(@js(session('status')))) @endif">
         <div class="mx-auto max-w-6xl space-y-4 sm:space-y-5 px-4 sm:px-6 lg:px-8">
-            @if (session('status'))
-                <div class="ui-alert ui-alert-success">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="ui-alert-icon text-brand-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-                    </svg>
-                    <span class="font-medium">{{ session('status') }}</span>
-                </div>
-            @endif
-
             <x-form-errors />
 
             @php
@@ -42,7 +38,7 @@
 
             <div class="grid grid-cols-1 gap-4 xl:grid-cols-[minmax(0,1.4fr)_minmax(320px,0.6fr)]">
                 <div class="space-y-4">
-                    <div class="ui-card-strong overflow-hidden">
+                    <div class="ui-card-strong overflow-hidden" x-data="{ tab: 'signals' }">
                         <div class="border-b border-slate-100/80 px-5 py-4 sm:px-6 sm:py-5">
                             <div class="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
                                 <div class="space-y-3">
@@ -69,7 +65,26 @@
                             </div>
                         </div>
 
-                        <div class="space-y-4 border-b border-slate-100/80 bg-slate-50/70 px-5 py-4 sm:px-6 sm:py-5">
+                        <div class="flex gap-0 border-b border-slate-200/80 px-5 sm:px-6" role="tablist" aria-label="Bagian detail anomali">
+                            <button type="button"
+                                @click="tab = 'signals'"
+                                :class="tab === 'signals' ? 'border-brand-500 text-brand-700' : 'border-transparent text-slate-400 hover:text-slate-600'"
+                                class="border-b-2 px-3 py-3 text-sm font-bold transition-colors"
+                                role="tab"
+                                :aria-selected="tab === 'signals'">
+                                Sinyal & Duplikat
+                            </button>
+                            <button type="button"
+                                @click="tab = 'detail'"
+                                :class="tab === 'detail' ? 'border-brand-500 text-brand-700' : 'border-transparent text-slate-400 hover:text-slate-600'"
+                                class="border-b-2 px-3 py-3 text-sm font-bold transition-colors"
+                                role="tab"
+                                :aria-selected="tab === 'detail'">
+                                Rincian Pembayaran
+                            </button>
+                        </div>
+
+                        <div x-show="tab === 'signals'" x-transition class="space-y-4 border-b border-slate-100/80 bg-slate-50/70 px-5 py-4 sm:px-6 sm:py-5">
                             <section class="rounded-2xl border border-slate-200 bg-white p-4">
                                 <div class="mb-4 space-y-1">
                                     <p class="text-[11px] font-semibold uppercase tracking-wide text-slate-500">Kenapa Ditandai</p>
@@ -103,6 +118,11 @@
                                                         <p class="font-sans text-xs font-semibold text-blue-600">{{ $candidate['no_transaksi'] ?? '-' }}</p>
                                                         <p class="mt-1 text-sm font-semibold text-slate-800">{{ $candidate['pembayar_nama'] ?? '-' }}</p>
                                                         <p class="text-xs text-slate-500">{{ $candidate['muzakki_name'] ?? '-' }}</p>
+                                                        @if (!empty($candidate['no_transaksi']))
+                                                            <a href="{{ route('internal.anomalies.show', ['noTransaksi' => $candidate['no_transaksi']]) }}" class="mt-2 inline-flex text-xs font-bold text-brand-700 hover:text-brand-900">
+                                                                Buka Review
+                                                            </a>
+                                                        @endif
                                                     </div>
                                                     <div class="grid gap-2 text-left text-xs text-slate-500 sm:text-right">
                                                         <span class="rounded-full border border-slate-200 bg-white px-3 py-1 font-semibold text-slate-700">{{ $candidate['time_diff_minutes'] ?? 0 }} menit</span>
@@ -116,7 +136,7 @@
                             @endif
                         </div>
 
-                        <div class="px-5 py-4 sm:px-6 sm:py-5">
+                        <div x-show="tab === 'detail'" x-transition x-cloak class="px-5 py-4 sm:px-6 sm:py-5">
                             <div class="mb-4 space-y-1">
                                 <div class="flex items-center gap-2">
                                     <span class="h-5 w-1 rounded-full bg-brand-500"></span>
@@ -320,6 +340,11 @@
                             </div>
                             <button type="submit" class="ui-btn ui-btn-primary w-full">Simpan Keputusan Review</button>
                         </form>
+                        @if (!empty($nextNoTransaksi) && $nextNoTransaksi !== $noTransaksi)
+                            <a href="{{ route('internal.anomalies.show', ['noTransaksi' => $nextNoTransaksi]) }}" class="ui-btn ui-btn-secondary mt-3 w-full">
+                                Lanjut ke Kasus Berikutnya
+                            </a>
+                        @endif
                         <a href="{{ route('internal.transactions.edit', ['transaction' => $mainTx->id]) }}" class="ui-btn ui-btn-secondary mt-3 w-full">
                             Buka Ubah Transaksi
                         </a>

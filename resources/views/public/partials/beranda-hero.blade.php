@@ -7,6 +7,24 @@
         <p class="mt-2 max-w-2xl text-[13px] font-medium leading-relaxed text-slate-600 sm:text-[14.5px]">
             Jamaah dapat melihat penerimaan zakat Masjid An-Nur tanpa menunggu rekap manual.
         </p>
+        @if ((($summaryData['totals']['total_uang'] ?? 0) > 0) || (($summaryData['totals']['total_jiwa'] ?? 0) > 0))
+            <div class="mt-5 grid gap-3 sm:grid-cols-2">
+                @if (($summaryData['totals']['total_uang'] ?? 0) > 0)
+                    <div class="public-subcard public-subcard-brand px-5 py-3">
+                        <p class="mb-1 text-[10px] font-bold uppercase tracking-[0.12em] text-brand-700">Total Penerimaan Uang</p>
+                        <p class="text-2xl font-black tabular-nums text-brand-950 sm:text-3xl">Rp{{ number_format($summaryData['totals']['total_uang'], 0, ',', '.') }}</p>
+                        <p class="mt-0.5 text-[11px] font-semibold text-brand-700">Tahun {{ $selectedYear }}</p>
+                    </div>
+                @endif
+                @if (($summaryData['totals']['total_jiwa'] ?? 0) > 0)
+                    <div class="public-subcard px-5 py-3">
+                        <p class="mb-1 text-[10px] font-bold uppercase tracking-[0.12em] text-slate-500">Total Jiwa Zakat Fitrah</p>
+                        <p class="text-2xl font-black tabular-nums text-slate-950 sm:text-3xl">{{ number_format($summaryData['totals']['total_jiwa'], 0, ',', '.') }}</p>
+                        <p class="mt-0.5 text-[11px] font-semibold text-slate-500">Jiwa terdaftar</p>
+                    </div>
+                @endif
+            </div>
+        @endif
         <div class="mt-4 flex flex-wrap items-center gap-2">
             <button type="button" @click="activeTab = 'laporan'"
                 class="inline-flex w-fit items-center rounded-full bg-brand-700 px-4 py-2.5 text-[12px] font-bold text-white shadow-md shadow-brand-700/25 transition hover:bg-brand-800 sm:text-sm">

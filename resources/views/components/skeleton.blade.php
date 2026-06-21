@@ -17,4 +17,4 @@
     $finalClass = $baseClass . ' ' . ($typeClasses[$type] ?? $typeClasses['text']) . ' ' . $class;
 @endphp
 
-<div {{ $attributes->merge(['class' => $finalClass]) }}></div>
+<div aria-hidden="true" {{ $attributes->merge(['class' => $finalClass]) }}></div>

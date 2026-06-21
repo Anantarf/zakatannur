@@ -16,7 +16,8 @@
  }
 
  .public-kicker {
-  @apply mb-2 inline-flex items-center rounded-full border border-brand-200 bg-white/80 px-4 py-1.5 text-[11px] font-bold tracking-[0.16em] text-brand-700 shadow-sm;
+  @apply mb-2 inline-flex items-center rounded-full border border-brand-200 bg-white/80 px-4 py-1.5 text-[11px] font-bold text-brand-700 shadow-sm;
+  letter-spacing: var(--tracking-label);
  }
 
  .public-title {
@@ -48,7 +49,8 @@
  }
 
  .public-subcard {
-  @apply rounded-[1.1rem] border border-slate-200/80 bg-white/[0.92] px-4 py-3 shadow-sm;
+  @apply border border-slate-200/80 bg-white/[0.92] px-4 py-3 shadow-sm;
+  border-radius: var(--radius-subcard);
  }
 
  .public-subcard-brand {
@@ -116,7 +118,8 @@
  }
 
  .public-header-kicker {
-  @apply text-[10px] font-bold uppercase tracking-[0.16em] text-brand-700;
+  @apply text-[10px] font-bold uppercase text-brand-700;
+  letter-spacing: var(--tracking-label);
  }
 
  .public-header-title {
@@ -136,15 +139,18 @@
  }
 
  .public-metric-card {
-  @apply rounded-[1.1rem] border border-slate-200/80 bg-white/[0.92] px-4 py-3 shadow-sm;
+  @apply border border-slate-200/80 bg-white/[0.92] px-4 py-3 shadow-sm;
+  border-radius: var(--radius-subcard);
  }
 
  .public-metric-card-brand {
-  @apply rounded-[1.1rem] border border-brand-100/90 bg-brand-50/[0.78] px-4 py-3 text-brand-900 shadow-sm;
+  @apply border border-brand-100/90 bg-brand-50/[0.78] px-4 py-3 text-brand-900 shadow-sm;
+  border-radius: var(--radius-subcard);
  }
 
  .public-metric-card-amber {
-  @apply rounded-[1.1rem] border border-amber-100/90 bg-amber-50/[0.82] px-4 py-3 text-amber-900 shadow-sm;
+  @apply border border-amber-100/90 bg-amber-50/[0.82] px-4 py-3 text-amber-900 shadow-sm;
+  border-radius: var(--radius-subcard);
  }
 
  .public-metric-label {
@@ -172,11 +178,13 @@
  }
 
  .public-stat-card {
-  @apply rounded-[1.1rem] border border-slate-200/80 bg-white/[0.95] px-4 py-3.5 shadow-sm ring-1 ring-white/70;
+  @apply border border-slate-200/80 bg-white/[0.95] px-4 py-3.5 shadow-sm ring-1 ring-white/70;
+  border-radius: var(--radius-subcard);
  }
 
  .public-stat-label {
-  @apply text-[10px] font-semibold uppercase tracking-[0.08em] text-slate-500;
+  @apply text-[10px] font-semibold uppercase text-slate-500;
+  letter-spacing: var(--tracking-caption);
  }
 
  .public-stat-value {
@@ -196,15 +204,18 @@
  }
 
  .public-report-row {
-  @apply grid items-center gap-2.5 rounded-[1.12rem] border border-slate-200/75 bg-white/[0.92] px-4 py-3 shadow-sm transition-colors hover:border-brand-100 hover:bg-brand-50/[0.12];
+  @apply grid items-center gap-2.5 border border-slate-200/75 bg-white/[0.92] px-4 py-3 shadow-sm transition-colors hover:border-brand-100 hover:bg-brand-50/[0.12];
+  border-radius: var(--radius-subcard);
  }
 
  .public-report-mobile-row {
-  @apply rounded-[1.1rem] border border-slate-200/80 bg-white px-4 py-3 shadow-sm ring-1 ring-white/70;
+  @apply border border-slate-200/80 bg-white px-4 py-3 shadow-sm ring-1 ring-white/70;
+  border-radius: var(--radius-subcard);
  }
 
  .public-report-mobile-total {
-  @apply rounded-[1.1rem] border border-brand-100 bg-brand-50/50 px-4 py-3 shadow-sm;
+  @apply border border-brand-100 bg-brand-50/50 px-4 py-3 shadow-sm;
+  border-radius: var(--radius-subcard);
  }
 
  .public-report-value-cell {
@@ -248,7 +259,8 @@
  }
 
  .public-chart-metric {
-  @apply relative overflow-hidden rounded-[1.2rem] border px-4 py-2.5 shadow-sm;
+  @apply relative overflow-hidden border px-4 py-2.5 shadow-sm;
+  border-radius: var(--radius-subcard);
  }
 
  .public-chart-metric-brand {
@@ -276,7 +288,8 @@
  }
 
  .public-chart-card {
-  @apply rounded-[1.1rem] border border-slate-200/80 bg-white/85 p-3 ring-1 ring-slate-200/60 sm:px-4 sm:py-3;
+  @apply border border-slate-200/80 bg-white/85 p-3 ring-1 ring-slate-200/60 sm:px-4 sm:py-3;
+  border-radius: var(--radius-subcard);
  }
 
  .public-chart-card-head {
@@ -345,11 +358,13 @@
  }
 
  .public-footer-kicker {
-  @apply text-[10px] font-medium tracking-[0.08em] text-brand-900/55;
+  @apply text-[10px] font-medium text-brand-900/55;
+  letter-spacing: var(--tracking-caption);
  }
 
  .public-footer-brand {
-  @apply text-[10px] font-medium tracking-[0.08em] text-brand-800/85 transition-colors duration-300 group-hover:text-brand-900;
+  @apply text-[10px] font-medium text-brand-800/85 transition-colors duration-300 group-hover:text-brand-900;
+  letter-spacing: var(--tracking-caption);
  }
 
 }

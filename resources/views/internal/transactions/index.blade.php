@@ -8,13 +8,13 @@
                     </svg>
                     Riwayat Transaksi
                 </h2>
-                <p class="text-sm text-slate-500">Cari, pantau, dan buka aksi transaksi.</p>
+                <p class="text-sm text-slate-500">Telusuri, filter, dan kelola transaksi tercatat.</p>
             </div>
 
             <div class="flex flex-col sm:flex-row items-center gap-2 w-full sm:w-auto">
                 <a href="{{ route('internal.transactions.create') }}" class="ui-btn ui-btn-primary w-full px-4 py-3 sm:w-auto sm:py-2.5">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M12 4v16m8-8H4" /></svg>
-                    Input Baru
+                    Catat Baru
                 </a>
 
                 @if (auth()->check() && in_array(auth()->user()->role, ['admin', 'super_admin'], true))

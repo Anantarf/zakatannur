@@ -33,22 +33,29 @@
  --color-brand-900-rgb: 19 78 74;
  --color-brand-950-rgb: 4 47 46;
 
- /* Slate / Neutral Colors */
- --color-slate-50-rgb: 248 250 252;
- --color-slate-100-rgb: 241 245 249;
- --color-slate-200-rgb: 226 232 240;
- --color-slate-300-rgb: 203 213 225;
- --color-slate-400-rgb: 148 163 184;
- --color-slate-500-rgb: 100 116 139;
- --color-slate-600-rgb: 71 85 105;
- --color-slate-700-rgb: 51 65 85;
- --color-slate-800-rgb: 30 41 59;
- --color-slate-900-rgb: 15 23 42;
- --color-slate-950-rgb: 2 6 23;
+ /* Neutral Colors (Stone — warm undertone) */
+ --color-slate-50-rgb: 250 250 249;
+ --color-slate-100-rgb: 245 245 244;
+ --color-slate-200-rgb: 231 229 228;
+ --color-slate-300-rgb: 214 211 209;
+ --color-slate-400-rgb: 168 162 158;
+ --color-slate-500-rgb: 120 113 108;
+ --color-slate-600-rgb: 87 83 78;
+ --color-slate-700-rgb: 68 64 60;
+ --color-slate-800-rgb: 41 37 36;
+ --color-slate-900-rgb: 28 25 23;
+ --color-slate-950-rgb: 12 10 9;
+
+ /* Status Colors */
+ --color-status-success-rgb: 20 184 166;
+ --color-status-warning-rgb: 245 158 11;
+ --color-status-error-rgb: 220 38 38;
+ --color-status-info-rgb: 56 189 248;
 
  /* Border Radius */
  --radius-card: 1.75rem;
  --radius-button: 1rem;
+ --radius-subcard: 1.1rem;
 
  /* Shadows */
  --shadow-topbar: 0 20px 40px -15px rgba(0, 0, 0, 0.08);
@@ -58,6 +65,11 @@
  --text-eyebrow: 10px; /* label badge, kicker, kolom uppercase */
  --text-caption: 11px; /* nomor tabel kecil, metadata compact */
  --text-body-sm: 13px; /* teks baris tabel, deskripsi pendek */
+
+ /* Letter Spacing */
+ --tracking-eyebrow: 0.22em; /* kicker utama, brand label */
+ --tracking-label: 0.14em;   /* label stat, settings, kicker sekunder */
+ --tracking-caption: 0.10em; /* metadata kompak, tabel header */
 }
 
 @keyframes slideInRight {

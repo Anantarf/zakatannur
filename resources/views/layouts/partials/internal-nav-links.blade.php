@@ -4,6 +4,7 @@
     'canInputTransaksi' => false,
     'isAdmin' => false,
     'segmented' => false,
+    'pendingAnomalyCount' => 0,
 ])
 
 @php
@@ -36,7 +37,14 @@
             {{ __('Audit Logs') }}
         </x-dynamic-component>
         <x-dynamic-component :component="$linkComponent" :href="route('internal.anomalies.index')" :active="request()->routeIs('internal.anomalies.*')">
-            {{ __('Review Anomali') }}
+            <span class="inline-flex items-center justify-center gap-1.5">
+                <span>{{ __('Review Anomali') }}</span>
+                @if (($pendingAnomalyCount ?? 0) > 0)
+                    <span class="inline-flex h-4 min-w-4 items-center justify-center rounded-full bg-amber-500 px-1 text-[9px] font-black text-white">
+                        {{ $pendingAnomalyCount > 99 ? '99+' : $pendingAnomalyCount }}
+                    </span>
+                @endif
+            </span>
         </x-dynamic-component>
 
         @if ($user?->isSuperAdmin())
@@ -58,7 +66,14 @@
         {{ __('Audit') }}
     </x-dynamic-component>
     <x-dynamic-component :component="$linkComponent" :href="route('internal.anomalies.index')" :active="request()->routeIs('internal.anomalies.*')">
-        {{ __('Review') }}
+        <span class="inline-flex items-center justify-center gap-1.5">
+            <span>{{ __('Review') }}</span>
+            @if (($pendingAnomalyCount ?? 0) > 0)
+                <span class="inline-flex h-4 min-w-4 items-center justify-center rounded-full bg-amber-500 px-1 text-[9px] font-black text-white">
+                    {{ $pendingAnomalyCount > 99 ? '99+' : $pendingAnomalyCount }}
+                </span>
+            @endif
+        </span>
     </x-dynamic-component>
 
     @if ($user?->isSuperAdmin())

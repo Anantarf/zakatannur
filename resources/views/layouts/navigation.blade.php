@@ -14,6 +14,9 @@
         || request()->routeIs('internal.anomalies.*')
         || request()->routeIs('internal.settings.period.*')
         || request()->routeIs('internal.templates.*');
+    $pendingAnomalyCount = $isAdmin
+        ? app(\App\Services\Transactions\TransactionReviewAssistantService::class)->warningGroupCount()
+        : 0;
 @endphp
 
 <nav x-data="{ scrolled: window.scrollY > 12 }"
@@ -31,7 +34,7 @@
 
             <div class="hidden flex-1 justify-center xl:flex">
                 <div class="flex items-center gap-2 rounded-full border border-slate-200 bg-slate-100 p-1.5">
-                    @include('layouts.partials.internal-nav-links', ['mobile' => false, 'user' => $user, 'canInputTransaksi' => $canInputTransaksi, 'isAdmin' => $isAdmin])
+                    @include('layouts.partials.internal-nav-links', ['mobile' => false, 'user' => $user, 'canInputTransaksi' => $canInputTransaksi, 'isAdmin' => $isAdmin, 'pendingAnomalyCount' => $pendingAnomalyCount])
                     @if ($isAdmin)
                         <x-dropdown align="right" width="48">
                             <x-slot name="trigger">
@@ -49,7 +52,14 @@
                                     {{ __('Audit Logs') }}
                                 </x-dropdown-link>
                                 <x-dropdown-link :href="route('internal.anomalies.index')">
-                                    {{ __('Review Anomali') }}
+                                    <span class="flex items-center justify-between gap-3">
+                                        <span>{{ __('Review Anomali') }}</span>
+                                        @if (($pendingAnomalyCount ?? 0) > 0)
+                                            <span class="inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-amber-500 px-1.5 text-[10px] font-black text-white">
+                                                {{ $pendingAnomalyCount > 99 ? '99+' : $pendingAnomalyCount }}
+                                            </span>
+                                        @endif
+                                    </span>
                                 </x-dropdown-link>
 
                                 @if ($user->isSuperAdmin())
@@ -105,7 +115,7 @@
         </div>
 
         <div class="ui-admin-mobile-tabs xl:hidden">
-            @include('layouts.partials.internal-nav-links', ['mobile' => true, 'segmented' => true, 'user' => $user, 'canInputTransaksi' => $canInputTransaksi, 'isAdmin' => $isAdmin])
+            @include('layouts.partials.internal-nav-links', ['mobile' => true, 'segmented' => true, 'user' => $user, 'canInputTransaksi' => $canInputTransaksi, 'isAdmin' => $isAdmin, 'pendingAnomalyCount' => $pendingAnomalyCount])
         </div>
     </div>
 </nav>

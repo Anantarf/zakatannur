@@ -6,7 +6,12 @@
         <div class="flex items-center justify-between border-b border-slate-200/75 pb-3">
             <div class="flex items-center gap-3">
                 <span class="h-9 w-1 rounded-full bg-brand-500"></span>
-                <h2 class="text-[1.22rem] font-bold leading-tight tracking-[-0.01em] text-slate-950 sm:text-[1.35rem]">Ringkasan penerimaan</h2>
+                <div>
+                    <h2 class="text-[1.22rem] font-bold leading-tight tracking-[-0.01em] text-slate-950 sm:text-[1.35rem]">Ringkasan penerimaan</h2>
+                    @if (!empty($summaryData['computed_at_wib']))
+                        <p class="mt-1 text-[11px] font-medium text-slate-500">Diperbarui: {{ \Carbon\Carbon::createFromFormat('d/m/Y H:i:s', $summaryData['computed_at_wib'], config('zakat.timezone'))->locale('id')->diffForHumans() }}</p>
+                    @endif
+                </div>
             </div>
         </div>
 

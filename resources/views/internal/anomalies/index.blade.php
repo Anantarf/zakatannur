@@ -22,11 +22,21 @@
     <div class="py-5 sm:py-8">
         <div class="mx-auto max-w-7xl space-y-4 sm:space-y-5 px-4 sm:px-6 lg:px-8">
             <div class="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-5">
-                <x-ui-stat-card title="Total Kasus" :value="$overview['totalGroups']" description="Grup transaksi sesuai filter." />
-                <x-ui-stat-card title="Warning" :value="$overview['warningGroups']" description="Kasus yang perlu dicek admin." tone="warning" />
-                <x-ui-stat-card title="Belum Review" :value="$overview['pendingReviewGroups']" description="Belum diputuskan admin." tone="muted" />
-                <x-ui-stat-card title="Aman" :value="$overview['safeReviewGroups']" description="Sudah ditutup aman." tone="info" />
-                <x-ui-stat-card title="Tindak Lanjut" :value="$overview['followUpGroups']" description="Masih perlu aksi lanjutan." tone="danger" />
+                <a href="{{ route('internal.anomalies.index', ['scope' => $scope ?? 'active']) }}" class="block rounded-card transition hover:ring-2 hover:ring-brand-200 focus:outline-none focus:ring-2 focus:ring-brand-500">
+                    <x-ui-stat-card title="Total Kasus" :value="$overview['totalGroups']" description="Lihat semua kasus." />
+                </a>
+                <a href="{{ route('internal.anomalies.index', ['scope' => $scope ?? 'active', 'risk_level' => \App\Models\TransactionRiskReview::LEVEL_WARNING]) }}" class="block rounded-card transition hover:ring-2 hover:ring-amber-200 focus:outline-none focus:ring-2 focus:ring-amber-500">
+                    <x-ui-stat-card title="Warning" :value="$overview['warningGroups']" description="Filter kasus warning." tone="warning" />
+                </a>
+                <a href="{{ route('internal.anomalies.index', ['scope' => 'active', 'review_status' => \App\Models\TransactionRiskReview::REVIEW_BELUM_DITINJAU]) }}" class="block rounded-card transition hover:ring-2 hover:ring-slate-200 focus:outline-none focus:ring-2 focus:ring-slate-500">
+                    <x-ui-stat-card title="Belum Review" :value="$overview['pendingReviewGroups']" description="Filter antrean review." tone="muted" />
+                </a>
+                <a href="{{ route('internal.anomalies.index', ['scope' => 'archived', 'review_status' => \App\Models\TransactionRiskReview::REVIEW_AMAN]) }}" class="block rounded-card transition hover:ring-2 hover:ring-blue-200 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <x-ui-stat-card title="Aman" :value="$overview['safeReviewGroups']" description="Buka arsip aman." tone="info" />
+                </a>
+                <a href="{{ route('internal.anomalies.index', ['scope' => 'active', 'review_status' => \App\Models\TransactionRiskReview::REVIEW_PERLU_TINDAK_LANJUT]) }}" class="block rounded-card transition hover:ring-2 hover:ring-red-200 focus:outline-none focus:ring-2 focus:ring-red-500">
+                    <x-ui-stat-card title="Tindak Lanjut" :value="$overview['followUpGroups']" description="Filter kasus lanjutan." tone="danger" />
+                </a>
             </div>
 
             <div class="ui-card overflow-hidden shadow-md">
