@@ -23,8 +23,9 @@ class TransactionAuditLogger
         bool $wasReceiptPrinted
     ): void {
         $newTotals = $this->newTotals($results);
+        $subject = count($results) > 0 ? $results[0] : null;
 
-        Audit::log($request, $isUpdate ? 'Updated.Transaction' : 'Created.Transaction', null, [
+        Audit::log($request, $isUpdate ? 'Updated.Transaction' : 'Created.Transaction', $subject, [
             'no_transaksi' => $noTransaksi,
             'pembayar' => $payerName,
             'summary' => $summary,

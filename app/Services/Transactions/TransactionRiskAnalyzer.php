@@ -35,6 +35,10 @@ class TransactionRiskAnalyzer
 
     private function levelFromScore(int $score): string
     {
+        if ($score >= 50) {
+            return TransactionRiskReview::LEVEL_SUSPICIOUS;
+        }
+
         if ($score >= 20) {
             return TransactionRiskReview::LEVEL_WARNING;
         }

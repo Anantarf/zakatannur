@@ -193,6 +193,7 @@ class TransactionReviewAssistantService
     public function sqlRiskSeverity(?string $level): int
     {
         return match ($level) {
+            TransactionRiskReview::LEVEL_SUSPICIOUS => 3,
             TransactionRiskReview::LEVEL_WARNING => 2,
             TransactionRiskReview::LEVEL_NORMAL => 1,
             default => 0,

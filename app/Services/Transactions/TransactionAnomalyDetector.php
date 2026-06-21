@@ -28,20 +28,20 @@ class TransactionAnomalyDetector
         }
         if (($context['updated_after_receipt_printed'] ?? false) === true) {
             $score += 30;
-            $flags[] = 'updated_after_receipt_printed';
+            $flags[] = TransactionRiskReview::FLAG_UPDATED_AFTER_RECEIPT_PRINTED;
             $reasons[] = 'Transaksi diubah setelah kwitansi pernah dicetak dan perlu verifikasi ulang.';
         }
 
         if (($context['significant_nominal_change'] ?? false) === true) {
             $score += 35;
-            $flags[] = 'significant_nominal_change';
+            $flags[] = TransactionRiskReview::FLAG_SIGNIFICANT_NOMINAL_CHANGE;
             $reasons[] = $this->significantChangeReason($transaction, $context);
         }
 
         $outlierResult = $this->checkStatisticalOutlier($transaction);
         if ($outlierResult !== null) {
             $score += self::OUTLIER_SCORE;
-            $flags[] = 'statistical_outlier';
+            $flags[] = TransactionRiskReview::FLAG_STATISTICAL_OUTLIER;
             $reasons[] = $outlierResult;
         }
 

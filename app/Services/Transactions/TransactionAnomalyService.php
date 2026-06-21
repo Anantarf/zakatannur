@@ -151,25 +151,27 @@ class TransactionAnomalyService
 
     public function nextPendingGroupNo(string $currentNoTransaksi): ?string
     {
-        $pendingGroups = DB::query()
+        $baseQuery = fn () => DB::query()
             ->fromSub($this->reviewAssistantService->historySummarySubquery(), 'risk_reviews')
             ->where('risk_severity', '>=', $this->reviewAssistantService->sqlRiskSeverity(TransactionRiskReview::LEVEL_WARNING))
-            ->where('review_severity', $this->reviewAssistantService->sqlReviewSeverity(TransactionRiskReview::REVIEW_BELUM_DITINJAU))
+            ->where('review_severity', $this->reviewAssistantService->sqlReviewSeverity(TransactionRiskReview::REVIEW_BELUM_DITINJAU));
+
+        $next = $baseQuery()
+            ->where('group_no_transaksi', '>', $currentNoTransaksi)
             ->orderByDesc('risk_score_max')
             ->orderBy('group_no_transaksi')
-            ->pluck('group_no_transaksi')
-            ->values();
+            ->limit(1)
+            ->value('group_no_transaksi');
 
-        if ($pendingGroups->isEmpty()) {
-            return null;
+        if ($next !== null) {
+            return $next;
         }
 
-        $currentIndex = $pendingGroups->search($currentNoTransaksi);
-        if ($currentIndex === false) {
-            return $pendingGroups->first();
-        }
-
-        return $pendingGroups->get($currentIndex + 1) ?? $pendingGroups->first();
+        return $baseQuery()
+            ->orderByDesc('risk_score_max')
+            ->orderBy('group_no_transaksi')
+            ->limit(1)
+            ->value('group_no_transaksi');
     }
 
     public static function flagLabels(): array

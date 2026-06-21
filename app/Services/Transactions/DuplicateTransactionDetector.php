@@ -2,6 +2,7 @@
 
 namespace App\Services\Transactions;
 
+use App\Models\TransactionRiskReview;
 use App\Models\ZakatTransaction;
 use Carbon\CarbonInterface;
 use Illuminate\Support\Collection;
@@ -38,16 +39,16 @@ class DuplicateTransactionDetector
 
             if ($this->samePayerAndAmount($transaction, $candidate) && (int) $candidate->muzakki_id === (int) $transaction->muzakki_id) {
                 $candidateScore = 60;
-                $matchType = 'exact_duplicate';
+                $matchType = TransactionRiskReview::FLAG_EXACT_DUPLICATE;
             } elseif ($this->samePayerByNameOnly($transaction, $candidate) && $this->sameAmount($transaction, $candidate) && (int) $candidate->muzakki_id === (int) $transaction->muzakki_id) {
                 $candidateScore = 40;
-                $matchType = 'payer_match_same_beneficiary';
+                $matchType = TransactionRiskReview::FLAG_PAYER_MATCH_SAME_BENEFICIARY;
             } elseif ($this->samePayerAndAmount($transaction, $candidate) && $this->isTransferPair($transaction, $candidate)) {
                 $candidateScore = 50;
-                $matchType = 'transfer_duplicate_candidate';
+                $matchType = TransactionRiskReview::FLAG_TRANSFER_DUPLICATE_CANDIDATE;
             } elseif ($this->samePayerAndAmount($transaction, $candidate)) {
                 $candidateScore = 10;
-                $matchType = 'payer_match_different_beneficiary';
+                $matchType = TransactionRiskReview::FLAG_PAYER_MATCH_DIFFERENT_BENEFICIARY;
             }
 
             if ($candidateScore <= 0 || $matchType === null) {
@@ -57,11 +58,11 @@ class DuplicateTransactionDetector
             $score = max($score, $candidateScore);
             $flags[] = $matchType;
 
-            if ($matchType === 'exact_duplicate') {
+            if ($matchType === TransactionRiskReview::FLAG_EXACT_DUPLICATE) {
                 $reasons[] = 'Transaksi sangat mirip ditemukan pada tahun zakat yang sama dengan muzakki, nilai, dan waktu yang berdekatan.';
-            } elseif ($matchType === 'transfer_duplicate_candidate') {
+            } elseif ($matchType === TransactionRiskReview::FLAG_TRANSFER_DUPLICATE_CANDIDATE) {
                 $reasons[] = 'Kandidat duplikasi transfer ditemukan dengan nominal dan pembayar yang sama dalam rentang waktu dekat.';
-            } elseif ($matchType === 'payer_match_same_beneficiary') {
+            } elseif ($matchType === TransactionRiskReview::FLAG_PAYER_MATCH_SAME_BENEFICIARY) {
                 $reasons[] = 'Transaksi dengan nama pembayar yang sama dan muzakki yang sama ditemukan dalam rentang waktu dekat.';
             }
 
