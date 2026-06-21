@@ -16,8 +16,8 @@
         <input type="hidden" name="tahun_zakat" value="{{ $activeYear }}">
 
         <div>
-            <label class="mb-1 block text-xs font-bold text-slate-700">Shift Petugas <span class="text-red-500">*</span></label>
-            <select name="shift" x-model="shift" class="w-full rounded-lg border-slate-300 text-sm shadow-sm focus:border-blue-500 focus:ring-blue-500" required>
+            <label class="ui-form-label">Shift Petugas <span class="text-red-500">*</span></label>
+            <select name="shift" x-model="shift" class="ui-select w-full" required>
                 <option value="">-- Pilih Shift --</option>
                 @foreach($shifts as $shift)
                     <option value="{{ $shift }}" {{ (old('shift', $mainTx->shift ?? (\Carbon\Carbon::now('Asia/Jakarta')->hour < 14 ? 'pagi' : (\Carbon\Carbon::now('Asia/Jakarta')->hour < 18 ? 'siang' : 'malam'))) == $shift) ? 'selected' : '' }}>
@@ -29,7 +29,7 @@
 
         @if(isset($isEdit))
             <div>
-                <label class="mb-1 block text-xs font-bold text-slate-700">Petugas Pelayan (Data Asli)</label>
+                <label class="ui-form-label">Petugas Pelayan (Data Asli)</label>
                 <div class="relative">
                     <select disabled class="w-full cursor-not-allowed rounded-lg border-slate-200 bg-slate-50 text-sm text-slate-500 shadow-sm">
                         @foreach($officers as $off)
@@ -44,7 +44,7 @@
                 </div>
             </div>
             <div>
-                <label class="mb-1 block text-xs font-bold text-slate-700">Waktu Transaksi (Asal)</label>
+                <label class="ui-form-label">Waktu Transaksi (Asal)</label>
                 <div class="relative">
                     <input type="datetime-local" readonly
                         value="{{ old('waktu_terima', ($mainTx->waktu_terima ?? $mainTx->created_at)->timezone('Asia/Jakarta')->format('Y-m-d\TH:i')) }}"
@@ -61,14 +61,14 @@
         @endif
 
         <div>
-            <label class="mb-1 block text-xs font-bold text-slate-700">Nama Pembayar <span class="text-red-500">*</span></label>
+            <label class="ui-form-label">Nama Pembayar <span class="text-red-500">*</span></label>
             <div class="relative" @click.away="showSuggestions = false">
                 <input type="text" name="pembayar_nama" x-model="pembayar_name"
                     @input="handleInput()"
                     @keydown.arrow-down.prevent="selectNext()"
                     @keydown.arrow-up.prevent="selectPrev()"
                     @keydown.enter.prevent="selectActive()"
-                    class="w-full rounded-lg border-slate-300 text-sm shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                    class="ui-input w-full"
                     autocomplete="off"
                     required placeholder="Ketik nama...">
                 <div class="mt-1.5 flex items-center">
@@ -103,13 +103,13 @@
         </div>
 
         <div>
-            <label class="mb-1 block text-xs font-bold text-slate-700">Alamat Domisili <span class="text-red-500">*</span></label>
-            <textarea name="pembayar_alamat" rows="3" x-model="pembayar_address" class="w-full rounded-lg border-slate-300 text-sm shadow-sm focus:border-blue-500 focus:ring-blue-500" required placeholder="Wajib diisi..."></textarea>
+            <label class="ui-form-label">Alamat Domisili <span class="text-red-500">*</span></label>
+            <textarea name="pembayar_alamat" rows="3" x-model="pembayar_address" class="ui-textarea w-full" required placeholder="Wajib diisi..."></textarea>
         </div>
 
         <div>
-            <label class="mb-1 block text-xs font-bold text-slate-700">Nomor HP / WhatsApp (Opsional)</label>
-            <input type="text" name="pembayar_phone" x-model="pembayar_phone" placeholder="08xxx" class="w-full rounded-lg border-slate-300 text-sm shadow-sm focus:border-blue-500 focus:ring-blue-500">
+            <label class="ui-form-label">Nomor HP / WhatsApp (Opsional)</label>
+            <input type="text" name="pembayar_phone" x-model="pembayar_phone" placeholder="08xxx" class="ui-input w-full">
         </div>
     </div>
 </div>

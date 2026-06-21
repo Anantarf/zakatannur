@@ -1,0 +1,590 @@
+﻿diff --git a/app/Http/Controllers/Api/ChatbotController.php b/app/Http/Controllers/Api/ChatbotController.php
+index 76ec26f..7ff5b60 100644
+--- a/app/Http/Controllers/Api/ChatbotController.php
++++ b/app/Http/Controllers/Api/ChatbotController.php
+@@ -20,10 +20,14 @@ public function chat(Request $request)
+     {
+         $request->validate([
+             'message' => 'required|string|max:500',
++            'context' => 'sometimes|array',
++            'context.last_intent' => 'sometimes|string|max:80',
++            'context.last_source' => 'sometimes|string|max:40',
++            'context.topic' => 'sometimes|string|max:40',
+         ]);
+ 
+         try {
+-            $response = $this->chatbot->handle($request->message);
++            $response = $this->chatbot->handle($request->message, $request->input('context', []));
+ 
+             return response()->json($response->toArray(), $response->statusCode);
+         } catch (\Throwable $e) {
+diff --git a/app/Services/Chatbot/ChatbotActionDetector.php b/app/Services/Chatbot/ChatbotActionDetector.php
+index ed7cfbb..b8f6428 100644
+--- a/app/Services/Chatbot/ChatbotActionDetector.php
++++ b/app/Services/Chatbot/ChatbotActionDetector.php
+@@ -4,27 +4,69 @@
+ 
+ class ChatbotActionDetector
+ {
+-    public function detect(string $message): ?ChatbotResponse
++    public function intent(string $message, ?ChatbotConversationContext $context = null): ?string
+     {
+         $message = $this->normalize($message);
+ 
+-        if ($this->containsAny($message, ['berapa', 'totalnya', 'jumlahnya'])) {
+-            return null;
++        if ($this->containsAny($message, ['update terakhir', 'terakhir update', 'diperbarui', 'kapan update', 'data terbaru'])) {
++            return 'ask_latest_update';
++        }
++
++        if ($this->containsAny($message, ['kategori terbesar', 'paling besar', 'terbanyak', 'tertinggi'])) {
++            return 'ask_top_category';
++        }
++
++        if ($this->containsAny($message, ['kategori', 'jenis zakat', 'jenis penerimaan'])) {
++            return 'ask_categories';
+         }
+ 
+-        if ($this->containsAny($message, ['ringkasan', 'penerimaan', 'total zakat', 'data zakat', 'laporan'])) {
++        if ($this->containsAny($message, ['beras', 'kg'])) {
++            return 'ask_total_rice';
++        }
++
++        if ($this->containsAny($message, ['jiwa', 'orang', 'muzakki fitrah'])) {
++            return 'ask_total_people';
++        }
++
++        if ($this->containsAny($message, ['uang', 'rupiah', 'rp', 'terkumpul', 'penerimaan uang', 'nominal'])) {
++            return 'ask_total_money';
++        }
++
++        if ($this->containsAny($message, ['berapa', 'total', 'jumlah', 'ringkasan penerimaan', 'rekap penerimaan'])) {
++            return 'ask_total_summary';
++        }
++
++        if ($this->containsAny($message, ['grafik', 'harian', 'chart', 'tren', 'pola penerimaan'])) {
++            return 'open_chart';
++        }
++
++        if ($this->containsAny($message, ['ringkasan', 'laporan', 'rekap'])) {
++            return 'open_summary';
++        }
++
++        if ($context?->isPublicDataTopic()) {
++            return $this->publicDataFollowUpIntent($message);
++        }
++
++        return null;
++    }
++
++    public function detect(string $message): ?ChatbotResponse
++    {
++        $intent = $this->intent($message);
++        if ($intent === 'open_summary') {
+             return ChatbotResponse::success(
+                 'Saya buka tab Ringkasan Penerimaan. Di sana jamaah bisa melihat total jiwa, uang, beras, dan rincian kategori.',
+                 'action',
+-                [['type' => 'open_tab', 'target' => 'laporan']]
++                [['type' => 'open_tab', 'target' => 'laporan', 'label' => 'Buka Ringkasan']]
+             );
+         }
+ 
+-        if ($this->containsAny($message, ['grafik', 'harian', 'chart', 'tren', 'pola penerimaan'])) {
++        if ($intent === 'open_chart') {
+             return ChatbotResponse::success(
+                 'Saya buka tab Grafik Harian. Di sana jamaah bisa melihat pola penerimaan per hari.',
+                 'action',
+-                [['type' => 'open_tab', 'target' => 'grafik']]
++                [['type' => 'open_tab', 'target' => 'grafik', 'label' => 'Lihat Grafik']]
+             );
+         }
+ 
+@@ -33,7 +75,9 @@ public function detect(string $message): ?ChatbotResponse
+ 
+     private function normalize(string $message): string
+     {
+-        return trim(preg_replace('/\s+/', ' ', mb_strtolower($message)) ?? '');
++        $message = preg_replace('/[^\pL\pN\s]/u', ' ', mb_strtolower($message)) ?? '';
++
++        return trim(preg_replace('/\s+/', ' ', $message) ?? '');
+     }
+ 
+     private function containsAny(string $message, array $keywords): bool
+@@ -46,4 +90,21 @@ private function containsAny(string $message, array $keywords): bool
+ 
+         return false;
+     }
++
++    private function publicDataFollowUpIntent(string $message): ?string
++    {
++        if ($this->containsAny($message, ['terakhir', 'terbaru', 'kapan'])) {
++            return 'ask_latest_update';
++        }
++
++        if ($this->containsAny($message, ['terbesar', 'terbanyak', 'tertinggi'])) {
++            return 'ask_top_category';
++        }
++
++        if ($this->containsAny($message, ['semua', 'semuanya', 'totalnya', 'jumlahnya', 'ringkas'])) {
++            return 'ask_total_summary';
++        }
++
++        return null;
++    }
+ }
+diff --git a/app/Services/Chatbot/ChatbotOrchestrator.php b/app/Services/Chatbot/ChatbotOrchestrator.php
+index 250d82c..d5f4209 100644
+--- a/app/Services/Chatbot/ChatbotOrchestrator.php
++++ b/app/Services/Chatbot/ChatbotOrchestrator.php
+@@ -3,8 +3,6 @@
+ namespace App\Services\Chatbot;
+ 
+ use App\Services\Chatbot\Knowledge\KnowledgeRetriever;
+-use App\Services\PublicSummaryService;
+-use App\Support\Format;
+ use Illuminate\Support\Facades\Log;
+ use Throwable;
+ 
+@@ -14,21 +12,24 @@ public function __construct(
+         private ChatbotServiceInterface $aiProvider,
+         private ChatbotActionDetector $actionDetector,
+         private KnowledgeRetriever $knowledgeRetriever,
+-        private PublicSummaryService $publicSummaryService
++        private ChatbotPublicDataResponder $publicDataResponder
+     ) {
+     }
+ 
+-    public function handle(string $message): ChatbotResponse
++    public function handle(string $message, array $rawContext = []): ChatbotResponse
+     {
++        $context = ChatbotConversationContext::fromArray($rawContext);
++
+         try {
+-            $action = $this->actionDetector->detect($message);
+-            if ($action) {
+-                return $action;
++            $intent = $this->actionDetector->intent($message, $context);
++            $publicData = $intent ? $this->publicDataResponder->respond($intent) : null;
++            if ($publicData) {
++                return $publicData->withContext($context->forIntent($intent, 'public_data')->toArray());
+             }
+ 
+-            $publicData = $this->answerFromPublicData($message);
+-            if ($publicData) {
+-                return $publicData;
++            $action = $this->actionDetector->detect($message);
++            if ($action) {
++                return $action->withContext($context->forIntent('navigation', 'action')->toArray());
+             }
+ 
+             $knowledge = $this->knowledgeRetriever->best($message);
+@@ -41,7 +42,7 @@ public function handle(string $message): ChatbotResponse
+                         'id' => $knowledge['id'] ?? null,
+                         'label' => $knowledge['source_label'] ?? 'Panduan Zakat Masjid An-Nur',
+                     ]]
+-                );
++                )->withContext($context->forIntent((string) ($knowledge['id'] ?? 'knowledge'), 'knowledge')->toArray());
+             }
+ 
+             return $this->answerFromAi($message);
+@@ -54,56 +55,6 @@ public function handle(string $message): ChatbotResponse
+         }
+     }
+ 
+-    private function answerFromPublicData(string $message): ?ChatbotResponse
+-    {
+-        $normalized = mb_strtolower($message);
+-        $asksTotal = str_contains($normalized, 'total') || str_contains($normalized, 'berapa');
+-        $asksCategory = str_contains($normalized, 'kategori') || str_contains($normalized, 'jenis');
+-
+-        if (!$asksTotal && !$asksCategory) {
+-            return null;
+-        }
+-
+-        if (!str_contains($normalized, 'zakat') && !str_contains($normalized, 'penerimaan') && !str_contains($normalized, 'beras') && !str_contains($normalized, 'uang') && !str_contains($normalized, 'jiwa')) {
+-            return null;
+-        }
+-
+-        $year = $this->publicSummaryService->resolveYear(null);
+-        $summary = $this->publicSummaryService->publicSummaryResponse($year)['data'] ?? [];
+-        $totals = $summary['totals'] ?? [];
+-        $items = $summary['items'] ?? [];
+-
+-        if ($asksCategory) {
+-            if (count($items) === 0) {
+-                return ChatbotResponse::success('Belum ada kategori penerimaan yang tercatat untuk periode ini.', 'public_data');
+-            }
+-
+-            $categories = collect($items)
+-                ->pluck('category')
+-                ->map(fn ($category) => ucwords(str_replace('_', ' ', (string) $category)))
+-                ->implode(', ');
+-
+-            return ChatbotResponse::success("Kategori yang tercatat saat ini: {$categories}.", 'public_data');
+-        }
+-
+-        $totalJiwa = (int) ($totals['total_jiwa'] ?? 0);
+-        $totalUang = (int) ($totals['total_uang'] ?? 0);
+-        $totalBeras = (float) ($totals['total_beras_kg'] ?? 0);
+-
+-        if ($totalJiwa === 0 && $totalUang === 0 && $totalBeras <= 0.0) {
+-            return ChatbotResponse::success('Belum ada data penerimaan yang tercatat untuk periode ini.', 'public_data');
+-        }
+-
+-        return ChatbotResponse::success(
+-            'Total penerimaan saat ini: '
+-            . number_format($totalJiwa, 0, ',', '.') . ' jiwa, '
+-            . Format::rupiah($totalUang) . ', dan '
+-            . Format::kg($totalBeras) . '. Data ini mengikuti ringkasan publik periode berjalan.',
+-            'public_data',
+-            [['type' => 'open_tab', 'target' => 'laporan']]
+-        );
+-    }
+-
+     private function answerFromAi(string $message): ChatbotResponse
+     {
+         $contexts = $this->knowledgeRetriever->search($message, 2);
+diff --git a/app/Services/Chatbot/ChatbotResponse.php b/app/Services/Chatbot/ChatbotResponse.php
+index 46b40e9..e81136a 100644
+--- a/app/Services/Chatbot/ChatbotResponse.php
++++ b/app/Services/Chatbot/ChatbotResponse.php
+@@ -8,6 +8,7 @@ class ChatbotResponse
+     public string $source;
+     public array $actions;
+     public array $citations;
++    public array $context;
+     public bool $retryable;
+     public int $statusCode;
+ 
+@@ -16,6 +17,7 @@ public function __construct(
+         string $source = 'ai',
+         array $actions = [],
+         array $citations = [],
++        array $context = [],
+         bool $retryable = false,
+         int $statusCode = 200
+     ) {
+@@ -23,6 +25,7 @@ public function __construct(
+         $this->source = $source;
+         $this->actions = $actions;
+         $this->citations = $citations;
++        $this->context = $context;
+         $this->retryable = $retryable;
+         $this->statusCode = $statusCode;
+     }
+@@ -32,9 +35,16 @@ public static function success(string $reply, string $source = 'ai', array $acti
+         return new self($reply, $source, $actions, $citations);
+     }
+ 
++    public function withContext(array $context): self
++    {
++        $this->context = $context;
++
++        return $this;
++    }
++
+     public static function error(string $reply, bool $retryable = true, int $statusCode = 503): self
+     {
+-        return new self($reply, 'fallback', [], [], $retryable, $statusCode);
++        return new self($reply, 'fallback', [], [], [], $retryable, $statusCode);
+     }
+ 
+     public function toArray(): array
+@@ -54,6 +64,7 @@ public function toArray(): array
+                 'source' => $this->source,
+                 'actions' => $this->actions,
+                 'citations' => $this->citations,
++                'context' => $this->context,
+             ],
+         ];
+     }
+diff --git a/app/Services/Chatbot/Knowledge/KnowledgeRetriever.php b/app/Services/Chatbot/Knowledge/KnowledgeRetriever.php
+index 3524ebe..68621ae 100644
+--- a/app/Services/Chatbot/Knowledge/KnowledgeRetriever.php
++++ b/app/Services/Chatbot/Knowledge/KnowledgeRetriever.php
+@@ -42,14 +42,15 @@ private function score(string $message, array $entry): int
+         $score = 0;
+ 
+         foreach (($entry['keywords'] ?? []) as $keyword) {
+-            if (str_contains($message, $this->normalize($keyword))) {
+-                $score += 3;
++            $keyword = $this->normalize($keyword);
++            if ($keyword !== '' && str_contains($message, $keyword)) {
++                $score += str_contains($keyword, ' ') ? 5 : 3;
+             }
+         }
+ 
+         foreach (explode(' ', $this->normalize((string) ($entry['title'] ?? ''))) as $token) {
+             if (mb_strlen($token) >= 4 && str_contains($message, $token)) {
+-                $score += 2;
++                $score += 1;
+             }
+         }
+ 
+@@ -58,6 +59,8 @@ private function score(string $message, array $entry): int
+ 
+     private function normalize(string $value): string
+     {
+-        return trim(preg_replace('/\s+/', ' ', mb_strtolower($value)) ?? '');
++        $value = preg_replace('/[^\pL\pN\s]/u', ' ', mb_strtolower($value)) ?? '';
++
++        return trim(preg_replace('/\s+/', ' ', $value) ?? '');
+     }
+ }
+diff --git a/app/Services/Chatbot/Providers/MockChatbotProvider.php b/app/Services/Chatbot/Providers/MockChatbotProvider.php
+index f791391..e52c7a3 100644
+--- a/app/Services/Chatbot/Providers/MockChatbotProvider.php
++++ b/app/Services/Chatbot/Providers/MockChatbotProvider.php
+@@ -10,14 +10,14 @@ public function sendMessage(string $message, array $context = []): string
+     {
+         $message = strtolower($message);
+         if (str_contains($message, 'zakat') || str_contains($message, 'bayar')) {
+-            return "Untuk panduan zakat atau cara pembayaran, Anda bisa langsung mengakses menu Transaksi. Fitur AI penuh masih dalam tahap pengembangan.";
++            return 'Zakky bisa membantu membaca data publik dan panduan umum zakat. Untuk tata cara pembayaran yang berlaku hari ini, tetap ikuti arahan panitia Masjid An-Nur.';
+         }
+ 
+         if (str_contains($message, 'halo') || str_contains($message, 'hi') || str_contains($message, 'assalamualaikum') || str_contains($message, 'zakky')) {
+-            return "Halo! Saya Zakky, asisten virtual Zakat An-Nur (versi simulasi). Ada yang bisa saya bantu terkait informasi zakat?";
++            return 'Halo! Saya Zakky, asisten virtual Zakat An-Nur. Saya bisa bantu membaca ringkasan penerimaan, grafik, dan panduan umum zakat.';
+         }
+ 
+-        return "Terima kasih atas pesannya: \"{$message}\". Saat ini AI Provider masih dalam tahap pertimbangan sehingga saya hanya bisa merespons dengan pesan otomatis. Insya Allah fitur penuh akan segera hadir!";
++        return 'Saya belum punya jawaban pasti untuk pertanyaan itu. Coba tanyakan total uang, total beras, total jiwa, kategori penerimaan, update terakhir, atau cara bayar zakat.';
+     }
+ 
+     public function wasLastReplyFallback(): bool
+diff --git a/app/Services/PublicSummaryService.php b/app/Services/PublicSummaryService.php
+index 96342bd..3c13abf 100644
+--- a/app/Services/PublicSummaryService.php
++++ b/app/Services/PublicSummaryService.php
+@@ -40,10 +40,17 @@ public function publicSummaryResponse(int $year): array
+ 
+         $payload = Cache::remember($cacheKey, $cacheTtlSeconds, function () use ($year) {
+             $rekap = RekapBuilder::build($year);
++            $latestTransactionAt = ZakatTransaction::query()
++                ->valid()
++                ->where('tahun_zakat', $year)
++                ->max('waktu_terima');
+ 
+             return [
+                 'year' => $year,
+                 'computed_at_wib' => now('Asia/Jakarta')->format('d/m/Y H:i:s'),
++                'latest_transaction_at_wib' => $latestTransactionAt
++                    ? (string) $latestTransactionAt
++                    : null,
+                 'items' => $rekap['items'],
+                 'totals' => $rekap['totals'],
+                 'dailyChartData' => RekapBuilder::buildDailyChartData($year),
+diff --git a/resources/js/chatbot-widget.js b/resources/js/chatbot-widget.js
+index edaf0bf..0cb670c 100644
+--- a/resources/js/chatbot-widget.js
++++ b/resources/js/chatbot-widget.js
+@@ -23,6 +23,7 @@ document.addEventListener('alpine:init', () => {
+         lastError: null,
+         unreadBadge: 0,
+         lastSeenMessageCount: 0,
++        conversationContext: {},
+ 
+         get isInputEmpty() {
+             return this.input.trim() === '';
+@@ -103,7 +104,10 @@ document.addEventListener('alpine:init', () => {
+                         'Content-Type': 'application/json',
+                         'Accept': 'application/json',
+                     },
+-                    body: JSON.stringify({ message: userMessage }),
++                    body: JSON.stringify({
++                        message: userMessage,
++                        context: this.conversationContext,
++                    }),
+                 });
+ 
+                 const payload = await this.parseResponse(response);
+@@ -118,6 +122,7 @@ document.addEventListener('alpine:init', () => {
+                         citations: data.citations || [],
+                         createdAt: nowIso(),
+                     });
++                    this.conversationContext = this.sanitizeContext(data.context || {});
+                     this.executeActions(data.actions || []);
+                     this.isOnline = true;
+                     return;
+@@ -182,18 +187,40 @@ document.addEventListener('alpine:init', () => {
+ 
+         executeActions(actions) {
+             actions.forEach((action) => {
+-                if (action?.type === 'open_tab' && action?.target) {
+-                    this.openTab(action.target);
++                if (action?.auto === true) {
++                    this.executeAction(action);
+                 }
+             });
+         },
+ 
++        executeAction(action) {
++            if (action?.type === 'open_tab' && action?.target) {
++                this.openTab(action.target);
++                return;
++            }
++
++            if (action?.type === 'suggested_reply' && action?.message) {
++                this.input = action.message;
++                this.sendMessage();
++            }
++        },
++
++        sanitizeContext(context) {
++            const allowedKeys = ['last_intent', 'last_source', 'topic'];
++            return allowedKeys.reduce((next, key) => {
++                if (typeof context[key] === 'string' && context[key].length <= 80) {
++                    next[key] = context[key];
++                }
++                return next;
++            }, {});
++        },
++
+         resolveLocalAction(message) {
+             const normalized = message.toLowerCase();
+-            if (normalized.includes('ringkasan') || normalized.includes('penerimaan') || normalized.includes('total zakat')) {
++            if (normalized.includes('buka ringkasan') || normalized.includes('lihat ringkasan') || normalized.includes('buka laporan')) {
+                 return 'laporan';
+             }
+-            if (normalized.includes('grafik') || normalized.includes('harian') || normalized.includes('chart')) {
++            if (normalized.includes('buka grafik') || normalized.includes('lihat grafik') || normalized.includes('buka chart')) {
+                 return 'grafik';
+             }
+             return null;
+diff --git a/resources/js/public-home/app.js b/resources/js/public-home/app.js
+index 5bfb3d6..8808908 100644
+--- a/resources/js/public-home/app.js
++++ b/resources/js/public-home/app.js
+@@ -15,6 +15,8 @@ const initialState = (config) => ({
+     selectedYear: config.selectedYear,
+     items: config.items ?? [],
+     totals: config.totals ?? {},
++    latestTransactionAt: config.latestTransactionAt ?? null,
++    latestTransactionAgeLabel: '',
+     dailyChartData: config.dailyChartData ?? {},
+     isFirstLoad: true,
+     error: null,
+@@ -65,6 +67,42 @@ export const createPublicHomeApp = (config, chartService) => {
+             const parts = formatter.formatToParts(new Date());
+             const d = parts.reduce((acc, part) => ({ ...acc, [part.type]: part.value }), {});
+             this.clock = `${d.weekday}, ${d.day} ${d.month} ${d.year} ${d.hour}:${d.minute}:${d.second} WIB`;
++            this.latestTransactionAgeLabel = this.formatLatestTransactionAge();
++        },
++
++        formatLatestTransactionAge() {
++            if (!this.latestTransactionAt) {
++                return 'Transaksi terakhir: belum ada transaksi';
++            }
++
++            const latest = new Date(String(this.latestTransactionAt).replace(' ', 'T') + '+07:00');
++            if (Number.isNaN(latest.getTime())) {
++                return 'Transaksi terakhir: waktu tidak tersedia';
++            }
++
++            let remainingMinutes = Math.max(0, Math.floor((Date.now() - latest.getTime()) / 60000));
++            const units = [
++                ['tahun', 12 * 30 * 24 * 60],
++                ['bulan', 30 * 24 * 60],
++                ['hari', 24 * 60],
++                ['jam', 60],
++                ['menit', 1],
++            ];
++
++            const parts = [];
++            units.forEach(([label, minutes]) => {
++                if (parts.length >= 2) {
++                    return;
++                }
++
++                const value = Math.floor(remainingMinutes / minutes);
++                if (value > 0 || parts.length > 0 || label === 'menit') {
++                    parts.push(`${value} ${label}`);
++                    remainingMinutes -= value * minutes;
++                }
++            });
++
++            return `Transaksi terakhir: ${parts.join(', ')} yang lalu`;
+         },
+ 
+         setChartSlide(index) {
+diff --git a/resources/js/public-home/charts.js b/resources/js/public-home/charts.js
+index 3043cee..5f4b74e 100644
+--- a/resources/js/public-home/charts.js
++++ b/resources/js/public-home/charts.js
+@@ -50,10 +50,10 @@ const PALETTES = {
+         pointFill: '#10b981',
+         pointDim: 'rgba(16, 185, 129, 0.35)',
+         labelColor: '#047857',
+-        borderLabel: 'rgba(16, 185, 129, 0.45)',
++        borderLabel: 'rgba(16, 185, 129, 0.35)',
+         axisColor: '#334155',
+-        axisColorSecondary: '#94a3b8',
+-        gridColor: 'rgba(226, 232, 240, 0.6)',
++        axisColorSecondary: '#64748b',
++        gridColor: 'rgba(148, 163, 184, 0.22)',
+         tickFormatter: (v) => formatRupiahCompact(v),
+         datalabelFormatter: (v) => formatRupiahCompact(v),
+         label: 'Uang Zakat',
+@@ -68,10 +68,10 @@ const PALETTES = {
+         pointFill: '#f59e0b',
+         pointDim: 'rgba(245, 158, 11, 0.35)',
+         labelColor: '#b45309',
+-        borderLabel: 'rgba(245, 158, 11, 0.45)',
+-        axisColor: '#92400e',
+-        axisColorSecondary: '#94a3b8',
+-        gridColor: 'rgba(226, 232, 240, 0.6)',
++        borderLabel: 'rgba(245, 158, 11, 0.28)',
++        axisColor: '#334155',
++        axisColorSecondary: '#64748b',
++        gridColor: 'rgba(148, 163, 184, 0.22)',
+         tickFormatter: (v) => v + ' Kg',
+         datalabelFormatter: (v) => formatBerasCompact(v),
+         label: 'Beras Zakat',
+@@ -120,7 +120,7 @@ const buildChart = (canvas, type, config, palette) => {
+                     fill: true,
+                     tension: 0.36,
+                     pointBackgroundColor: pointColors,
+-                    pointBorderColor: '#fff',
++                    pointBorderColor: '#ffffff',
+                     pointBorderWidth: 2.5,
+                     pointRadius: pointSizes,
+                     pointHoverRadius: 7,
+@@ -130,7 +130,7 @@ const buildChart = (canvas, type, config, palette) => {
+                         anchor: 'end',
+                         offset: 6,
+                         color: palette.labelColor,
+-                        backgroundColor: 'rgba(255, 255, 255, 0.92)',
++                        backgroundColor: 'rgba(255, 255, 255, 0.94)',
+                         borderColor: palette.borderLabel,
+                         borderWidth: 1,
+                         borderRadius: 6,
+@@ -167,7 +167,7 @@ const buildChart = (canvas, type, config, palette) => {
+                         maxRotation: 0,
+                         minRotation: 0,
+                         font: { family: publicChartFont, weight: '600', size: 11 },
+-                        color: '#334155',
++                        color: palette.axisColorSecondary,
+                         padding: 6,
+                     },
+                 },
+diff --git a/resources/js/public-home/data.js b/resources/js/public-home/data.js
+index eb8b9a2..ad59e68 100644
+--- a/resources/js/public-home/data.js
++++ b/resources/js/public-home/data.js
+@@ -48,6 +48,8 @@ export const createDataMethods = (config, chartService, animateValue = noopAnima
+ 
+             this.items = data.items || [];
+             this.totals = data.totals || {};
++            this.latestTransactionAt = data.latest_transaction_at_wib || null;
++            this.latestTransactionAgeLabel = this.formatLatestTransactionAge();
+ 
+             if (data.dailyChartData) {
+                 this.dailyChartData = data.dailyChartData;
+@@ -167,4 +169,4 @@ export const createDataMethods = (config, chartService, animateValue = noopAnima
+         this.processQueue();
+     },
+     };
+-};
+\ No newline at end of file
++};

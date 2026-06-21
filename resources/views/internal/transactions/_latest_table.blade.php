@@ -6,7 +6,7 @@
             <article class="rounded-card border border-slate-100 bg-white p-4 shadow-sm">
                 <div class="flex items-start justify-between gap-3">
                     <div class="min-w-0">
-                        <span class="inline-flex rounded-md bg-blue-50 px-2 py-1 font-sans text-[11px] font-semibold text-blue-600">{{ $t->no_transaksi }}</span>
+                        <span class="inline-flex rounded-md bg-slate-100 px-2 py-1 font-sans text-[11px] font-semibold text-slate-600">{{ $t->no_transaksi }}</span>
                         <div class="mt-2 text-sm font-semibold leading-tight text-slate-800">{{ $t->pembayar_nama }}</div>
                         @if($t->muzakki_total > 1)
                             <div class="mt-1 text-[11px] text-slate-500">+ {{ $t->muzakki_total - 1 }} muzakki lainnya</div>
@@ -106,7 +106,7 @@
                 @foreach ($items as $t)
                 <tr class="transition-colors hover:bg-brand-50/30">
                     <td class="whitespace-nowrap px-3 py-3 sm:px-5">
-                        <span class="font-sans text-xs font-semibold text-blue-600 bg-blue-50 px-1.5 py-1 rounded-md">{{ $t->no_transaksi }}</span>
+                        <span class="font-sans text-xs font-semibold text-slate-600 bg-slate-100 px-1.5 py-1 rounded-md">{{ $t->no_transaksi }}</span>
                     </td>
                     <td class="whitespace-nowrap px-3 py-3 text-xs text-slate-500 sm:text-sm">
                         @if ($t->waktu_terima)

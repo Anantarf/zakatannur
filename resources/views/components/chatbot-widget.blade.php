@@ -1,8 +1,10 @@
 @php
     $quickReplies = [
-        ['label' => 'Buka ringkasan', 'action' => 'tab', 'target' => 'laporan'],
+        ['label' => 'Total uang', 'message' => 'Berapa total uang yang terkumpul?'],
+        ['label' => 'Total beras', 'message' => 'Berapa total beras yang terkumpul?'],
+        ['label' => 'Total jiwa', 'message' => 'Berapa total jiwa zakat fitrah?'],
+        ['label' => 'Update terakhir', 'message' => 'Kapan data terakhir diperbarui?'],
         ['label' => 'Lihat grafik', 'action' => 'tab', 'target' => 'grafik'],
-        ['label' => 'Total penerimaan', 'message' => 'Berapa total penerimaan zakat saat ini?'],
         ['label' => 'Cara bayar zakat', 'message' => 'Bagaimana cara membayar zakat?'],
     ];
 
@@ -34,7 +36,7 @@
         <span
             x-show="unreadBadge"
             x-cloak
-            class="absolute -top-1 -right-1 z-20 flex h-5 min-w-[1.25rem] items-center justify-center rounded-full bg-rose-500 px-1 text-[10px] font-bold text-white ring-2 ring-white shadow-sm"
+            class="absolute -top-1 -right-1 z-20 flex h-5 min-w-[1.25rem] items-center justify-center rounded-full bg-red-500 px-1 text-[10px] font-bold text-white ring-2 ring-white shadow-sm"
             x-text="unreadBadge"
         ></span>
     </button>
@@ -147,6 +149,19 @@
                                 </button>
                             </template>
                         </div>
+                        <template x-if="message.actions && message.actions.length > 0">
+                            <div class="mt-2 flex flex-wrap gap-1.5">
+                                <template x-for="(action, actionIndex) in message.actions" :key="`action-${index}-${actionIndex}`">
+                                    <button
+                                        type="button"
+                                        x-show="action.type === 'open_tab' || action.type === 'suggested_reply'"
+                                        @click="executeAction(action)"
+                                        class="rounded-full border border-brand-200 bg-brand-50 px-3 py-1 text-[11px] font-bold text-brand-800 transition-colors hover:border-brand-300 hover:bg-brand-100"
+                                        x-text="action.label || (action.target === 'grafik' ? 'Lihat Grafik' : 'Buka Ringkasan')"
+                                    ></button>
+                                </template>
+                            </div>
+                        </template>
                     </div>
                 </div>
             </template>

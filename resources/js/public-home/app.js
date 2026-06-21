@@ -15,6 +15,8 @@ const initialState = (config) => ({
     selectedYear: config.selectedYear,
     items: config.items ?? [],
     totals: config.totals ?? {},
+    latestTransactionAt: config.latestTransactionAt ?? null,
+    latestTransactionAgeLabel: '',
     dailyChartData: config.dailyChartData ?? {},
     isFirstLoad: true,
     error: null,
@@ -65,6 +67,42 @@ export const createPublicHomeApp = (config, chartService) => {
             const parts = formatter.formatToParts(new Date());
             const d = parts.reduce((acc, part) => ({ ...acc, [part.type]: part.value }), {});
             this.clock = `${d.weekday}, ${d.day} ${d.month} ${d.year} ${d.hour}:${d.minute}:${d.second} WIB`;
+            this.latestTransactionAgeLabel = this.formatLatestTransactionAge();
+        },
+
+        formatLatestTransactionAge() {
+            if (!this.latestTransactionAt) {
+                return 'Transaksi terakhir: belum ada transaksi';
+            }
+
+            const latest = new Date(String(this.latestTransactionAt).replace(' ', 'T') + '+07:00');
+            if (Number.isNaN(latest.getTime())) {
+                return 'Transaksi terakhir: waktu tidak tersedia';
+            }
+
+            let remainingMinutes = Math.max(0, Math.floor((Date.now() - latest.getTime()) / 60000));
+            const units = [
+                ['tahun', 12 * 30 * 24 * 60],
+                ['bulan', 30 * 24 * 60],
+                ['hari', 24 * 60],
+                ['jam', 60],
+                ['menit', 1],
+            ];
+
+            const parts = [];
+            units.forEach(([label, minutes]) => {
+                if (parts.length >= 2) {
+                    return;
+                }
+
+                const value = Math.floor(remainingMinutes / minutes);
+                if (value > 0 || parts.length > 0 || label === 'menit') {
+                    parts.push(`${value} ${label}`);
+                    remainingMinutes -= value * minutes;
+                }
+            });
+
+            return `Transaksi terakhir: ${parts.join(', ')} yang lalu`;
         },
 
         setChartSlide(index) {

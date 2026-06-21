@@ -14,23 +14,9 @@
     <div class="py-6 sm:py-10">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
             <div class="grid grid-cols-1 gap-3 sm:grid-cols-3">
-                <div class="ui-stat-card ui-stat-card-default">
-                    <div class="ui-stat-eyebrow text-brand-700">Total Log</div>
-                    <div class="ui-stat-value text-brand-950">{{ $totalLogs }}</div>
-                    <div class="ui-stat-description text-brand-700">Total aktivitas yang tercatat di tabel audit.</div>
-                </div>
-                <div class="ui-stat-card ui-stat-card-muted">
-                    <div class="ui-stat-eyebrow text-slate-500">Log Terbaru</div>
-                    <div class="mt-2 text-sm font-black text-slate-800">
-                        {{ $latestLog?->created_at?->timezone('Asia/Jakarta')->format('d/m/Y H:i') ?? '-' }}
-                    </div>
-                    <div class="ui-stat-description text-slate-500">Waktu catatan terakhir yang masuk ke audit log.</div>
-                </div>
-                <div class="ui-stat-card ui-stat-card-info">
-                    <div class="ui-stat-eyebrow text-blue-700">Akses</div>
-                    <div class="mt-2 text-sm font-black text-blue-950">Khusus Super Admin</div>
-                    <div class="ui-stat-description text-blue-700">Area ini dibatasi untuk kontrol dan pelacakan tingkat tinggi.</div>
-                </div>
+                <x-ui-stat-card title="Total Log" :value="$totalLogs" description="Total aktivitas yang tercatat di tabel audit." />
+                <x-ui-stat-card title="Log Terbaru" :value="$latestLog?->created_at?->timezone('Asia/Jakarta')->format('d/m/Y H:i') ?? '-'" description="Waktu catatan terakhir yang masuk ke audit log." tone="muted" />
+                <x-ui-stat-card title="Akses" value="Khusus Super Admin" description="Area ini dibatasi untuk kontrol dan pelacakan tingkat tinggi." tone="info" />
             </div>
 
             <div class="ui-card overflow-hidden shadow-md">
@@ -42,7 +28,7 @@
                             <p class="text-xs text-slate-500">Klik judul kolom untuk mengurutkan data.</p>
                         </div>
                     </div>
-                    <span class="hidden rounded-full border border-brand-100 bg-brand-50 px-3 py-1 text-[10px] font-black uppercase tracking-widest text-brand-700 sm:inline-flex">
+                    <span class="ui-label hidden rounded-full border border-brand-100 bg-brand-50 px-3 py-1 text-brand-700 sm:inline-flex">
                         Super Admin
                     </span>
                 </div>
@@ -89,8 +75,8 @@
                     <div class="hidden overflow-x-auto w-full rounded-2xl border border-slate-100 md:block">
                         <table class="w-full text-left text-sm font-medium text-slate-700">
                             <thead>
-                                <tr class="bg-slate-50 text-slate-500 text-xs font-bold uppercase tracking-widest border-b border-slate-100">
-                                    <th class="px-4 sm:px-6 py-4 text-xs font-bold uppercase tracking-widest border-b border-slate-100">
+                                <tr class="bg-slate-50 text-slate-500 text-xs font-semibold uppercase tracking-[0.08em] border-b border-slate-100">
+                                    <th class="px-4 sm:px-6 py-4 text-xs font-semibold uppercase tracking-[0.08em] border-b border-slate-100">
                                         <a href="{{ route('internal.audit_logs.index', ['sort_by' => 'created_at', 'sort_dir' => ($sortBy === 'created_at' && $sortDir === 'desc') ? 'asc' : 'desc']) }}" class="flex items-center gap-1 hover:text-slate-700 transition-colors group">
                                             Waktu
                                             <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 transition-colors {{ $sortBy === 'created_at' ? 'text-brand-500' : 'text-slate-300' }} {{ $sortBy === 'created_at' && $sortDir === 'asc' ? 'rotate-180' : '' }}" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -98,7 +84,7 @@
                                             </svg>
                                         </a>
                                     </th>
-                                    <th class="px-4 sm:px-6 py-4 text-xs font-bold uppercase tracking-widest border-b border-slate-100">
+                                    <th class="px-4 sm:px-6 py-4 text-xs font-semibold uppercase tracking-[0.08em] border-b border-slate-100">
                                         <a href="{{ route('internal.audit_logs.index', ['sort_by' => 'petugas', 'sort_dir' => ($sortBy === 'petugas' && $sortDir === 'asc') ? 'desc' : 'asc']) }}" class="flex items-center gap-1 hover:text-slate-700 transition-colors group">
                                             Petugas
                                             <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 transition-colors {{ $sortBy === 'petugas' ? 'text-brand-500' : 'text-slate-300' }} {{ $sortBy === 'petugas' && $sortDir === 'desc' ? 'rotate-180' : '' }}" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -106,7 +92,7 @@
                                             </svg>
                                         </a>
                                     </th>
-                                    <th class="px-4 sm:px-6 py-4 text-xs font-bold uppercase tracking-widest border-b border-slate-100">
+                                    <th class="px-4 sm:px-6 py-4 text-xs font-semibold uppercase tracking-[0.08em] border-b border-slate-100">
                                         <a href="{{ route('internal.audit_logs.index', ['sort_by' => 'action', 'sort_dir' => ($sortBy === 'action' && $sortDir === 'asc') ? 'desc' : 'asc']) }}" class="flex items-center gap-1 hover:text-slate-700 transition-colors group">
                                             Aksi
                                             <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 transition-colors {{ $sortBy === 'action' ? 'text-brand-500' : 'text-slate-300' }} {{ $sortBy === 'action' && $sortDir === 'desc' ? 'rotate-180' : '' }}" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -158,7 +144,7 @@
                         </table>
                     </div>
 
-                    <div class="mt-6">
+                    <div class="border-t border-slate-100 pt-4">
                         {{ $logs->links() }}
                     </div>
                 </div>

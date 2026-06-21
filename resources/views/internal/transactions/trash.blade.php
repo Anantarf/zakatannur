@@ -97,7 +97,7 @@
                                             @foreach(explode(',', $t->methods_list ?? '') as $met)
                                                 @php $met = trim($met); @endphp
                                                 @if($met)
-                                                    <span class="inline-flex items-center justify-center rounded px-2 py-0.5 text-[9px] font-semibold uppercase bg-amber-50 text-amber-700 border border-amber-100 whitespace-nowrap leading-tight text-center">{{ \App\Models\ZakatTransaction::METHOD_LABELS[$met] ?? strtoupper($met) }}</span>
+                                                    <span class="inline-flex items-center justify-center rounded px-2 py-0.5 text-[10px] font-semibold uppercase bg-amber-50 text-amber-700 border border-amber-100 whitespace-nowrap leading-tight text-center">{{ \App\Models\ZakatTransaction::METHOD_LABELS[$met] ?? strtoupper($met) }}</span>
                                                 @endif
                                             @endforeach
                                         </div>
@@ -109,7 +109,7 @@
                                                 <div class="flex items-center justify-end gap-1.5">
                                                     <div class="text-sm font-bold text-slate-800">{{ $t->total_uang_display }}</div>
                                                     @if($t->has_transfer)
-                                                        <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[9px] font-bold bg-brand-100 text-brand-700 border border-brand-200 uppercase">TF</span>
+                                                        <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-semibold bg-brand-100 text-brand-700 border border-brand-200 uppercase">TF</span>
                                                     @endif
                                                 </div>
                                             @endif
@@ -122,7 +122,7 @@
                                         <span class="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-400">Petugas</span>
                                         <div class="text-right">
                                             <div class="font-medium text-slate-700">{{ $t->petugas?->name ?? '-' }}</div>
-                                            <span class="mt-1 inline-flex items-center justify-center rounded px-2 py-0.5 text-[9px] font-bold uppercase bg-brand-50 text-brand-700 border border-brand-100 whitespace-nowrap leading-tight text-center">
+                                            <span class="mt-1 inline-flex items-center justify-center rounded px-2 py-0.5 text-[10px] font-semibold uppercase bg-brand-50 text-brand-700 border border-brand-100 whitespace-nowrap leading-tight text-center">
                                                 {{ $t->shift_label }}
                                             </span>
                                         </div>
@@ -206,7 +206,7 @@
                                             @foreach(explode(',', $t->methods_list ?? '') as $met)
                                                 @php $met = trim($met); @endphp
                                                 @if($met)
-                                                    <span class="inline-flex items-center justify-center rounded px-2 py-0.5 text-[9px] font-semibold uppercase bg-amber-50 text-amber-700 border border-amber-100 whitespace-nowrap leading-tight text-center">{{ \App\Models\ZakatTransaction::METHOD_LABELS[$met] ?? strtoupper($met) }}</span>
+                                                    <span class="inline-flex items-center justify-center rounded px-2 py-0.5 text-[10px] font-semibold uppercase bg-amber-50 text-amber-700 border border-amber-100 whitespace-nowrap leading-tight text-center">{{ \App\Models\ZakatTransaction::METHOD_LABELS[$met] ?? strtoupper($met) }}</span>
                                                 @endif
                                             @endforeach
                                         </div>
@@ -217,7 +217,7 @@
                                                 <div class="flex items-center justify-end gap-1.5">
                                                     <div class="text-xs font-bold text-slate-800">{{ $t->total_uang_display }}</div>
                                                     @if($t->has_transfer)
-                                                        <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[9px] font-bold bg-brand-100 text-brand-700 border border-brand-200 uppercase">TF</span>
+                                                        <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-semibold bg-brand-100 text-brand-700 border border-brand-200 uppercase">TF</span>
                                                     @endif
                                                 </div>
                                             @endif
@@ -229,7 +229,7 @@
                                     <td class="whitespace-nowrap px-5 py-3 text-center text-xs text-slate-500">
                                         <div class="flex flex-col items-center gap-1">
                                             <span>{{ $t->petugas?->name ?? '-' }}</span>
-                                            <span class="inline-flex items-center justify-center rounded px-2 py-0.5 text-[9px] font-bold uppercase bg-brand-50 text-brand-700 border border-brand-100 whitespace-nowrap leading-tight text-center">
+                                            <span class="inline-flex items-center justify-center rounded px-2 py-0.5 text-[10px] font-semibold uppercase bg-brand-50 text-brand-700 border border-brand-100 whitespace-nowrap leading-tight text-center">
                                                 {{ $t->shift_label }}
                                             </span>
                                         </div>

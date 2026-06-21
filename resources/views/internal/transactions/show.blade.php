@@ -144,7 +144,7 @@
                                                 <td class="px-2 py-3 text-right sm:px-5">
                                                     <p class="whitespace-nowrap text-[10px] font-bold tabular-nums text-slate-900 sm:text-sm">
                                                         @if($tx->metode === 'beras')
-                                                            {{ rtrim(rtrim(number_format($tx->jumlah_beras_kg, 2, ',', '.'), '0'), ',') }} <span class="ml-0.5 text-[9px] font-bold text-slate-400 sm:text-xs">kg</span>
+                                                            {{ rtrim(rtrim(number_format($tx->jumlah_beras_kg, 2, ',', '.'), '0'), ',') }} <span class="ml-0.5 text-[10px] font-semibold text-slate-400 sm:text-xs">kg</span>
                                                         @else
                                                             {{ \App\Support\Format::rupiah((int)$tx->nominal_uang) }}
                                                             @if($tx->is_transfer)
@@ -227,7 +227,7 @@
                 </div>
             </div>
             
-            <p class="mt-4 text-center text-xs font-semibold uppercase tracking-[0.18em] text-slate-400/80">Dokumentasi Administrasi Masjid An-Nur</p>
+            <p class="ui-label mt-4 text-center text-slate-400/80">Dokumentasi Administrasi Masjid An-Nur</p>
         </div>
     </div>
 </x-app-layout>

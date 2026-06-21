@@ -50,12 +50,12 @@
                 <div class="p-5">
                     <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                         <div>
-                            <div class="text-xs font-black uppercase tracking-[0.18em] text-brand-700">Template Aktif</div>
+                            <div class="ui-label text-brand-700">Template Aktif</div>
                             @if ($activeTemplate)
-                                <div class="mt-1 text-lg font-black text-slate-900">v{{ $activeTemplate->version }} - {{ $activeTemplate->original_filename }}</div>
+                                <div class="ui-metric-value mt-1 text-lg text-slate-900">v{{ $activeTemplate->version }} - {{ $activeTemplate->original_filename }}</div>
                                 <div class="mt-1 text-xs text-slate-500">Dipakai saat cetak dokumen.</div>
                             @else
-                                <div class="mt-1 text-lg font-black text-amber-800">Belum ada template aktif</div>
+                                <div class="ui-metric-value mt-1 text-lg text-amber-800">Belum ada template aktif</div>
                                 <div class="mt-1 text-xs text-amber-700">Aktifkan satu template untuk cetak.</div>
                             @endif
                         </div>
@@ -69,7 +69,7 @@
             <div class="grid grid-cols-1 gap-4 lg:grid-cols-2">
                 <div class="ui-card overflow-hidden shadow-md">
                     <div class="ui-inline-note rounded-none border-b border-brand-100/70">
-                        <div class="text-sm font-black text-slate-900">Upload Template Baru</div>
+                        <div class="ui-section-title text-sm">Upload Template Baru</div>
                         <div class="mt-1 text-xs text-slate-600">Hanya PDF. Ukuran maks 10MB.</div>
                     </div>
                     <div class="p-5 text-slate-900">
@@ -98,7 +98,7 @@
                 <div class="ui-card overflow-hidden shadow-md">
                 <div class="ui-card-header ui-card-header-slate">
                     <div>
-                        <div class="text-sm font-black text-slate-900">Daftar Versi</div>
+                        <div class="ui-section-title text-sm">Daftar Versi</div>
                         <div class="mt-1 text-xs text-slate-600">Aktifkan tepat 1 template untuk dipakai saat cetak.</div>
                     </div>
                 </div>
@@ -122,7 +122,7 @@
                                         </div>
 
                                         <div class="mt-3 grid grid-cols-1 gap-2">
-                                            <a href="{{ route('internal.templates.preview', $t) }}" target="_blank" class="ui-btn ui-btn-secondary w-full px-4 py-2.5 text-sm text-indigo-700">Preview</a>
+                                            <a href="{{ route('internal.templates.preview', $t) }}" target="_blank" class="ui-btn ui-btn-secondary w-full px-4 py-2.5 text-sm">Preview</a>
                                             @if (!$t->is_active)
                                                 <form method="POST" action="{{ route('internal.templates.activate', $t) }}">
                                                     @csrf
@@ -170,7 +170,7 @@
                                             </td>
                                             <td class="py-2.5">
                                                 <div class="flex flex-wrap items-center gap-2">
-                                                    <a href="{{ route('internal.templates.preview', $t) }}" target="_blank" class="ui-btn ui-btn-secondary px-3 py-2 text-xs text-indigo-700">Preview</a>
+                                                    <a href="{{ route('internal.templates.preview', $t) }}" target="_blank" class="ui-btn ui-btn-secondary px-3 py-2 text-xs">Preview</a>
 
                                                     @if (!$t->is_active)
                                                         <form method="POST" action="{{ route('internal.templates.activate', $t) }}">

@@ -22,7 +22,7 @@
                 <a href="/">
                     <x-application-logo />
                 </a>
-                <a href="/" class="text-[10px] font-black tracking-widest text-brand-600 uppercase bg-brand-50 px-3 py-1.5 rounded-lg hover:bg-brand-100 transition-all">&larr; Beranda</a>
+                <a href="/" class="ui-label rounded-lg bg-brand-50 px-3 py-1.5 text-brand-600 transition-all hover:bg-brand-100">&larr; Beranda</a>
             </div>
         </nav>
 

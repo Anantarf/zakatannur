@@ -16,12 +16,12 @@
  }
 
  .public-kicker {
-  @apply mb-2 inline-flex items-center rounded-full border border-brand-200 bg-white/80 px-4 py-1.5 text-[11px] font-bold text-brand-700 shadow-sm;
+  @apply mb-2 inline-flex items-center rounded-full border border-brand-200 bg-white/80 px-4 py-1.5 text-[11px] font-semibold text-brand-700 shadow-sm;
   letter-spacing: var(--tracking-label);
  }
 
  .public-title {
-  @apply text-3xl sm:text-4xl lg:text-5xl font-bold text-slate-950 leading-[1.08] tracking-[-0.025em];
+  @apply text-3xl font-bold leading-[1.08] tracking-[-0.015em] text-slate-950 text-balance sm:text-4xl lg:text-5xl;
  }
 
  .public-subtitle {
@@ -82,7 +82,7 @@
  }
 
  .public-section-title {
-  @apply text-2xl sm:text-[2rem] font-bold tracking-[-0.025em] text-slate-950;
+  @apply text-2xl font-bold tracking-[-0.015em] text-slate-950 text-balance sm:text-[2rem];
  }
 
  .public-section-copy {
@@ -104,12 +104,12 @@
  }
 
  .public-header-kicker {
-  @apply text-[10px] font-bold uppercase text-brand-700;
+  @apply text-[10px] font-semibold uppercase text-brand-700;
   letter-spacing: var(--tracking-label);
  }
 
  .public-header-title {
-  @apply mt-2 max-w-2xl text-[1.45rem] font-extrabold leading-[1.1] tracking-[-0.015em] text-slate-950 sm:text-[1.85rem] lg:text-[2.05rem];
+  @apply ui-display-title mt-2 max-w-2xl;
  }
 
  .public-header-meta {
@@ -140,7 +140,8 @@
  }
 
  .public-metric-label {
-  @apply text-[10px] font-medium tracking-[0.03em] text-slate-500;
+  @apply text-[10px] font-semibold text-slate-500;
+  letter-spacing: var(--tracking-caption);
  }
 
  .public-metric-label-brand {
@@ -152,7 +153,7 @@
  }
 
  .public-metric-value {
-  @apply mt-1 text-[0.98rem] font-semibold tabular-nums text-slate-900 sm:text-[1.05rem];
+  @apply ui-metric-value mt-1 text-[0.98rem] text-slate-900 sm:text-[1.05rem];
  }
 
  .public-metric-value-brand {
@@ -169,12 +170,12 @@
  }
 
  .public-stat-label {
-  @apply text-[10px] font-semibold uppercase text-slate-500;
+  @apply ui-label text-slate-500;
   letter-spacing: var(--tracking-caption);
  }
 
  .public-stat-value {
-  @apply mt-1.5 text-[1.08rem] font-bold leading-tight tabular-nums text-slate-950 sm:text-[1.18rem];
+  @apply ui-metric-value mt-1.5 text-[1.08rem] leading-tight text-slate-950 sm:text-[1.18rem];
  }
 
  .public-report-shell {
@@ -209,7 +210,7 @@
  }
 
  .public-report-value-cell dt {
-  @apply text-[10px] font-semibold uppercase tracking-[0.1em];
+  @apply ui-label;
  }
 
  .public-report-value-cell dd {
@@ -283,7 +284,8 @@
  }
 
  .public-chart-card-title {
-  @apply inline-flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-[0.06em] text-slate-700;
+  @apply inline-flex items-center gap-1.5 text-[11px] font-semibold uppercase text-slate-700;
+  letter-spacing: var(--tracking-caption);
  }
 
  .public-chart-card-meta {

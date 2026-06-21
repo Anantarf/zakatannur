@@ -23,6 +23,7 @@ document.addEventListener('alpine:init', () => {
         lastError: null,
         unreadBadge: 0,
         lastSeenMessageCount: 0,
+        conversationContext: {},
 
         get isInputEmpty() {
             return this.input.trim() === '';
@@ -103,7 +104,10 @@ document.addEventListener('alpine:init', () => {
                         'Content-Type': 'application/json',
                         'Accept': 'application/json',
                     },
-                    body: JSON.stringify({ message: userMessage }),
+                    body: JSON.stringify({
+                        message: userMessage,
+                        context: this.conversationContext,
+                    }),
                 });
 
                 const payload = await this.parseResponse(response);
@@ -118,6 +122,7 @@ document.addEventListener('alpine:init', () => {
                         citations: data.citations || [],
                         createdAt: nowIso(),
                     });
+                    this.conversationContext = this.sanitizeContext(data.context || {});
                     this.executeActions(data.actions || []);
                     this.isOnline = true;
                     return;
@@ -182,18 +187,40 @@ document.addEventListener('alpine:init', () => {
 
         executeActions(actions) {
             actions.forEach((action) => {
-                if (action?.type === 'open_tab' && action?.target) {
-                    this.openTab(action.target);
+                if (action?.auto === true) {
+                    this.executeAction(action);
                 }
             });
         },
 
+        executeAction(action) {
+            if (action?.type === 'open_tab' && action?.target) {
+                this.openTab(action.target);
+                return;
+            }
+
+            if (action?.type === 'suggested_reply' && action?.message) {
+                this.input = action.message;
+                this.sendMessage();
+            }
+        },
+
+        sanitizeContext(context) {
+            const allowedKeys = ['last_intent', 'last_source', 'topic'];
+            return allowedKeys.reduce((next, key) => {
+                if (typeof context[key] === 'string' && context[key].length <= 80) {
+                    next[key] = context[key];
+                }
+                return next;
+            }, {});
+        },
+
         resolveLocalAction(message) {
             const normalized = message.toLowerCase();
-            if (normalized.includes('ringkasan') || normalized.includes('penerimaan') || normalized.includes('total zakat')) {
+            if (normalized.includes('buka ringkasan') || normalized.includes('lihat ringkasan') || normalized.includes('buka laporan')) {
                 return 'laporan';
             }
-            if (normalized.includes('grafik') || normalized.includes('harian') || normalized.includes('chart')) {
+            if (normalized.includes('buka grafik') || normalized.includes('lihat grafik') || normalized.includes('buka chart')) {
                 return 'grafik';
             }
             return null;

@@ -12,6 +12,7 @@
             'selectedYear' => $selectedYear,
             'items' => $summaryData['items'] ?? [],
             'totals' => $summaryData['totals'] ?? [],
+            'latestTransactionAt' => $summaryData['latest_transaction_at_wib'] ?? null,
             'dailyChartData' => $dailyChartData ?? [],
             'historicalChartData' => $historicalChartData ?? [],
             'refreshIntervalSeconds' => (int) $refreshIntervalSeconds,
@@ -23,10 +24,11 @@
         ], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!}
     </script>
 </head>
-<body class="ui-shell min-h-screen pb-11 text-slate-800 flex flex-col font-sans antialiased relative overflow-x-hidden sm:pb-12"
+<body class="min-h-screen bg-[#eef4f1] text-slate-800 flex flex-col font-sans antialiased relative overflow-x-hidden pb-2 sm:pb-3"
     x-data="publicHome"
     :class="{ 'overflow-hidden': openLogin }">
-    <div class="absolute inset-0 pointer-events-none opacity-[0.16] [background-image:linear-gradient(rgba(15,118,110,0.05)_1px,transparent_1px),linear-gradient(90deg,rgba(15,118,110,0.05)_1px,transparent_1px)] [background-size:44px_44px]"></div>
+    <div class="absolute inset-0 pointer-events-none bg-[radial-gradient(circle_at_top_left,rgba(20,184,166,0.12),transparent_30%),radial-gradient(circle_at_80%_10%,rgba(148,163,184,0.10),transparent_24%),linear-gradient(180deg,#eef4f1_0%,#e8f0ec_46%,#f4f8f6_100%)]"></div>
+    <div class="absolute inset-0 pointer-events-none opacity-[0.16] [background-image:linear-gradient(rgba(15,118,110,0.08)_1px,transparent_1px),linear-gradient(90deg,rgba(15,118,110,0.06)_1px,transparent_1px)] [background-size:44px_44px]"></div>
 
     @include('public.partials.notification')
     @include('public._login_modal')

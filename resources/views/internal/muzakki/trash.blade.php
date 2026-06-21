@@ -60,7 +60,7 @@
                 <div class="ui-toolbar-soft">
                     <div class="flex items-center gap-2">
                         <div class="h-6 w-2 rounded-full bg-amber-500"></div>
-                        <h3 class="font-bold text-slate-800">Daftar Tempat Sampah</h3>
+                        <h3 class="ui-section-title">Daftar Tempat Sampah</h3>
                     </div>
 
                     <form method="GET" action="{{ route('internal.muzakki.trash') }}" class="flex w-full flex-col items-stretch gap-2 sm:w-auto sm:flex-row sm:items-center">
@@ -149,7 +149,7 @@
                 <div class="hidden overflow-x-auto w-full md:block">
                     <table class="min-w-full text-sm">
                         <thead>
-                            <tr class="bg-slate-50 text-left text-xs font-bold text-slate-400 uppercase tracking-widest border-b border-slate-100">
+                            <tr class="bg-slate-50 text-left text-xs font-semibold text-slate-400 uppercase tracking-[0.08em] border-b border-slate-100">
                                 <th class="px-6 py-4">Nama</th>
                                 <th class="px-6 py-4">Alamat</th>
                                 <th class="px-6 py-4 text-center">Waktu Hapus</th>

@@ -41,8 +41,8 @@
                     </div>
                     <div class="space-y-4 p-5">
                         <div>
-                            <p class="text-xs font-black uppercase tracking-[0.16em] text-brand-700">Nama</p>
-                            <p class="mt-1 text-xl font-black text-slate-950 sm:text-2xl">{{ $muzakki->name }}</p>
+                            <p class="ui-label text-brand-700">Nama</p>
+                            <p class="ui-metric-value mt-1 text-xl text-slate-950 sm:text-2xl">{{ $muzakki->name }}</p>
                         </div>
                         <div class="grid grid-cols-1 gap-3 text-sm">
                             <div class="ui-card-muted px-4 py-3">
@@ -58,14 +58,14 @@
                         @php
                             $segmentTone = [
                                 'success' => 'border-brand-100 bg-brand-50 text-brand-800',
-                                'info' => 'border-sky-100 bg-sky-50 text-sky-800',
+                                'info' => 'border-blue-100 bg-blue-50 text-blue-800',
                                 'warning' => 'border-amber-100 bg-amber-50 text-amber-800',
                                 'muted' => 'border-slate-100 bg-slate-50 text-slate-700',
                             ][$summary['segment']['tone'] ?? 'muted'] ?? 'border-slate-100 bg-slate-50 text-slate-700';
                         @endphp
                         <div class="rounded-2xl border px-4 py-3 {{ $segmentTone }}">
-                            <p class="text-xs font-black uppercase tracking-[0.16em]">Segmentasi</p>
-                            <p class="mt-1 text-lg font-black">{{ $summary['segment']['label'] }}</p>
+                            <p class="ui-label">Segmentasi</p>
+                            <p class="ui-metric-value mt-1 text-lg">{{ $summary['segment']['label'] }}</p>
                             <p class="mt-1 text-sm opacity-80">{{ $summary['segment']['description'] }}</p>
                         </div>
                     </div>
@@ -82,14 +82,14 @@
             @if ($possible_duplicates->isNotEmpty())
                 <section class="ui-alert ui-alert-warning">
                     <div class="w-full">
-                        <p class="font-black text-amber-900">Kemungkinan data ganda</p>
+                        <p class="font-bold text-amber-900">Kemungkinan data ganda</p>
                         <p class="mt-1 text-sm text-amber-800">Ada muzakki lain dengan nama atau nomor HP yang mirip. Belum digabung otomatis agar riwayat tetap aman.</p>
                         <div class="mt-3 grid grid-cols-1 gap-3 md:grid-cols-2">
                             @foreach ($possible_duplicates as $duplicate)
                                 <div class="rounded-2xl border border-amber-200 bg-white p-3">
                                     <div class="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
                                         <div>
-                                            <a href="{{ route('internal.muzakki.show', ['muzakki' => $duplicate->id]) }}" class="text-sm font-black text-amber-900 hover:text-amber-700">
+                                            <a href="{{ route('internal.muzakki.show', ['muzakki' => $duplicate->id]) }}" class="text-sm font-bold text-amber-900 hover:text-amber-700">
                                                 {{ $duplicate->name }}
                                             </a>
                                             <p class="text-xs text-amber-700">{{ $duplicate->phone ?: '-' }}</p>
@@ -118,7 +118,7 @@
                 </div>
                 <div class="hidden overflow-x-auto md:block">
                     <table class="min-w-full text-sm">
-                        <thead class="bg-slate-50 text-left text-xs font-black uppercase tracking-[0.16em] text-slate-400">
+                        <thead class="bg-slate-50 text-left text-xs font-semibold uppercase tracking-[0.08em] text-slate-400">
                             <tr>
                                 <th class="px-6 py-4">Periode</th>
                                 <th class="px-6 py-4">Transaksi</th>
@@ -147,11 +147,11 @@
                 <div class="space-y-2.5 p-3 md:hidden">
                     @forelse ($periods as $period)
                         <article class="ui-mobile-card">
-                            <p class="font-black text-slate-900">{{ $period['label'] }}</p>
+                            <p class="font-bold text-slate-900">{{ $period['label'] }}</p>
                             <p class="mt-1 text-xs text-slate-500">{{ $period['count'] }} transaksi - terakhir {{ $period['last_at'] }}</p>
                             <div class="mt-3 grid grid-cols-2 gap-2 text-xs">
                                 <div class="rounded-xl bg-brand-50 px-3 py-2 font-bold text-brand-800">{{ $period['total_uang_display'] }}</div>
-                                <div class="rounded-xl bg-sky-50 px-3 py-2 font-bold text-sky-800">{{ $period['total_beras_display'] }}</div>
+                                <div class="rounded-xl bg-amber-50 px-3 py-2 font-bold text-amber-800">{{ $period['total_beras_display'] }}</div>
                             </div>
                         </article>
                     @empty
@@ -171,7 +171,7 @@
                         <a href="{{ route('internal.transactions.show', ['transaction' => $tx->id]) }}" class="block px-5 py-3.5 transition hover:bg-slate-50">
                             <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                                 <div>
-                                    <p class="font-black text-slate-900">{{ $tx->no_transaksi }}</p>
+                                    <p class="font-bold text-slate-900">{{ $tx->no_transaksi }}</p>
                                     <p class="text-xs text-slate-500">{{ $tx->zakatPeriod?->display_label ?? $tx->tahun_zakat }} - {{ $tx->category_label }} - {{ $tx->metode_label }}</p>
                                 </div>
                                 <div class="text-sm font-bold text-slate-700">

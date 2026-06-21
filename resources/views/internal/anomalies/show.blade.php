@@ -8,7 +8,7 @@
                     </svg>
                     Tinjau Anomali
                 </h2>
-                <p class="text-sm text-slate-500">Verifikasi sinyal sistem dan putuskan apakah kasus ini perlu tindak lanjut.</p>
+                <p class="ui-body-muted">Verifikasi sinyal sistem dan putuskan apakah kasus ini perlu tindak lanjut.</p>
             </div>
             <div class="flex flex-col gap-2 sm:flex-row">
                 <a href="{{ route('internal.transactions.show', ['transaction' => $mainTx->id]) }}" class="ui-btn ui-btn-secondary w-full sm:w-auto">
@@ -47,19 +47,19 @@
                                         <x-review-status-badge :status="$riskReview['review_status'] ?? null" />
                                     </div>
                                     <div>
-                                        <p class="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Nomor Transaksi</p>
+                                        <p class="ui-label text-slate-400">Nomor Transaksi</p>
                                         <h3 class="mt-1 inline-flex rounded-lg border border-brand-100 bg-brand-50 px-3 py-1 font-sans text-sm font-bold text-brand-700 sm:text-base">{{ $noTransaksi }}</h3>
                                     </div>
                                     <div>
-                                        <p class="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Pembayar</p>
-                                        <p class="mt-1 text-xl font-black leading-tight text-slate-800">{{ $mainTx->pembayar_nama }}</p>
+                                        <p class="ui-label text-slate-400">Pembayar</p>
+                                        <p class="ui-metric-value mt-1 text-xl leading-tight text-slate-800">{{ $mainTx->pembayar_nama }}</p>
                                     </div>
                                 </div>
 
                                 <div class="ui-panel-note lg:min-w-[260px]">
-                                    <p class="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Status Review</p>
+                                    <p class="ui-label text-slate-400">Status Review</p>
                                     <p class="mt-1 text-sm font-semibold text-slate-800">{{ $reviewStatusLabel }}</p>
-                                    <p class="mt-3 text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Sinyal Aktif</p>
+                                    <p class="ui-label mt-3 text-slate-400">Sinyal Aktif</p>
                                     <p class="mt-1 text-sm font-semibold text-slate-800">{{ $riskMeta['flags_count'] }} warning</p>
                                 </div>
                             </div>
@@ -87,7 +87,7 @@
                         <div x-show="tab === 'signals'" x-transition class="space-y-4 border-b border-slate-100/80 bg-slate-50/70 px-5 py-4 sm:px-6 sm:py-5">
                             <section class="rounded-2xl border border-slate-200 bg-white p-4">
                                 <div class="mb-4 space-y-1">
-                                    <p class="text-[11px] font-semibold uppercase tracking-wide text-slate-500">Kenapa Ditandai</p>
+                                    <p class="ui-label text-slate-500">Kenapa Ditandai</p>
                                     <h4 class="text-lg font-bold text-slate-900">{{ $riskMeta['flag_labels'][0] ?? 'Perlu dicek ulang' }}</h4>
                                 </div>
                                 @if (!empty($riskReview['reasons']))
@@ -107,7 +107,7 @@
                             @if ($hasDuplicateCandidates)
                                 <section class="rounded-2xl border border-slate-200 bg-white p-4">
                                     <div class="mb-4 space-y-1">
-                                        <p class="text-[11px] font-semibold uppercase tracking-wide text-slate-500">Kandidat Transaksi Mirip</p>
+                                        <p class="ui-label text-slate-500">Kandidat Transaksi Mirip</p>
                                         <h4 class="text-lg font-bold text-slate-900">Bandingkan transaksi terdekat</h4>
                                     </div>
                                     <div class="space-y-3">
@@ -115,7 +115,7 @@
                                             <div class="rounded-xl border border-slate-100 bg-slate-50/70 px-4 py-4">
                                                 <div class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                                                     <div class="min-w-0">
-                                                        <p class="font-sans text-xs font-semibold text-blue-600">{{ $candidate['no_transaksi'] ?? '-' }}</p>
+                                                        <p class="font-sans text-xs font-semibold text-slate-600">{{ $candidate['no_transaksi'] ?? '-' }}</p>
                                                         <p class="mt-1 text-sm font-semibold text-slate-800">{{ $candidate['pembayar_nama'] ?? '-' }}</p>
                                                         <p class="text-xs text-slate-500">{{ $candidate['muzakki_name'] ?? '-' }}</p>
                                                         @if (!empty($candidate['no_transaksi']))
@@ -140,7 +140,7 @@
                             <div class="mb-4 space-y-1">
                                 <div class="flex items-center gap-2">
                                     <span class="h-5 w-1 rounded-full bg-brand-500"></span>
-                                    <h4 class="text-sm font-bold uppercase tracking-wide text-slate-800">Rincian Pembayaran</h4>
+                                    <h4 class="ui-label text-slate-800">Rincian Pembayaran</h4>
                                 </div>
                             </div>
                             <div class="space-y-3 md:hidden">
@@ -150,7 +150,7 @@
                                             <article class="ui-mobile-card">
                                             <div class="flex items-start justify-between gap-3">
                                                 <div class="min-w-0">
-                                                    <div class="text-[10px] font-black uppercase tracking-widest text-slate-400">Muzakki {{ $rowNo++ }}</div>
+                                                    <div class="ui-label text-slate-400">Muzakki {{ $rowNo++ }}</div>
                                                     <p class="mt-1 text-sm font-bold leading-tight text-slate-900">{{ $muzakkiName }}</p>
                                                 </div>
                                                 <span class="inline-flex items-center rounded px-2.5 py-1 text-[11px] font-bold uppercase tracking-wider {{ $tx->metode === 'beras' ? 'bg-amber-100 text-amber-700' : 'bg-brand-100 text-brand-700' }}">
@@ -182,7 +182,7 @@
                                                     <div class="mt-1 text-right">
                                                         <p class="text-sm font-bold text-slate-900">
                                                             @if($tx->metode === 'beras')
-                                                                {{ rtrim(rtrim(number_format($tx->jumlah_beras_kg, 2, ',', '.'), '0'), ',') }} <span class="ml-0.5 text-[9px] font-bold text-slate-400">kg</span>
+                                                                {{ rtrim(rtrim(number_format($tx->jumlah_beras_kg, 2, ',', '.'), '0'), ',') }} <span class="ml-0.5 text-[10px] font-semibold text-slate-400">kg</span>
                                                             @else
                                                                 {{ \App\Support\Format::rupiah((int) $tx->nominal_uang) }}
                                                                 @if($tx->is_transfer)
@@ -208,7 +208,7 @@
                                         <col class="w-[20%]">
                                     </colgroup>
                                     <thead>
-                                        <tr class="border-b border-slate-100 bg-slate-50 text-left text-[11px] font-semibold uppercase tracking-wider text-slate-400 sm:text-xs">
+                                        <tr class="border-b border-slate-100 bg-slate-50 text-left text-[11px] font-semibold uppercase tracking-[0.08em] text-slate-400 sm:text-xs">
                                             <th class="px-5 py-4">Nama Muzakki</th>
                                             <th class="px-3 py-4 sm:px-4">Kategori</th>
                                             <th class="px-3 py-4 sm:px-4">Bentuk</th>
@@ -234,7 +234,7 @@
                                                         <x-zakat-category-tags :categories="[$tx->category]" />
                                                     </td>
                                                     <td class="px-3 py-4 sm:px-4">
-                                                        <span class="inline-flex items-center rounded px-2.5 py-1 text-[11px] font-bold uppercase tracking-wider {{ $tx->metode === 'beras' ? 'bg-amber-100 text-amber-700' : 'bg-brand-100 text-brand-700' }}">
+                                                        <span class="inline-flex items-center rounded px-2.5 py-1 text-[11px] font-semibold uppercase tracking-[0.08em] {{ $tx->metode === 'beras' ? 'bg-amber-100 text-amber-700' : 'bg-brand-100 text-brand-700' }}">
                                                             {{ $tx->metode_label }}
                                                         </span>
                                                     </td>
@@ -271,7 +271,7 @@
 
                 <div class="space-y-4">
                     <div class="ui-card h-fit p-4 sm:p-5">
-                        <h3 class="text-sm font-bold uppercase tracking-wide text-slate-800">Aksi Review</h3>
+                        <h3 class="ui-label text-slate-800">Aksi Review</h3>
                         <div class="mb-4 mt-3 flex flex-wrap items-center gap-2">
                             <x-risk-level-badge :level="$riskReview['risk_level'] ?? null" />
                             <x-review-status-badge :status="$riskReview['review_status'] ?? null" />
@@ -280,7 +280,7 @@
 
                         <div class="mt-4 space-y-3 rounded-xl border border-slate-100 bg-slate-50/70 p-4">
                             <div>
-                                <p class="text-[11px] font-semibold uppercase tracking-wider text-slate-400">Status Kwitansi</p>
+                                <p class="ui-label text-slate-400">Status Kwitansi</p>
                                 <p class="mt-1 text-sm font-semibold text-slate-700">
                                     {{ $receiptPrintedAt ? 'Sudah pernah dicetak' : 'Belum pernah dicetak' }}
                                 </p>
@@ -295,7 +295,7 @@
                             </div>
 
                             <div>
-                                <p class="text-[11px] font-semibold uppercase tracking-wider text-slate-400">Sinyal Sistem</p>
+                                <p class="ui-label text-slate-400">Sinyal Sistem</p>
                                 <div class="mt-2 flex flex-wrap gap-2">
                                     @forelse ($riskMeta['flag_labels'] as $flagLabel)
                                         <span class="inline-flex items-center rounded-full border border-amber-200 bg-amber-50 px-3 py-1 text-xs font-semibold text-amber-700">{{ $flagLabel }}</span>
@@ -307,7 +307,7 @@
 
                             @if (!empty($riskReview['reviewed_at']) && !empty($riskReview['reviewed_by_name']))
                                 <div>
-                                    <p class="text-[11px] font-semibold uppercase tracking-wider text-slate-400">Review Terakhir</p>
+                                    <p class="ui-label text-slate-400">Review Terakhir</p>
                                     <p class="mt-1 text-sm text-slate-700">
                                         {{ $riskReview['reviewed_by_name'] }} pada {{ $riskReview['reviewed_at']->timezone('Asia/Jakarta')->format('d/m/Y H:i') }}
                                     </p>
@@ -316,7 +316,7 @@
 
                             @if (!empty($riskReview['review_note']))
                                 <div>
-                                    <p class="text-[11px] font-semibold uppercase tracking-wider text-slate-400">Catatan Operator</p>
+                                    <p class="ui-label text-slate-400">Catatan Operator</p>
                                     <p class="mt-1 rounded-xl border border-slate-200 bg-white px-3 py-3 text-sm leading-6 text-slate-700">{{ $riskReview['review_note'] }}</p>
                                 </div>
                             @endif
@@ -335,7 +335,7 @@
                                 @endforeach
                             </select>
                             <div class="space-y-2">
-                                <label for="review_note" class="text-xs font-semibold uppercase tracking-wider text-slate-500">Catatan Review</label>
+                                <label for="review_note" class="ui-label text-slate-500">Catatan Review</label>
                                 <textarea id="review_note" name="review_note" rows="4" class="ui-textarea w-full bg-white" placeholder="Tuliskan alasan keputusan review. Wajib diisi jika status tindak lanjut.">{{ old('review_note', $riskReview['review_note'] ?? '') }}</textarea>
                             </div>
                             <button type="submit" class="ui-btn ui-btn-primary w-full">Simpan Keputusan Review</button>

@@ -1,7 +1,7 @@
 <article class="ui-mobile-card">
     <div class="flex items-start justify-between gap-3">
         <div class="min-w-0">
-            <span class="inline-flex rounded-md bg-blue-50 px-2 py-1 font-sans text-[11px] font-semibold text-blue-600">{!! \App\Support\Format::highlight($t->no_transaksi, $q) !!}</span>
+            <span class="inline-flex rounded-md bg-slate-100 px-2 py-1 font-sans text-[11px] font-semibold text-slate-600">{!! \App\Support\Format::highlight($t->no_transaksi, $q) !!}</span>
             <div class="mt-2 text-sm font-semibold leading-tight text-slate-800">{!! \App\Support\Format::highlight($t->pembayar_nama, $q) !!}</div>
             @if($t->muzakki_total > 1)
                 <div class="mt-1 text-[11px] text-slate-500">+ {{ $t->muzakki_total - 1 }} muzakki lainnya</div>

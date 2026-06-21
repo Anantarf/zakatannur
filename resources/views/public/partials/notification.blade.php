@@ -15,7 +15,7 @@
                 </svg>
             </div>
             <div class="flex-1">
-                <p class="text-[12px] font-extrabold tracking-widest text-brand-100 uppercase opacity-90">Penerimaan Baru</p>
+                <p class="ui-label text-brand-700 opacity-90">Penerimaan Baru</p>
                 <p class="text-[15px] sm:text-base font-bold leading-normal mt-0.5" x-text="notification.message"></p>
             </div>
         </div>

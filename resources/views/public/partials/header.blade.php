@@ -5,7 +5,7 @@
                 <p class="public-header-kicker">Portal Zakat Masjid An-Nur</p>
                 <h1 class="public-header-title">Ringkasan penerimaan zakat.</h1>
                 <div class="public-header-meta">
-                    <span class="public-header-location">Komplek BPK V Gandul</span>
+                    <span class="public-header-location">Masjid Annur Komplek BPK V Gandul</span>
                     <span class="public-header-divider"></span>
                     <span class="text-slate-500">Laporan penerimaan zakat real-time yang transparan dan akuntabel.</span>
                 </div>

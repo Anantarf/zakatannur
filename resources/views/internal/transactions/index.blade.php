@@ -42,7 +42,7 @@
                 <div class="ui-toolbar-soft xl:flex-row xl:items-start">
                     <div class="max-w-full space-y-1 xl:max-w-[260px] xl:flex-none">
                         <div class="ui-section-title">
-                            <div class="h-5 w-1.5 rounded-full bg-brand-500"></div>
+                            <div class="ui-section-accent"></div>
                             <h3 class="font-semibold text-slate-800">Daftar Transaksi</h3>
                         </div>
                         <p class="text-sm leading-6 text-slate-500">Filter dan aksi cepat per transaksi.</p>
@@ -108,7 +108,7 @@
                 </div>
 
                 @if ($transactions->hasPages())
-                    <div class="border-t border-slate-100 px-6 py-4">
+                    <div class="border-t border-slate-100 px-5 py-3">
                         {{ $transactions->links() }}
                     </div>
                 @endif

@@ -42,14 +42,15 @@ class KnowledgeRetriever
         $score = 0;
 
         foreach (($entry['keywords'] ?? []) as $keyword) {
-            if (str_contains($message, $this->normalize($keyword))) {
-                $score += 3;
+            $keyword = $this->normalize($keyword);
+            if ($keyword !== '' && str_contains($message, $keyword)) {
+                $score += str_contains($keyword, ' ') ? 5 : 3;
             }
         }
 
         foreach (explode(' ', $this->normalize((string) ($entry['title'] ?? ''))) as $token) {
             if (mb_strlen($token) >= 4 && str_contains($message, $token)) {
-                $score += 2;
+                $score += 1;
             }
         }
 
@@ -58,6 +59,8 @@ class KnowledgeRetriever
 
     private function normalize(string $value): string
     {
-        return trim(preg_replace('/\s+/', ' ', mb_strtolower($value)) ?? '');
+        $value = preg_replace('/[^\pL\pN\s]/u', ' ', mb_strtolower($value)) ?? '';
+
+        return trim(preg_replace('/\s+/', ' ', $value) ?? '');
     }
 }

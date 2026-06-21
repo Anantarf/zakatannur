@@ -65,11 +65,13 @@
  --text-eyebrow: 10px; /* label badge, kicker, kolom uppercase */
  --text-caption: 11px; /* nomor tabel kecil, metadata compact */
  --text-body-sm: 13px; /* teks baris tabel, deskripsi pendek */
+ --text-body: 14px; /* body copy operasional */
+ --text-section-title: 16px; /* judul panel/card */
 
  /* Letter Spacing */
- --tracking-eyebrow: 0.22em; /* kicker utama, brand label */
- --tracking-label: 0.14em;   /* label stat, settings, kicker sekunder */
- --tracking-caption: 0.10em; /* metadata kompak, tabel header */
+ --tracking-eyebrow: 0.12em; /* kicker utama, brand label */
+ --tracking-label: 0.10em;   /* label stat, settings, kicker sekunder */
+ --tracking-caption: 0.08em; /* metadata kompak, tabel header */
 }
 
 @keyframes slideInRight {

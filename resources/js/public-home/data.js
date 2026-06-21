@@ -48,6 +48,8 @@ export const createDataMethods = (config, chartService, animateValue = noopAnima
 
             this.items = data.items || [];
             this.totals = data.totals || {};
+            this.latestTransactionAt = data.latest_transaction_at_wib || null;
+            this.latestTransactionAgeLabel = this.formatLatestTransactionAge();
 
             if (data.dailyChartData) {
                 this.dailyChartData = data.dailyChartData;

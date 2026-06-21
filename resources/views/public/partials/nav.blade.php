@@ -11,7 +11,7 @@
     @scroll.window="scrolled = window.scrollY > 12"
     class="sticky top-3 z-[100] px-3 sm:px-4">
     <div class="public-nav-shell"
-        :class="scrolled ? 'bg-white/95 shadow-md shadow-slate-900/5' : 'bg-white/75 shadow-sm'">
+        :class="scrolled ? 'bg-[#f8fbf9]/95 shadow-md shadow-brand-950/5' : 'bg-[#f8fbf9]/82 shadow-sm shadow-brand-950/5'">
         <div class="flex items-center justify-between gap-2 lg:grid lg:grid-cols-[minmax(180px,1fr)_auto_minmax(180px,1fr)] lg:items-center lg:gap-2">
             <div class="flex justify-start min-w-0">
                 <a href="{{ route('home') }}" class="shrink-0">

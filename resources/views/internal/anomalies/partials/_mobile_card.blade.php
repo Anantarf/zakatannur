@@ -4,7 +4,7 @@
 <article class="ui-mobile-card border-amber-100">
     <div class="flex items-start justify-between gap-3">
         <div class="space-y-1">
-            <span class="inline-flex rounded-md bg-blue-50 px-2 py-1 font-sans text-xs font-semibold text-blue-600">{{ $group->no_transaksi }}</span>
+            <span class="inline-flex rounded-md bg-slate-100 px-2 py-1 font-sans text-xs font-semibold text-slate-600">{{ $group->no_transaksi }}</span>
             <h4 class="text-sm font-bold leading-tight text-slate-900">{{ $group->pembayar_nama }}</h4>
             <p class="text-xs text-slate-500">
                 {{ $groupTime?->format('d/m/Y H:i') ?? '-' }}

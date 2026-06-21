@@ -54,21 +54,9 @@
             @endif
 
             <div class="grid grid-cols-1 gap-3 sm:grid-cols-3">
-                <div class="ui-stat-card ui-stat-card-default">
-                    <div class="ui-stat-eyebrow text-brand-700">Total Akun</div>
-                    <div class="ui-stat-value text-brand-950">{{ $totalUsers }}</div>
-                    <div class="ui-stat-description text-brand-700">Jumlah akun yang tampil di daftar saat ini.</div>
-                </div>
-                <div class="ui-stat-card ui-stat-card-info">
-                    <div class="ui-stat-eyebrow text-blue-700">Akses Anda</div>
-                    <div class="mt-2 text-lg font-black text-blue-950">{{ $roleLabels[$currentUser->role] ?? ucfirst($currentUser->role) }}</div>
-                    <div class="ui-stat-description text-blue-700">Hak kelola mengikuti role yang sedang Anda pakai.</div>
-                </div>
-                <div class="ui-stat-card ui-stat-card-muted">
-                    <div class="ui-stat-eyebrow text-slate-500">Catatan</div>
-                    <div class="mt-2 text-sm font-semibold text-slate-800">Admin hanya boleh mengelola petugas.</div>
-                    <div class="ui-stat-description text-slate-500">Akun admin dan super admin lain tetap terlindungi.</div>
-                </div>
+                <x-ui-stat-card title="Total Akun" :value="$totalUsers" description="Jumlah akun yang tampil di daftar saat ini." />
+                <x-ui-stat-card title="Akses Anda" :value="$roleLabels[$currentUser->role] ?? ucfirst($currentUser->role)" description="Hak kelola mengikuti role yang sedang Anda pakai." tone="info" />
+                <x-ui-stat-card title="Catatan" value="Admin hanya boleh mengelola petugas." description="Akun admin dan super admin lain tetap terlindungi." tone="muted" />
             </div>
 
             <div class="ui-card overflow-hidden shadow-md">
@@ -121,7 +109,7 @@
                 <div class="hidden overflow-x-auto w-full md:block">
                     <table class="min-w-full text-sm">
                         <thead>
-                            <tr class="bg-slate-50 text-left text-xs font-bold text-slate-400 uppercase tracking-widest border-b border-slate-100">
+                            <tr class="bg-slate-50 text-left text-xs font-semibold text-slate-400 uppercase tracking-[0.08em] border-b border-slate-100">
                                 <th class="px-6 py-4">Nama</th>
                                 <th class="px-6 py-4">Username</th>
                                 <th class="px-6 py-4">Role</th>
@@ -169,7 +157,7 @@
                     </table>
                 </div>
                 @if ($users->hasPages())
-                    <div class="px-6 py-4 border-t border-slate-50">
+                    <div class="border-t border-slate-100 px-5 py-3">
                         {{ $users->links() }}
                     </div>
                 @endif

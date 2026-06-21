@@ -10,7 +10,7 @@
                     <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" /></svg>
                 </div>
                 <div>
-                    <h2 class="text-[1rem] sm:text-[1.08rem] font-semibold text-slate-900">Grafik penerimaan harian</h2>
+                    <h2 class="text-[1rem] sm:text-[1.08rem] font-semibold text-slate-950">Grafik penerimaan harian</h2>
                     <p class="hidden text-[11px] text-slate-500 sm:block">Pola harian sebagai insight pendukung setelah ringkasan utama.</p>
                 </div>
             </div>

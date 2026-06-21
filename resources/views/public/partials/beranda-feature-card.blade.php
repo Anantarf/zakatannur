@@ -1,5 +1,5 @@
 <article class="public-shell hover-lift flex items-start gap-3 p-3.5 group">
-    <div class="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-brand-100 text-brand-700 shadow-sm transition-all group-hover:bg-brand-700 group-hover:text-white">
+    <div class="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-brand-100 text-brand-700 shadow-sm shadow-brand-950/5 ring-1 ring-brand-100 transition-all group-hover:bg-brand-700 group-hover:text-white">
         @switch($icon)
             @case('people')
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">

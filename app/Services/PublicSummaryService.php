@@ -40,10 +40,17 @@ class PublicSummaryService
 
         $payload = Cache::remember($cacheKey, $cacheTtlSeconds, function () use ($year) {
             $rekap = RekapBuilder::build($year);
+            $latestTransactionAt = ZakatTransaction::query()
+                ->valid()
+                ->where('tahun_zakat', $year)
+                ->max('waktu_terima');
 
             return [
                 'year' => $year,
                 'computed_at_wib' => now('Asia/Jakarta')->format('d/m/Y H:i:s'),
+                'latest_transaction_at_wib' => $latestTransactionAt
+                    ? (string) $latestTransactionAt
+                    : null,
                 'items' => $rekap['items'],
                 'totals' => $rekap['totals'],
                 'dailyChartData' => RekapBuilder::buildDailyChartData($year),

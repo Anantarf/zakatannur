@@ -3,8 +3,6 @@
 namespace App\Services\Chatbot;
 
 use App\Services\Chatbot\Knowledge\KnowledgeRetriever;
-use App\Services\PublicSummaryService;
-use App\Support\Format;
 use Illuminate\Support\Facades\Log;
 use Throwable;
 
@@ -14,21 +12,24 @@ class ChatbotOrchestrator
         private ChatbotServiceInterface $aiProvider,
         private ChatbotActionDetector $actionDetector,
         private KnowledgeRetriever $knowledgeRetriever,
-        private PublicSummaryService $publicSummaryService
+        private ChatbotPublicDataResponder $publicDataResponder
     ) {
     }
 
-    public function handle(string $message): ChatbotResponse
+    public function handle(string $message, array $rawContext = []): ChatbotResponse
     {
+        $context = ChatbotConversationContext::fromArray($rawContext);
+
         try {
-            $action = $this->actionDetector->detect($message);
-            if ($action) {
-                return $action;
+            $intent = $this->actionDetector->intent($message, $context);
+            $publicData = $intent ? $this->publicDataResponder->respond($intent) : null;
+            if ($publicData) {
+                return $publicData->withContext($context->forIntent($intent, 'public_data')->toArray());
             }
 
-            $publicData = $this->answerFromPublicData($message);
-            if ($publicData) {
-                return $publicData;
+            $action = $this->actionDetector->detect($message);
+            if ($action) {
+                return $action->withContext($context->forIntent('navigation', 'action')->toArray());
             }
 
             $knowledge = $this->knowledgeRetriever->best($message);
@@ -41,7 +42,7 @@ class ChatbotOrchestrator
                         'id' => $knowledge['id'] ?? null,
                         'label' => $knowledge['source_label'] ?? 'Panduan Zakat Masjid An-Nur',
                     ]]
-                );
+                )->withContext($context->forIntent((string) ($knowledge['id'] ?? 'knowledge'), 'knowledge')->toArray());
             }
 
             return $this->answerFromAi($message);
@@ -52,56 +53,6 @@ class ChatbotOrchestrator
 
             return ChatbotResponse::error('Gagal memproses pesan. Silakan coba beberapa saat lagi.', true, 500);
         }
-    }
-
-    private function answerFromPublicData(string $message): ?ChatbotResponse
-    {
-        $normalized = mb_strtolower($message);
-        $asksTotal = str_contains($normalized, 'total') || str_contains($normalized, 'berapa');
-        $asksCategory = str_contains($normalized, 'kategori') || str_contains($normalized, 'jenis');
-
-        if (!$asksTotal && !$asksCategory) {
-            return null;
-        }
-
-        if (!str_contains($normalized, 'zakat') && !str_contains($normalized, 'penerimaan') && !str_contains($normalized, 'beras') && !str_contains($normalized, 'uang') && !str_contains($normalized, 'jiwa')) {
-            return null;
-        }
-
-        $year = $this->publicSummaryService->resolveYear(null);
-        $summary = $this->publicSummaryService->publicSummaryResponse($year)['data'] ?? [];
-        $totals = $summary['totals'] ?? [];
-        $items = $summary['items'] ?? [];
-
-        if ($asksCategory) {
-            if (count($items) === 0) {
-                return ChatbotResponse::success('Belum ada kategori penerimaan yang tercatat untuk periode ini.', 'public_data');
-            }
-
-            $categories = collect($items)
-                ->pluck('category')
-                ->map(fn ($category) => ucwords(str_replace('_', ' ', (string) $category)))
-                ->implode(', ');
-
-            return ChatbotResponse::success("Kategori yang tercatat saat ini: {$categories}.", 'public_data');
-        }
-
-        $totalJiwa = (int) ($totals['total_jiwa'] ?? 0);
-        $totalUang = (int) ($totals['total_uang'] ?? 0);
-        $totalBeras = (float) ($totals['total_beras_kg'] ?? 0);
-
-        if ($totalJiwa === 0 && $totalUang === 0 && $totalBeras <= 0.0) {
-            return ChatbotResponse::success('Belum ada data penerimaan yang tercatat untuk periode ini.', 'public_data');
-        }
-
-        return ChatbotResponse::success(
-            'Total penerimaan saat ini: '
-            . number_format($totalJiwa, 0, ',', '.') . ' jiwa, '
-            . Format::rupiah($totalUang) . ', dan '
-            . Format::kg($totalBeras) . '. Data ini mengikuti ringkasan publik periode berjalan.',
-            'public_data',
-            [['type' => 'open_tab', 'target' => 'laporan']]
-        );
     }
 
     private function answerFromAi(string $message): ChatbotResponse

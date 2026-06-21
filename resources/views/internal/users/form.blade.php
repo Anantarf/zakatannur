@@ -38,8 +38,8 @@
             <div class="ui-card overflow-hidden">
                 @if ($user)
                     <div class="ui-inline-note border-b border-brand-100/70 rounded-none">
-                        <div class="text-xs font-black uppercase tracking-[0.18em] text-brand-700">Akun yang Diedit</div>
-                        <div class="mt-1 text-lg font-black text-slate-900">{{ $user->name }}</div>
+                        <div class="ui-label text-brand-700">Akun yang Diedit</div>
+                        <div class="ui-metric-value mt-1 text-lg text-slate-900">{{ $user->name }}</div>
                         <div class="mt-0.5 text-sm font-semibold text-brand-700">{{ '@' . $user->username }} - {{ $roleLabels[$user->role] ?? ucfirst($user->role) }}</div>
                     </div>
                 @endif

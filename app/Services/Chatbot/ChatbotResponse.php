@@ -8,6 +8,7 @@ class ChatbotResponse
     public string $source;
     public array $actions;
     public array $citations;
+    public array $context;
     public bool $retryable;
     public int $statusCode;
 
@@ -16,6 +17,7 @@ class ChatbotResponse
         string $source = 'ai',
         array $actions = [],
         array $citations = [],
+        array $context = [],
         bool $retryable = false,
         int $statusCode = 200
     ) {
@@ -23,6 +25,7 @@ class ChatbotResponse
         $this->source = $source;
         $this->actions = $actions;
         $this->citations = $citations;
+        $this->context = $context;
         $this->retryable = $retryable;
         $this->statusCode = $statusCode;
     }
@@ -32,9 +35,16 @@ class ChatbotResponse
         return new self($reply, $source, $actions, $citations);
     }
 
+    public function withContext(array $context): self
+    {
+        $this->context = $context;
+
+        return $this;
+    }
+
     public static function error(string $reply, bool $retryable = true, int $statusCode = 503): self
     {
-        return new self($reply, 'fallback', [], [], $retryable, $statusCode);
+        return new self($reply, 'fallback', [], [], [], $retryable, $statusCode);
     }
 
     public function toArray(): array
@@ -54,6 +64,7 @@ class ChatbotResponse
                 'source' => $this->source,
                 'actions' => $this->actions,
                 'citations' => $this->citations,
+                'context' => $this->context,
             ],
         ];
     }

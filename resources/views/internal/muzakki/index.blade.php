@@ -62,7 +62,7 @@
                 <div class="ui-toolbar-soft">
                     <div class="flex items-center gap-2">
                         <div class="ui-section-accent h-6 w-2"></div>
-                        <h3 class="font-bold text-slate-800">Daftar Muzakki</h3>
+                        <h3 class="ui-section-title">Daftar Muzakki</h3>
                     </div>
 
                     <form method="GET" action="{{ route('internal.muzakki.index') }}" class="flex w-full flex-col items-stretch gap-2 sm:w-auto sm:flex-row sm:items-center">
@@ -93,11 +93,11 @@
                                     <div class="mt-2 text-sm leading-relaxed text-slate-600">{!! \App\Support\Format::highlight($m->address ?? '-', $q) !!}</div>
                                     <div class="mt-3 grid grid-cols-2 gap-2 text-xs">
                                         <div class="rounded-xl bg-brand-50 px-3 py-2 text-brand-800">
-                                            <div class="font-black">{{ (int) ($m->valid_transactions_count ?? 0) }} transaksi</div>
+                                            <div class="font-bold">{{ (int) ($m->valid_transactions_count ?? 0) }} transaksi</div>
                                             <div class="text-brand-700">Riwayat valid</div>
                                         </div>
                                         <div class="rounded-xl bg-slate-50 px-3 py-2 text-slate-700">
-                                            <div class="font-black">{{ $m->last_transaction_at ? \Carbon\Carbon::parse($m->last_transaction_at)->timezone(config('zakat.timezone'))->translatedFormat('d M Y') : '-' }}</div>
+                                            <div class="font-bold">{{ $m->last_transaction_at ? \Carbon\Carbon::parse($m->last_transaction_at)->timezone(config('zakat.timezone'))->translatedFormat('d M Y') : '-' }}</div>
                                             <div class="text-slate-500">Terakhir</div>
                                         </div>
                                     </div>
@@ -133,7 +133,7 @@
                 <div class="hidden overflow-x-auto w-full md:block">
                     <table class="min-w-full text-sm">
                         <thead>
-                            <tr class="bg-slate-50 text-left text-xs font-bold text-slate-400 uppercase tracking-widest border-b border-slate-100">
+                            <tr class="bg-slate-50 text-left text-xs font-semibold text-slate-400 uppercase tracking-[0.08em] border-b border-slate-100">
                                 <th class="px-3 sm:px-5 py-3">Nama</th>
                                 <th class="px-3 sm:px-5 py-3">No HP</th>
                                 <th class="px-3 sm:px-5 py-3">Alamat</th>
@@ -150,7 +150,7 @@
                                     <td class="px-3 sm:px-5 py-3 text-slate-500 text-sm">{!! \App\Support\Format::highlight($m->address ?? '-', $q) !!}</td>
                                     <td class="px-3 sm:px-5 py-3">
                                         <div class="space-y-1 text-xs">
-                                            <div class="font-black text-slate-800">{{ (int) ($m->valid_transactions_count ?? 0) }} transaksi</div>
+                                            <div class="font-bold text-slate-800">{{ (int) ($m->valid_transactions_count ?? 0) }} transaksi</div>
                                             <div class="text-slate-500">{{ \App\Support\Format::rupiah((int) ($m->valid_total_uang ?? 0)) }} / {{ \App\Support\Format::kg((float) ($m->valid_total_beras ?? 0)) }}</div>
                                             <div class="text-slate-400">Terakhir: {{ $m->last_transaction_at ? \Carbon\Carbon::parse($m->last_transaction_at)->timezone(config('zakat.timezone'))->translatedFormat('d M Y') : '-' }}</div>
                                         </div>
@@ -195,7 +195,7 @@
                     </table>
                 </div>
                 @if ($muzakki->hasPages())
-                    <div class="px-5 py-3 border-t border-slate-50">
+                    <div class="border-t border-slate-100 px-5 py-3">
                         {{ $muzakki->links() }}
                     </div>
                 @endif

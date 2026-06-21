@@ -29,7 +29,7 @@
 
 @if ($isAdmin && $mobile && ! $segmented)
     <div class="border-t border-slate-100 bg-slate-50/50 pb-1 pt-4">
-        <div class="px-4 py-2 text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Area Admin</div>
+        <div class="ui-label px-4 py-2 text-slate-400">Area Admin</div>
         <x-dynamic-component :component="$linkComponent" :href="route('internal.users.index')" :active="request()->routeIs('internal.users.*')">
             {{ __('Manajemen Pengguna') }}
         </x-dynamic-component>
@@ -40,7 +40,7 @@
             <span class="inline-flex items-center justify-center gap-1.5">
                 <span>{{ __('Review Anomali') }}</span>
                 @if (($pendingAnomalyCount ?? 0) > 0)
-                    <span class="inline-flex h-4 min-w-4 items-center justify-center rounded-full bg-amber-500 px-1 text-[9px] font-black text-white">
+                    <span class="inline-flex h-4 min-w-4 items-center justify-center rounded-full bg-amber-500 px-1 text-[10px] font-bold text-white">
                         {{ $pendingAnomalyCount > 99 ? '99+' : $pendingAnomalyCount }}
                     </span>
                 @endif
@@ -69,7 +69,7 @@
         <span class="inline-flex items-center justify-center gap-1.5">
             <span>{{ __('Review') }}</span>
             @if (($pendingAnomalyCount ?? 0) > 0)
-                <span class="inline-flex h-4 min-w-4 items-center justify-center rounded-full bg-amber-500 px-1 text-[9px] font-black text-white">
+                <span class="inline-flex h-4 min-w-4 items-center justify-center rounded-full bg-amber-500 px-1 text-[10px] font-bold text-white">
                     {{ $pendingAnomalyCount > 99 ? '99+' : $pendingAnomalyCount }}
                 </span>
             @endif

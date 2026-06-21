@@ -20,10 +20,14 @@ class ChatbotController extends Controller
     {
         $request->validate([
             'message' => 'required|string|max:500',
+            'context' => 'sometimes|array',
+            'context.last_intent' => 'sometimes|string|max:80',
+            'context.last_source' => 'sometimes|string|max:40',
+            'context.topic' => 'sometimes|string|max:40',
         ]);
 
         try {
-            $response = $this->chatbot->handle($request->message);
+            $response = $this->chatbot->handle($request->message, $request->input('context', []));
 
             return response()->json($response->toArray(), $response->statusCode);
         } catch (\Throwable $e) {

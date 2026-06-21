@@ -6,13 +6,13 @@
                     Sebelumnya
                 </span>
             @else
-                <a href="{{ $paginator->previousPageUrl() }}" class="relative inline-flex items-center rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm font-semibold leading-5 text-slate-700 transition hover:border-emerald-200 hover:text-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-200">
+                <a href="{{ $paginator->previousPageUrl() }}" class="relative inline-flex items-center rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm font-semibold leading-5 text-slate-700 transition hover:border-brand-200 hover:text-brand-700 focus:outline-none focus:ring-2 focus:ring-brand-200">
                     Sebelumnya
                 </a>
             @endif
 
             @if ($paginator->hasMorePages())
-                <a href="{{ $paginator->nextPageUrl() }}" class="relative ml-3 inline-flex items-center rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm font-semibold leading-5 text-slate-700 transition hover:border-emerald-200 hover:text-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-200">
+                <a href="{{ $paginator->nextPageUrl() }}" class="relative ml-3 inline-flex items-center rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm font-semibold leading-5 text-slate-700 transition hover:border-brand-200 hover:text-brand-700 focus:outline-none focus:ring-2 focus:ring-brand-200">
                     Berikutnya
                 </a>
             @else
@@ -50,7 +50,7 @@
                             </span>
                         </span>
                     @else
-                        <a href="{{ $paginator->previousPageUrl() }}" rel="prev" class="relative inline-flex items-center rounded-l-xl border border-slate-200 bg-white px-3 py-2 text-sm font-medium leading-5 text-slate-500 transition hover:border-emerald-200 hover:text-emerald-700 focus:z-10 focus:outline-none focus:ring-2 focus:ring-emerald-200" aria-label="Halaman sebelumnya">
+                        <a href="{{ $paginator->previousPageUrl() }}" rel="prev" class="relative inline-flex items-center rounded-l-xl border border-slate-200 bg-white px-3 py-2 text-sm font-medium leading-5 text-slate-500 transition hover:border-brand-200 hover:text-brand-700 focus:z-10 focus:outline-none focus:ring-2 focus:ring-brand-200" aria-label="Halaman sebelumnya">
                             <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
                                 <path fill-rule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clip-rule="evenodd" />
                             </svg>
@@ -68,10 +68,10 @@
                             @foreach ($element as $page => $url)
                                 @if ($page == $paginator->currentPage())
                                     <span aria-current="page">
-                                        <span class="relative -ml-px inline-flex items-center border border-emerald-200 bg-emerald-50 px-4 py-2 text-sm font-bold leading-5 text-emerald-700">{{ $page }}</span>
+                                        <span class="relative -ml-px inline-flex items-center border border-brand-200 bg-brand-50 px-4 py-2 text-sm font-bold leading-5 text-brand-700">{{ $page }}</span>
                                     </span>
                                 @else
-                                    <a href="{{ $url }}" class="relative -ml-px inline-flex items-center border border-slate-200 bg-white px-4 py-2 text-sm font-medium leading-5 text-slate-700 transition hover:border-emerald-200 hover:text-emerald-700 focus:z-10 focus:outline-none focus:ring-2 focus:ring-emerald-200" aria-label="Ke halaman {{ $page }}">
+                                    <a href="{{ $url }}" class="relative -ml-px inline-flex items-center border border-slate-200 bg-white px-4 py-2 text-sm font-medium leading-5 text-slate-700 transition hover:border-brand-200 hover:text-brand-700 focus:z-10 focus:outline-none focus:ring-2 focus:ring-brand-200" aria-label="Ke halaman {{ $page }}">
                                         {{ $page }}
                                     </a>
                                 @endif
@@ -80,7 +80,7 @@
                     @endforeach
 
                     @if ($paginator->hasMorePages())
-                        <a href="{{ $paginator->nextPageUrl() }}" rel="next" class="relative -ml-px inline-flex items-center rounded-r-xl border border-slate-200 bg-white px-3 py-2 text-sm font-medium leading-5 text-slate-500 transition hover:border-emerald-200 hover:text-emerald-700 focus:z-10 focus:outline-none focus:ring-2 focus:ring-emerald-200" aria-label="Halaman berikutnya">
+                        <a href="{{ $paginator->nextPageUrl() }}" rel="next" class="relative -ml-px inline-flex items-center rounded-r-xl border border-slate-200 bg-white px-3 py-2 text-sm font-medium leading-5 text-slate-500 transition hover:border-brand-200 hover:text-brand-700 focus:z-10 focus:outline-none focus:ring-2 focus:ring-brand-200" aria-label="Halaman berikutnya">
                             <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
                                 <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd" />
                             </svg>

@@ -18,8 +18,8 @@
                     <div class="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
                         <div class="space-y-2">
                             <p class="ui-kicker">Ringkasan</p>
-                            <h3 class="text-xl font-bold leading-tight text-slate-900 sm:text-2xl">Manajemen Operasional Zakat</h3>
-                            <p class="max-w-2xl text-sm leading-6 text-slate-600">Pantau penerimaan zakat dan kelola operasional harian.</p>
+                            <h3 class="ui-section-title text-xl sm:text-2xl">Manajemen Operasional Zakat</h3>
+                            <p class="ui-body-muted max-w-2xl">Pantau penerimaan zakat dan kelola operasional harian.</p>
                         </div>
                         <div class="flex flex-wrap gap-2">
                             <a href="{{ route('internal.transactions.create') }}" class="ui-btn ui-btn-primary w-full sm:w-auto">Catat Transaksi</a>
@@ -46,27 +46,27 @@
 
                     <div class="mt-5 grid grid-cols-1 gap-3 sm:grid-cols-3">
                         <div class="rounded-2xl border border-slate-200 bg-slate-50 p-4">
-                            <p class="text-xs font-semibold uppercase tracking-wider text-slate-500">Total Transaksi</p>
-                            <p class="mt-2 text-3xl font-bold tracking-tight text-slate-900">{{ number_format($payload['totals']['jumlah_transaksi'] ?? 0, 0, ',', '.') }}</p>
-                            <p class="mt-2 text-[11px] leading-5 text-slate-500">Total transaksi dalam filter aktif.</p>
+                            <p class="ui-label">Total Transaksi</p>
+                            <p class="ui-metric-value mt-2 text-3xl text-slate-900">{{ number_format($payload['totals']['jumlah_transaksi'] ?? 0, 0, ',', '.') }}</p>
+                            <p class="ui-body-muted mt-2 text-[11px] leading-5">Total transaksi dalam filter aktif.</p>
                         </div>
                         <div class="rounded-2xl border border-slate-200 bg-slate-50 p-4">
-                            <p class="text-xs font-semibold uppercase tracking-wider text-slate-500">Transaksi Hari Ini</p>
-                            <p class="mt-2 text-3xl font-bold tracking-tight text-brand-500">{{ number_format($workspace['today_count'] ?? 0, 0, ',', '.') }}</p>
-                            <p class="mt-2 text-[11px] leading-5 text-slate-500">Transaksi valid hari ini.</p>
+                            <p class="ui-label">Transaksi Hari Ini</p>
+                            <p class="ui-metric-value mt-2 text-3xl text-brand-500">{{ number_format($workspace['today_count'] ?? 0, 0, ',', '.') }}</p>
+                            <p class="ui-body-muted mt-2 text-[11px] leading-5">Transaksi valid hari ini.</p>
                         </div>
                         <div class="rounded-2xl border border-slate-200 bg-slate-50 p-4">
-                            <p class="text-xs font-semibold uppercase tracking-wider text-slate-500">Transaksi Terakhir</p>
-                            <p class="mt-2 text-xl font-bold tracking-tight text-slate-900">
+                            <p class="ui-label">Transaksi Terakhir</p>
+                            <p class="ui-metric-value mt-2 text-xl text-slate-900">
                                 {{ ($workspace['latest_transaction_at'] ?? null)?->format('d/m/Y H:i') ?? '-' }}
                             </p>
-                            <p class="mt-2 text-[11px] leading-5 text-slate-500">Waktu catat terbaru.</p>
+                            <p class="ui-body-muted mt-2 text-[11px] leading-5">Waktu catat terbaru.</p>
                         </div>
                     </div>
                 </div>
 
                 <div class="ui-card p-5 sm:p-6">
-                    <p class="text-[11px] font-bold uppercase tracking-[0.16em] text-slate-400">Navigasi Cepat</p>
+                    <p class="ui-label text-slate-400">Navigasi Cepat</p>
                     <div class="mt-4 grid grid-cols-1 gap-3">
                         <a href="{{ route('internal.transactions.index', array_filter(['year' => $year, 'period_id' => $periodId, 'metode' => $metode])) }}" class="ui-action-tile">
                             <p class="text-sm font-bold text-slate-900">Riwayat Transaksi</p>
@@ -89,9 +89,9 @@
                 <div class="px-4 sm:px-6 py-3 sm:py-4 border-b border-slate-50 flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4">
                     <div class="flex items-center gap-2 flex-wrap">
                         <div class="w-1.5 h-5 sm:w-2 sm:h-6 bg-brand-500 rounded-full flex-shrink-0"></div>
-                        <h3 class="font-bold text-sm sm:text-base text-slate-800">Tren Penerimaan</h3>
+                        <h3 class="ui-section-title text-sm sm:text-base">Tren Penerimaan</h3>
                         @if($chartPeriodLabel)
-                            <span class="inline-flex items-center gap-1 rounded-full bg-amber-100 border border-amber-200 px-2.5 py-0.5 text-[10px] font-bold text-amber-700 uppercase tracking-wide whitespace-nowrap">
+                            <span class="inline-flex items-center gap-1 rounded-full bg-amber-100 border border-amber-200 px-2.5 py-0.5 text-[10px] font-semibold text-amber-700 uppercase tracking-[0.08em] whitespace-nowrap">
                                 <svg class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
                                 Range: {{ $chartPeriodLabel }}
                             </span>
@@ -104,7 +104,7 @@
                         @if(request('period_id')) <input type="hidden" name="period_id" value="{{ request('period_id') }}"> @endif
                         @if(request('metode')) <input type="hidden" name="metode" value="{{ request('metode') }}"> @endif
 
-                        <select name="days" onchange="this.form.submit()" class="appearance-none rounded-lg border-slate-200 bg-slate-50 pl-3 pr-8 py-1.5 text-[11px] sm:text-xs font-bold text-slate-500 uppercase tracking-widest focus:border-brand-500 focus:ring-brand-500 transition-all cursor-pointer">
+                        <select name="days" onchange="this.form.submit()" class="appearance-none rounded-lg border-slate-200 bg-slate-50 pl-3 pr-8 py-1.5 text-[11px] sm:text-xs font-semibold text-slate-500 uppercase tracking-[0.08em] focus:border-brand-500 focus:ring-brand-500 transition-all cursor-pointer">
                             <option value="7" @selected($activeDays == 7)>7 Hari</option>
                             <option value="14" @selected($activeDays == 14)>14 Hari</option>
                             <option value="30" @selected($activeDays == 30)>30 Hari</option>
@@ -114,7 +114,7 @@
                 <div class="p-4 sm:p-6">
                     <p class="mb-4 text-sm leading-6 text-slate-500">Visualisasi tren transaksi aktif. Untuk laporan terperinci, gunakan menu Rekapitulasi atau Riwayat.</p>
                     @if (!empty($dashboardChartSourceNote))
-                        <div class="mb-4 rounded-2xl border border-sky-100 bg-sky-50 px-4 py-3 text-xs leading-relaxed text-sky-800">
+                        <div class="mb-4 rounded-2xl border border-slate-100 bg-slate-50 px-4 py-3 text-xs leading-relaxed text-slate-600">
                             {{ $dashboardChartSourceNote }}
                         </div>
                     @endif
@@ -134,7 +134,7 @@
                 <div class="px-4 sm:px-6 py-3 sm:py-4 border-b border-slate-50 flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4">
                     <div class="flex items-center gap-2">
                         <div class="w-1.5 h-5 sm:w-2 sm:h-6 bg-brand-500 rounded-full"></div>
-                        <h3 class="font-bold text-sm sm:text-base text-slate-800">Rekapitulasi Zakat</h3>
+                        <h3 class="ui-section-title text-sm sm:text-base">Rekapitulasi Zakat</h3>
                     </div>
 
                     <form method="GET" action="{{ route('dashboard') }}" class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 w-full sm:w-auto mt-2 sm:mt-0">
@@ -192,10 +192,10 @@
             <div class="ui-card overflow-hidden !p-0">
                 <div class="px-4 sm:px-6 py-3 sm:py-4 border-b border-slate-50 flex items-center justify-between">
                     <div class="flex items-center gap-2">
-                        <div class="w-1.5 h-5 sm:w-2 sm:h-6 bg-blue-500 rounded-full"></div>
-                        <h3 class="font-bold text-sm sm:text-base text-slate-800">10 Transaksi Terakhir</h3>
+                        <div class="w-1.5 h-5 sm:w-2 sm:h-6 bg-brand-500 rounded-full"></div>
+                        <h3 class="ui-section-title text-sm sm:text-base">10 Transaksi Terakhir</h3>
                     </div>
-                    <a href="{{ route('internal.transactions.index', array_filter(['year' => $chartYear ?? $activeYear, 'period_id' => $periodId ?? null])) }}" class="text-xs sm:text-sm font-bold text-blue-600 hover:text-blue-700 transition-colors flex items-center gap-1">
+                    <a href="{{ route('internal.transactions.index', array_filter(['year' => $chartYear ?? $activeYear, 'period_id' => $periodId ?? null])) }}" class="text-xs sm:text-sm font-bold text-brand-600 hover:text-brand-700 transition-colors flex items-center gap-1">
                         Lengkap
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />

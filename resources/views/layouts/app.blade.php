@@ -51,7 +51,7 @@
                 <div x-show="$store.toast.undoRoute" class="shrink-0 w-full sm:w-auto">
                     <form :action="$store.toast.undoRoute" method="POST">
                         @csrf
-                        <button type="submit" class="w-full flex items-center justify-center gap-2 text-[10px] font-black uppercase tracking-widest text-brand-800 bg-white hover:bg-brand-100 px-4 py-2.5 rounded-xl border border-brand-200 shadow-sm transition-all hover:scale-[1.02] active:scale-95">
+                        <button type="submit" class="ui-label flex w-full items-center justify-center gap-2 rounded-xl border border-brand-200 bg-white px-4 py-2.5 text-brand-800 shadow-sm transition-all hover:scale-[1.02] hover:bg-brand-100 active:scale-95">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6" /></svg>
                             Urungkan
                         </button>

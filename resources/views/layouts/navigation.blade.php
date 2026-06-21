@@ -44,7 +44,7 @@
                             </x-slot>
 
                             <x-slot name="content">
-                                <div class="border-b border-slate-50 px-4 py-2 text-[10px] font-bold uppercase tracking-widest text-slate-400">Pengaturan Admin</div>
+                                <div class="ui-label border-b border-slate-50 px-4 py-2 text-slate-400">Pengaturan Admin</div>
                                 <x-dropdown-link :href="route('internal.users.index')">
                                     {{ __('Manajemen Pengguna') }}
                                 </x-dropdown-link>
@@ -55,7 +55,7 @@
                                     <span class="flex items-center justify-between gap-3">
                                         <span>{{ __('Review Anomali') }}</span>
                                         @if (($pendingAnomalyCount ?? 0) > 0)
-                                            <span class="inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-amber-500 px-1.5 text-[10px] font-black text-white">
+                                            <span class="inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-amber-500 px-1.5 text-[10px] font-bold text-white">
                                                 {{ $pendingAnomalyCount > 99 ? '99+' : $pendingAnomalyCount }}
                                             </span>
                                         @endif
@@ -63,7 +63,7 @@
                                 </x-dropdown-link>
 
                                 @if ($user->isSuperAdmin())
-                                    <div class="mt-1 border-y border-slate-50 px-4 py-2 text-[10px] font-bold uppercase tracking-widest text-slate-400">Khusus Super Admin</div>
+                                    <div class="ui-label mt-1 border-y border-slate-50 px-4 py-2 text-slate-400">Khusus Super Admin</div>
                                     <x-dropdown-link :href="route('internal.settings.period.edit')">
                                         {{ __('Konfigurasi Periode') }}
                                     </x-dropdown-link>
@@ -97,7 +97,7 @@
                     </x-slot>
 
                     <x-slot name="content">
-                        <div class="border-b border-slate-50 px-4 py-2 text-[10px] font-bold uppercase tracking-widest text-slate-400">Akun</div>
+                        <div class="ui-label border-b border-slate-50 px-4 py-2 text-slate-400">Akun</div>
                         <x-dropdown-link :href="route('internal.profile.edit')">
                             {{ __('Pengaturan Akun') }}
                         </x-dropdown-link>

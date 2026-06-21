@@ -11,11 +11,11 @@
             </div>
             <div class="mt-3 grid grid-cols-2 gap-3 rounded-2xl bg-slate-50 p-3">
                 <div class="space-y-1">
-                    <p class="text-[11px] font-semibold uppercase tracking-wide text-slate-400">Total Uang</p>
+                    <p class="ui-label text-slate-400">Total Uang</p>
                     <p class="text-sm font-bold text-brand-700">{{ $item['total_uang_display'] }}</p>
                 </div>
                 <div class="space-y-1">
-                    <p class="text-[11px] font-semibold uppercase tracking-wide text-slate-400">Total Beras</p>
+                    <p class="ui-label text-slate-400">Total Beras</p>
                     <p class="text-sm font-bold text-amber-700">{{ $item['total_beras_kg_display'] }}</p>
                 </div>
             </div>
@@ -23,18 +23,18 @@
     @endforeach
 
     <article class="rounded-2xl border border-brand-200 bg-brand-50/60 p-4 shadow-sm">
-        <p class="text-[11px] font-semibold uppercase tracking-wide text-brand-700">Grand Total</p>
+        <p class="ui-label text-brand-700">Grand Total</p>
         <div class="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-3">
             <div>
-                <p class="text-[11px] font-semibold uppercase tracking-wide text-brand-700/70">Transaksi</p>
+                <p class="ui-label text-brand-700/70">Transaksi</p>
                 <p class="text-sm font-bold text-brand-900">{{ number_format($payload['totals']['jumlah_transaksi']) }}</p>
             </div>
             <div>
-                <p class="text-[11px] font-semibold uppercase tracking-wide text-brand-700/70">Total Uang</p>
+                <p class="ui-label text-brand-700/70">Total Uang</p>
                 <p class="text-sm font-bold text-brand-900">{{ $payload['totals']['total_uang_display'] }}</p>
             </div>
             <div>
-                <p class="text-[11px] font-semibold uppercase tracking-wide text-brand-700/70">Total Beras</p>
+                <p class="ui-label text-brand-700/70">Total Beras</p>
                 <p class="text-sm font-bold text-brand-900">{{ $payload['totals']['total_beras_kg_display'] }}</p>
             </div>
         </div>
@@ -44,7 +44,7 @@
 <div class="hidden overflow-x-auto md:block">
     <table class="min-w-full text-[10px] sm:text-sm">
         <thead>
-            <tr class="border-b border-slate-100 bg-slate-50 text-left text-[11px] font-bold uppercase tracking-[0.18em] text-slate-400 sm:text-xs">
+            <tr class="border-b border-slate-100 bg-slate-50 text-left text-[11px] font-semibold uppercase tracking-[0.08em] text-slate-400 sm:text-xs">
                 <th class="px-3 py-4 sm:px-6 sm:py-4 text-left">Kategori</th>
                 <th class="px-3 py-4 sm:px-6 sm:py-4 text-center">Total Transaksi</th>
                 <th class="px-3 py-4 sm:px-6 sm:py-4 text-right">Total Uang</th>

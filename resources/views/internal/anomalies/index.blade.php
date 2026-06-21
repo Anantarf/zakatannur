@@ -8,7 +8,7 @@
                     </svg>
                     Review Anomali
                 </h2>
-                <p class="text-sm text-slate-500">Antrean admin untuk memeriksa warning transaksi, menutup kasus yang aman, dan menandai kasus yang perlu tindak lanjut.</p>
+                <p class="ui-body-muted">Antrean admin untuk memeriksa warning transaksi, menutup kasus yang aman, dan menandai kasus yang perlu tindak lanjut.</p>
             </div>
             <a href="{{ route('internal.transactions.index') }}" class="ui-btn ui-btn-secondary w-full sm:w-auto">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -52,7 +52,7 @@
                             </a>
                             <a
                                 href="{{ route('internal.anomalies.index', array_filter(['scope' => 'archived'])) }}"
-                                class="inline-flex items-center rounded-full border px-4 py-2 text-sm font-semibold transition {{ ($scope ?? 'active') === 'archived' ? 'border-sky-600 bg-sky-600 text-white shadow-sm' : 'border-slate-200 bg-white text-slate-600 hover:border-sky-200 hover:text-sky-700' }}"
+                                class="inline-flex items-center rounded-full border px-4 py-2 text-sm font-semibold transition {{ ($scope ?? 'active') === 'archived' ? 'border-brand-600 bg-brand-600 text-white shadow-sm' : 'border-slate-200 bg-white text-slate-600 hover:border-brand-200 hover:text-brand-700' }}"
                                 aria-current="{{ ($scope ?? 'active') === 'archived' ? 'page' : 'false' }}"
                             >
                                 Riwayat Review
@@ -70,10 +70,10 @@
                 <div class="ui-toolbar-soft lg:flex-col xl:flex-row xl:items-start">
                     <div class="max-w-full space-y-1 xl:max-w-[280px] xl:flex-none">
                         <div class="ui-section-title">
-                            <div class="h-6 w-2 rounded-full bg-amber-500"></div>
+                            <div class="ui-section-accent"></div>
                             <h3 class="font-semibold text-slate-800">{{ ($scope ?? 'active') === 'archived' ? 'Riwayat Review' : 'Daftar Kasus Aktif' }}</h3>
                         </div>
-                        <p class="text-sm leading-6 text-slate-500">
+                        <p class="ui-body-muted">
                             {{ ($scope ?? 'active') === 'archived'
                                 ? 'Lihat kembali kasus yang sudah selesai tanpa mengganggu antrean kerja aktif.'
                                 : 'Utamakan kasus belum ditinjau, buka detail, lalu putuskan apakah aman atau perlu tindak lanjut.' }}
@@ -176,7 +176,7 @@
                 <div class="hidden overflow-x-auto md:block">
                     <table class="min-w-full text-sm">
                         <thead>
-                            <tr class="border-b border-slate-100 bg-slate-50 text-left text-[11px] font-bold uppercase tracking-widest text-slate-400 sm:text-xs">
+                            <tr class="border-b border-slate-100 bg-slate-50 text-left text-[11px] font-semibold uppercase tracking-[0.08em] text-slate-400 sm:text-xs">
                                 <th class="px-3 py-3 sm:px-5">No. Transaksi</th>
                                 <th class="px-3 py-3 sm:px-5">Waktu</th>
                                 <th class="px-3 py-3 sm:px-5">Pembayar</th>
@@ -203,7 +203,7 @@
                 </div>
 
                 @if ($groups->hasPages())
-                    <div class="border-t border-slate-50 px-5 py-3">
+                    <div class="border-t border-slate-100 px-5 py-3">
                         {{ $groups->links() }}
                     </div>
                 @endif

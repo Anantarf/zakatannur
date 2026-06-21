@@ -123,6 +123,41 @@ class PublicSummaryApiTest extends TestCase
         $this->assertSame('Rp 10.000',             $fitrah['total_uang_display']);
         $this->assertSame('2,50 Kg',               $fitrah['total_beras_kg_display']);
         $this->assertSame('Rp 10.000 + 2,50 Kg',  $fitrah['total_display']);
+        $this->assertNotNull($response->json('data.latest_transaction_at_wib'));
+    }
+
+    public function test_public_summary_latest_transaction_uses_latest_valid_transaction_time(): void
+    {
+        $petugas = User::factory()->create(['role' => User::ROLE_STAFF]);
+        $muzakki = Muzakki::query()->create(['name' => 'Ahmad']);
+
+        foreach ([
+            ['TRX-20260308-0001', ZakatTransaction::STATUS_VALID, '2026-03-08 09:00:00'],
+            ['TRX-20260308-0002', ZakatTransaction::STATUS_VALID, '2026-03-08 10:15:20'],
+            ['TRX-20260308-0003', ZakatTransaction::STATUS_VOID, '2026-03-08 11:00:00'],
+        ] as [$number, $status, $receivedAt]) {
+            ZakatTransaction::query()->create([
+                'no_transaksi' => $number,
+                'muzakki_id' => $muzakki->id,
+                'pembayar_nama' => 'Hamba Allah',
+                'pembayar_phone' => '0812',
+                'pembayar_alamat' => 'Jakarta',
+                'shift' => ZakatTransaction::SHIFTS[0],
+                'category' => ZakatTransaction::CATEGORY_FITRAH,
+                'tahun_zakat' => 2026,
+                'metode' => ZakatTransaction::METHOD_UANG,
+                'nominal_uang' => 25000,
+                'jiwa' => 1,
+                'petugas_id' => $petugas->id,
+                'status' => $status,
+                'waktu_terima' => $receivedAt,
+            ]);
+        }
+
+        $response = $this->getJson('/api/public/summary?year=2026');
+
+        $response->assertOk()
+            ->assertJsonPath('data.latest_transaction_at_wib', '2026-03-08 10:15:20');
     }
 
     public function test_public_daily_chart_uses_configured_admin_range_and_effective_transaction_date(): void

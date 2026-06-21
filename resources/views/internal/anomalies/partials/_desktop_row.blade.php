@@ -3,7 +3,7 @@
 @endphp
 <tr class="transition-colors hover:bg-amber-50/30">
     <td class="whitespace-nowrap px-3 py-3 sm:px-5">
-        <span class="rounded-md bg-blue-50 px-2 py-1 font-sans text-xs font-semibold text-blue-600">{{ $group->no_transaksi }}</span>
+        <span class="rounded-md bg-slate-100 px-2 py-1 font-sans text-xs font-semibold text-slate-600">{{ $group->no_transaksi }}</span>
     </td>
     <td class="whitespace-nowrap px-3 py-3 text-[13px] text-slate-500 sm:px-5">
         <div class="leading-tight">
