@@ -143,20 +143,26 @@ class PeriodSettingsService
         ]);
     }
 
+    public function ensureAnnualSettingsExist(int $year): void
+    {
+        AnnualSetting::query()->firstOrCreate(
+            ['year' => $year],
+            [
+                'default_fitrah_cash_per_jiwa' => (int) config('zakat.annual_defaults.fitrah_cash_per_jiwa', 50000),
+                'default_fitrah_beras_per_jiwa' => (float) config('zakat.annual_defaults.fitrah_beras_per_jiwa', 2.50),
+                'default_fidyah_per_hari' => (int) config('zakat.annual_defaults.fidyah_per_hari', 30000),
+                'default_fidyah_beras_per_hari' => (float) config('zakat.annual_defaults.fidyah_beras_per_hari', 0.75),
+            ]
+        );
+    }
+
     public function startNewPeriod(int $activeYear, int $newYear, Request $request): ZakatPeriod
     {
         $newPeriod = null;
 
         DB::transaction(function () use ($activeYear, $newYear, &$newPeriod) {
-            $currentAnnual = AnnualSetting::query()->firstOrCreate(
-                ['year' => $activeYear],
-                [
-                    'default_fitrah_cash_per_jiwa' => (int) config('zakat.annual_defaults.fitrah_cash_per_jiwa', 50000),
-                    'default_fitrah_beras_per_jiwa' => (float) config('zakat.annual_defaults.fitrah_beras_per_jiwa', 2.50),
-                    'default_fidyah_per_hari' => (int) config('zakat.annual_defaults.fidyah_per_hari', 30000),
-                    'default_fidyah_beras_per_hari' => (float) config('zakat.annual_defaults.fidyah_beras_per_hari', 0.75),
-                ]
-            );
+            $this->ensureAnnualSettingsExist($activeYear);
+            $currentAnnual = AnnualSetting::query()->where('year', $activeYear)->firstOrFail();
 
             AnnualSetting::query()->firstOrCreate(
                 ['year' => $newYear],

@@ -32,11 +32,13 @@ class TransactionRiskReview extends Model
     public const LEVELS = [
         self::LEVEL_NORMAL,
         self::LEVEL_WARNING,
+        self::LEVEL_SUSPICIOUS,
     ];
 
     public const LEVEL_LABELS = [
         self::LEVEL_NORMAL => 'Normal',
         self::LEVEL_WARNING => 'Warning',
+        self::LEVEL_SUSPICIOUS => 'Suspicious',
     ];
 
     public const REVIEW_STATUSES = [

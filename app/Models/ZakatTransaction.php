@@ -194,17 +194,17 @@ class ZakatTransaction extends Model
 
     protected function categoryLabel(): Attribute
     {
-        return Attribute::get(fn() => self::CATEGORY_LABELS[$this->category] ?? strtoupper($this->category));
+        return Attribute::get(fn() => self::CATEGORY_LABELS[$this->category] ?? (strtoupper($this->category) ?: '-'));
     }
 
     protected function metodeLabel(): Attribute
     {
-        return Attribute::get(fn() => self::METHOD_LABELS[$this->metode] ?? strtoupper($this->metode));
+        return Attribute::get(fn() => self::METHOD_LABELS[$this->metode] ?? (strtoupper($this->metode) ?: '-'));
     }
 
     protected function shiftLabel(): Attribute
     {
-        return Attribute::get(fn() => self::SHIFT_LABELS[$this->shift] ?? strtoupper((string) $this->shift) ?: '-');
+        return Attribute::get(fn() => self::SHIFT_LABELS[$this->shift] ?? (strtoupper((string) $this->shift) ?: '-'));
     }
 
     protected function nominalUangDisplay(): Attribute

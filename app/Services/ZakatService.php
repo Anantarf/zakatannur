@@ -178,7 +178,6 @@ class ZakatService
 
             $oldTotals = $this->getExistingTransactionTotals($noTransaksi);
             $pembayarData = $this->muzakkiResolver->payerData($data);
-            $this->muzakkiResolver->resolvePayer($data);
 
             $existingIds = ZakatTransaction::where('no_transaksi', $noTransaksi)->pluck('id')->toArray();
             [$results, $newIds] = $this->processItems($items, $data, $pembayarData, $petugasId, $waktuTerima, $noTransaksi);

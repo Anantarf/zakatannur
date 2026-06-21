@@ -15,19 +15,11 @@ use Illuminate\Support\Facades\Validator;
 
 class PeriodSettingsController extends Controller
 {
-    public function edit(ChartRangeResolver $chartRangeResolver, ZakatPeriodResolver $periodResolver)
+    public function edit(ChartRangeResolver $chartRangeResolver, ZakatPeriodResolver $periodResolver, PeriodSettingsService $service)
     {
         $activeYear = AppSetting::getInt(AppSetting::KEY_ACTIVE_YEAR, (int) now()->year);
 
-        AnnualSetting::query()->firstOrCreate(
-            ['year' => $activeYear],
-            [
-                'default_fitrah_cash_per_jiwa' => (int) config('zakat.annual_defaults.fitrah_cash_per_jiwa', 50000),
-                'default_fitrah_beras_per_jiwa' => (float) config('zakat.annual_defaults.fitrah_beras_per_jiwa', 2.50),
-                'default_fidyah_per_hari' => (int) config('zakat.annual_defaults.fidyah_per_hari', 30000),
-                'default_fidyah_beras_per_hari' => (float) config('zakat.annual_defaults.fidyah_beras_per_hari', 0.75),
-            ]
-        );
+        $service->ensureAnnualSettingsExist($activeYear);
         $period = $periodResolver->ensureForYear($activeYear);
 
         $publicRefreshIntervalSecondsRaw = AppSetting::getInt(AppSetting::KEY_PUBLIC_REFRESH_INTERVAL_SECONDS, 15);

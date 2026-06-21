@@ -535,7 +535,7 @@ class TransactionRiskReviewTest extends TestCase
         $this->actingAs($admin)
             ->get('/internal/anomalies/' . $tx->no_transaksi)
             ->assertOk()
-            ->assertSee('Detail Review Anomali')
+            ->assertSee('Tinjau Anomali')
             ->assertSee('Transaksi diubah setelah kwitansi pernah dicetak dan perlu verifikasi ulang.')
             ->assertSee('TRX-20260516-0099');
 
