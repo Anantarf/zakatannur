@@ -152,8 +152,12 @@
                                         x-show="!message.feedback"
                                         class="opacity-0 group-hover:opacity-100 transition-opacity px-1.5 text-slate-500 hover:text-green-600"
                                         title="Membantu"
+                                        aria-label="Membantu"
                                     >
-                                        👍
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 1.95-1.56l1.38-6A2 2 0 0 0 19.66 12H14V9Z" />
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3" />
+                                        </svg>
                                     </button>
                                     <button
                                         type="button"
@@ -161,10 +165,19 @@
                                         x-show="!message.feedback"
                                         class="opacity-0 group-hover:opacity-100 transition-opacity px-1.5 text-slate-500 hover:text-red-600"
                                         title="Tidak membantu"
+                                        aria-label="Tidak membantu"
                                     >
-                                        👎
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M10 15v4a3 3 0 0 0 3 3l4-9V2H5.72a2 2 0 0 0-1.95 1.56l-1.38 6A2 2 0 0 0 4.34 12H10v3Z" />
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M17 2h3a2 2 0 0 1 2 2v7a2 2 0 0 1-2 2h-3" />
+                                        </svg>
                                     </button>
-                                    <span x-show="message.feedback" class="px-2 py-0.5 text-slate-400">✓ Terima kasih</span>
+                                    <span x-show="message.feedback" class="inline-flex items-center gap-1 px-2 py-0.5 text-slate-400">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.25" aria-hidden="true">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="m5 13 4 4L19 7" />
+                                        </svg>
+                                        <span>Terima kasih</span>
+                                    </span>
                                 </div>
                             </template>
                             <template x-if="message.isError &amp;&amp; message.isRetryable">
