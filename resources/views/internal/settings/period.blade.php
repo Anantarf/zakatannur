@@ -64,23 +64,16 @@
                 }"
                 @keydown.escape="expandedSection = null">
 
-                <div class="ui-card-header ui-card-header-slate flex-wrap justify-between gap-3">
-                    <div class="flex items-center gap-2">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="ui-card-header-icon text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.066 2.573c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.573 1.066c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.066-2.573c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                        </svg>
-                        <h3 class="ui-card-header-title">Konfigurasi Periode Zakat</h3>
-                    </div>
-                    <div class="flex rounded-lg border border-slate-200 bg-slate-100/60 p-0.5">
+                <div class="border-b border-slate-100 bg-white px-4 py-3 sm:px-5">
+                    <div class="flex w-full rounded-lg border border-slate-200 bg-slate-100/60 p-0.5 sm:w-fit">
                         <button type="button" @click="tab = 'config'"
                             :class="tab === 'config' ? 'bg-white shadow-sm text-slate-900' : 'text-slate-500 hover:text-slate-700'"
-                            class="rounded-md px-3 py-1.5 text-sm font-semibold transition">
+                            class="flex-1 rounded-md px-3 py-1.5 text-sm font-semibold transition sm:flex-none">
                             Edit Periode Aktif
                         </button>
                         <button type="button" @click="tab = 'new_period'"
                             :class="tab === 'new_period' ? 'bg-amber-600 text-white shadow-sm' : 'text-slate-500 hover:text-amber-700'"
-                            class="rounded-md px-3 py-1.5 text-sm font-semibold transition">
+                            class="flex-1 rounded-md px-3 py-1.5 text-sm font-semibold transition sm:flex-none">
                             Buka Tahun Baru
                         </button>
                     </div>
@@ -93,7 +86,7 @@
                         <div class="grid grid-cols-1 gap-3 text-sm md:grid-cols-3">
                             <button type="button" @click="toggleSection(2)" class="ui-settings-summary-card ui-settings-summary-card-emerald text-left hover:ring-2 hover:ring-brand-300 transition-all cursor-pointer">
                                 <div class="text-[11px] font-bold text-brand-700 flex items-center justify-between">
-                                    <span>📅 Periode Aktif</span>
+                                    <span>Periode Aktif</span>
                                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" :class="expandedSection === 2 ? 'rotate-180' : ''" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
                                     </svg>
@@ -105,7 +98,7 @@
                             </button>
                             <button type="button" @click="toggleSection(4)" class="ui-settings-summary-card ui-settings-summary-card-emerald text-left hover:ring-2 hover:ring-brand-300 transition-all cursor-pointer">
                                 <div class="text-[11px] font-bold text-brand-700 flex items-center justify-between">
-                                    <span>📊 Grafik Periode</span>
+                                    <span>Grafik Periode</span>
                                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" :class="expandedSection === 4 ? 'rotate-180' : ''" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
                                     </svg>
@@ -117,7 +110,7 @@
                             </button>
                             <button type="button" @click="toggleSection(5)" class="ui-settings-summary-card ui-settings-summary-card-emerald text-left hover:ring-2 hover:ring-brand-300 transition-all cursor-pointer">
                                 <div class="text-[11px] font-bold text-brand-700 flex items-center justify-between">
-                                    <span>🎯 Sumber Dashboard</span>
+                                    <span>Sumber Dashboard</span>
                                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" :class="expandedSection === 5 ? 'rotate-180' : ''" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
                                     </svg>
@@ -138,7 +131,7 @@
                             <div class="ui-settings-section-head">
                                 <span class="ui-section-accent"></span>
                                 <div>
-                                    <h4 class="ui-settings-section-title">⚙️ Dasar Sistem</h4>
+                                    <h4 class="ui-settings-section-title">Dasar Sistem</h4>
                                     <p class="ui-settings-section-copy">Info sistem dan interval refresh. Tahun aktif hanya bisa diubah via "Buka Tahun Baru".</p>
                                 </div>
                             </div>
@@ -171,7 +164,7 @@
                             <button type="button" @click="toggleSection(2)" class="ui-settings-section-head group w-full text-left hover:bg-slate-50/50 transition-colors">
                                 <span class="ui-section-accent"></span>
                                 <div class="flex-1">
-                                    <h4 class="ui-settings-section-title">📅 Identitas Periode Aktif</h4>
+                                    <h4 class="ui-settings-section-title">Identitas Periode Aktif</h4>
                                     <p class="ui-settings-section-copy">Nama, tahun Hijriah, dan rentang penerimaan.</p>
                                 </div>
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-slate-400 transition-transform" :class="expandedSection === 2 ? 'rotate-180' : ''" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -209,7 +202,7 @@
                             <button type="button" @click="toggleSection(3)" class="ui-settings-section-head group w-full text-left hover:bg-slate-50/50 transition-colors">
                                 <span class="ui-section-accent"></span>
                                 <div class="flex-1">
-                                    <h4 class="ui-settings-section-title">💰 Nominal Default Transaksi</h4>
+                                    <h4 class="ui-settings-section-title">Nominal Default Transaksi</h4>
                                     <p class="ui-settings-section-copy">Isian awal saat panitia input transaksi baru. Transaksi lama tidak otomatis dihitung ulang.</p>
                                 </div>
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-slate-400 transition-transform" :class="expandedSection === 3 ? 'rotate-180' : ''" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -246,7 +239,7 @@
                             <button type="button" @click="toggleSection(4)" class="ui-settings-section-head group w-full text-left hover:bg-emerald-50/50 transition-colors">
                                 <span class="ui-section-accent"></span>
                                 <div class="flex-1">
-                                    <h4 class="ui-settings-section-title">📊 Rentang Grafik Periode Aktif</h4>
+                                    <h4 class="ui-settings-section-title">Rentang Grafik Periode Aktif</h4>
                                     <p class="ui-settings-section-copy">Tanggal yang dipakai untuk baca grafik periode. Kosongkan untuk ikuti rentang periode.</p>
                                 </div>
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-emerald-400 transition-transform" :class="expandedSection === 4 ? 'rotate-180' : ''" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -280,7 +273,7 @@
                             <button type="button" @click="toggleSection(5)" class="ui-settings-section-head group w-full text-left hover:bg-emerald-50/50 transition-colors">
                                 <span class="ui-section-accent"></span>
                                 <div class="flex-1">
-                                    <h4 class="ui-settings-section-title">🎯 Sumber Grafik Dashboard</h4>
+                                    <h4 class="ui-settings-section-title">Sumber Grafik Dashboard</h4>
                                     <p class="ui-settings-section-copy">Pilih apakah dashboard ikut periode aktif, periode manual, atau periode terakhir selesai.</p>
                                 </div>
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-emerald-400 transition-transform" :class="expandedSection === 5 ? 'rotate-180' : ''" fill="none" viewBox="0 0 24 24" stroke="currentColor">

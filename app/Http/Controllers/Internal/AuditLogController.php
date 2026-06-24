@@ -4,11 +4,12 @@ namespace App\Http\Controllers\Internal;
 
 use App\Http\Controllers\Controller;
 use App\Models\AuditLog;
+use App\Services\Admin\ZakkyAdminInsightService;
 use Illuminate\Http\Request;
 
 class AuditLogController extends Controller
 {
-    public function index(Request $request)
+    public function index(Request $request, ZakkyAdminInsightService $zakkyInsightService)
     {
         $sortBy = $request->get('sort_by', 'created_at');
         $sortDir = $request->get('sort_dir', 'desc') === 'asc' ? 'asc' : 'desc';
@@ -28,7 +29,8 @@ class AuditLogController extends Controller
         $logs = $query->paginate(50)->appends($request->query());
         $totalLogs = AuditLog::query()->count();
         $latestLog = AuditLog::query()->latest('created_at')->first();
+        $zakkyInsight = $zakkyInsightService->auditLogInsight();
 
-        return view('internal.audit_logs.index', compact('logs', 'sortBy', 'sortDir', 'totalLogs', 'latestLog'));
+        return view('internal.audit_logs.index', compact('logs', 'sortBy', 'sortDir', 'totalLogs', 'latestLog', 'zakkyInsight'));
     }
 }

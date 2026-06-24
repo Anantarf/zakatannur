@@ -8,13 +8,13 @@
                     </svg>
                     Riwayat Transaksi
                 </h2>
-                <p class="text-sm text-slate-500">Telusuri, filter, dan kelola transaksi tercatat.</p>
+                <p class="ui-page-title-copy">Telusuri, filter, dan kelola transaksi tercatat.</p>
             </div>
 
             <div class="flex flex-col sm:flex-row items-center gap-2 w-full sm:w-auto">
                 <a href="{{ route('internal.transactions.create') }}" class="ui-btn ui-btn-primary w-full px-4 py-3 sm:w-auto sm:py-2.5">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M12 4v16m8-8H4" /></svg>
-                    Catat Baru
+                    Input Baru
                 </a>
 
                 @if (auth()->check() && in_array(auth()->user()->role, ['admin', 'super_admin'], true))
@@ -95,7 +95,7 @@
                                             <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 text-slate-200 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                                             </svg>
-                                            <span class="text-sm font-medium text-slate-400">
+                                            <span class="ui-empty-state-copy">
                                                 {{ ($q || $year || $category) ? "Data tidak ditemukan." : "Belum ada transaksi ditemukan." }}
                                             </span>
                                         </div>

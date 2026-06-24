@@ -6,7 +6,7 @@
                     {{ isset($isEdit) ? 'Ubah Transaksi ' . $mainTx->no_transaksi : 'Input Transaksi' }}
                 </h2>
                 <p class="text-sm text-slate-500">
-                    {{ isset($isEdit) ? 'Perbarui data transaksi dengan aman, lalu simpan perubahan setelah semua detail sesuai.' : 'Isi pembayar, pilih kategori zakat per jiwa, lalu simpan seluruh transaksi dalam satu proses.' }}
+                    {{ isset($isEdit) ? 'Perbarui data transaksi, lalu simpan.' : 'Isi pembayar dan pilih kategori zakat per jiwa.' }}
                 </p>
             </div>
             <div class="mx-auto inline-flex w-fit items-center justify-center rounded-full border border-brand-100 bg-brand-50 px-3 py-1.5 text-[10px] font-bold uppercase tracking-[0.14em] text-brand-700 sm:mx-0">
@@ -78,15 +78,8 @@
                     <!-- Right Column (Matrix Members) -->
                     <div class="lg:col-span-3 space-y-4 max-w-full">
                         <div class="ui-card-strong p-4 sm:p-5">
-                            <div class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-                                <div>
-                                    <h3 class="text-lg font-bold text-slate-800">Detail Pembayaran</h3>
-                                    <p class="mt-1 text-sm text-slate-500">Aktifkan jenis zakat, lalu isi nominal atau beratnya.</p>
-                                </div>
-                                <div class="inline-flex items-center rounded-full border border-brand-100 bg-white px-3 py-1 text-[11px] font-semibold text-brand-700">
-                                    Satu keluarga, satu halaman
-                                </div>
-                            </div>
+                            <h3 class="text-lg font-bold text-slate-800">Detail Pembayaran</h3>
+                            <p class="mt-1 text-sm text-slate-500">Aktifkan jenis zakat, lalu isi nominal atau beratnya.</p>
                         </div>
 
                         <template x-for="(person, index) in persons" :key="person.id">
@@ -110,11 +103,6 @@
                             Harap pilih minimal 1 jenis zakat (Fitrah, Fidyah, Mal, atau Infaq) untuk muzakki.
                         </div>
                         
-                        <!-- Realtime Info Badge -->
-                        <div class="justify-end hidden">
-                            <span class="rounded-full border border-slate-200 bg-slate-100 px-3 py-1 text-sm font-bold text-slate-500" x-text="'Total Transaksi Dipilih: '+txs.length"></span>
-                        </div>
-
                         @include('internal.transactions.partials.form-actions')
                     </div>
                 </div>

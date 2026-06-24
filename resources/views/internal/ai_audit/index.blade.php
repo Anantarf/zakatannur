@@ -8,7 +8,7 @@
                     </svg>
                     AI Audit Assistant
                 </h2>
-                <p class="ui-body-muted">Generate ringkasan aktivitas audit dan rekomendasi tindak lanjut berbasis AI.</p>
+                <p class="ui-page-title-copy">Generate ringkasan aktivitas audit dan rekomendasi tindak lanjut berbasis AI.</p>
             </div>
         </div>
     </x-slot>
@@ -17,8 +17,11 @@
         <div class="mx-auto max-w-5xl space-y-6 px-4 sm:px-6 lg:px-8">
 
             @if (session('status'))
-                <div class="rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-700">
-                    {{ session('status') }}
+                <div class="ui-alert ui-alert-success">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="ui-alert-icon text-brand-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                    </svg>
+                    <span class="font-medium">{{ session('status') }}</span>
                 </div>
             @endif
 

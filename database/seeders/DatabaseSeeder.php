@@ -56,5 +56,29 @@ class DatabaseSeeder extends Seeder
                 'password' => Hash::make('password'),
             ]
         );
+
+        $templatePath = 'templates/letterhead/kop_zakat_v2.pdf';
+        $sourcePath = base_path('kop zakat v2.pdf');
+        
+        if (file_exists($sourcePath)) {
+            if (!\Illuminate\Support\Facades\Storage::disk('local')->exists($templatePath)) {
+                \Illuminate\Support\Facades\Storage::disk('local')->put(
+                    $templatePath,
+                    file_get_contents($sourcePath)
+                );
+            }
+
+            \App\Models\Template::query()->firstOrCreate(
+                ['template_type' => \App\Models\Template::TYPE_LETTERHEAD, 'version' => 1],
+                [
+                    'is_active' => true,
+                    'storage_path' => $templatePath,
+                    'original_filename' => 'kop zakat v2.pdf',
+                    'mime_type' => 'application/pdf',
+                    'file_size_bytes' => filesize($sourcePath),
+                    'uploaded_by' => null,
+                ]
+            );
+        }
     }
 }

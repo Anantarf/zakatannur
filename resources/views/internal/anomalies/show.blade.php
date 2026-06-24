@@ -8,7 +8,7 @@
                     </svg>
                     Tinjau Anomali
                 </h2>
-                <p class="ui-body-muted">Verifikasi sinyal sistem dan putuskan apakah kasus ini perlu tindak lanjut.</p>
+                <p class="ui-page-title-copy">Verifikasi sinyal sistem dan putuskan apakah kasus ini perlu tindak lanjut.</p>
             </div>
             <div class="flex flex-col gap-2 sm:flex-row">
                 <a href="{{ route('internal.transactions.show', ['transaction' => $mainTx->id]) }}" class="ui-btn ui-btn-secondary w-full sm:w-auto">
@@ -38,6 +38,14 @@
 
             <div class="grid grid-cols-1 gap-4 xl:grid-cols-[minmax(0,1.4fr)_minmax(320px,0.6fr)]">
                 <div class="space-y-4">
+                    <x-zakky-insight
+                        :tone="$zakkyInsight['tone']"
+                        :label="$zakkyInsight['label']"
+                        :message="$zakkyInsight['message']"
+                        :items="$zakkyInsight['items'] ?? []"
+                        :generated="$zakkyInsight['generated'] ?? false"
+                    />
+
                     <div class="ui-card-strong overflow-hidden" x-data="{ tab: 'signals' }">
                         <div class="border-b border-slate-100/80 px-5 py-4 sm:px-6 sm:py-5">
                             <div class="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">

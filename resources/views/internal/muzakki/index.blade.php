@@ -83,7 +83,7 @@
                         </div>
                     </form>
                 </div>
-                <div class="space-y-2.5 p-3 md:hidden">
+                <div class="space-y-3 p-4 md:hidden">
                     @if (count($muzakki) > 0)
                         @foreach ($muzakki as $m)
                             <article class="ui-mobile-card">
@@ -122,7 +122,7 @@
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 text-slate-200 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
                                 </svg>
-                                <span class="ui-empty-state-copy font-bold">
+                                <span class="ui-empty-state-copy">
                                     {{ ($q ?? '') ? 'Data tidak ditemukan.' : 'Belum ada data muzakki.' }}
                                 </span>
                             </div>
@@ -144,7 +144,7 @@
                         <tbody class="divide-y divide-slate-50">
                             @if (count($muzakki) > 0)
                                 @foreach ($muzakki as $m)
-                                <tr class="transition-colors hover:bg-slate-50/70">
+                                <tr class="transition-colors hover:bg-slate-50">
                                     <td class="px-3 sm:px-5 py-3 font-bold text-slate-800">{!! \App\Support\Format::highlight($m->name, $q) !!}</td>
                                     <td class="px-3 sm:px-5 py-3 text-slate-500">{{ $m->phone ?? '-' }}</td>
                                     <td class="px-3 sm:px-5 py-3 text-slate-500 text-sm">{!! \App\Support\Format::highlight($m->address ?? '-', $q) !!}</td>
@@ -180,11 +180,11 @@
                             @else
                                 <tr>
                                     <td colspan="5" class="px-6 py-12 text-center">
-                                        <div class="ui-empty-state-box flex flex-col items-center">
+                                        <div class="flex flex-col items-center">
                                             <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 text-slate-200 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
                                             </svg>
-                                            <span class="ui-empty-state-copy font-bold">
+                                            <span class="ui-empty-state-copy">
                                                 {{ ($q ?? '') ? 'Data tidak ditemukan.' : 'Belum ada data muzakki.' }}
                                             </span>
                                         </div>
@@ -205,7 +205,7 @@
 
     <!-- Modal Konfirmasi Hapus Muzakki -->
     <x-modal name="delete-muzakki-modal" focusable>
-        <form method="POST" x-data="{ id: '', name: '' }" x-on:open-delete-modal.window="id = $event.detail.id; name = $event.detail.name; $el.action = '{{ url('/internal/muzakki') }}/' + id;" class="p-5">
+        <form method="POST" x-data="{ id: '', name: '' }" x-on:open-delete-modal.window="id = $event.detail.id; name = $event.detail.name; $el.action = '{{ url('/internal/muzakki') }}/' + id;" class="p-6">
             @csrf
             @method('DELETE')
             <h2 class="text-lg font-medium text-slate-900">

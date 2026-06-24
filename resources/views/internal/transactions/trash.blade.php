@@ -18,17 +18,6 @@
 
     <div class="py-4 sm:py-6">
         <div class="mx-auto max-w-7xl space-y-4 px-4 sm:px-6 lg:px-8">
-            {{-- Warning Banner --}}
-            <div class="ui-alert ui-alert-warning">
-                <svg xmlns="http://www.w3.org/2000/svg" class="ui-alert-icon text-amber-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z" />
-                </svg>
-                <div>
-                    <p class="text-sm font-bold">Transaksi dihapus sementara akan dihapus permanen secara otomatis setelah <span class="underline">30 hari</span>.</p>
-                    <p class="text-xs mt-0.5 font-medium text-amber-700">Anda masih dapat memulihkan transaksi sebelum batas waktu tersebut.</p>
-                </div>
-            </div>
-
             @if (session('status'))
                 <div class="ui-alert ui-alert-success">
                     <svg xmlns="http://www.w3.org/2000/svg" class="ui-alert-icon text-brand-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -59,8 +48,8 @@
             {{-- Trash Table --}}
             <div class="ui-card overflow-hidden">
                 <div class="ui-card-header ui-card-header-slate">
-                    <div class="h-6 w-2 rounded-full bg-red-400"></div>
-                    <h3 class="font-bold text-slate-800">Transaksi Terhapus</h3>
+                    <div class="ui-section-accent h-6 w-2"></div>
+                    <h3 class="ui-card-header-title">Transaksi Terhapus</h3>
                 </div>
                 <div class="space-y-3 p-4 md:hidden">
                     @if (count($transactions) > 0)
@@ -133,7 +122,7 @@
                                     <a class="ui-btn ui-btn-secondary px-3 py-3 text-xs" href="{{ route('internal.transactions.show', ['transaction' => $t->id]) }}">
                                         Lihat
                                     </a>
-                                    <form method="POST" action="{{ route('internal.transactions.restore', ['transactionId' => $t->id]) }}">
+                                    <form method="POST" action="{{ route('internal.transactions.restore', ['transaction' => $t->id]) }}">
                                         @csrf
                                         <button type="submit" class="ui-btn ui-btn-primary w-full px-3 py-3 text-xs">
                                             Pulihkan
@@ -166,92 +155,95 @@
                 <div class="hidden overflow-x-auto w-full md:block">
                     <table class="min-w-full text-sm">
                         <thead>
-                            <tr class="border-b border-slate-100 bg-slate-50 text-left text-xs font-semibold uppercase tracking-[0.14em] text-slate-400">
-                                <th class="px-5 py-3">No. Transaksi</th>
-                                <th class="px-5 py-3">Dihapus</th>
-                                <th class="px-5 py-3">Pembayar</th>
-                                <th class="px-4 py-3 text-center">Kategori</th>
-                                <th class="px-4 py-3 text-center">Bentuk</th>
-                                <th class="px-5 py-3 text-right">Total Nominal</th>
-                                <th class="px-5 py-3 text-center">Petugas</th>
-                                <th class="min-w-[150px] px-5 py-3 text-center">Aksi</th>
+                            <tr class="border-b border-slate-100 bg-slate-50 text-left text-[11px] font-semibold uppercase tracking-[0.14em] text-slate-400 sm:text-xs">
+                                <th class="px-3 py-3 sm:px-5">No. Transaksi</th>
+                                <th class="px-3 py-3 sm:px-5">Dihapus</th>
+                                <th class="px-3 py-3 sm:px-5">Pembayar</th>
+                                <th class="px-2 py-3 text-center">Kategori</th>
+                                <th class="px-2 py-3 text-center">Bentuk</th>
+                                <th class="px-3 py-3 text-right sm:px-5">Total Nominal</th>
+                                <th class="px-3 py-3 text-center sm:px-5">Petugas</th>
+                                <th class="min-w-[120px] px-3 py-3 text-center">Aksi</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-slate-100">
                             @if (count($transactions) > 0)
                                 @foreach ($transactions as $t)
                                 <tr class="transition-colors hover:bg-slate-50">
-                                    <td class="whitespace-nowrap px-5 py-3">
+                                    <td class="whitespace-nowrap px-3 py-3 sm:px-5">
                                         <span class="font-sans text-xs font-bold text-red-500 bg-red-50 px-2 py-1 rounded-md">{!! \App\Support\Format::highlight($t->no_transaksi, $q) !!}</span>
                                     </td>
-                                    <td class="whitespace-nowrap px-5 py-3 text-xs text-slate-500">
-                                        <div>{{ $t->deleted_at_formatted }}</div>
+                                    <td class="whitespace-nowrap px-3 py-3 text-[13px] text-slate-500 sm:px-5">
+                                        <div class="leading-tight">{{ $t->deleted_at_formatted }}</div>
                                         @if($t->days_left !== null)
-                                            <div class="mt-0.5 text-[10px] font-bold {{ $t->days_left <= 7 ? 'text-red-500' : 'text-slate-400' }}">
-                                                {{ $t->days_left > 0 ? 'Hapus permanen dalam ' . $t->days_left . ' hari' : 'Akan dihapus permanen hari ini' }}
+                                            <div class="mt-1 text-[11px] font-bold {{ $t->days_left <= 7 ? 'text-red-500' : 'text-slate-400' }}">
+                                                {{ $t->days_left > 0 ? 'Sisa ' . $t->days_left . ' hari' : 'Hari ini' }}
                                             </div>
                                         @endif
                                     </td>
-                                    <td class="whitespace-nowrap px-5 py-3">
-                                        <div class="text-[13px] font-semibold text-slate-700">{!! \App\Support\Format::highlight(\Illuminate\Support\Str::limit($t->pembayar_nama, 20), $q) !!}</div>
+                                    <td class="px-3 py-3 sm:px-5">
+                                        <div class="max-w-[180px] whitespace-normal break-words text-sm font-semibold leading-tight text-slate-700">{!! \App\Support\Format::highlight($t->pembayar_nama, $q) !!}</div>
                                         @if($t->muzakki_total > 1)
-                                            <div class="mt-0.5 text-[10px] font-normal text-slate-400">+ {{ $t->muzakki_total - 1 }} Muzakki Lainnya</div>
+                                            <div class="mt-1 whitespace-nowrap text-[11px] text-slate-400">+ {{ $t->muzakki_total - 1 }} Muzakki Lainnya</div>
                                         @endif
                                     </td>
-                                    <td class="px-4 py-4">
+                                    <td class="px-2 py-3 text-center">
                                         <x-zakat-category-tags :categories="$t->categories_list" />
                                     </td>
-                                    <td class="px-4 py-4">
+                                    <td class="px-2 py-3">
                                         <div class="flex flex-wrap gap-1 justify-center max-w-[100px] mx-auto">
                                             @foreach(explode(',', $t->methods_list ?? '') as $met)
                                                 @php $met = trim($met); @endphp
                                                 @if($met)
-                                                    <span class="inline-flex items-center justify-center rounded px-2 py-0.5 text-[10px] font-semibold uppercase bg-amber-50 text-amber-700 border border-amber-100 whitespace-nowrap leading-tight text-center">{{ \App\Models\ZakatTransaction::METHOD_LABELS[$met] ?? strtoupper($met) }}</span>
+                                                    <span class="inline-flex items-center justify-center rounded px-2 py-0.5 text-[11px] font-semibold uppercase bg-amber-50 text-amber-700 border border-amber-100 whitespace-nowrap leading-tight text-center">{{ \App\Models\ZakatTransaction::METHOD_LABELS[$met] ?? strtoupper($met) }}</span>
                                                 @endif
                                             @endforeach
                                         </div>
                                     </td>
-                                    <td class="px-5 py-3 text-right">
-                                        <div class="space-y-1">
+                                    <td class="whitespace-nowrap px-3 py-3 text-right sm:px-5">
+                                        <div class="space-y-0.5">
                                             @if($t->total_uang > 0)
-                                                <div class="flex items-center justify-end gap-1.5">
-                                                    <div class="text-xs font-bold text-slate-800">{{ $t->total_uang_display }}</div>
+                                                <div class="flex items-center justify-end gap-1">
+                                                    <div class="text-sm font-semibold text-slate-800">{{ $t->total_uang_display }}</div>
                                                     @if($t->has_transfer)
                                                         <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-semibold bg-brand-100 text-brand-700 border border-brand-200 uppercase">TF</span>
                                                     @endif
                                                 </div>
                                             @endif
                                             @if($t->total_beras > 0)
-                                                <div class="text-xs font-bold text-slate-800">{{ $t->total_beras_display }}</div>
+                                                <div class="text-sm font-semibold text-slate-800">{{ $t->total_beras_display }}</div>
                                             @endif
                                         </div>
                                     </td>
-                                    <td class="whitespace-nowrap px-5 py-3 text-center text-xs text-slate-500">
+                                    <td class="whitespace-nowrap px-3 py-3 text-center text-[13px] text-slate-500 sm:px-5">
                                         <div class="flex flex-col items-center gap-1">
-                                            <span>{{ $t->petugas?->name ?? '-' }}</span>
-                                            <span class="inline-flex items-center justify-center rounded px-2 py-0.5 text-[10px] font-semibold uppercase bg-brand-50 text-brand-700 border border-brand-100 whitespace-nowrap leading-tight text-center">
+                                            <span class="font-medium text-slate-700">{{ $t->petugas?->name ?? '-' }}</span>
+                                            <span class="inline-flex items-center justify-center rounded px-2 py-0.5 text-[11px] font-bold uppercase bg-brand-50 text-brand-700 border border-brand-100 whitespace-nowrap leading-tight text-center">
                                                 {{ $t->shift_label }}
                                             </span>
                                         </div>
                                     </td>
-                                    <td class="px-6 py-4 text-center whitespace-nowrap">
-                                        <div class="flex items-center justify-center gap-2">
-                                            <a class="inline-flex items-center justify-center rounded-lg p-2 text-slate-500 transition-colors hover:bg-slate-100 hover:text-slate-700" href="{{ route('internal.transactions.show', ['transaction' => $t->id]) }}" title="Lihat">
+                                    <td class="whitespace-nowrap px-3 py-3 text-center">
+                                        <div class="flex items-center justify-center gap-1.5">
+                                            <a class="ui-icon-button ui-icon-button-slate px-2" href="{{ route('internal.transactions.show', ['transaction' => $t->id]) }}" title="Lihat">
                                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
+                                                <span class="ui-table-action-label">Lihat</span>
                                             </a>
-                                            <form method="POST" action="{{ route('internal.transactions.restore', ['transactionId' => $t->id]) }}">
+                                            <form method="POST" action="{{ route('internal.transactions.restore', ['transaction' => $t->id]) }}" class="inline">
                                                 @csrf
-                                                <button type="submit" class="inline-flex items-center justify-center rounded-lg border border-brand-100 bg-brand-50 p-2 text-brand-600 transition-all hover:bg-brand-600 hover:text-white" title="Pulihkan">
+                                                <button type="submit" class="ui-icon-button ui-icon-button-blue px-2" title="Pulihkan">
                                                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
                                                     </svg>
+                                                    <span class="ui-table-action-label">Pulihkan</span>
                                                 </button>
                                             </form>
                                             @if(in_array(auth()->user()->role, ['admin', 'super_admin']))
-                                            <button type="button" @click="$dispatch('open-modal', 'force-delete-modal'); $dispatch('open-force-delete-modal', { id: {{ $t->id }}, no: '{{ $t->no_transaksi }}' })" class="inline-flex items-center justify-center rounded-lg border border-red-100 bg-red-50 p-2 text-red-600 transition-all hover:bg-red-600 hover:text-white" title="Hapus Permanen">
+                                            <button type="button" @click="$dispatch('open-modal', 'force-delete-modal'); $dispatch('open-force-delete-modal', { id: {{ $t->id }}, no: '{{ $t->no_transaksi }}' })" class="ui-icon-button ui-icon-button-danger px-2" title="Hapus Permanen">
                                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                                                 </svg>
+                                                <span class="ui-table-action-label">Hapus</span>
                                             </button>
                                             @endif
                                         </div>
@@ -265,7 +257,7 @@
                                             <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 text-slate-200 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
                                             </svg>
-                                            <span class="text-sm font-medium text-slate-400">
+                                            <span class="ui-empty-state-copy">
                                                 {{ ($q ?? '') ? 'Data tidak ditemukan.' : 'Sampah kosong - semua transaksi aman.' }}
                                             </span>
                                         </div>

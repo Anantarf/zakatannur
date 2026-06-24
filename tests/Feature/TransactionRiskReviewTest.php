@@ -622,7 +622,7 @@ class TransactionRiskReviewTest extends TestCase
         $this->actingAs($admin)
             ->get('/internal/anomalies')
             ->assertOk()
-            ->assertSee('Review Anomali')
+            ->assertSee('Deteksi Anomali')
             ->assertSee('Pembayar Anomali A')
             ->assertDontSee('Pembayar Anomali B')
             ->assertSee('Kasus Aktif')

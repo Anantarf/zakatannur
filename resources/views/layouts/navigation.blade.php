@@ -53,7 +53,7 @@
                                 </x-dropdown-link>
                                 <x-dropdown-link :href="route('internal.anomalies.index')">
                                     <span class="flex items-center justify-between gap-3">
-                                        <span>{{ __('Review Anomali') }}</span>
+                                        <span>{{ __('Deteksi Anomali') }}</span>
                                         @if (($pendingAnomalyCount ?? 0) > 0)
                                             <span class="inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-amber-500 px-1.5 text-[10px] font-bold text-white">
                                                 {{ $pendingAnomalyCount > 99 ? '99+' : $pendingAnomalyCount }}

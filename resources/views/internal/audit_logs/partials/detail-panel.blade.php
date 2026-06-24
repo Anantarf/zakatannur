@@ -202,14 +202,5 @@
             <pre class="text-[10px] text-brand-400 font-mono leading-relaxed bg-slate-800/50 p-3 rounded border border-slate-700/30">No Data Available</pre>
         @endif
 
-        @if(is_array($log->metadata) && count($log->metadata) > 0)
-            <div class="pt-3 mt-4 border-t border-slate-700/50">
-                <button @click="$el.nextElementSibling.classList.toggle('hidden')" class="text-[10px] text-slate-600 hover:text-slate-400 font-semibold uppercase tracking-[0.08em] flex items-center gap-1 transition-all">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-2 w-2" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v2H7a1 1 0 100 2h2v2a1 1 0 102 0v-2h2a1 1 0 100-2h-2V7z" clip-rule="evenodd" /></svg>
-                    Toggle Debug Info (JSON)
-                </button>
-                <pre class="hidden mt-4 text-[10px] text-brand-400/80 font-mono leading-relaxed bg-slate-950 p-4 rounded-xl border border-slate-800 shadow-inner">{{ json_encode($log->metadata, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES) }}</pre>
-            </div>
-        @endif
     </div>
 </div>

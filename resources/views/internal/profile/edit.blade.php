@@ -105,7 +105,7 @@
 
                         <div class="ui-settings-panel ui-settings-panel-muted sm:flex sm:items-center sm:justify-between">
                             <p class="mb-3 text-xs font-semibold text-slate-500 sm:mb-0">Simpan hanya jika ada perubahan akun.</p>
-                            <button type="submit" class="ui-btn ui-btn-primary w-full px-8 py-3 sm:w-auto">
+                            <button type="submit" class="ui-btn ui-btn-primary w-full px-6 py-3 sm:w-auto">
                                 {{ __('Simpan Perubahan') }}
                             </button>
                         </div>

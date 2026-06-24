@@ -3,7 +3,7 @@
 namespace Tests\Feature;
 
 use App\Services\Chatbot\ChatbotServiceInterface;
-use App\Services\Chatbot\Providers\GeminiChatbotProvider;
+use App\Services\Chatbot\Providers\OpenAiChatbotProvider;
 use App\Services\Chatbot\Providers\MockChatbotProvider;
 use App\Models\Muzakki;
 use App\Models\User;
@@ -68,7 +68,7 @@ class ChatbotApiTest extends TestCase
             ], 200),
         ]);
 
-        $this->app->bind(ChatbotServiceInterface::class, fn () => new GeminiChatbotProvider(
+        $this->app->bind(ChatbotServiceInterface::class, fn () => new OpenAiChatbotProvider(
             'test-key',
             'gemini-2.5-flash',
             'https://generativelanguage.googleapis.com/v1beta/models'
@@ -90,7 +90,7 @@ class ChatbotApiTest extends TestCase
             ], 404),
         ]);
 
-        $this->app->bind(ChatbotServiceInterface::class, fn () => new GeminiChatbotProvider(
+        $this->app->bind(ChatbotServiceInterface::class, fn () => new OpenAiChatbotProvider(
             'test-key',
             'gemini-2.5-flash',
             'https://generativelanguage.googleapis.com/v1beta/models'
@@ -120,7 +120,7 @@ class ChatbotApiTest extends TestCase
             ], 429),
         ]);
 
-        $this->app->bind(ChatbotServiceInterface::class, fn () => new GeminiChatbotProvider(
+        $this->app->bind(ChatbotServiceInterface::class, fn () => new OpenAiChatbotProvider(
             'test-key',
             'gemini-2.5-flash',
             'https://generativelanguage.googleapis.com/v1beta/models'
@@ -140,7 +140,7 @@ class ChatbotApiTest extends TestCase
             ], 500),
         ]);
 
-        $this->app->bind(ChatbotServiceInterface::class, fn () => new GeminiChatbotProvider(
+        $this->app->bind(ChatbotServiceInterface::class, fn () => new OpenAiChatbotProvider(
             'test-key',
             'gemini-2.5-flash',
             'https://generativelanguage.googleapis.com/v1beta/models'

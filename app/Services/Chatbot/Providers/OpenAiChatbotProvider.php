@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Throwable;
 
-class GeminiChatbotProvider implements ChatbotServiceInterface
+class OpenAiChatbotProvider implements ChatbotServiceInterface
 {
     private string $apiKey;
     private string $model;
@@ -38,50 +38,49 @@ class GeminiChatbotProvider implements ChatbotServiceInterface
     . "Jika ditanya hal di luar topik zakat, agama Islam, atau operasional masjid, tolak dengan sopan dan kembalikan ke topik zakat. "
     . "Jika pengguna menyapa (halo, assalamualaikum, hai, dll), balas sapaan dengan hangat dan perkenalkan diri sebagai Zakky.";
 
-        $url = "{$this->baseUrl}/{$this->model}:generateContent";
+        if (!empty($context)) {
+            $contextText = collect($context)
+                ->map(fn ($item) => '- ' . ($item['title'] ?? 'Konteks') . ': ' . ($item['answer'] ?? ''))
+                ->implode("\n");
+            $systemInstruction .= "\n\nKonteks resmi:\n" . $contextText;
+        }
+
+        $url = "{$this->baseUrl}/chat/completions";
 
         try {
-            $response = Http::withHeaders([
-                'Content-Type' => 'application/json',
-            ])
+            $response = Http::withToken($this->apiKey)
+                ->withHeaders([
+                    'Content-Type' => 'application/json',
+                ])
                 ->timeout($this->timeout)
                 ->connectTimeout(8)
                 ->retry(2, 700, function ($exception, $request) {
                     return $exception instanceof ConnectionException;
                 }, throw: false)
-                ->post($url . '?key=' . $this->apiKey, [
-                    'contents' => [
-                        [
-                            'parts' => [
-                                ['text' => $this->buildPrompt($message, $context)]
-                            ]
-                        ]
+                ->post($url, [
+                    'model' => $this->model,
+                    'messages' => [
+                        ['role' => 'system', 'content' => $systemInstruction],
+                        ['role' => 'user', 'content' => $message],
                     ],
-                    'systemInstruction' => [
-                        'parts' => [
-                            ['text' => $systemInstruction]
-                        ]
-                    ],
-                    'generationConfig' => [
-                        'temperature' => 0.4,
-                        'maxOutputTokens' => 500,
-                    ]
+                    'temperature' => 0.4,
+                    'max_tokens' => 500,
                 ]);
 
             if ($response->successful()) {
-                $reply = $response->json('candidates.0.content.parts.0.text');
+                $reply = $response->json('choices.0.message.content');
                 if (is_string($reply) && trim($reply) !== '') {
                     return $reply;
                 }
 
-                Log::warning('Gemini API returned empty reply', [
+                Log::warning('OpenAI API returned empty reply', [
                     'status' => $response->status(),
                     'body' => $response->body(),
                     'model' => $this->model,
                 ]);
             }
 
-            Log::error('Gemini API Error Response', [
+            Log::error('OpenAI API Error Response', [
                 'status' => $response->status(),
                 'body' => $response->body(),
                 'model' => $this->model,
@@ -101,7 +100,7 @@ class GeminiChatbotProvider implements ChatbotServiceInterface
 
             return $this->fallback('Layanan asisten AI sedang tidak tersedia saat ini. Silakan coba beberapa saat lagi.');
         } catch (Throwable $e) {
-            Log::error('Gemini API Exception', [
+            Log::error('OpenAI API Exception', [
                 'message' => $e->getMessage(),
                 'model' => $this->model,
             ]);
@@ -119,18 +118,5 @@ class GeminiChatbotProvider implements ChatbotServiceInterface
     {
         $this->lastReplyWasFallback = true;
         return ChatbotServiceInterface::FALLBACK_PREFIX . $message;
-    }
-
-    private function buildPrompt(string $message, array $context): string
-    {
-        if ($context === []) {
-            return $message;
-        }
-
-        $contextText = collect($context)
-            ->map(fn ($item) => '- ' . ($item['title'] ?? 'Konteks') . ': ' . ($item['answer'] ?? ''))
-            ->implode("\n");
-
-        return "Konteks resmi:\n{$contextText}\n\nPertanyaan pengguna:\n{$message}";
     }
 }

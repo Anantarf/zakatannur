@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Internal;
 use App\Http\Controllers\Controller;
 use App\Models\TransactionRiskReview;
 use App\Models\ZakatTransaction;
+use App\Services\Admin\ZakkyAdminInsightService;
 use App\Services\Transactions\TransactionAnomalyService;
 use App\Services\Transactions\TransactionReviewAssistantService;
 use App\Support\Audit;
@@ -15,20 +16,36 @@ use Illuminate\View\View;
 
 class TransactionAnomalyController extends Controller
 {
-    public function index(Request $request, TransactionAnomalyService $anomalyService): View
+    public function index(
+        Request $request,
+        TransactionAnomalyService $anomalyService,
+        ZakkyAdminInsightService $zakkyInsightService
+    ): View
     {
         $filters = $anomalyService->parseFilters($request);
+        $viewData = $anomalyService->indexViewData($filters);
         $groups = $anomalyService->paginatedGroups($filters, $request->query());
+        $zakkyInsight = $zakkyInsightService->anomalyListInsight($viewData['overview']);
 
         return view('internal.anomalies.index', array_merge(
-            $anomalyService->indexViewData($filters),
-            ['groups' => $groups]
+            $viewData,
+            ['groups' => $groups, 'zakkyInsight' => $zakkyInsight]
         ));
     }
 
-    public function show(string $noTransaksi, TransactionAnomalyService $anomalyService): View
+    public function show(
+        string $noTransaksi,
+        TransactionAnomalyService $anomalyService,
+        ZakkyAdminInsightService $zakkyInsightService
+    ): View
     {
-        return view('internal.anomalies.show', $anomalyService->detailViewData($noTransaksi));
+        $viewData = $anomalyService->detailViewData($noTransaksi);
+        $viewData['zakkyInsight'] = $zakkyInsightService->anomalyDetailInsight(
+            $viewData['riskReview'],
+            $viewData['riskMeta'],
+        );
+
+        return view('internal.anomalies.show', $viewData);
     }
 
     public function updateReviewStatus(
@@ -73,6 +90,6 @@ class TransactionAnomalyController extends Controller
 
         return redirect()
             ->route('internal.anomalies.show', ['noTransaksi' => $noTransaksi])
-            ->with('status', 'Status review anomali berhasil diperbarui.');
+            ->with('status', 'Status deteksi anomali berhasil diperbarui.');
     }
 }

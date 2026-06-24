@@ -27,7 +27,8 @@ class ChatbotController extends Controller
         ]);
 
         try {
-            $response = $this->chatbot->handle($request->message, $request->input('context', []));
+            $sessionId = $request->input('session_id') ?: ($request->session()->getId() ?: null);
+            $response = $this->chatbot->handle($request->message, $request->input('context', []), $sessionId);
 
             return response()->json($response->toArray(), $response->statusCode);
         } catch (\Throwable $e) {

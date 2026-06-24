@@ -6,9 +6,9 @@
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7 shrink-0 text-amber-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01M5.07 19h13.86c1.54 0 2.5-1.67 1.73-3L13.73 4c-.77-1.33-2.69-1.33-3.46 0L3.34 16c-.77 1.33.19 3 1.73 3z" />
                     </svg>
-                    Review Anomali
+                    Deteksi Anomali
                 </h2>
-                <p class="ui-body-muted">Antrean admin untuk memeriksa warning transaksi, menutup kasus yang aman, dan menandai kasus yang perlu tindak lanjut.</p>
+                <p class="ui-page-title-copy">Antrean admin untuk memeriksa warning transaksi, menutup kasus yang aman, dan menandai kasus yang perlu tindak lanjut.</p>
             </div>
             <a href="{{ route('internal.transactions.index') }}" class="ui-btn ui-btn-secondary w-full sm:w-auto">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -21,6 +21,14 @@
 
     <div class="py-5 sm:py-8">
         <div class="mx-auto max-w-7xl space-y-4 sm:space-y-5 px-4 sm:px-6 lg:px-8">
+            <x-zakky-insight
+                :tone="$zakkyInsight['tone']"
+                :label="$zakkyInsight['label']"
+                :message="$zakkyInsight['message']"
+                :items="$zakkyInsight['items'] ?? []"
+                :generated="$zakkyInsight['generated'] ?? false"
+            />
+
             <div class="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-5">
                 <a href="{{ route('internal.anomalies.index', ['scope' => $scope ?? 'active']) }}" class="block rounded-card transition hover:ring-2 hover:ring-brand-200 focus:outline-none focus:ring-2 focus:ring-brand-500">
                     <x-ui-stat-card title="Total Kasus" :value="$overview['totalGroups']" description="Lihat semua kasus." />
@@ -73,7 +81,7 @@
                             <div class="ui-section-accent"></div>
                             <h3 class="font-semibold text-slate-800">{{ ($scope ?? 'active') === 'archived' ? 'Riwayat Review' : 'Daftar Kasus Aktif' }}</h3>
                         </div>
-                        <p class="ui-body-muted">
+                        <p class="text-sm text-slate-500">
                             {{ ($scope ?? 'active') === 'archived'
                                 ? 'Lihat kembali kasus yang sudah selesai tanpa mengganggu antrean kerja aktif.'
                                 : 'Utamakan kasus belum ditinjau, buka detail, lalu putuskan apakah aman atau perlu tindak lanjut.' }}

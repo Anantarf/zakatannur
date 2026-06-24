@@ -13,24 +13,18 @@
 
     <div class="py-6 sm:py-10">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
-            <div class="grid grid-cols-1 gap-3 sm:grid-cols-3">
-                <x-ui-stat-card title="Total Log" :value="$totalLogs" description="Total aktivitas yang tercatat di tabel audit." />
-                <x-ui-stat-card title="Log Terbaru" :value="$latestLog?->created_at?->timezone('Asia/Jakarta')->format('d/m/Y H:i') ?? '-'" description="Waktu catatan terakhir yang masuk ke audit log." tone="muted" />
-                <x-ui-stat-card title="Akses" value="Khusus Super Admin" description="Area ini dibatasi untuk kontrol dan pelacakan tingkat tinggi." tone="info" />
-            </div>
+            <x-zakky-insight
+                :tone="$zakkyInsight['tone']"
+                :label="$zakkyInsight['label']"
+                :message="$zakkyInsight['message']"
+                :items="$zakkyInsight['items'] ?? []"
+                :generated="$zakkyInsight['generated'] ?? false"
+            />
 
             <div class="ui-card overflow-hidden shadow-md">
-                <div class="ui-card-header ui-card-header-slate justify-between">
-                    <div class="flex items-center gap-2">
-                        <div class="ui-section-accent h-6 w-2"></div>
-                        <div>
-                            <h3 class="ui-card-header-title">Riwayat Aktivitas</h3>
-                            <p class="text-xs text-slate-500">Klik judul kolom untuk mengurutkan data.</p>
-                        </div>
-                    </div>
-                    <span class="ui-label hidden rounded-full border border-brand-100 bg-brand-50 px-3 py-1 text-brand-700 sm:inline-flex">
-                        Super Admin
-                    </span>
+                <div class="ui-card-header ui-card-header-slate">
+                    <div class="ui-section-accent h-6 w-2"></div>
+                    <h3 class="ui-card-header-title">Riwayat Aktivitas</h3>
                 </div>
                 <div class="p-4 sm:p-6 text-slate-900">
 
@@ -66,8 +60,13 @@
                                 </article>
                             @endforeach
                         @else
-                            <div class="ui-empty-state-box text-slate-500">
-                                Belum ada aktivitas yang tercatat.
+                            <div class="ui-empty-state">
+                                <div class="flex flex-col items-center">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 text-slate-200 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414A1 1 0 0119 9.414V19a2 2 0 01-2 2z" />
+                                    </svg>
+                                    <span class="ui-empty-state-copy">Belum ada aktivitas yang tercatat.</span>
+                                </div>
                             </div>
                         @endif
                     </div>
@@ -108,7 +107,7 @@
                             <tbody class="divide-y divide-slate-100">
                                 @if (count($logs) > 0)
                                     @foreach ($logs as $log)
-                                    <tr class="hover:bg-slate-50/50 transition-colors">
+                                    <tr class="transition-colors hover:bg-slate-50">
                                         <td class="px-6 py-4 font-sans text-xs text-slate-500">
                                             {{ $log->created_at->timezone('Asia/Jakarta')->format('d/m/Y H:i:s') }}
                                             <div class="mt-1 font-sans text-[10px] font-bold text-slate-300">WIB</div>
@@ -135,8 +134,13 @@
                                     @endforeach
                                 @else
                                     <tr>
-                                        <td colspan="6" class="px-6 py-12 text-center text-slate-500">
-                                            <div class="ui-empty-state-box py-5">Belum ada aktivitas yang tercatat.</div>
+                                        <td colspan="6" class="px-6 py-12 text-center">
+                                            <div class="flex flex-col items-center">
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 text-slate-200 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414A1 1 0 0119 9.414V19a2 2 0 01-2 2z" />
+                                                </svg>
+                                                <span class="ui-empty-state-copy">Belum ada aktivitas yang tercatat.</span>
+                                            </div>
                                         </td>
                                     </tr>
                                 @endif
@@ -144,7 +148,7 @@
                         </table>
                     </div>
 
-                    <div class="border-t border-slate-100 pt-4">
+                    <div class="border-t border-slate-100 px-5 py-3">
                         {{ $logs->links() }}
                     </div>
                 </div>

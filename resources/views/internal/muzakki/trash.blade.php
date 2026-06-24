@@ -59,7 +59,7 @@
             <div class="ui-card overflow-hidden shadow-md">
                 <div class="ui-toolbar-soft">
                     <div class="flex items-center gap-2">
-                        <div class="h-6 w-2 rounded-full bg-amber-500"></div>
+                        <div class="ui-section-accent h-6 w-2"></div>
                         <h3 class="ui-section-title">Daftar Tempat Sampah</h3>
                     </div>
 
@@ -81,7 +81,7 @@
                         </div>
                     </form>
                 </div>
-                <div class="space-y-4 p-4 md:hidden">
+                <div class="space-y-3 p-4 md:hidden">
                     @forelse ($muzakki as $m)
                         <article class="ui-mobile-card">
                             <div class="flex items-start justify-between gap-3">
@@ -133,12 +133,12 @@
                             </div>
                         </article>
                     @empty
-                        <div class="ui-empty-state-box">
+                        <div class="ui-empty-state">
                             <div class="flex flex-col items-center">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="mb-2 h-10 w-10 text-slate-200" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
                                 </svg>
-                                <span class="ui-empty-state-copy font-bold">
+                                <span class="ui-empty-state-copy">
                                     {{ ($q ?? '') ? 'Data tidak ditemukan.' : 'Belum ada data muzakki di sampah.' }}
                                 </span>
                             </div>
@@ -160,7 +160,7 @@
                         <tbody class="divide-y divide-slate-50">
                             @if (count($muzakki) > 0)
                                 @foreach ($muzakki as $m)
-                                <tr class="transition-colors hover:bg-slate-50/70">
+                                <tr class="transition-colors hover:bg-slate-50">
                                     <td class="px-5 py-3 font-bold text-slate-800">
                                         {!! \App\Support\Format::highlight($m->name, $q) !!}
                                         <div class="text-[10px] text-slate-400 font-medium">HP: {{ $m->phone ?? '-' }}</div>
@@ -201,11 +201,11 @@
                             @else
                                 <tr>
                                     <td colspan="5" class="px-6 py-12 text-center">
-                                        <div class="ui-empty-state-box flex flex-col items-center">
+                                        <div class="flex flex-col items-center">
                                             <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 text-slate-200 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
                                             </svg>
-                                            <span class="ui-empty-state-copy font-bold">
+                                            <span class="ui-empty-state-copy">
                                                 {{ ($q ?? '') ? 'Data tidak ditemukan.' : 'Belum ada data muzakki di sampah.' }}
                                             </span>
                                         </div>
@@ -216,7 +216,7 @@
                     </table>
                 </div>
                 @if ($muzakki->hasPages())
-                    <div class="px-5 py-3 border-t border-slate-50">
+                    <div class="border-t border-slate-100 px-5 py-3">
                         {{ $muzakki->links() }}
                     </div>
                 @endif
@@ -226,7 +226,7 @@
 
     <!-- Modal Konfirmasi Hapus Permanen -->
     <x-modal name="force-delete-muzakki-modal" focusable>
-        <form method="POST" x-data="{ id: '', name: '' }" x-on:open-force-delete-modal.window="id = $event.detail.id; name = $event.detail.name; $el.action = '{{ url('/internal/muzakki') }}/' + id + '/force-delete';" class="p-5">
+        <form method="POST" x-data="{ id: '', name: '' }" x-on:open-force-delete-modal.window="id = $event.detail.id; name = $event.detail.name; $el.action = '{{ url('/internal/muzakki') }}/' + id + '/force-delete';" class="p-6">
             @csrf
             @method('DELETE')
             <h2 class="text-lg font-medium text-slate-900">

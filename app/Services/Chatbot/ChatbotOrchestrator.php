@@ -2,6 +2,7 @@
 
 namespace App\Services\Chatbot;
 
+use App\Models\AiChatLog;
 use App\Services\Chatbot\Knowledge\KnowledgeRetriever;
 use Illuminate\Support\Facades\Log;
 use Throwable;
@@ -16,7 +17,7 @@ class ChatbotOrchestrator
     ) {
     }
 
-    public function handle(string $message, array $rawContext = []): ChatbotResponse
+    public function handle(string $message, array $rawContext = [], ?string $sessionId = null): ChatbotResponse
     {
         $context = ChatbotConversationContext::fromArray($rawContext);
 
@@ -24,17 +25,21 @@ class ChatbotOrchestrator
             $intent = $this->actionDetector->intent($message, $context);
             $publicData = $intent ? $this->publicDataResponder->respond($intent) : null;
             if ($publicData) {
-                return $publicData->withContext($context->forIntent($intent, 'public_data')->toArray());
+                $response = $publicData->withContext($context->forIntent($intent, 'public_data')->toArray());
+                $this->saveChatLog($message, $intent, 'public_data', $response->reply, $sessionId);
+                return $response;
             }
 
             $action = $this->actionDetector->detect($message);
             if ($action) {
-                return $action->withContext($context->forIntent('navigation', 'action')->toArray());
+                $response = $action->withContext($context->forIntent('navigation', 'action')->toArray());
+                $this->saveChatLog($message, 'navigation', 'action', $response->reply, $sessionId);
+                return $response;
             }
 
             $knowledge = $this->knowledgeRetriever->best($message);
             if ($knowledge) {
-                return ChatbotResponse::success(
+                $response = ChatbotResponse::success(
                     (string) $knowledge['answer'],
                     'knowledge',
                     $knowledge['actions'] ?? [],
@@ -43,15 +48,34 @@ class ChatbotOrchestrator
                         'label' => $knowledge['source_label'] ?? 'Panduan Zakat Masjid An-Nur',
                     ]]
                 )->withContext($context->forIntent((string) ($knowledge['id'] ?? 'knowledge'), 'knowledge')->toArray());
+                $this->saveChatLog($message, (string) ($knowledge['id'] ?? 'knowledge'), 'knowledge', $response->reply, $sessionId);
+                return $response;
             }
 
-            return $this->answerFromAi($message);
+            $response = $this->answerFromAi($message);
+            $this->saveChatLog($message, null, $response->source, $response->reply, $sessionId);
+            return $response;
         } catch (Throwable $e) {
             Log::error('Chatbot orchestration failed.', [
                 'message' => $e->getMessage(),
             ]);
 
             return ChatbotResponse::error('Gagal memproses pesan. Silakan coba beberapa saat lagi.', true, 500);
+        }
+    }
+
+    private function saveChatLog(string $question, ?string $intent, string $sourceType, string $answer, ?string $sessionId): void
+    {
+        try {
+            AiChatLog::create([
+                'session_id' => $sessionId,
+                'question' => $question,
+                'intent' => $intent,
+                'source_type' => $sourceType,
+                'answer' => $answer,
+            ]);
+        } catch (Throwable $e) {
+            Log::warning('Failed to save AI chat log.', ['message' => $e->getMessage()]);
         }
     }
 

@@ -29,6 +29,7 @@
                         <input type="checkbox" x-model="person.zakat.fitrah.is_custom" class="h-3 w-3 rounded border-slate-300 text-brand-600">
                         Nominal Khusus
                     </label>
+                    <p class="text-[10px] text-brand-600/70 leading-tight">Standar: Rp {{ number_format($fitrahUang, 0, ',', '.') }} / {{ $berasPerJiwa }}kg</p>
 
                     <template x-if="!person.zakat.fitrah.is_custom">
                         <div class="rounded border border-brand-200 bg-brand-100/50 px-2 py-1.5 text-[11px] font-medium not-italic text-brand-800">
@@ -49,11 +50,6 @@
                     </template>
                 </div>
 
-                <div class="pt-1">
-                    <p class="text-[10px] font-semibold leading-tight text-brand-600">
-                        * Standar: Rp {{ number_format($fitrahUang, 0, ',', '.') }} atau {{ $berasPerJiwa }}kg / 3.5L per jiwa
-                    </p>
-                </div>
             </div>
         </div>
 
@@ -80,6 +76,7 @@
                         <input type="checkbox" x-model="person.zakat.fidyah.is_custom" class="h-3 w-3 rounded border-slate-300 text-amber-600">
                         Nominal Khusus
                     </label>
+                    <p class="text-[10px] text-amber-600/70 leading-tight">Standar: Rp {{ number_format($fidyahUang, 0, ',', '.') }} / {{ $berasPerJiwa }}kg per hari</p>
 
                     <template x-if="!person.zakat.fidyah.is_custom">
                         <div class="text-[11px] bg-amber-100/50 text-amber-800 px-2 py-1.5 rounded border border-amber-200 font-medium not-italic">
@@ -100,11 +97,6 @@
                     </template>
                 </div>
 
-                <div class="pt-1">
-                    <p class="text-[10px] font-semibold leading-tight text-amber-600">
-                        * Standar: Rp {{ number_format($fidyahUang, 0, ',', '.') }} atau {{ $berasPerJiwa }}kg / 3.5L per hari
-                    </p>
-                </div>
             </div>
         </div>
 
