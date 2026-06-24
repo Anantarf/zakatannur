@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Guest\GuestSummaryController;
 use App\Http\Controllers\Guest\GuestLatestController;
+use App\Http\Controllers\Api\ChatbotStreamController;
 
 /*
 |--------------------------------------------------------------------------
@@ -23,5 +24,8 @@ Route::withoutMiddleware('throttle:api')->group(function () {
         ->middleware(['throttle:public-summary']);
 
     Route::post('/chatbot/message', [\App\Http\Controllers\Api\ChatbotController::class, 'chat'])
+        ->middleware(['throttle:30,1', \App\Http\Middleware\ThrottleChatbot::class]);
+
+    Route::post('/chatbot/stream', [ChatbotStreamController::class, 'stream'])
         ->middleware(['throttle:30,1', \App\Http\Middleware\ThrottleChatbot::class]);
 });

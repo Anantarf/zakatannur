@@ -171,6 +171,17 @@ document.addEventListener('alpine:init', () => {
             this.lastError = null;
             this.$nextTick(() => this.scrollToBottom());
 
+            // Try streaming first, fallback to regular message
+            const streamEndpoint = this.endpoint.replace('/message', '/stream');
+            const useStreaming = await this.tryStreaming(userMessage, streamEndpoint);
+
+            if (useStreaming) {
+                this.isTyping = false;
+                this.$nextTick(() => this.scrollToBottom());
+                return;
+            }
+
+            // Fallback to regular message
             try {
                 const response = await fetch(this.endpoint, {
                     method: 'POST',
@@ -299,6 +310,75 @@ document.addEventListener('alpine:init', () => {
                 return 'grafik';
             }
             return null;
+        },
+
+        async tryStreaming(userMessage, streamEndpoint) {
+            try {
+                const response = await fetch(streamEndpoint, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'text/event-stream',
+                    },
+                    body: JSON.stringify({
+                        message: userMessage,
+                        context: this.conversationContext,
+                        session_id: this.sessionId,
+                    }),
+                });
+
+                if (!response.ok) {
+                    return false;
+                }
+
+                const reader = response.body.getReader();
+                const decoder = new TextDecoder();
+                let buffer = '';
+                let botMessage = {
+                    role: 'bot',
+                    content: '',
+                    citations: [],
+                    createdAt: nowIso(),
+                };
+
+                this.messages.push(botMessage);
+
+                while (true) {
+                    const { done, value } = await reader.read();
+                    if (done) break;
+
+                    buffer += decoder.decode(value, { stream: true });
+                    const lines = buffer.split('\n');
+
+                    for (let i = 0; i < lines.length - 1; i++) {
+                        const line = lines[i].trim();
+                        if (line.startsWith('data: ')) {
+                            const data = JSON.parse(line.slice(6));
+                            if (data.chunk) {
+                                botMessage.content += data.chunk;
+                                this.$nextTick(() => this.scrollToBottom());
+                            } else if (data.error) {
+                                botMessage.isError = true;
+                                botMessage.isRetryable = data.retryable;
+                                botMessage.content = data.error;
+                                break;
+                            }
+                        }
+                    }
+
+                    buffer = lines[lines.length - 1];
+                }
+
+                this.isOnline = true;
+                return true;
+            } catch (error) {
+                console.warn('Streaming failed, will fallback to regular message', error);
+                // Remove the incomplete bot message on error
+                if (this.messages[this.messages.length - 1]?.role === 'bot' && !this.messages[this.messages.length - 1]?.content) {
+                    this.messages.pop();
+                }
+                return false;
+            }
         },
 
         retryLastMessage() {
