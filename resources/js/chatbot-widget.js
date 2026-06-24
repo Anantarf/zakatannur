@@ -26,6 +26,7 @@ document.addEventListener('alpine:init', () => {
         unreadBadge: 0,
         lastSeenMessageCount: 0,
         conversationContext: {},
+        sessionId: null,
 
         get isInputEmpty() {
             return this.input.trim() === '';
@@ -47,6 +48,8 @@ document.addEventListener('alpine:init', () => {
         },
 
         init() {
+            this.generateOrLoadSessionId();
+            this.loadHistory();
             this.lastSeenMessageCount = this.messages.length;
             this.$watch('isOpen', (open) => {
                 if (open) {
@@ -61,6 +64,7 @@ document.addEventListener('alpine:init', () => {
             });
             this.$watch('messages', (next) => {
                 this.$nextTick(() => this.scrollToBottom());
+                this.saveHistory();
                 if (this.isOpen) {
                     this.lastSeenMessageCount = next.length;
                 } else if (next.length > this.lastSeenMessageCount) {
@@ -69,6 +73,54 @@ document.addEventListener('alpine:init', () => {
                     this.lastSeenMessageCount = next.length;
                 }
             });
+        },
+
+        generateOrLoadSessionId() {
+            try {
+                const storedId = localStorage.getItem('zakky_session_id');
+                if (storedId) {
+                    this.sessionId = storedId;
+                } else {
+                    this.sessionId = 'session_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+                    localStorage.setItem('zakky_session_id', this.sessionId);
+                }
+            } catch (e) {
+                this.sessionId = 'session_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+            }
+        },
+
+        loadHistory() {
+            try {
+                const key = 'zakky_history_' + (this.sessionId || 'default');
+                const saved = localStorage.getItem(key);
+                if (saved) {
+                    const parsed = JSON.parse(saved);
+                    if (Array.isArray(parsed) && parsed.length > 0) {
+                        this.messages = parsed;
+                    }
+                }
+            } catch (e) {
+                console.warn('Failed to load chat history:', e);
+            }
+        },
+
+        saveHistory() {
+            try {
+                const key = 'zakky_history_' + (this.sessionId || 'default');
+                const limited = this.messages.slice(-50);
+                localStorage.setItem(key, JSON.stringify(limited));
+            } catch (e) {
+                console.warn('Failed to save chat history:', e);
+            }
+        },
+
+        clearHistory() {
+            try {
+                const key = 'zakky_history_' + (this.sessionId || 'default');
+                localStorage.removeItem(key);
+            } catch (e) {
+                console.warn('Failed to clear chat history:', e);
+            }
         },
 
         toggleChat() {
@@ -129,6 +181,7 @@ document.addEventListener('alpine:init', () => {
                     body: JSON.stringify({
                         message: userMessage,
                         context: this.conversationContext,
+                        session_id: this.sessionId,
                     }),
                 });
 
@@ -296,6 +349,7 @@ document.addEventListener('alpine:init', () => {
                     message: message.content,
                     feedback: rating,
                     type: 'feedback',
+                    session_id: this.sessionId,
                 }),
             }).catch(() => {});
         },

@@ -246,7 +246,7 @@
                 </button>
                 <button
                     type="button"
-                    @click="messages = []; input = ''"
+                    @click="messages = []; input = ''; clearHistory()"
                     x-show="messages.length > 0"
                     class="flex h-10 w-10 items-center justify-center rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-all active:scale-95 flex-shrink-0 focus:outline-none focus:ring-2 focus:ring-slate-400 focus:ring-offset-1"
                     aria-label="Hapus riwayat chat"
