@@ -1,5 +1,5 @@
-﻿const DEFAULT_ERROR_MESSAGE = 'Maaf, terjadi kesalahan saat menghubungi server.';
-const NETWORK_ERROR_MESSAGE = 'Maaf, terjadi gangguan jaringan.';
+﻿const DEFAULT_ERROR_MESSAGE = 'Maaf, Zakky sedang bermasalah. 😢 Coba lagi dalam beberapa saat.';
+const NETWORK_ERROR_MESSAGE = 'Gangguan jaringan terdeteksi. Periksa koneksi internet Anda.';
 
 const timeFormatter = new Intl.DateTimeFormat('id-ID', {
     hour: '2-digit',
@@ -51,6 +51,11 @@ document.addEventListener('alpine:init', () => {
                     this.unreadBadge = 0;
                     this.lastSeenMessageCount = this.messages.length;
                     this.$nextTick(() => this.scrollToBottom());
+                    // Set focus to input for accessibility
+                    this.$nextTick(() => {
+                        const input = document.querySelector('[data-chatbot-widget] input[type="text"]');
+                        if (input) input.focus();
+                    });
                 }
             });
             this.$watch('messages', (next) => {
@@ -66,6 +71,12 @@ document.addEventListener('alpine:init', () => {
 
         toggleChat() {
             this.isOpen = !this.isOpen;
+            if (this.isOpen) {
+                this.$nextTick(() => {
+                    const input = document.querySelector('[data-chatbot-widget] input[type="text"]');
+                    if (input) input.focus();
+                });
+            }
         },
 
         closeChat() {
@@ -85,11 +96,20 @@ document.addEventListener('alpine:init', () => {
             }
 
             const userMessage = this.input.trim();
+
+            // Validate message length
+            if (userMessage.length < 2) {
+                return;
+            }
+
+            // Check for local actions first
             const localAction = this.resolveLocalAction(userMessage);
             this.messages.push({ role: 'user', content: userMessage, createdAt: nowIso() });
             this.input = '';
+
             if (localAction) {
                 this.openTab(localAction);
+                this.$nextTick(() => this.scrollToBottom());
                 return;
             }
 

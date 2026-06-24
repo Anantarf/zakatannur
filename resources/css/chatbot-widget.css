@@ -1,0 +1,94 @@
+/* Chatbot Widget Animations & Styling */
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in {
+  animation: fadeIn 300ms ease-out forwards;
+}
+
+.animate-slide-up {
+  animation: slideUp 400ms ease-out forwards;
+}
+
+/* FAB Button Pulse */
+.zakky-fab-pulse {
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+/* Loading Dots */
+.zakky-dot {
+  transform-origin: center;
+}
+
+/* Smooth scrolling in chat container */
+[x-ref="chatContainer"] {
+  scroll-behavior: smooth;
+  scroll-padding-top: 1rem;
+}
+
+/* Mobile optimizations */
+@media (max-width: 640px) {
+  [data-chatbot-widget] {
+    position: fixed;
+    bottom: 1rem;
+    right: 1rem;
+  }
+
+  /* Larger touch targets on mobile */
+  [data-chatbot-widget] button {
+    min-height: 44px;
+    min-width: 44px;
+  }
+
+  /* Better keyboard handling on mobile */
+  [data-chatbot-widget] input {
+    font-size: 16px; /* Prevents zoom on iOS focus */
+  }
+}
+
+/* Dark mode ready (future) */
+@media (prefers-color-scheme: dark) {
+  /* Fallback colors work with Tailwind, no additional CSS needed */
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  .animate-fade-in,
+  .animate-slide-up,
+  .zakky-fab-pulse,
+  .zakky-dot,
+  [data-chatbot-widget] * {
+    animation: none !important;
+    transition: none !important;
+  }
+}
