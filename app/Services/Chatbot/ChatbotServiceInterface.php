@@ -20,9 +20,10 @@ interface ChatbotServiceInterface
      *
      * @param string $message
      * @param array<int,array<string,mixed>> $context
+     * @param string $language 'id' or 'en'
      * @return string
      */
-    public function sendMessage(string $message, array $context = []): string;
+    public function sendMessage(string $message, array $context = [], string $language = 'id'): string;
 
     /**
      * Apakah balasan terakhir merupakan fallback (layanan AI tidak tersedia).

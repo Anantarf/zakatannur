@@ -14,6 +14,8 @@
             <path stroke-linecap="round" stroke-linejoin="round" d="M5.5 18.5A7.5 7.5 0 1 1 12 21H7l-3 2 1.5-4.5Z" />
         </svg>
     SVG;
+
+    $profileAvatar = '<img src="' . asset('images/muslim.png') . '" alt="Avatar Zakky" class="h-full w-full object-cover">';
 @endphp
 
 <div
@@ -29,8 +31,8 @@
         :class="isOpen ? 'scale-0 opacity-0 pointer-events-none' : 'scale-100 opacity-100'"
         aria-label="Buka chat"
     >
-        <span class="flex items-center justify-center">
-            {!! $messageIcon !!}
+        <span class="flex h-full w-full items-center justify-center overflow-hidden rounded-full">
+            {!! $profileAvatar !!}
         </span>
         <span
             x-show="unreadBadge"
@@ -57,7 +59,7 @@
         <div class="z-10 flex items-center justify-between border-b border-slate-200 bg-white px-4 py-3">
             <div class="flex items-center space-x-3 min-w-0 flex-1">
                 <span class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-brand-600 text-white">
-                    {!! $messageIcon !!}
+                    {!! $profileAvatar !!}
                 </span>
                 <div class="min-w-0 flex-1">
                     <h3 class="text-sm font-semibold text-slate-900">Zakky</h3>
@@ -88,7 +90,7 @@
             <!-- Welcome Message -->
             <div class="flex items-start animate-fade-in gap-3">
                 <span class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-brand-600 text-white flex-shrink-0">
-                    {!! $messageIcon !!}
+                    {!! $profileAvatar !!}
                 </span>
                 <div class="flex flex-col items-start min-w-0">
                     <div class="rounded-lg border border-slate-200 bg-slate-50 px-3 py-2.5 text-sm leading-6 text-slate-800 break-words">Assalamu'alaikum. Saya <span class="font-semibold text-brand-700">Zakky</span>. Saya bisa bantu cek data zakat atau jawab pertanyaan Anda.</div>
@@ -116,7 +118,7 @@
                 <div class="flex w-full animate-fade-in" :class="message.role === 'user' ? 'justify-end' : 'justify-start items-start'" style="animation-duration: 300ms;">
                     <template x-if="message.role === 'bot'">
                         <span class="mr-3 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-brand-600 text-white flex-shrink-0">
-                            {!! $messageIcon !!}
+                            {!! $profileAvatar !!}
                         </span>
                     </template>
 

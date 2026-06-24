@@ -14,7 +14,7 @@ class ChatbotServiceProvider extends ServiceProvider
         $this->app->bind(ChatbotServiceInterface::class, function () {
             $openaiKey = config('services.openai.api_key');
             if (!empty($openaiKey)) {
-                return new \App\Services\Chatbot\Providers\OpenAiChatbotProvider(
+                return new OpenAiChatbotProvider(
                     $openaiKey,
                     config('services.openai.model'),
                     config('services.openai.base_url'),

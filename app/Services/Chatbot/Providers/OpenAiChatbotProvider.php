@@ -24,7 +24,7 @@ class OpenAiChatbotProvider implements ChatbotServiceInterface
         $this->timeout = $timeout;
     }
 
-    public function sendMessage(string $message, array $context = []): string
+    public function sendMessage(string $message, array $context = [], string $language = 'id'): string
     {
         $this->lastReplyWasFallback = false;
 
@@ -36,12 +36,23 @@ class OpenAiChatbotProvider implements ChatbotServiceInterface
             return $this->fallback('Layanan asisten belum dikonfigurasi. Hubungi administrator.');
         }
 
-        $systemInstruction = "Nama Anda adalah 'Zakky', asisten virtual untuk Zakat An-Nur. "
-    . "Tugas Anda: membantu dengan pertanyaan zakat, pembayaran, nishab, dan operasional masjid. "
-    . "Gaya: singkat, ramah, sopan, profesional. "
-    . "PENTING: Hanya gunakan konteks yang diberikan. Jangan mengarang data (nomor rekening, jadwal, panitia, nominal). "
-    . "Jika tidak tahu, katakan 'Informasi belum tersedia, hubungi panitia'. "
-    . "Jika ditanya di luar topik zakat/Islam, kembalikan ke topik zakat.";
+        $systemInstruction = "Your name is 'Zakky', a virtual assistant for Zakat An-Nur. "
+    . "Your task: help with zakat questions, payment, nishab, and mosque operations. "
+    . "Style: brief, friendly, courteous, professional. "
+    . "IMPORTANT: Only use the provided context. Do not make up data (bank accounts, schedules, committees, amounts). "
+    . "If you don't know, say 'Information is not available, please contact the committee'. "
+    . "If asked about topics outside zakat/Islam, redirect to zakat topics. "
+    . "ALWAYS reply in the same language as the user's question.";
+
+        if ($language === 'id') {
+            $systemInstruction = "Nama Anda adalah 'Zakky', asisten virtual untuk Zakat An-Nur. "
+        . "Tugas Anda: membantu dengan pertanyaan zakat, pembayaran, nishab, dan operasional masjid. "
+        . "Gaya: singkat, ramah, sopan, profesional. "
+        . "PENTING: Hanya gunakan konteks yang diberikan. Jangan mengarang data (nomor rekening, jadwal, panitia, nominal). "
+        . "Jika tidak tahu, katakan 'Informasi belum tersedia, hubungi panitia'. "
+        . "Jika ditanya di luar topik zakat/Islam, kembalikan ke topik zakat. "
+        . "SELALU balas dalam bahasa yang sama dengan pertanyaan user.";
+        }
 
         if (!empty($context)) {
             $contextText = collect($context)

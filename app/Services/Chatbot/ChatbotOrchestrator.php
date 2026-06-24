@@ -93,8 +93,9 @@ class ChatbotOrchestrator
 
     private function answerFromAi(string $message): ChatbotResponse
     {
+        $language = ChatbotLanguageDetector::detect($message);
         $contexts = $this->knowledgeRetriever->search($message, 2);
-        $reply = $this->aiProvider->sendMessage($message, $contexts);
+        $reply = $this->aiProvider->sendMessage($message, $contexts, $language);
 
         $wasFallback = $this->aiProvider->wasLastReplyFallback();
         $cleanReply = $wasFallback && str_starts_with($reply, ChatbotServiceInterface::FALLBACK_PREFIX)
