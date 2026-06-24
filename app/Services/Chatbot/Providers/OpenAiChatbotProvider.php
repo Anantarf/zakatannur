@@ -28,15 +28,20 @@ class OpenAiChatbotProvider implements ChatbotServiceInterface
     {
         $this->lastReplyWasFallback = false;
 
-        $systemInstruction = "Nama Anda adalah 'Zakky', asisten virtual resmi untuk sistem manajemen Zakat An-Nur. "
-    . "Saat memperkenalkan diri, sebutkan nama Anda sebagai Zakky dan bahwa Anda melayani Zakat An-Nur. "
-    . "Tugas Anda adalah membantu pengguna (jamaah atau petugas) terkait pengelolaan zakat, cara pembayaran, panduan nishab, dan operasional masjid. "
-    . "Gaya bicara: singkat, ramah, sopan, dan profesional layaknya agen Customer Service. "
-    . "Untuk informasi lokal Masjid An-Nur, gunakan hanya konteks resmi yang diberikan. "
-    . "Jika konteks tidak cukup, katakan informasi belum tersedia dan arahkan pengguna untuk konfirmasi kepada panitia. "
-    . "Jangan mengarang nomor rekening, jadwal, panitia, nominal, data penerimaan, atau kebijakan lokal. "
-    . "Jika ditanya hal di luar topik zakat, agama Islam, atau operasional masjid, tolak dengan sopan dan kembalikan ke topik zakat. "
-    . "Jika pengguna menyapa (halo, assalamualaikum, hai, dll), balas sapaan dengan hangat dan perkenalkan diri sebagai Zakky.";
+        // Validate API key
+        if (empty($this->apiKey)) {
+            Log::error('OpenAI API key not configured', [
+                'model' => $this->model,
+            ]);
+            return $this->fallback('Layanan asisten belum dikonfigurasi. Hubungi administrator.');
+        }
+
+        $systemInstruction = "Nama Anda adalah 'Zakky', asisten virtual untuk Zakat An-Nur. "
+    . "Tugas Anda: membantu dengan pertanyaan zakat, pembayaran, nishab, dan operasional masjid. "
+    . "Gaya: singkat, ramah, sopan, profesional. "
+    . "PENTING: Hanya gunakan konteks yang diberikan. Jangan mengarang data (nomor rekening, jadwal, panitia, nominal). "
+    . "Jika tidak tahu, katakan 'Informasi belum tersedia, hubungi panitia'. "
+    . "Jika ditanya di luar topik zakat/Islam, kembalikan ke topik zakat.";
 
         if (!empty($context)) {
             $contextText = collect($context)
@@ -87,18 +92,26 @@ class OpenAiChatbotProvider implements ChatbotServiceInterface
             ]);
 
             if ($response->status() === 401 || $response->status() === 403) {
-                return $this->fallback('Layanan asisten AI belum dikonfigurasi dengan benar. Mohon hubungi admin.');
+                Log::error('OpenAI Authentication Failed', ['status' => $response->status()]);
+                return $this->fallback('Konfigurasi asisten belum lengkap. Silakan hubungi administrator.');
             }
 
             if ($response->status() === 404) {
-                return $this->fallback('Model AI yang diminta tidak tersedia. Hubungi admin untuk memperbarui konfigurasi.');
+                Log::error('OpenAI Model Not Found', ['model' => $this->model]);
+                return $this->fallback('Model asisten tidak ditemukan. Hubungi admin untuk update konfigurasi.');
             }
 
             if ($response->status() === 429) {
-                return $this->fallback('Kuota penggunaan AI harian sudah tercapai. Silakan coba lagi besok.');
+                Log::warning('OpenAI Rate Limit Exceeded');
+                return $this->fallback('Permintaan terlalu banyak. Coba lagi dalam beberapa menit.');
             }
 
-            return $this->fallback('Layanan asisten AI sedang tidak tersedia saat ini. Silakan coba beberapa saat lagi.');
+            if ($response->status() >= 500) {
+                Log::error('OpenAI Server Error', ['status' => $response->status()]);
+                return $this->fallback('Server asisten mengalami masalah. Coba lagi sebentar.');
+            }
+
+            return $this->fallback('Koneksi ke asisten gagal. Periksa internet Anda.');
         } catch (Throwable $e) {
             Log::error('OpenAI API Exception', [
                 'message' => $e->getMessage(),

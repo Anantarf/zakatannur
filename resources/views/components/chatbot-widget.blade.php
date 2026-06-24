@@ -91,21 +91,19 @@
                     {!! $messageIcon !!}
                 </span>
                 <div class="flex flex-col items-start min-w-0">
-                    <div class="rounded-lg border border-slate-200 bg-slate-50 px-3 py-2.5 text-sm leading-6 text-slate-800 break-words whitespace-pre-wrap">
-                        Assalamu'alaikum. Saya <span class="font-semibold text-brand-700">Zakky</span>. Saya bisa bantu cek data zakat atau jawab pertanyaan Anda.
-                    </div>
+                    <div class="rounded-lg border border-slate-200 bg-slate-50 px-3 py-2.5 text-sm leading-6 text-slate-800 break-words">Assalamu'alaikum. Saya <span class="font-semibold text-brand-700">Zakky</span>. Saya bisa bantu cek data zakat atau jawab pertanyaan Anda.</div>
                     <span class="mt-2 text-xs text-slate-400" x-text="formatTime(welcomeAt)"></span>
                 </div>
             </div>
 
             <!-- Quick Replies -->
             <div x-show="quickReplies.length > 0 &amp;&amp; messages.length === 0" class="animate-fade-in" style="animation-delay: 100ms;">
-                <div class="grid grid-cols-2 gap-2">
+                <div class="grid grid-cols-2 gap-1.5">
                     <template x-for="(chip, i) in quickReplies" :key="`chip-${i}`">
                         <button
                             type="button"
                             @click="useQuickReply(chip)"
-                            class="rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 font-medium transition-all hover:border-brand-300 hover:bg-brand-50 active:scale-95 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:ring-offset-1"
+                            class="rounded-lg border border-slate-200 bg-white px-2.5 py-1.5 text-xs text-slate-700 font-medium transition-all hover:border-brand-300 hover:bg-brand-50 active:scale-95 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:ring-offset-1"
                             :title="chip.label"
                         >
                             <span class="block truncate" x-text="chip.label"></span>
