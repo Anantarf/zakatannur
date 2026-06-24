@@ -67,21 +67,34 @@ class TransactionGroupLifecycleService
     public function restoreGroup(Request $request, int $transactionId): array
     {
         $user = $request->user();
-        $transaction = ZakatTransaction::withTrashed()->findOrFail($transactionId);
-        $noTransaksi = $transaction->no_transaksi;
 
-        $hasActiveCollision = ZakatTransaction::where('no_transaksi', $noTransaksi)
-            ->whereNull('deleted_at')
-            ->exists();
+        return DB::transaction(function () use ($user, $request, $transactionId) {
+            $transaction = ZakatTransaction::withTrashed()
+                ->lockForUpdate()
+                ->findOrFail($transactionId);
 
-        if ($hasActiveCollision) {
-            return [
-                'restored' => false,
-                'no_transaksi' => $noTransaksi,
-            ];
-        }
+            $noTransaksi = $transaction->no_transaksi;
 
-        DB::transaction(function () use ($noTransaksi, $transaction, $user, $request) {
+            if ($transaction->deleted_at === null) {
+                return [
+                    'restored' => false,
+                    'reason' => 'Transaction is already active',
+                ];
+            }
+
+            $hasActiveCollision = ZakatTransaction::where('no_transaksi', $noTransaksi)
+                ->whereNull('deleted_at')
+                ->lockForUpdate()
+                ->exists();
+
+            if ($hasActiveCollision) {
+                return [
+                    'restored' => false,
+                    'no_transaksi' => $noTransaksi,
+                    'reason' => 'Collision with active transaction',
+                ];
+            }
+
             ZakatTransaction::onlyTrashed()
                 ->where('no_transaksi', $noTransaksi)
                 ->restore();
@@ -100,24 +113,24 @@ class TransactionGroupLifecycleService
                 'deleted_reason' => $transaction->deleted_reason,
                 'restored_by' => $user->id,
             ]);
+
+            $restoredTransactions = ZakatTransaction::query()
+                ->where('no_transaksi', $noTransaksi)
+                ->orderBy('id')
+                ->get();
+
+            $restoredTransactions->each(function (ZakatTransaction $transaction): void {
+                $transaction->setAttribute('anomaly_context', [
+                    'restored_after_delete' => true,
+                ]);
+            });
+            $this->reviewAssistantService->syncForTransactions($restoredTransactions);
+
+            return [
+                'restored' => true,
+                'no_transaksi' => $noTransaksi,
+            ];
         });
-
-        $restoredTransactions = ZakatTransaction::query()
-            ->where('no_transaksi', $noTransaksi)
-            ->orderBy('id')
-            ->get();
-
-        $restoredTransactions->each(function (ZakatTransaction $transaction): void {
-            $transaction->setAttribute('anomaly_context', [
-                'restored_after_delete' => true,
-            ]);
-        });
-        $this->reviewAssistantService->syncForTransactions($restoredTransactions);
-
-        return [
-            'restored' => true,
-            'no_transaksi' => $noTransaksi,
-        ];
     }
 
     public function forceDeleteGroup(Request $request, int $transactionId): string

@@ -44,6 +44,10 @@ class ChatbotActionDetector
             return 'open_summary';
         }
 
+        if ($this->containsAny($message, ['cara bayar', 'bayar zakat', 'pembayaran', 'rekening', 'transfer'])) {
+            return 'ask_payment_info';
+        }
+
         if ($context?->isPublicDataTopic()) {
             return $this->publicDataFollowUpIntent($message);
         }

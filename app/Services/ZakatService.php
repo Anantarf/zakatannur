@@ -357,7 +357,7 @@ class ZakatService
      * This guards cases where the UI leaves nominal empty but annual defaults
      * are required for fitrah/fidyah calculations.
      *
-     * @throws \Illuminate\Validation\ValidationException
+     * @throws ValidationException
      */
     public function validateNominalDefaults(array $data): void
     {

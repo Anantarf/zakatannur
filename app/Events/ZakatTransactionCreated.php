@@ -13,13 +13,13 @@ class ZakatTransactionCreated implements ShouldBroadcast
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
-    /** @var \Illuminate\Database\Eloquent\Collection<int, \App\Models\ZakatTransaction> */
+    /** @var \Illuminate\Database\Eloquent\Collection<int, ZakatTransaction> */
     public $transactions;
 
     /**
      * Create a new event instance.
      *
-     * @param \App\Models\ZakatTransaction|\App\Models\ZakatTransaction[]|\Illuminate\Database\Eloquent\Collection $transactions
+     * @param ZakatTransaction|ZakatTransaction[]|\Illuminate\Database\Eloquent\Collection $transactions
      * @return void
      */
     public function __construct($transactions)
@@ -36,7 +36,7 @@ class ZakatTransactionCreated implements ShouldBroadcast
     /**
      * Get the channels the event should broadcast on.
      *
-     * @return \Illuminate\Broadcasting\Channel|array
+     * @return Channel|array
      */
     public function broadcastOn()
     {

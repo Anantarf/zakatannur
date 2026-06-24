@@ -25,25 +25,20 @@ class TransactionReviewAssistantService
             }
 
             $analysis = $this->riskAnalyzer->analyze($transaction);
-            $review = TransactionRiskReview::query()->firstOrNew([
-                'zakat_transaction_id' => $transaction->id,
-            ]);
 
-            $review->fill([
-                'group_no_transaksi' => $transaction->no_transaksi,
-                'risk_level' => $analysis['risk_level'],
-                'risk_score' => $analysis['risk_score'],
-                'risk_flags' => $analysis['risk_flags'],
-                'reasons' => $analysis['reasons'],
-                'duplicate_candidates' => $analysis['duplicate_candidates'],
-                'detector_version' => $analysis['detector_version'],
-                'review_status' => $review->review_status ?: TransactionRiskReview::REVIEW_BELUM_DITINJAU,
-                'reviewed_by' => $review->reviewed_by,
-                'reviewed_at' => $review->reviewed_at,
-                'checked_at' => now(config('zakat.timezone')),
-            ]);
-
-            $review->save();
+            TransactionRiskReview::query()->updateOrCreate(
+                ['zakat_transaction_id' => $transaction->id],
+                [
+                    'group_no_transaksi' => $transaction->no_transaksi,
+                    'risk_level' => $analysis['risk_level'],
+                    'risk_score' => $analysis['risk_score'],
+                    'risk_flags' => $analysis['risk_flags'],
+                    'reasons' => $analysis['reasons'],
+                    'duplicate_candidates' => $analysis['duplicate_candidates'],
+                    'detector_version' => $analysis['detector_version'],
+                    'checked_at' => now(config('zakat.timezone')),
+                ]
+            );
         }
     }
 

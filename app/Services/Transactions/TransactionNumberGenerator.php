@@ -13,6 +13,7 @@ class TransactionNumberGenerator
         $prefix = 'TRX-' . $time->format('Ymd') . '-';
         $last = ZakatTransaction::withTrashed()
             ->where('no_transaksi', 'like', $prefix . '%')
+            ->lockForUpdate()
             ->orderByRaw(SqlDialect::transactionNumberOrderExpression())
             ->orderByDesc('id')
             ->value('no_transaksi');
