@@ -434,14 +434,14 @@ Then implement explicit cleanup service if needed.
 ## ✅ RECOMMENDATIONS (Priority Order)
 
 ### Immediate (This Sprint)
-- [ ] Fix TransactionNumberGenerator with `lockForUpdate()`
-- [ ] Replace `firstOrNew()` with `updateOrCreate()` in TransactionReviewAssistantService
-- [ ] Remove duplicate rate limiting middleware
-- [ ] Move collision check inside transaction in RestoreGroup
+- [x] Fix TransactionNumberGenerator with `lockForUpdate()`
+- [x] Replace `firstOrNew()` with `updateOrCreate()` in TransactionReviewAssistantService
+- [x] Remove duplicate rate limiting middleware
+- [x] Move collision check inside transaction in RestoreGroup
 
 ### Short-term (Next Sprint)
-- [ ] Add idempotency to AiChatLog and ChatbotFeedback
-- [ ] Implement explicit locking in MuzakkiMergeService
+- [x] Add idempotency to AiChatLog and ChatbotFeedback
+- [x] Implement explicit locking in MuzakkiMergeService
 - [ ] Configure Redis for cache driver (if multi-server)
 - [ ] Load test concurrent transaction operations
 

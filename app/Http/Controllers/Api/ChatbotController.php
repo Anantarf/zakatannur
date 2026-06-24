@@ -69,17 +69,24 @@ class ChatbotController extends Controller
     private function handleFeedback(Request $request)
     {
         try {
-            \App\Models\ChatbotFeedback::create([
-                'session_id' => $request->input('session_id'),
-                'message' => $request->input('message'),
-                'rating' => $request->input('feedback'),
-                'ip_address' => $request->ip(),
-            ]);
+            $feedback = \App\Models\ChatbotFeedback::updateOrCreate(
+                [
+                    'session_id' => $request->input('session_id'),
+                    'message' => $request->input('message'),
+                ],
+                [
+                    'rating' => $request->input('feedback'),
+                    'ip_address' => $request->ip(),
+                ]
+            );
 
-            return response()->json(['status' => 'success']);
+            return response()->json(['status' => 'success', 'id' => $feedback->id]);
         } catch (\Throwable $e) {
-            Log::warning('Failed to save feedback', ['error' => $e->getMessage()]);
-            return response()->json(['status' => 'success']);
+            Log::error('Failed to save feedback', ['error' => $e->getMessage()]);
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Feedback save failed'
+            ], 500);
         }
     }
 }

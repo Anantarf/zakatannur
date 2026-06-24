@@ -11,6 +11,7 @@ class AiChatLog extends Model
         'user_id',
         'session_id',
         'question',
+        'question_md5',
         'intent',
         'context_summary',
         'answer',

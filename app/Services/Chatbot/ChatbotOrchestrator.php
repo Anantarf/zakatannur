@@ -80,14 +80,19 @@ class ChatbotOrchestrator
     private function saveChatLog(string $question, ?string $intent, string $sourceType, string $answer, ?string $sessionId, ?string $sentiment = null): void
     {
         try {
-            AiChatLog::create([
-                'session_id' => $sessionId,
-                'question' => $question,
-                'intent' => $intent,
-                'source_type' => $sourceType,
-                'answer' => $answer,
-                'sentiment' => $sentiment,
-            ]);
+            AiChatLog::updateOrCreate(
+                [
+                    'session_id' => $sessionId,
+                    'question_md5' => md5($question),
+                ],
+                [
+                    'question' => $question,
+                    'intent' => $intent,
+                    'source_type' => $sourceType,
+                    'answer' => $answer,
+                    'sentiment' => $sentiment,
+                ]
+            );
         } catch (Throwable $e) {
             Log::warning('Failed to save AI chat log.', ['message' => $e->getMessage()]);
         }
