@@ -51,14 +51,14 @@
         x-transition:leave-start="translate-y-0 scale-100 opacity-100"
         x-transition:leave-end="translate-y-6 scale-95 opacity-0"
         @keydown.escape.window="closeChat()"
-        class="flex w-[calc(100vw-1.5rem)] max-w-[24rem] origin-bottom-right flex-col overflow-hidden rounded-2xl border border-slate-200/80 bg-white shadow-[0_24px_60px_-20px_rgba(15,23,42,0.25)] ring-1 ring-slate-200/70 sm:w-96"
+        class="absolute bottom-0 right-0 z-50 flex w-[calc(100vw-1.5rem)] max-w-[24rem] origin-bottom-right flex-col overflow-hidden rounded-2xl border border-slate-200/80 bg-white shadow-[0_24px_60px_-20px_rgba(15,23,42,0.25)] ring-1 ring-slate-200/70 sm:w-96"
         style="height: min(500px, 78vh); max-height: 78vh;"
         role="dialog"
         aria-label="Chat dengan Zakky"
     >
         <div class="z-10 flex items-center justify-between border-b border-slate-200 bg-white px-4 py-3">
             <div class="flex items-center space-x-3 min-w-0 flex-1">
-                <span class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-brand-600 text-white">
+                <span class="flex h-8 w-8 shrink-0 items-center justify-center overflow-hidden rounded-full bg-brand-600 text-white transform-gpu">
                     {!! $profileAvatar !!}
                 </span>
                 <div class="min-w-0 flex-1">
@@ -89,7 +89,7 @@
         <div x-ref="chatContainer" class="flex flex-1 flex-col space-y-4 overflow-y-auto bg-white p-4">
             <!-- Welcome Message -->
             <div class="flex items-start animate-fade-in gap-3">
-                <span class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-brand-600 text-white flex-shrink-0">
+                <span class="flex h-8 w-8 shrink-0 items-center justify-center overflow-hidden rounded-full bg-brand-600 text-white flex-shrink-0 transform-gpu">
                     {!! $profileAvatar !!}
                 </span>
                 <div class="flex flex-col items-start min-w-0">
@@ -117,7 +117,7 @@
             <template x-for="(message, index) in messages" :key="`${message.role}-${index}`">
                 <div class="flex w-full animate-fade-in" :class="message.role === 'user' ? 'justify-end' : 'justify-start items-start'" style="animation-duration: 300ms;">
                     <template x-if="message.role === 'bot'">
-                        <span class="mr-3 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-brand-600 text-white flex-shrink-0">
+                        <span class="mr-3 flex h-8 w-8 shrink-0 items-center justify-center overflow-hidden rounded-full bg-brand-600 text-white flex-shrink-0 transform-gpu">
                             {!! $profileAvatar !!}
                         </span>
                     </template>
@@ -212,7 +212,7 @@
             </template>
 
             <div x-show="isTyping" class="flex items-start animate-fade-in gap-3">
-                <span class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-brand-600 text-white flex-shrink-0">
+                <span class="flex h-8 w-8 shrink-0 items-center justify-center overflow-hidden rounded-full bg-brand-600 text-white flex-shrink-0 transform-gpu">
                     {!! $profileAvatar !!}
                 </span>
                 <div class="flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 py-2">

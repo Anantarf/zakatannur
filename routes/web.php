@@ -4,6 +4,7 @@ use App\Http\Controllers\Internal\DashboardController;
 use App\Http\Controllers\Internal\PeriodSettingsController;
 use App\Http\Controllers\Internal\TemplateController;
 use App\Http\Controllers\Internal\AuditLogController;
+use App\Http\Controllers\Internal\ChatbotAnalyticsController;
 use App\Http\Controllers\Internal\TransactionAnomalyController;
 use App\Http\Controllers\Internal\TransactionHistoryController;
 use App\Http\Controllers\Internal\UserManagementController;
@@ -69,6 +70,7 @@ Route::middleware(['auth', 'role:staff,admin,super_admin'])
             Route::patch('/users/{user}', [UserManagementController::class, 'update'])->name('users.update');
 
             Route::get('/audit-logs', [AuditLogController::class, 'index'])->name('audit_logs.index');
+            Route::get('/chatbot-analytics', [ChatbotAnalyticsController::class, 'index'])->name('chatbot_analytics.index');
         });
 
         Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
