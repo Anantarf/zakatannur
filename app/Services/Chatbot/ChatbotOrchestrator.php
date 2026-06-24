@@ -31,6 +31,53 @@ class ChatbotOrchestrator
 
         try {
             $intent = $this->actionDetector->intent($message, $context);
+
+            // Handle fitrah/fidyah calculation cases
+            if ($intent === 'calculate_fitrah_case') {
+                $response = $this->calculateFitrah($message);
+                $this->saveChatLog($message, $intent, 'calculation', $response->reply, $sessionId);
+                ChatbotResponseCache::put($message, $response);
+                return $response;
+            }
+
+            if ($intent === 'calculate_fidyah_case') {
+                $response = $this->calculateFidyah($message);
+                $this->saveChatLog($message, $intent, 'calculation', $response->reply, $sessionId);
+                ChatbotResponseCache::put($message, $response);
+                return $response;
+            }
+
+            // Route specific zakat mal intents to their knowledge base entries
+            if (in_array($intent, ['ask_zakat_mal_definition', 'ask_zakat_mal_nishab', 'ask_zakat_mal_example'])) {
+                $entryId = match($intent) {
+                    'ask_zakat_mal_definition', 'ask_zakat_mal_nishab' => 'zakat-mal-definisi',
+                    'ask_zakat_mal_example' => 'zakat-mal-contoh',
+                    default => null,
+                };
+
+                if ($entryId) {
+                    $knowledge = null;
+                    foreach (config('zakky_knowledge', []) as $entry) {
+                        if ($entry['id'] === $entryId) {
+                            $knowledge = $entry;
+                            break;
+                        }
+                    }
+
+                    if ($knowledge) {
+                        $response = ChatbotResponse::success(
+                            (string) $knowledge['answer'],
+                            'knowledge',
+                            $knowledge['actions'] ?? [],
+                            [['id' => $knowledge['id'], 'label' => $knowledge['source_label'] ?? 'Panduan Zakat Masjid An-Nur']]
+                        )->withContext($context->forIntent($entryId, 'knowledge')->toArray());
+                        $this->saveChatLog($message, $intent, 'knowledge', $response->reply, $sessionId);
+                        ChatbotResponseCache::put($message, $response);
+                        return $response;
+                    }
+                }
+            }
+
             $publicData = $intent ? $this->publicDataResponder->respond($intent) : null;
             if ($publicData) {
                 $response = $publicData->withContext($context->forIntent($intent, 'public_data')->toArray());
@@ -126,5 +173,67 @@ class ChatbotOrchestrator
         }
 
         return ChatbotResponse::success($cleanReply, 'ai');
+    }
+
+    private function calculateFitrah(string $message): ChatbotResponse
+    {
+        // ponytail: regex extract number, no NLP — upgrade if multi-language parsing needed
+        if (!preg_match('/(\d+)[\s]*(orang|jiwa|person)/', $message, $matches)) {
+            return ChatbotResponse::success(
+                'Saya butuh tahu berapa orang yang membayar fitrah. Coba tanya: "Fitrah 4 orang berapa?"',
+                'knowledge',
+                [['type' => 'suggested_reply', 'label' => 'Contoh', 'message' => 'Fitrah keluarga 4 orang berapa?']]
+            );
+        }
+
+        $count = (int) $matches[1];
+        $cashPerJiwa = config('zakat.annual_defaults.fitrah_cash_per_jiwa', 50000);
+        $berasPerJiwa = config('zakat.annual_defaults.fitrah_beras_per_jiwa', 2.5);
+
+        $totalCash = $count * $cashPerJiwa;
+        $totalBeras = $count * $berasPerJiwa;
+
+        $reply = sprintf(
+            "✅ Perhitungan Zakat Fitrah untuk %d orang:\n\n"
+            . "💰 UANG:\n%d × Rp %s = Rp %s\n\n"
+            . "🌾 BERAS:\n%d × %.1f kg = %.1f kg\n\n"
+            . "⚠️ Silakan konfirmasi ke Panitia Zakat An-Nur untuk validasi.",
+            $count,
+            $count, number_format($cashPerJiwa, 0, ',', '.'), number_format($totalCash, 0, ',', '.'),
+            $count, $berasPerJiwa, $totalBeras
+        );
+
+        return ChatbotResponse::success($reply, 'calculation');
+    }
+
+    private function calculateFidyah(string $message): ChatbotResponse
+    {
+        // ponytail: regex extract number, no NLP
+        if (!preg_match('/(\d+)[\s]*(hari|day)/', $message, $matches)) {
+            return ChatbotResponse::success(
+                'Saya butuh tahu berapa hari fidyah yang Anda bayar. Coba tanya: "Fidyah 7 hari berapa?"',
+                'knowledge',
+                [['type' => 'suggested_reply', 'label' => 'Contoh', 'message' => 'Fidyah 5 hari berapa?']]
+            );
+        }
+
+        $days = (int) $matches[1];
+        $cashPerHari = config('zakat.annual_defaults.fidyah_per_hari', 30000);
+        $berasPerHari = config('zakat.annual_defaults.fidyah_beras_per_hari', 0.75);
+
+        $totalCash = $days * $cashPerHari;
+        $totalBeras = $days * $berasPerHari;
+
+        $reply = sprintf(
+            "✅ Perhitungan Fidyah untuk %d hari:\n\n"
+            . "💰 UANG:\n%d × Rp %s = Rp %s\n\n"
+            . "🌾 BERAS:\n%d × %.2f kg = %.2f kg\n\n"
+            . "⚠️ Silakan konfirmasi ke Panitia Zakat An-Nur untuk validasi.",
+            $days,
+            $days, number_format($cashPerHari, 0, ',', '.'), number_format($totalCash, 0, ',', '.'),
+            $days, $berasPerHari, $totalBeras
+        );
+
+        return ChatbotResponse::success($reply, 'calculation');
     }
 }

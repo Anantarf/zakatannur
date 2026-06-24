@@ -8,6 +8,28 @@ class ChatbotActionDetector
     {
         $message = $this->normalize($message);
 
+        // Fitrah/Fidyah case scenarios (user asking for calculation)
+        if ($this->containsAny($message, ['fitrah', 'orang', 'jiwa']) && $this->containsAny($message, ['berapa', 'hitung', 'brp'])) {
+            return 'calculate_fitrah_case';
+        }
+
+        if ($this->containsAny($message, ['fidyah', 'hari', 'puasa']) && $this->containsAny($message, ['berapa', 'hitung', 'brp'])) {
+            return 'calculate_fidyah_case';
+        }
+
+        // Zakat mal specific queries (check specific before general)
+        if ($this->containsAny($message, ['contoh', 'skenario']) && $this->containsAny($message, ['zakat', 'hitung', 'berapa'])) {
+            return 'ask_zakat_mal_example';
+        }
+
+        if ($this->containsAny($message, ['nishab', 'nisab']) && $this->containsAny($message, ['berapa', 'apa', 'hitung'])) {
+            return 'ask_zakat_mal_nishab';
+        }
+
+        if ($this->containsAny($message, ['zakat mal', 'apa itu zakat', 'definisi zakat', 'pengertian zakat'])) {
+            return 'ask_zakat_mal_definition';
+        }
+
         if ($this->containsAny($message, ['update terakhir', 'terakhir update', 'diperbarui', 'kapan update', 'data terbaru'])) {
             return 'ask_latest_update';
         }
