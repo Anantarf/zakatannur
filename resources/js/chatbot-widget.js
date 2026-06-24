@@ -1,5 +1,7 @@
 ﻿const DEFAULT_ERROR_MESSAGE = 'Maaf, terjadi kesalahan. Silakan coba lagi.';
 const NETWORK_ERROR_MESSAGE = 'Gangguan jaringan. Periksa koneksi internet Anda.';
+const COPY_SUCCESS_MESSAGE = 'Tersalin!';
+const FEEDBACK_SUCCESS_MESSAGE = 'Terima kasih atas feedback!';
 
 const timeFormatter = new Intl.DateTimeFormat('id-ID', {
     hour: '2-digit',
@@ -51,7 +53,6 @@ document.addEventListener('alpine:init', () => {
                     this.unreadBadge = 0;
                     this.lastSeenMessageCount = this.messages.length;
                     this.$nextTick(() => this.scrollToBottom());
-                    // Set focus to input for accessibility
                     this.$nextTick(() => {
                         const input = document.querySelector('[data-chatbot-widget] input[type="text"]');
                         if (input) input.focus();
@@ -59,6 +60,7 @@ document.addEventListener('alpine:init', () => {
                 }
             });
             this.$watch('messages', (next) => {
+                this.$nextTick(() => this.scrollToBottom());
                 if (this.isOpen) {
                     this.lastSeenMessageCount = next.length;
                 } else if (next.length > this.lastSeenMessageCount) {
@@ -271,6 +273,46 @@ document.addEventListener('alpine:init', () => {
             } catch (_) {
                 return null;
             }
+        },
+
+        copyMessage(content) {
+            navigator.clipboard.writeText(content).then(() => {
+                this.showToast(COPY_SUCCESS_MESSAGE, 'success');
+            });
+        },
+
+        sendFeedback(messageIndex, rating) {
+            const message = this.messages[messageIndex];
+            if (!message || message.role !== 'bot') return;
+
+            message.feedback = rating;
+            this.showToast(FEEDBACK_SUCCESS_MESSAGE, 'success');
+
+            // Log feedback (could be sent to backend later)
+            fetch(this.endpoint, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    message: message.content,
+                    feedback: rating,
+                    type: 'feedback',
+                }),
+            }).catch(() => {});
+        },
+
+        showToast(message, type = 'info') {
+            const toast = document.createElement('div');
+            toast.className = `fixed bottom-6 right-6 px-4 py-2 rounded text-sm font-medium text-white ${
+                type === 'success' ? 'bg-green-600' : 'bg-slate-600'
+            } shadow-lg animate-fade-in`;
+            toast.textContent = message;
+            toast.style.zIndex = '9999';
+            document.body.appendChild(toast);
+
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                setTimeout(() => toast.remove(), 300);
+            }, 2000);
         },
     }));
 });

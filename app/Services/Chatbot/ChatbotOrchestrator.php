@@ -6,6 +6,7 @@ use App\Models\AiChatLog;
 use App\Services\Chatbot\Knowledge\KnowledgeRetriever;
 use Illuminate\Support\Facades\Log;
 use Throwable;
+use App\Services\Chatbot\ChatbotResponseCache;
 
 class ChatbotOrchestrator
 {
@@ -19,6 +20,13 @@ class ChatbotOrchestrator
 
     public function handle(string $message, array $rawContext = [], ?string $sessionId = null): ChatbotResponse
     {
+        // Check cache for identical messages
+        $cached = ChatbotResponseCache::get($message);
+        if ($cached) {
+            $this->saveChatLog($message, 'cached', 'cache', $cached->reply, $sessionId);
+            return $cached;
+        }
+
         $context = ChatbotConversationContext::fromArray($rawContext);
 
         try {
@@ -27,6 +35,7 @@ class ChatbotOrchestrator
             if ($publicData) {
                 $response = $publicData->withContext($context->forIntent($intent, 'public_data')->toArray());
                 $this->saveChatLog($message, $intent, 'public_data', $response->reply, $sessionId);
+                ChatbotResponseCache::put($message, $response);
                 return $response;
             }
 
@@ -34,6 +43,7 @@ class ChatbotOrchestrator
             if ($action) {
                 $response = $action->withContext($context->forIntent('navigation', 'action')->toArray());
                 $this->saveChatLog($message, 'navigation', 'action', $response->reply, $sessionId);
+                ChatbotResponseCache::put($message, $response);
                 return $response;
             }
 
@@ -49,11 +59,13 @@ class ChatbotOrchestrator
                     ]]
                 )->withContext($context->forIntent((string) ($knowledge['id'] ?? 'knowledge'), 'knowledge')->toArray());
                 $this->saveChatLog($message, (string) ($knowledge['id'] ?? 'knowledge'), 'knowledge', $response->reply, $sessionId);
+                ChatbotResponseCache::put($message, $response);
                 return $response;
             }
 
             $response = $this->answerFromAi($message);
             $this->saveChatLog($message, null, $response->source, $response->reply, $sessionId);
+            ChatbotResponseCache::put($message, $response);
             return $response;
         } catch (Throwable $e) {
             Log::error('Chatbot orchestration failed.', [

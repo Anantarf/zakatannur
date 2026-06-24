@@ -23,5 +23,5 @@ Route::withoutMiddleware('throttle:api')->group(function () {
         ->middleware(['throttle:public-summary']);
 
     Route::post('/chatbot/message', [\App\Http\Controllers\Api\ChatbotController::class, 'chat'])
-        ->middleware(['throttle:60,1']);
+        ->middleware(['throttle:30,1', \App\Http\Middleware\ThrottleChatbot::class]);
 });

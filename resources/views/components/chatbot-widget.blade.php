@@ -130,27 +130,48 @@
                                     : 'rounded-lg rounded-tl-none border border-slate-200 bg-white text-slate-800')"
                             x-text="message.content"
                         ></div>
-                        <div class="mt-1 flex items-center gap-2 px-1 text-xs text-slate-400">
-                            <span x-text="formatTime(message.createdAt)" class="flex-shrink-0"></span>
+                        <div class="mt-2 flex flex-wrap items-center gap-2 px-1 text-xs">
+                            <span x-text="formatTime(message.createdAt)" class="text-slate-400 flex-shrink-0"></span>
                             <template x-if="message.citations && message.citations.length > 0">
-                                <span class="truncate text-xs" x-text="'Sumber: ' + message.citations[0].label"></span>
+                                <span class="truncate text-slate-400" x-text="'Sumber: ' + message.citations[0].label"></span>
                             </template>
                             <template x-if="message.role === 'bot' &amp;&amp; !message.isError">
-                                <button
-                                    type="button"
-                                    @click="navigator.clipboard.writeText(message.content)"
-                                    class="opacity-0 group-hover:opacity-100 transition-opacity px-2 py-0.5 text-xs font-medium text-slate-500 hover:text-slate-700 hover:bg-slate-100 rounded"
-                                    title="Salin pesan"
-                                    aria-label="Salin pesan"
-                                >
-                                    Salin
-                                </button>
+                                <div class="flex gap-1 ml-auto">
+                                    <button
+                                        type="button"
+                                        @click="copyMessage(message.content)"
+                                        x-show="!message.feedback"
+                                        class="opacity-0 group-hover:opacity-100 transition-opacity px-2 py-0.5 font-medium text-slate-500 hover:text-slate-700 hover:bg-slate-100 rounded"
+                                        title="Salin pesan"
+                                    >
+                                        Salin
+                                    </button>
+                                    <button
+                                        type="button"
+                                        @click="sendFeedback(index, 'helpful')"
+                                        x-show="!message.feedback"
+                                        class="opacity-0 group-hover:opacity-100 transition-opacity px-1.5 text-slate-500 hover:text-green-600"
+                                        title="Membantu"
+                                    >
+                                        👍
+                                    </button>
+                                    <button
+                                        type="button"
+                                        @click="sendFeedback(index, 'unhelpful')"
+                                        x-show="!message.feedback"
+                                        class="opacity-0 group-hover:opacity-100 transition-opacity px-1.5 text-slate-500 hover:text-red-600"
+                                        title="Tidak membantu"
+                                    >
+                                        👎
+                                    </button>
+                                    <span x-show="message.feedback" class="px-2 py-0.5 text-slate-400">✓ Terima kasih</span>
+                                </div>
                             </template>
                             <template x-if="message.isError &amp;&amp; message.isRetryable">
                                 <button
                                     type="button"
                                     @click="retryLastMessage()"
-                                    class="ml-auto inline-flex items-center gap-1 rounded border border-amber-300 bg-white px-2 py-0.5 text-xs font-semibold text-amber-700 transition-all hover:bg-amber-100 active:scale-95"
+                                    class="ml-auto inline-flex items-center gap-1 rounded border border-amber-300 bg-white px-2 py-0.5 font-semibold text-amber-700 transition-all hover:bg-amber-100 active:scale-95"
                                     title="Coba ulangi pesan"
                                 >
                                     Coba lagi
@@ -158,13 +179,13 @@
                             </template>
                         </div>
                         <template x-if="message.actions && message.actions.length > 0">
-                            <div class="mt-2 flex flex-wrap gap-2">
+                            <div class="mt-2 flex flex-wrap gap-1.5">
                                 <template x-for="(action, actionIndex) in message.actions" :key="`action-${index}-${actionIndex}`">
                                     <button
                                         type="button"
                                         x-show="action.type === 'open_tab' || action.type === 'suggested_reply'"
                                         @click="executeAction(action)"
-                                        class="rounded border border-brand-200 bg-brand-50 px-2 py-1 text-xs font-medium text-brand-700 transition-all hover:border-brand-300 hover:bg-brand-100 active:scale-95 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:ring-offset-1"
+                                        class="rounded-lg border border-slate-200 bg-white px-2.5 py-1.5 text-xs font-medium text-slate-700 transition-all hover:border-brand-300 hover:bg-brand-50 active:scale-95 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:ring-offset-1"
                                         :title="action.label || (action.target === 'grafik' ? 'Lihat Grafik' : 'Buka Ringkasan')"
                                         x-text="action.label || (action.target === 'grafik' ? 'Lihat Grafik' : 'Buka Ringkasan')"
                                     ></button>

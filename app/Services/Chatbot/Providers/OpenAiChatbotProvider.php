@@ -93,25 +93,25 @@ class OpenAiChatbotProvider implements ChatbotServiceInterface
 
             if ($response->status() === 401 || $response->status() === 403) {
                 Log::error('OpenAI Authentication Failed', ['status' => $response->status()]);
-                return $this->fallback('Konfigurasi asisten belum lengkap. Silakan hubungi administrator.');
+                return $this->fallback('Konfigurasi belum lengkap. Coba: Total uang, Total beras, Cara bayar zakat.');
             }
 
             if ($response->status() === 404) {
                 Log::error('OpenAI Model Not Found', ['model' => $this->model]);
-                return $this->fallback('Model asisten tidak ditemukan. Hubungi admin untuk update konfigurasi.');
+                return $this->fallback('Asisten sedang diperbarui. Coba tanya: Total uang, Total beras, Total jiwa.');
             }
 
             if ($response->status() === 429) {
                 Log::warning('OpenAI Rate Limit Exceeded');
-                return $this->fallback('Permintaan terlalu banyak. Coba lagi dalam beberapa menit.');
+                return $this->fallback('Terlalu banyak pertanyaan. Tunggu 1 menit, lalu coba lagi.');
             }
 
             if ($response->status() >= 500) {
                 Log::error('OpenAI Server Error', ['status' => $response->status()]);
-                return $this->fallback('Server asisten mengalami masalah. Coba lagi sebentar.');
+                return $this->fallback('Server sedang sibuk. Coba dalam 1 menit atau tanya: Update terakhir.');
             }
 
-            return $this->fallback('Koneksi ke asisten gagal. Periksa internet Anda.');
+            return $this->fallback('Koneksi bermasalah. Periksa internet atau coba pertanyaan sederhana.');
         } catch (Throwable $e) {
             Log::error('OpenAI API Exception', [
                 'message' => $e->getMessage(),
