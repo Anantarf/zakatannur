@@ -15,6 +15,7 @@ class AiChatLog extends Model
         'context_summary',
         'answer',
         'source_type',
+        'sentiment',
     ];
 
     public function user(): BelongsTo

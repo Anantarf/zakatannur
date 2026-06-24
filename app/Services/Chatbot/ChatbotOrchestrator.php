@@ -63,8 +63,9 @@ class ChatbotOrchestrator
                 return $response;
             }
 
+            $sentiment = ChatbotSentimentDetector::detect($message);
             $response = $this->answerFromAi($message);
-            $this->saveChatLog($message, null, $response->source, $response->reply, $sessionId);
+            $this->saveChatLog($message, null, $response->source, $response->reply, $sessionId, $sentiment);
             ChatbotResponseCache::put($message, $response);
             return $response;
         } catch (Throwable $e) {
@@ -76,7 +77,7 @@ class ChatbotOrchestrator
         }
     }
 
-    private function saveChatLog(string $question, ?string $intent, string $sourceType, string $answer, ?string $sessionId): void
+    private function saveChatLog(string $question, ?string $intent, string $sourceType, string $answer, ?string $sessionId, ?string $sentiment = null): void
     {
         try {
             AiChatLog::create([
@@ -85,6 +86,7 @@ class ChatbotOrchestrator
                 'intent' => $intent,
                 'source_type' => $sourceType,
                 'answer' => $answer,
+                'sentiment' => $sentiment,
             ]);
         } catch (Throwable $e) {
             Log::warning('Failed to save AI chat log.', ['message' => $e->getMessage()]);
@@ -94,7 +96,19 @@ class ChatbotOrchestrator
     private function answerFromAi(string $message): ChatbotResponse
     {
         $language = ChatbotLanguageDetector::detect($message);
+        $sentiment = ChatbotSentimentDetector::detect($message);
         $contexts = $this->knowledgeRetriever->search($message, 2);
+
+        // Adjust system prompt based on sentiment
+        if ($sentiment === 'frustrated') {
+            // Prepend empathy hint to first context chunk
+            if (!empty($contexts)) {
+                $contexts[0] = array_merge($contexts[0], [
+                    '_sentiment_hint' => 'User appears frustrated. Be empathetic, concise, and offer clear next steps.',
+                ]);
+            }
+        }
+
         $reply = $this->aiProvider->sendMessage($message, $contexts, $language);
 
         $wasFallback = $this->aiProvider->wasLastReplyFallback();

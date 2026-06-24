@@ -1,4 +1,4 @@
-﻿const DEFAULT_ERROR_MESSAGE = 'Maaf, terjadi kesalahan. Silakan coba lagi.';
+const DEFAULT_ERROR_MESSAGE = 'Maaf, terjadi kesalahan. Silakan coba lagi.';
 const NETWORK_ERROR_MESSAGE = 'Gangguan jaringan. Periksa koneksi internet Anda.';
 const COPY_SUCCESS_MESSAGE = 'Tersalin!';
 const FEEDBACK_SUCCESS_MESSAGE = 'Terima kasih atas feedback!';
@@ -55,7 +55,7 @@ document.addEventListener('alpine:init', () => {
                     this.$nextTick(() => this.scrollToBottom());
                     this.$nextTick(() => {
                         const input = document.querySelector('[data-chatbot-widget] input[type="text"]');
-                        if (input) input.focus();
+                        if (input && window.matchMedia('(pointer: fine)').matches) input.focus();
                     });
                 }
             });
@@ -76,7 +76,7 @@ document.addEventListener('alpine:init', () => {
             if (this.isOpen) {
                 this.$nextTick(() => {
                     const input = document.querySelector('[data-chatbot-widget] input[type="text"]');
-                    if (input) input.focus();
+                    if (input && window.matchMedia('(pointer: fine)').matches) input.focus();
                 });
             }
         },

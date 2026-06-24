@@ -213,7 +213,7 @@
 
             <div x-show="isTyping" class="flex items-start animate-fade-in gap-3">
                 <span class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-brand-600 text-white flex-shrink-0">
-                    {!! $messageIcon !!}
+                    {!! $profileAvatar !!}
                 </span>
                 <div class="flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 py-2">
                     <span class="zakky-dot zakky-dot-1 h-2 w-2 rounded-full bg-slate-400 animate-bounce" style="animation-delay: 0ms;"></span>
