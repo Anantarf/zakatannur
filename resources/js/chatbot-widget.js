@@ -1,5 +1,5 @@
-﻿const DEFAULT_ERROR_MESSAGE = 'Maaf, Zakky sedang bermasalah. 😢 Coba lagi dalam beberapa saat.';
-const NETWORK_ERROR_MESSAGE = 'Gangguan jaringan terdeteksi. Periksa koneksi internet Anda.';
+﻿const DEFAULT_ERROR_MESSAGE = 'Maaf, terjadi kesalahan. Silakan coba lagi.';
+const NETWORK_ERROR_MESSAGE = 'Gangguan jaringan. Periksa koneksi internet Anda.';
 
 const timeFormatter = new Intl.DateTimeFormat('id-ID', {
     hour: '2-digit',
