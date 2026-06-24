@@ -54,6 +54,13 @@ class ChatbotOrchestrator
                 return $response;
             }
 
+            if ($intent === 'refer_zakat_mal_complex') {
+                $response = $this->referTopanitia($message);
+                $this->saveChatLog($message, $intent, 'referral', $response->reply, $sessionId);
+                ChatbotResponseCache::put($message, $response);
+                return $response;
+            }
+
             // Route specific zakat mal intents to their knowledge base entries
             if (in_array($intent, ['ask_zakat_mal_definition', 'ask_zakat_mal_nishab', 'ask_zakat_mal_example'])) {
                 $entryId = match($intent) {
@@ -305,5 +312,27 @@ class ChatbotOrchestrator
         }
 
         return ChatbotResponse::success($reply, 'calculation');
+    }
+
+    private function referTopanitia(string $message): ChatbotResponse
+    {
+        // ponytail: simple referral template, no case-specific messaging (same template for all complex cases)
+        $reply = "Pertanyaan Anda tentang aset kompleks atau situasi khusus memerlukan konsultasi langsung dengan Panitia Zakat An-Nur.\n\n" .
+            "Alasannya:\n" .
+            "• Perhitungan membutuhkan verifikasi aset dan dokumen langsung\n" .
+            "• Ada perbedaan fatwa antar mazhab untuk kasus Anda\n" .
+            "• Panitia An-Nur mungkin punya ketentuan khusus yang tidak tercakup dalam kalkulator Zakky\n\n" .
+            "📞 HUBUNGI PANITIA ZAKAT MASJID AN-NUR:\n" .
+            "Mereka siap memberikan konsultasi gratis untuk kasus pribadi Anda.\n" .
+            "Panitia akan membantu Anda:\n" .
+            "  1. Memahami aset kompleks Anda\n" .
+            "  2. Menghitung zakat sesuai syariat dan aturan An-Nur\n" .
+            "  3. Memastikan pembayaran akurat dan tepat waktu\n\n" .
+            "Silakan datang ke Masjid An-Nur atau hubungi panitia langsung untuk diskusi lebih lanjut.";
+
+        return ChatbotResponse::success($reply, 'referral', [
+            ['type' => 'suggested_reply', 'label' => 'Info kontak panitia', 'message' => 'Bagaimana cara menghubungi panitia?'],
+            ['type' => 'suggested_reply', 'label' => 'Kembali ke menu', 'message' => 'Menu utama'],
+        ]);
     }
 }
