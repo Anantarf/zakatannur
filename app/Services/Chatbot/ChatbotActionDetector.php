@@ -17,6 +17,12 @@ class ChatbotActionDetector
             return 'calculate_fidyah_case';
         }
 
+        // Zakat mal calculation scenario (has financial data + zakat question)
+        if ($this->containsAny($message, ['gaji', 'penghasilan', 'tabungan', 'emas', 'harta']) &&
+            $this->containsAny($message, ['zakat berapa', 'berapa zakat', 'hitung zakat'])) {
+            return 'calculate_zakat_mal_case';
+        }
+
         // Zakat mal specific queries (check specific before general)
         if ($this->containsAny($message, ['contoh', 'skenario']) && $this->containsAny($message, ['zakat', 'hitung', 'berapa'])) {
             return 'ask_zakat_mal_example';

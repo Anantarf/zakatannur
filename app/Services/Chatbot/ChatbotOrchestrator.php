@@ -47,6 +47,13 @@ class ChatbotOrchestrator
                 return $response;
             }
 
+            if ($intent === 'calculate_zakat_mal_case') {
+                $response = $this->calculateZakatMal($message);
+                $this->saveChatLog($message, $intent, 'calculation', $response->reply, $sessionId);
+                ChatbotResponseCache::put($message, $response);
+                return $response;
+            }
+
             // Route specific zakat mal intents to their knowledge base entries
             if (in_array($intent, ['ask_zakat_mal_definition', 'ask_zakat_mal_nishab', 'ask_zakat_mal_example'])) {
                 $entryId = match($intent) {
@@ -233,6 +240,69 @@ class ChatbotOrchestrator
             $days, number_format($cashPerHari, 0, ',', '.'), number_format($totalCash, 0, ',', '.'),
             $days, $berasPerHari, $totalBeras
         );
+
+        return ChatbotResponse::success($reply, 'calculation');
+    }
+
+    private function calculateZakatMal(string $message): ChatbotResponse
+    {
+        $guide = app(ChatbotZakatMalGuide::class);
+        $data = $guide->detect($message);
+
+        if (!$data || !array_filter($data)) {
+            return ChatbotResponse::success(
+                'Saya butuh informasi finansial Anda untuk hitung zakat mal. Coba tanya: "Saya PNS gaji 15 juta, tabungan 80 juta, emas 200 gram, zakat berapa?"',
+                'knowledge',
+                [['type' => 'suggested_reply', 'label' => 'Contoh', 'message' => 'Saya PNS gaji 15 juta, tabungan 80 juta, emas 200 gram, zakat berapa?']]
+            );
+        }
+
+        $result = $guide->calculate($data);
+
+        if (!$result['is_above_nishab']) {
+            $reply = "📊 Perhitungan Zakat Mal Anda:\n\n" .
+                sprintf("Total Aset Neto: Rp %s\nNishab minimum: Rp %s\n\n",
+                    number_format($result['nett_assets'], 0, ',', '.'),
+                    number_format($result['nishab'], 0, ',', '.')
+                ) .
+                "❌ Aset Anda BELUM mencapai nishab, jadi belum wajib zakat mal.\n\n" .
+                "⚠️ Perhitungan bersifat estimasi. Silakan konfirmasi ke Panitia Zakat An-Nur untuk kepastian.";
+        } else {
+            $reply = "📊 PERHITUNGAN ZAKAT MAL ESTIMASI ANDA:\n\n" .
+                sprintf("A. ASET YANG DIHITUNG:\n" .
+                    "   • Penghasilan setahun: Rp %s\n" .
+                    "   • Tabungan/cash: Rp %s\n" .
+                    "   • Emas %dg (@ Rp 900rb/g): Rp %s\n" .
+                    "   Total aset bruto: Rp %s\n\n" .
+                    "B. DIKURANGI:\n" .
+                    "   • Pengeluaran rutin (1 tahun): Rp %s\n" .
+                    "   • Hutang: Rp %s\n\n" .
+                    "C. CEK NISHAB:\n" .
+                    "   Aset Neto: Rp %s (Nishab: Rp %s)\n" .
+                    "   ✓ MELEBIHI NISHAB → WAJIB ZAKAT\n\n" .
+                    "D. ZAKAT 2.5%%:\n" .
+                    "   Rp %s × 2.5%% = Rp %s per tahun\n" .
+                    "   (~Rp %s per bulan jika dicicil)\n\n",
+                    number_format($result['annual_income'], 0, ',', '.'),
+                    number_format($result['savings'] ?? 0, 0, ',', '.'),
+                    $data['gold_gram'] ?? 0,
+                    number_format($result['gold_value'], 0, ',', '.'),
+                    number_format($result['total_assets'], 0, ',', '.'),
+                    number_format($result['annual_expenses'], 0, ',', '.'),
+                    number_format($result['debt'], 0, ',', '.'),
+                    number_format($result['nett_assets'], 0, ',', '.'),
+                    number_format($result['nishab'], 0, ',', '.'),
+                    number_format($result['nett_assets'], 0, ',', '.'),
+                    number_format($result['zakat_amount'], 0, ',', '.'),
+                    number_format((int)($result['zakat_amount'] / 12), 0, ',', '.')
+                ) .
+                "⚠️ PENTING:\n" .
+                "• Perhitungan menggunakan standar umum ulama (BAZNAS, Syafi'i)\n" .
+                "• Tarif An-Nur mungkin berbeda dari standar umum\n" .
+                "• Harga emas fluktuatif, gunakan rate hari ini untuk akurasi\n" .
+                "• ZAKKY BISA SALAH dalam kasus pribadi\n" .
+                "• KONFIRMASI KE PANITIA ZAKAT AN-NUR SEBELUM BAYAR";
+        }
 
         return ChatbotResponse::success($reply, 'calculation');
     }
