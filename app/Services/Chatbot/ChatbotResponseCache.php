@@ -11,7 +11,7 @@ class ChatbotResponseCache
 
     public static function key(string $message): string
     {
-        $normalized = Str::lower(trim($message));
+        $normalized = trim(preg_replace('/\s+/', ' ', preg_replace('/[^\pL\pN\s]/u', ' ', mb_strtolower($message))));
         $hash = md5($normalized);
         return "chatbot:response:{$hash}";
     }

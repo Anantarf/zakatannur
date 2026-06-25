@@ -6,6 +6,7 @@ use Illuminate\Support\ServiceProvider;
 use App\Services\Chatbot\ChatbotServiceInterface;
 use App\Services\Chatbot\Providers\MockChatbotProvider;
 use App\Services\Chatbot\Providers\OpenAiChatbotProvider;
+use App\Services\Chatbot\Providers\OpenAiEmbeddingsProvider;
 
 class ChatbotServiceProvider extends ServiceProvider
 {
@@ -22,6 +23,14 @@ class ChatbotServiceProvider extends ServiceProvider
             }
 
             return new MockChatbotProvider();
+        });
+
+        $this->app->singleton(OpenAiEmbeddingsProvider::class, function () {
+            $openaiKey = config('services.openai.api_key');
+            return new OpenAiEmbeddingsProvider(
+                $openaiKey ?? '',
+                config('services.openai.base_url', 'https://api.openai.com/v1')
+            );
         });
     }
 

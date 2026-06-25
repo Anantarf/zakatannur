@@ -35,28 +35,28 @@ class ChatbotOrchestrator
             // Handle fitrah/fidyah calculation cases
             if ($intent === 'calculate_fitrah_case') {
                 $response = $this->calculateFitrah($message);
-                $this->saveChatLog($message, $intent, 'calculation', $response->reply, $sessionId);
+                $this->saveChatLog($message, $intent, 'calculation', $response->reply, $sessionId, null, 'calculation');
                 ChatbotResponseCache::put($message, $response);
                 return $response;
             }
 
             if ($intent === 'calculate_fidyah_case') {
                 $response = $this->calculateFidyah($message);
-                $this->saveChatLog($message, $intent, 'calculation', $response->reply, $sessionId);
+                $this->saveChatLog($message, $intent, 'calculation', $response->reply, $sessionId, null, 'calculation');
                 ChatbotResponseCache::put($message, $response);
                 return $response;
             }
 
             if ($intent === 'calculate_zakat_mal_case') {
                 $response = $this->calculateZakatMal($message);
-                $this->saveChatLog($message, $intent, 'calculation', $response->reply, $sessionId);
+                $this->saveChatLog($message, $intent, 'calculation', $response->reply, $sessionId, null, 'calculation');
                 ChatbotResponseCache::put($message, $response);
                 return $response;
             }
 
             if ($intent === 'refer_zakat_mal_complex') {
                 $response = $this->referTopanitia($message);
-                $this->saveChatLog($message, $intent, 'referral', $response->reply, $sessionId);
+                $this->saveChatLog($message, $intent, 'referral', $response->reply, $sessionId, null, 'calculation');
                 ChatbotResponseCache::put($message, $response);
                 return $response;
             }
@@ -85,7 +85,7 @@ class ChatbotOrchestrator
                             $knowledge['actions'] ?? [],
                             [['id' => $knowledge['id'], 'label' => $knowledge['source_label'] ?? 'Panduan Zakat Masjid An-Nur']]
                         )->withContext($context->forIntent($entryId, 'knowledge')->toArray());
-                        $this->saveChatLog($message, $intent, 'knowledge', $response->reply, $sessionId);
+                        $this->saveChatLog($message, $intent, 'knowledge', $response->reply, $sessionId, null, 'knowledge');
                         ChatbotResponseCache::put($message, $response);
                         return $response;
                     }
@@ -95,7 +95,7 @@ class ChatbotOrchestrator
             $publicData = $intent ? $this->publicDataResponder->respond($intent) : null;
             if ($publicData) {
                 $response = $publicData->withContext($context->forIntent($intent, 'public_data')->toArray());
-                $this->saveChatLog($message, $intent, 'public_data', $response->reply, $sessionId);
+                $this->saveChatLog($message, $intent, 'public_data', $response->reply, $sessionId, null, 'knowledge');
                 ChatbotResponseCache::put($message, $response);
                 return $response;
             }
@@ -119,14 +119,15 @@ class ChatbotOrchestrator
                         'label' => $knowledge['source_label'] ?? 'Panduan Zakat Masjid An-Nur',
                     ]]
                 )->withContext($context->forIntent((string) ($knowledge['id'] ?? 'knowledge'), 'knowledge')->toArray());
-                $this->saveChatLog($message, (string) ($knowledge['id'] ?? 'knowledge'), 'knowledge', $response->reply, $sessionId);
+                $this->saveChatLog($message, (string) ($knowledge['id'] ?? 'knowledge'), 'knowledge', $response->reply, $sessionId, null, 'knowledge');
                 ChatbotResponseCache::put($message, $response);
                 return $response;
             }
 
             $sentiment = ChatbotSentimentDetector::detect($message);
             $response = $this->answerFromAi($message);
-            $this->saveChatLog($message, null, $response->source, $response->reply, $sessionId, $sentiment);
+            $confidenceSource = $this->aiProvider->wasLastReplyFallback() ? 'fallback' : 'ai';
+            $this->saveChatLog($message, null, $response->source, $response->reply, $sessionId, $sentiment, $confidenceSource);
             ChatbotResponseCache::put($message, $response);
             return $response;
         } catch (Throwable $e) {
@@ -138,7 +139,7 @@ class ChatbotOrchestrator
         }
     }
 
-    private function saveChatLog(string $question, ?string $intent, string $sourceType, string $answer, ?string $sessionId, ?string $sentiment = null): void
+    private function saveChatLog(string $question, ?string $intent, string $sourceType, string $answer, ?string $sessionId, ?string $sentiment = null, ?string $confidenceSource = null): void
     {
         try {
             AiChatLog::updateOrCreate(
@@ -152,6 +153,7 @@ class ChatbotOrchestrator
                     'source_type' => $sourceType,
                     'answer' => $answer,
                     'sentiment' => $sentiment,
+                    'confidence_source' => $confidenceSource,
                 ]
             );
         } catch (Throwable $e) {

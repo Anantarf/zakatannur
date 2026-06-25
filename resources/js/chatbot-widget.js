@@ -17,6 +17,7 @@ document.addEventListener('alpine:init', () => {
         endpoint,
         quickReplies,
         isOpen: false,
+        showTooltip: false,
         input: '',
         messages: [],
         isTyping: false,
@@ -51,6 +52,13 @@ document.addEventListener('alpine:init', () => {
             this.generateOrLoadSessionId();
             this.loadHistory();
             this.lastSeenMessageCount = this.messages.length;
+
+            setTimeout(() => {
+                if (!this.isOpen && !localStorage.getItem('zakky_tooltip_dismissed')) {
+                    this.showTooltip = true;
+                }
+            }, 3000);
+
             this.$watch('isOpen', (open) => {
                 if (open) {
                     this.unreadBadge = 0;
@@ -126,6 +134,7 @@ document.addEventListener('alpine:init', () => {
         toggleChat() {
             this.isOpen = !this.isOpen;
             if (this.isOpen) {
+                this.dismissTooltip();
                 this.$nextTick(() => {
                     const input = document.querySelector('[data-chatbot-widget] input[type="text"]');
                     if (input && window.matchMedia('(pointer: fine)').matches) input.focus();
@@ -135,6 +144,11 @@ document.addEventListener('alpine:init', () => {
 
         closeChat() {
             this.isOpen = false;
+        },
+
+        dismissTooltip() {
+            this.showTooltip = false;
+            localStorage.setItem('zakky_tooltip_dismissed', 'true');
         },
 
         scrollToBottom() {

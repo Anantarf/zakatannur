@@ -188,4 +188,57 @@ Takaran berlaku periode aktif Ramadan. Silakan konfirmasi ke panitia untuk perio
             ['type' => 'suggested_reply', 'label' => 'Cara bayar', 'message' => 'Bagaimana cara membayar zakat?'],
         ],
     ],
+    [
+        'id' => 'regulasi-an-nur-spesifik',
+        'title' => 'Regulasi zakat spesifik Masjid An-Nur',
+        'keywords' => ['regulasi an-nur', 'ketentuan an-nur', 'syarat an-nur', 'peraturan an-nur', 'tarif an-nur', 'panitia an-nur', 'persyaratan penerima'],
+        'answer' => 'Regulasi Zakat Masjid An-Nur 2026:
+
+JADWAL PENERIMAAN:
+• Periode utama: 10 hari terakhir Ramadhan
+• Penerimaan berkelanjutan sesuai pengumuman dari panitia
+• Verifikasi dokumen penerima dilakukan di lokasi masjid
+
+TARIF ZAKAT AN-NUR (2026):
+Zakat Fitrah:
+• Uang: Rp 50.000 per jiwa
+• Beras: 2,5 kg per jiwa
+
+Zakat Fidyah:
+• Uang: Rp 30.000 per hari
+• Beras: 0,75 kg per hari
+
+Zakat Mal:
+• Tarif: 2,5% dari aset neto yang melebihi nishab
+• Nishab: Mengikuti standar BAZNAS dan fatwa ulama
+
+SYARAT PENERIMA:
+• Daftar mustahik diverifikasi panitia An-Nur secara langsung
+• Prioritas: fakir miskin dari jemaat masjid dan sekitarnya
+• Verifikasi dokumen dan kondisi sosial ekonomi dilakukan panitia
+
+CATATAN PENTING:
+Semua perhitungan di Zakky bersifat estimasi. Untuk kasus pribadi yang kompleks, silakan konsultasikan langsung dengan panitia zakat Masjid An-Nur untuk memastikan perhitungan sesuai ketentuan lokal An-Nur.',
+        'source_label' => 'Peraturan Masjid An-Nur 2026',
+        'actions' => [
+            ['type' => 'suggested_reply', 'label' => 'Contoh hitung', 'message' => 'Contoh perhitungan zakat mal?'],
+            ['type' => 'suggested_reply', 'label' => 'Hubungi panitia', 'message' => 'Bagaimana cara hubungi panitia zakat?'],
+        ],
+    ],
+    [
+        'id' => 'hubungi-panitia-an-nur',
+        'title' => 'Hubungi panitia An-Nur untuk detail lengkap',
+        'keywords' => ['hubungi panitia', 'kontak panitia', 'datang ke masjid', 'detail lebih lanjut', 'tanya langsung', 'lokasi an-nur', 'alamat masjid'],
+        'answer' => 'Mau detail lebih? Datang aja ke Masjid An-Nur!
+
+Kapan: 10 hari terakhir Ramadhan atau setelah zakat dibuka
+Lokasi: https://maps.app.goo.gl/o4SULwNTn9QYkQba9
+
+Di sana panitia zakat siap membantu Anda dengan kasus yang lebih kompleks atau yang butuh verifikasi dokumen. Mereka juga bisa jawab detail peraturan An-Nur spesifik.',
+        'source_label' => 'Informasi Masjid An-Nur',
+        'actions' => [
+            ['type' => 'suggested_reply', 'label' => 'Tanya panitia', 'message' => 'Bagaimana cara konsultasi langsung dengan panitia?'],
+            ['type' => 'suggested_reply', 'label' => 'Kembali ke menu', 'message' => 'Menu utama'],
+        ],
+    ],
 ];

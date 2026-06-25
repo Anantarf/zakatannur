@@ -42,6 +42,46 @@
         ></span>
     </button>
 
+    <!-- Tooltip CTA -->
+    <div
+        x-show="showTooltip && !isOpen"
+        x-cloak
+        x-transition:enter="transition ease-out duration-500"
+        x-transition:enter-start="translate-y-2 opacity-0"
+        x-transition:enter-end="translate-y-0 opacity-100"
+        x-transition:leave="transition ease-in duration-300"
+        x-transition:leave-start="translate-y-0 opacity-100"
+        x-transition:leave-end="translate-y-2 opacity-0"
+        class="absolute bottom-[4.5rem] right-0 z-40 mb-2 w-64 origin-bottom-right"
+    >
+        <div class="relative rounded-2xl bg-brand-600 px-4 py-3 text-white shadow-xl ring-1 ring-brand-700/50">
+            <!-- Close Button -->
+            <button
+                type="button"
+                @click.stop="dismissTooltip()"
+                class="absolute right-2.5 top-2.5 flex h-5 w-5 items-center justify-center rounded-full bg-brand-700/50 text-brand-100 transition-colors hover:bg-brand-700 hover:text-white"
+                aria-label="Tutup pesan"
+                title="Tutup"
+            >
+                <svg class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+            </button>
+            
+            <div class="flex items-start gap-3 pr-4">
+                <!-- Avatar mini -->
+                <div class="mt-0.5 h-8 w-8 shrink-0 overflow-hidden rounded-full border border-brand-400/50 bg-brand-500">
+                    {!! $profileAvatar !!}
+                </div>
+                <div>
+                    <p class="text-sm font-bold leading-tight tracking-wide">Assalamu'alaikum!</p>
+                    <p class="mt-1 text-xs text-brand-100 leading-relaxed">Ada pertanyaan seputar Zakat? Tanya Zakky di sini 👇</p>
+                </div>
+            </div>
+            
+            <!-- Tail pointing to the button -->
+            <div class="absolute -bottom-2 right-6 h-4 w-4 rotate-45 rounded-sm bg-brand-600 shadow-[2px_2px_2px_rgba(0,0,0,0.05)] ring-1 ring-brand-700/50"></div>
+        </div>
+    </div>
+
     <div
         x-show="isOpen"
         x-transition:enter="transition ease-out duration-300"

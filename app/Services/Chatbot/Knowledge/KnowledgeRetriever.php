@@ -4,10 +4,90 @@ namespace App\Services\Chatbot\Knowledge;
 
 class KnowledgeRetriever
 {
+    private OpenAiEmbeddingsProvider $embeddingsProvider;
+    private KnowledgeEmbeddingsCache $embeddingsCache;
+
+    public function __construct(OpenAiEmbeddingsProvider $embeddingsProvider, KnowledgeEmbeddingsCache $embeddingsCache)
+    {
+        $this->embeddingsProvider = $embeddingsProvider;
+        $this->embeddingsCache = $embeddingsCache;
+    }
+
     public function search(string $message, int $limit = 3): array
     {
-        $message = $this->normalize($message);
         $entries = config('zakky_knowledge', []);
+
+        // 1. Semantic Search via Embeddings
+        $rankedViaSemantic = $this->searchViaEmbeddings($message, $entries);
+        
+        if (!empty($rankedViaSemantic)) {
+            // Semantic search succeeded
+            return array_slice($rankedViaSemantic, 0, $limit);
+        }
+
+        // 2. Fallback to Keyword Search
+        \Illuminate\Support\Facades\Log::info('KnowledgeRetriever falling back to keyword search', ['message' => $message]);
+        return $this->searchViaKeywords($message, $entries, $limit);
+    }
+
+    public function best(string $message, float $threshold = 0.65): ?array
+    {
+        $results = $this->search($message, 1);
+        $top = $results[0] ?? null;
+
+        if (!$top) {
+            return null;
+        }
+
+        // Check if it was ranked by semantic search
+        if (isset($top['_cosine_similarity'])) {
+            if ($top['_cosine_similarity'] < $threshold) {
+                return null;
+            }
+            return $top;
+        }
+
+        // Fallback keyword score threshold check
+        // The old signature used int threshold=3, we translate that here
+        if ((int) ($top['_score'] ?? 0) < 3) {
+            return null;
+        }
+
+        return $top;
+    }
+
+    private function searchViaEmbeddings(string $message, array $entries): array
+    {
+        $messageEmbedding = $this->embeddingsProvider->getEmbedding($message);
+        if (!$messageEmbedding) {
+            return [];
+        }
+
+        $knowledgeEmbeddings = $this->embeddingsCache->getCachedEmbeddings();
+        if (empty($knowledgeEmbeddings)) {
+            return [];
+        }
+
+        $ranked = [];
+        foreach ($entries as $entry) {
+            $entryId = $entry['id'] ?? null;
+            if (!$entryId || !isset($knowledgeEmbeddings[$entryId])) {
+                continue;
+            }
+
+            $similarity = KnowledgeEmbeddingsCache::cosineSimilarity($messageEmbedding, $knowledgeEmbeddings[$entryId]);
+            $entry['_cosine_similarity'] = $similarity;
+            $ranked[] = $entry;
+        }
+
+        usort($ranked, fn ($a, $b) => $b['_cosine_similarity'] <=> $a['_cosine_similarity']);
+
+        return $ranked;
+    }
+
+    private function searchViaKeywords(string $message, array $entries, int $limit): array
+    {
+        $message = $this->normalize($message);
         $ranked = [];
 
         foreach ($entries as $entry) {
@@ -23,18 +103,6 @@ class KnowledgeRetriever
         usort($ranked, fn ($a, $b) => $b['_score'] <=> $a['_score']);
 
         return array_slice($ranked, 0, $limit);
-    }
-
-    public function best(string $message, int $threshold = 3): ?array
-    {
-        $results = $this->search($message, 1);
-        $top = $results[0] ?? null;
-
-        if (!$top || (int) ($top['_score'] ?? 0) < $threshold) {
-            return null;
-        }
-
-        return $top;
     }
 
     private function score(string $message, array $entry): int
