@@ -56,21 +56,15 @@
         </div>
         @if ($canViewRisk)
             <div class="ui-mobile-meta-item col-span-2">
-                <div class="flex items-start justify-between gap-3">
-                    <div>
-                        <p class="ui-mobile-meta-label">Risiko</p>
-                        <p class="mt-1 text-xs leading-5 text-slate-500">Buka detail review untuk melihat alasan dan tindak lanjut.</p>
-                    </div>
+                <p class="ui-mobile-meta-label">Risiko</p>
+                <div class="mt-1">
                     @if ($t->risk_level !== \App\Models\TransactionRiskReview::LEVEL_NORMAL)
-                        <button type="button" @click="open = !open" class="flex flex-col items-end gap-1 cursor-pointer hover:opacity-75 transition-opacity">
+                        <button type="button" @click="open = !open" class="flex flex-col items-start gap-1 cursor-pointer hover:opacity-75 transition-opacity">
                             <x-risk-level-badge :level="$t->risk_level" />
                             <x-review-status-badge :status="$t->review_status" />
                         </button>
                     @else
-                        <div class="flex flex-col items-end gap-1">
-                            <x-risk-level-badge :level="$t->risk_level" />
-                            <x-review-status-badge :status="$t->review_status" />
-                        </div>
+                        <x-risk-level-badge :level="$t->risk_level" />
                     @endif
                 </div>
             </div>
