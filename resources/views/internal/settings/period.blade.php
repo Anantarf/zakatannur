@@ -45,6 +45,8 @@
                 x-data="{
                     tab: 'config',
                     expandedSection: null,
+                    isDirty: false,
+                    isSubmitting: false,
                     dashboardMode: @js(old('dashboard_chart_mode', $dashboardChartMode)),
                     dashboardArchive: @js((bool) old('dashboard_chart_show_offseason_archive', $dashboardChartShowOffseasonArchive)),
                     dashboardAutoSwitch: @js((bool) old('dashboard_chart_auto_switch_on_new_active_period', $dashboardChartAutoSwitchOnNewActivePeriod)),
@@ -61,6 +63,14 @@
                     year: @js((string) old('new_year', $activeYear + 1)),
                     confirmYear: @js((string) old('new_year_confirmation')),
                     backup: @js((bool) old('backup_confirmed')),
+                    init() {
+                        window.addEventListener('beforeunload', (e) => {
+                            if (this.isDirty) {
+                                e.preventDefault();
+                                e.returnValue = '';
+                            }
+                        });
+                    },
                 }"
                 @keydown.escape="expandedSection = null">
 
@@ -135,7 +145,7 @@
                         </div>
                     </div>
 
-                    <form method="POST" action="{{ route('internal.settings.period.update') }}" class="space-y-3">
+                    <form method="POST" action="{{ route('internal.settings.period.update') }}" class="space-y-3" @submit="isDirty = false">
                         @csrf
 
                         {{-- Section 1: Dasar Sistem (Always Visible) --}}
@@ -164,7 +174,7 @@
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                                         </svg>
                                     </label>
-                                    <input id="public_refresh_interval_seconds" name="public_refresh_interval_seconds" type="number" min="0" max="60" value="{{ old('public_refresh_interval_seconds', $publicRefreshIntervalSeconds ?? 15) }}" class="ui-input w-full" required />
+                                    <input id="public_refresh_interval_seconds" name="public_refresh_interval_seconds" type="number" min="0" max="60" value="{{ old('public_refresh_interval_seconds', $publicRefreshIntervalSeconds ?? 15) }}" class="ui-input w-full" @change="isDirty = true" required />
                                     <p class="mt-1 text-xs leading-5 text-slate-500">0 = tidak refresh, 15 = refresh tiap 15 detik</p>
                                     <x-input-error class="mt-2" :messages="$errors->get('public_refresh_interval_seconds')" />
                                 </div>
@@ -187,7 +197,7 @@
                                 <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
                                     <div class="sm:col-span-2">
                                         <label class="ui-form-label" for="period_label">Nama Periode</label>
-                                        <input id="period_label" name="period_label" type="text" maxlength="80" value="{{ old('period_label', $activePeriod?->label ?? ('Ramadan ' . $activeYear)) }}" class="ui-input w-full" placeholder="Contoh: Ramadan 2026" />
+                                        <input id="period_label" name="period_label" type="text" maxlength="80" value="{{ old('period_label', $activePeriod?->label ?? ('Ramadan ' . $activeYear)) }}" class="ui-input w-full" placeholder="Contoh: Ramadan 2026" @change="isDirty = true" />
                                         <x-input-error class="mt-2" :messages="$errors->get('period_label')" />
                                     </div>
                                     <div>
@@ -415,11 +425,21 @@
                                 </div>
                                 <div class="flex flex-col items-stretch gap-2 sm:flex-row sm:items-center">
                                     <a href="{{ route('dashboard') }}" class="ui-btn ui-btn-secondary w-full sm:w-auto">Kembali</a>
-                                    <button type="submit" class="ui-btn ui-btn-primary w-full px-6 py-3 sm:w-auto">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-                                        </svg>
-                                        Simpan Pengaturan
+                                    <button type="submit"
+                                            @click="isSubmitting = true"
+                                            :disabled="isSubmitting"
+                                            class="ui-btn ui-btn-primary w-full px-6 py-3 sm:w-auto">
+                                        <template x-if="isSubmitting">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="animate-spin h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                                            </svg>
+                                        </template>
+                                        <template x-if="!isSubmitting">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                                            </svg>
+                                        </template>
+                                        <span x-text="isSubmitting ? 'Menyimpan...' : 'Simpan Pengaturan'"></span>
                                     </button>
                                 </div>
                             </div>

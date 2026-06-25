@@ -2,6 +2,8 @@
 
 namespace App\Services\Chatbot\Knowledge;
 
+use App\Services\Chatbot\Providers\OpenAiEmbeddingsProvider;
+
 class KnowledgeRetriever
 {
     private OpenAiEmbeddingsProvider $embeddingsProvider;

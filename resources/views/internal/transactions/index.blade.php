@@ -34,6 +34,20 @@
 
     <div class="py-4 sm:py-6">
         <div class="mx-auto max-w-7xl space-y-4 px-4 sm:px-6 lg:px-8">
+            @if (session('just_deleted_id'))
+            <div x-data="{ show: true }" x-show="show" x-transition
+                 class="flex items-center justify-between gap-3 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm">
+                <span>Transaksi <strong>{{ session('just_deleted_no') }}</strong> dipindahkan ke sampah.</span>
+                <div class="flex gap-2">
+                    <form method="POST" action="{{ route('internal.transactions.restore', session('just_deleted_id')) }}" class="inline">
+                        @csrf
+                        <button type="submit" class="font-bold text-brand-700 hover:underline">Kembalikan</button>
+                    </form>
+                    <button @click="show = false" class="text-slate-400 hover:text-slate-600">Tutup</button>
+                </div>
+            </div>
+            @endif
+
             @if ($errors->any())
                 <x-form-errors />
             @endif

@@ -339,6 +339,13 @@ if (transactionFormConfig) {
                     this.initialSnapshot = this.getSnapshot();
                 });
             };
+
+            window.addEventListener('beforeunload', (e) => {
+                if (!this.submitting && this.hasChanged) {
+                    e.preventDefault();
+                    e.returnValue = '';
+                }
+            });
         },
         syncFirstName() {
             if (this.persons.length > 0) {
@@ -361,6 +368,16 @@ if (transactionFormConfig) {
                     infaq: { active: false, metode: 'uang', is_transfer: false, nominal: '' },
                 },
             });
+        },
+        checkDuplicateName(personId, name) {
+            if (!name) return;
+            const normalized = name.trim().toLowerCase();
+            const isDuplicate = this.persons.some(
+                p => p.id !== personId && p.name.trim().toLowerCase() === normalized
+            );
+            if (isDuplicate) {
+                this.showFormNotice(`Nama "${name}" sudah ada di daftar. Pastikan tidak dobel!`);
+            }
         },
         removePerson(index) {
             if (this.persons.length > 1) {

@@ -96,6 +96,21 @@ document.addEventListener('alpine:init', () => {
             this.loadHistory();
             this.lastSeenMessageCount = this.messages.length;
 
+            // Inject welcome message untuk first-time users
+            if (this.messages.length === 0) {
+                this.messages.push({
+                    role: 'assistant',
+                    content: 'Halo! Saya Zakky, asisten virtual Masjid An-Nur. Saya bisa membantu:\n• Hitung zakat fitrah, fidyah, atau mal\n• Jawab pertanyaan seputar zakat\n• Info jadwal dan cara bayar\n\nAda yang bisa saya bantu?',
+                    createdAt: nowIso(),
+                    isWelcome: true,
+                });
+                this.quickReplies = [
+                    { label: 'Hitung zakat fitrah', message: 'Zakat fitrah 4 orang berapa?' },
+                    { label: 'Cara bayar zakat', message: 'Bagaimana cara membayar zakat?' },
+                    { label: 'Apa itu zakat mal?', message: 'Apa itu zakat mal?' },
+                ];
+            }
+
             setTimeout(() => {
                 if (!this.isOpen) {
                     this.showTooltip = true;
@@ -158,7 +173,7 @@ document.addEventListener('alpine:init', () => {
         saveHistory() {
             try {
                 const key = 'zakky_history_' + (this.sessionId || 'default');
-                const limited = this.messages.slice(-50);
+                const limited = this.messages.slice(-50).filter(m => !m.isWelcome);
                 localStorage.setItem(key, JSON.stringify(limited));
             } catch (e) {
                 console.warn('Failed to save chat history:', e);

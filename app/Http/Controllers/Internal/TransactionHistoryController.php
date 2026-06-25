@@ -54,8 +54,8 @@ class TransactionHistoryController extends Controller
 
         return redirect()->route('internal.transactions.index')
             ->with('status', "Transaksi {$result['no_transaksi']} ({$result['payer']}) berhasil dipindahkan ke sampah.")
-            ->with('undo_id', $result['id'])
-            ->with('undo_no', $result['no_transaksi']);
+            ->with('just_deleted_id', $result['id'])
+            ->with('just_deleted_no', $result['no_transaksi']);
     }
 
     public function restore(

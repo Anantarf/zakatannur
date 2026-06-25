@@ -18,6 +18,29 @@
     $profileAvatar = '<img src="' . asset('images/muslim.png') . '" alt="Avatar Zakky" class="h-full w-full object-cover">';
 @endphp
 
+<style>
+    /* Thin scrollbar for chatbot */
+    .chat-scroll::-webkit-scrollbar {
+        width: 5px;
+        height: 5px;
+    }
+    .chat-scroll::-webkit-scrollbar-track {
+        background: transparent;
+    }
+    .chat-scroll::-webkit-scrollbar-thumb {
+        background-color: #cbd5e1;
+        border-radius: 10px;
+    }
+    .chat-scroll::-webkit-scrollbar-thumb:hover {
+        background-color: #94a3b8;
+    }
+    /* Firefox */
+    .chat-scroll {
+        scrollbar-width: thin;
+        scrollbar-color: #cbd5e1 transparent;
+    }
+</style>
+
 <div
     data-chatbot-widget
     x-data="chatbotWidget({ endpoint: '{{ url('/api/chatbot/message') }}', quickReplies: {{ json_encode($quickReplies) }} })"
@@ -126,15 +149,15 @@
             </button>
         </div>
 
-        <div x-ref="chatContainer" class="flex flex-1 flex-col space-y-4 overflow-y-auto bg-white p-4">
+        <div x-ref="chatContainer" class="chat-scroll flex flex-1 flex-col space-y-3 overflow-y-auto overflow-x-hidden bg-white p-4">
             <!-- Welcome Message -->
-            <div class="flex items-start animate-fade-in gap-3">
+            <div class="flex items-start animate-fade-in gap-2.5">
                 <span class="flex h-8 w-8 shrink-0 items-center justify-center overflow-hidden rounded-full bg-brand-600 text-white flex-shrink-0 transform-gpu">
                     {!! $profileAvatar !!}
                 </span>
                 <div class="flex flex-col items-start min-w-0">
-                    <div class="rounded-lg border border-slate-200 bg-slate-50 px-3 py-2.5 text-sm leading-6 text-slate-800 break-words">Assalamu'alaikum. Saya <span class="font-semibold text-brand-700">Zakky</span>. Saya bisa bantu cek data zakat atau jawab pertanyaan Anda.</div>
-                    <span class="mt-2 text-xs text-slate-400" x-text="formatTime(welcomeAt)"></span>
+                    <div class="rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-[13px] leading-relaxed text-slate-800 break-words">Assalamu'alaikum. Saya <span class="font-semibold text-brand-700">Zakky</span>. Saya bisa bantu cek data zakat atau jawab pertanyaan Anda.</div>
+                    <span class="mt-1.5 text-[11px] text-slate-400" x-text="formatTime(welcomeAt)"></span>
                 </div>
             </div>
 
@@ -162,9 +185,10 @@
                         </span>
                     </template>
 
-                    <div class="flex max-w-[75%] flex-col group" :class="message.role === 'user' ? 'items-end' : 'items-start'">
+                    <div class="flex max-w-[85%] flex-col group" :class="message.role === 'user' ? 'items-end' : 'items-start'">
                         <div
-                            class="px-3 py-2 text-sm leading-6 break-words whitespace-pre-wrap"
+                            class="px-3 py-2 text-[13px] leading-relaxed break-words whitespace-pre-wrap"
+                            style="word-break: break-word;"
                             :class="message.role === 'user'
                                 ? 'rounded-lg rounded-tr-none bg-brand-600 text-white'
                                 : (message.isError
@@ -172,7 +196,7 @@
                                     : 'rounded-lg rounded-tl-none border border-slate-200 bg-white text-slate-800')"
                             x-text="message.content"
                         ></div>
-                        <div class="mt-2 flex flex-wrap items-center gap-2 px-1 text-xs">
+                        <div class="mt-1.5 flex flex-wrap items-center gap-2 px-1 text-[11px]">
                             <span x-text="formatTime(message.createdAt)" class="text-slate-400 flex-shrink-0"></span>
                             <template x-if="message.citations && message.citations.length > 0">
                                 <span class="truncate text-slate-400" x-text="'Sumber: ' + message.citations[0].label"></span>
@@ -272,8 +296,8 @@
                     @keydown="handleKeydown($event)"
                     maxlength="500"
                     rows="1"
-                    class="flex-1 resize-none rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-sm text-slate-800 transition-all placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent disabled:opacity-60 disabled:cursor-not-allowed max-h-[120px] overflow-y-auto"
-                    style="min-height: 42px;"
+                    class="chat-scroll flex-1 resize-none rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-[13px] text-slate-800 transition-all placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent disabled:opacity-60 disabled:cursor-not-allowed max-h-[120px] overflow-y-auto"
+                    style="min-height: 40px;"
                     placeholder="Tanya Zakky... (Shift+Enter u/ baris baru)"
                     :disabled="isTyping"
                 ></textarea>
