@@ -25,6 +25,9 @@ class TransactionReviewAssistantService
             }
 
             $analysis = $this->riskAnalyzer->analyze($transaction);
+            $reviewStatus = $analysis['risk_level'] === TransactionRiskReview::LEVEL_NORMAL
+                ? TransactionRiskReview::REVIEW_AMAN
+                : TransactionRiskReview::REVIEW_BELUM_DITINJAU;
 
             TransactionRiskReview::query()->updateOrCreate(
                 ['zakat_transaction_id' => $transaction->id],
@@ -36,6 +39,7 @@ class TransactionReviewAssistantService
                     'reasons' => $analysis['reasons'],
                     'duplicate_candidates' => $analysis['duplicate_candidates'],
                     'detector_version' => $analysis['detector_version'],
+                    'review_status' => $reviewStatus,
                     'checked_at' => now(config('zakat.timezone')),
                 ]
             );
