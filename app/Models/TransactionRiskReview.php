@@ -28,6 +28,8 @@ class TransactionRiskReview extends Model
     public const FLAG_PAYER_MATCH_DIFFERENT_BENEFICIARY = 'payer_match_different_beneficiary';
 
     public const ANOMALY_FLAG_RESTORE_SCORE = 25;
+    public const SCORE_UPDATED_AFTER_RECEIPT = 30;
+    public const SCORE_SIGNIFICANT_NOMINAL_CHANGE = 35;
 
     public const LEVELS = [
         self::LEVEL_NORMAL,

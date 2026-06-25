@@ -27,13 +27,13 @@ class TransactionAnomalyDetector
             $reasons[] = 'Transaksi ini dipulihkan setelah dihapus, perlu diverifikasi ulang kelengkapan datanya.';
         }
         if (($context['updated_after_receipt_printed'] ?? false) === true) {
-            $score += 30;
+            $score += TransactionRiskReview::SCORE_UPDATED_AFTER_RECEIPT;
             $flags[] = TransactionRiskReview::FLAG_UPDATED_AFTER_RECEIPT_PRINTED;
             $reasons[] = 'Transaksi diubah setelah kwitansi pernah dicetak dan perlu verifikasi ulang.';
         }
 
         if (($context['significant_nominal_change'] ?? false) === true) {
-            $score += 35;
+            $score += TransactionRiskReview::SCORE_SIGNIFICANT_NOMINAL_CHANGE;
             $flags[] = TransactionRiskReview::FLAG_SIGNIFICANT_NOMINAL_CHANGE;
             $reasons[] = $this->significantChangeReason($transaction, $context);
         }
@@ -63,7 +63,7 @@ class TransactionAnomalyDetector
             return null;
         }
 
-        $avg = $this->averageNominalUang();
+        $avg = $this->averageNominalUang($transaction->category);
         if ($avg === null || $avg <= 0) {
             return null;
         }
@@ -82,12 +82,13 @@ class TransactionAnomalyDetector
         return null;
     }
 
-    private function averageNominalUang(): ?float
+    private function averageNominalUang(string $category): ?float
     {
-        return Cache::remember('anomaly:avg_nominal_uang', self::AVG_CACHE_TTL_SECONDS, function () {
+        return Cache::remember("anomaly:avg_nominal_uang:{$category}", self::AVG_CACHE_TTL_SECONDS, function () use ($category) {
             $stats = DB::table('zakat_transactions')
                 ->whereNull('deleted_at')
                 ->where('status', ZakatTransaction::STATUS_VALID)
+                ->where('category', $category)
                 ->where('metode', '!=', ZakatTransaction::METHOD_BERAS)
                 ->where('nominal_uang', '>', 0)
                 ->selectRaw('AVG(nominal_uang) as avg_nominal, COUNT(*) as total')

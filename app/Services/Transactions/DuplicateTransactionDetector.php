@@ -46,9 +46,6 @@ class DuplicateTransactionDetector
             } elseif ($this->samePayerAndAmount($transaction, $candidate) && $this->isTransferPair($transaction, $candidate)) {
                 $candidateScore = 50;
                 $matchType = TransactionRiskReview::FLAG_TRANSFER_DUPLICATE_CANDIDATE;
-            } elseif ($this->samePayerAndAmount($transaction, $candidate)) {
-                $candidateScore = 10;
-                $matchType = TransactionRiskReview::FLAG_PAYER_MATCH_DIFFERENT_BENEFICIARY;
             }
 
             if ($candidateScore <= 0 || $matchType === null) {
