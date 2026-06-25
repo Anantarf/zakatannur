@@ -64,7 +64,19 @@
 
                     @include('internal.transactions.partials.history-filters')
                 </div>
-                                <div class="space-y-3 px-4 pb-4 pt-4 md:hidden">
+
+                @if ($canViewRisk && !empty($zakkyAnomalyInsight['message']))
+                    <div class="px-4 py-3 border-b border-slate-100">
+                        <x-zakky-insight
+                            :tone="$zakkyAnomalyInsight['tone']"
+                            :label="$zakkyAnomalyInsight['label']"
+                            :message="$zakkyAnomalyInsight['message']"
+                            :items="$zakkyAnomalyInsight['items'] ?? []"
+                        />
+                    </div>
+                @endif
+
+                <div class="space-y-3 px-4 pb-4 pt-4 md:hidden">
                     @forelse ($transactions as $t)
                         @include("internal.transactions.partials._mobile_card", ["t" => $t])
                     @empty
@@ -99,10 +111,13 @@
                                 <th class="min-w-[120px] px-3 py-3 text-center">Aksi</th>
                             </tr>
                         </thead>
-                        <tbody class="divide-y divide-slate-100/80">
                             @forelse ($transactions as $t)
-                                @include("internal.transactions.partials._desktop_row", ["t" => $t])
+                                <tbody class="divide-y divide-slate-100/80" x-data="{ open: false }">
+                                    @include("internal.transactions.partials._desktop_row", ["t" => $t])
+                                </tbody>
                             @empty
+                                <tbody class="divide-y divide-slate-100/80">
+                            </tbody>
                                 <tr>
                                     <td colspan="{{ $canViewRisk ? 9 : 8 }}" class="px-6 py-12 text-center">
                                         <div class="flex flex-col items-center">

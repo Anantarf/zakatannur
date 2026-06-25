@@ -1,4 +1,4 @@
-<article class="ui-mobile-card stagger-item">
+<article class="ui-mobile-card stagger-item" x-data="{ open: false }">
     <div class="flex items-start justify-between gap-3">
         <div class="min-w-0">
             <span class="inline-flex rounded-md bg-slate-100 px-2 py-1 font-sans text-[11px] font-semibold text-slate-600">{!! \App\Support\Format::highlight($t->no_transaksi, $q) !!}</span>
@@ -61,11 +61,11 @@
                         <p class="ui-mobile-meta-label">Risiko</p>
                         <p class="mt-1 text-xs leading-5 text-slate-500">Buka detail review untuk melihat alasan dan tindak lanjut.</p>
                     </div>
-                    @if ($t->risk_level === \App\Models\TransactionRiskReview::LEVEL_WARNING)
-                        <a href="{{ route('internal.anomalies.show', ['noTransaksi' => $t->no_transaksi]) }}" class="flex flex-col items-end gap-1">
+                    @if ($t->risk_level !== \App\Models\TransactionRiskReview::LEVEL_NORMAL)
+                        <button type="button" @click="open = !open" class="flex flex-col items-end gap-1 cursor-pointer hover:opacity-75 transition-opacity">
                             <x-risk-level-badge :level="$t->risk_level" />
                             <x-review-status-badge :status="$t->review_status" />
-                        </a>
+                        </button>
                     @else
                         <div class="flex flex-col items-end gap-1">
                             <x-risk-level-badge :level="$t->risk_level" />
@@ -76,6 +76,41 @@
             </div>
         @endif
     </div>
+
+    @if ($canViewRisk && $t->risk_level !== \App\Models\TransactionRiskReview::LEVEL_NORMAL)
+    <div x-show="open" x-transition class="mt-3 pt-3 border-t border-amber-100 space-y-3">
+        @if (!empty($t->risk_flags))
+        <div class="flex flex-wrap gap-2">
+            @foreach ($t->risk_flags as $flag)
+                <span class="rounded-full border border-amber-200 bg-amber-50 px-3 py-1 text-xs font-semibold text-amber-700">
+                    {{ \App\Models\TransactionRiskReview::flagLabel($flag) }}
+                </span>
+            @endforeach
+        </div>
+        @endif
+
+        @if (!empty($t->risk_reasons))
+        <div class="space-y-1">
+            @foreach ($t->risk_reasons as $reason)
+                <p class="text-xs text-slate-600">• {{ $reason }}</p>
+            @endforeach
+        </div>
+        @endif
+
+        <form method="POST" action="{{ route('internal.anomalies.review_status', $t->no_transaksi) }}" class="pt-2 flex flex-wrap items-center gap-2">
+            @csrf @method('PATCH')
+            <select name="review_status" class="ui-select text-xs py-1.5 flex-1">
+                @foreach (\App\Models\TransactionRiskReview::REVIEW_STATUSES as $s)
+                    <option value="{{ $s }}" @selected($t->review_status === $s)>
+                        {{ \App\Models\TransactionRiskReview::reviewStatusLabel($s) }}
+                    </option>
+                @endforeach
+            </select>
+            <button type="submit" class="ui-btn ui-btn-primary py-1.5 text-xs flex-1">Simpan</button>
+            <button type="button" @click="open = false" class="ui-btn ui-btn-secondary py-1.5 text-xs flex-1">Tutup</button>
+        </form>
+    </div>
+    @endif
 
     <div class="mt-4 grid grid-cols-2 gap-2">
         <a class="ui-btn ui-btn-secondary px-3 py-3 text-xs" href="{{ route('internal.transactions.show', ['transaction' => $t->id]) }}">

@@ -36,16 +36,6 @@
         <x-dynamic-component :component="$linkComponent" :href="route('internal.audit_logs.index')" :active="request()->routeIs('internal.audit_logs.index')">
             {{ __('Audit Logs') }}
         </x-dynamic-component>
-        <x-dynamic-component :component="$linkComponent" :href="route('internal.anomalies.index')" :active="request()->routeIs('internal.anomalies.*')">
-            <span class="inline-flex items-center justify-center gap-1.5">
-                <span>{{ __('Deteksi Anomali') }}</span>
-                @if (($pendingAnomalyCount ?? 0) > 0)
-                    <span class="inline-flex h-4 min-w-4 items-center justify-center rounded-full bg-amber-500 px-1 text-[10px] font-bold text-white">
-                        {{ $pendingAnomalyCount > 99 ? '99+' : $pendingAnomalyCount }}
-                    </span>
-                @endif
-            </span>
-        </x-dynamic-component>
         @if ($user?->isSuperAdmin())
             <x-dynamic-component :component="$linkComponent" :href="route('internal.settings.period.edit')" :active="request()->routeIs('internal.settings.period.*')">
                 {{ __('Konfigurasi Periode') }}
@@ -63,16 +53,6 @@
     </x-dynamic-component>
     <x-dynamic-component :component="$linkComponent" :href="route('internal.audit_logs.index')" :active="request()->routeIs('internal.audit_logs.index')">
         {{ __('Audit') }}
-    </x-dynamic-component>
-    <x-dynamic-component :component="$linkComponent" :href="route('internal.anomalies.index')" :active="request()->routeIs('internal.anomalies.*')">
-        <span class="inline-flex items-center justify-center gap-1.5">
-            <span>{{ __('Anomali') }}</span>
-            @if (($pendingAnomalyCount ?? 0) > 0)
-                <span class="inline-flex h-4 min-w-4 items-center justify-center rounded-full bg-amber-500 px-1 text-[10px] font-bold text-white">
-                    {{ $pendingAnomalyCount > 99 ? '99+' : $pendingAnomalyCount }}
-                </span>
-            @endif
-        </span>
     </x-dynamic-component>
     @if ($user?->isSuperAdmin())
         <x-dynamic-component :component="$linkComponent" :href="route('internal.settings.period.edit')" :active="request()->routeIs('internal.settings.period.*')">

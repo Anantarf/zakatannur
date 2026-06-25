@@ -125,7 +125,7 @@
                     {!! $profileAvatar !!}
                 </span>
                 <div class="min-w-0 flex-1">
-                    <h3 class="text-sm font-semibold text-slate-900">Zakky</h3>
+                    <h3 class="text-sm font-extrabold text-slate-900">Zakky</h3>
                     <p class="flex items-center text-xs text-slate-500">
                         <span
                             class="mr-1.5 h-2 w-2 shrink-0 rounded-full"
@@ -150,16 +150,7 @@
         </div>
 
         <div x-ref="chatContainer" class="chat-scroll flex flex-1 flex-col space-y-3 overflow-y-auto overflow-x-hidden bg-white p-4">
-            <!-- Welcome Message -->
-            <div class="flex items-start animate-fade-in gap-2.5">
-                <span class="flex h-8 w-8 shrink-0 items-center justify-center overflow-hidden rounded-full bg-brand-600 text-white flex-shrink-0 transform-gpu">
-                    {!! $profileAvatar !!}
-                </span>
-                <div class="flex flex-col items-start min-w-0">
-                    <div class="rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-[13px] leading-relaxed text-slate-800 break-words">Assalamu'alaikum. Saya <span class="font-semibold text-brand-700">Zakky</span>. Saya bisa bantu cek data zakat atau jawab pertanyaan Anda.</div>
-                    <span class="mt-1.5 text-[11px] text-slate-400" x-text="formatTime(welcomeAt)"></span>
-                </div>
-            </div>
+
 
             <!-- Quick Replies -->
             <div x-show="quickReplies.length > 0 &amp;&amp; messages.length === 0" class="animate-fade-in" style="animation-delay: 100ms;">
@@ -187,14 +178,14 @@
 
                     <div class="flex max-w-[85%] flex-col group" :class="message.role === 'user' ? 'items-end' : 'items-start'">
                         <div
-                            class="px-3 py-2 text-[13px] leading-relaxed break-words whitespace-pre-wrap"
+                            class="px-3 py-2 text-[13px] font-medium leading-relaxed break-words whitespace-pre-wrap"
                             style="word-break: break-word;"
                             :class="message.role === 'user'
                                 ? 'rounded-lg rounded-tr-none bg-brand-600 text-white'
                                 : (message.isError
                                     ? 'rounded-lg rounded-tl-none border border-amber-200 bg-amber-50 text-amber-900'
                                     : 'rounded-lg rounded-tl-none border border-slate-200 bg-white text-slate-800')"
-                            x-text="message.content"
+                            x-html="formatMessage(message.content, message.role)"
                         ></div>
                         <div class="mt-1.5 flex flex-wrap items-center gap-2 px-1 text-[11px]">
                             <span x-text="formatTime(message.createdAt)" class="text-slate-400 flex-shrink-0"></span>
@@ -313,15 +304,13 @@
                 </button>
                 <button
                     type="button"
-                    @click="messages = []; input = ''; clearHistory()"
-                    x-show="messages.length > 0"
-                    class="flex h-10 w-10 items-center justify-center rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-all active:scale-95 flex-shrink-0 focus:outline-none focus:ring-2 focus:ring-slate-400 focus:ring-offset-1"
-                    aria-label="Hapus riwayat chat"
-                    title="Hapus riwayat chat"
+                    @click="input = ''; clearHistory(); resetToWelcome();"
+                    x-show="messages.filter(m => !m.isWelcome).length > 0"
+                    class="flex h-10 items-center justify-center rounded-lg px-3 text-xs font-medium text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-all active:scale-95 flex-shrink-0 focus:outline-none focus:ring-2 focus:ring-slate-400 focus:ring-offset-1"
+                    aria-label="Reset chat"
+                    title="Reset percakapan"
                 >
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                        <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd" />
-                    </svg>
+                    Reset
                 </button>
             </form>
             <div class="mt-2 flex items-center justify-between gap-2 px-2 text-xs text-slate-400">

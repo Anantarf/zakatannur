@@ -52,6 +52,8 @@ class TransactionReviewAssistantService
             $transaction->risk_level = $summary['risk_level'] ?? null;
             $transaction->risk_score = $summary['risk_score'] ?? 0;
             $transaction->review_status = $summary['review_status'] ?? null;
+            $transaction->risk_flags = $summary['risk_flags'] ?? [];
+            $transaction->risk_reasons = $summary['risk_reasons'] ?? [];
             return $transaction;
         });
     }
@@ -148,15 +150,22 @@ class TransactionReviewAssistantService
             return [];
         }
 
-        return $this->historySummarySubquery()
+        $reviews = $this->activeReviewsQuery()
             ->whereIn('transaction_risk_reviews.group_no_transaksi', $groupNos->all())
-            ->get()
-            ->mapWithKeys(function ($review) {
+            ->get();
+
+        return $reviews->groupBy('group_no_transaksi')
+            ->mapWithKeys(function (EloquentCollection $groupReviews) {
+                $riskLevel = $this->aggregateRiskLevel($groupReviews);
+                $reviewStatus = $this->aggregateReviewStatus($groupReviews);
+
                 return [
-                    $review->group_no_transaksi => [
-                        'risk_level' => $this->riskLevelFromSeverity((int) $review->risk_severity),
-                        'risk_score' => (int) ($review->risk_score_max ?? 0),
-                        'review_status' => $this->reviewStatusFromSeverity((int) $review->review_severity),
+                    $groupReviews->first()->group_no_transaksi => [
+                        'risk_level' => $riskLevel,
+                        'risk_score' => (int) $groupReviews->max('risk_score'),
+                        'review_status' => $reviewStatus,
+                        'risk_flags' => $groupReviews->pluck('risk_flags')->flatten(1)->filter()->unique()->values()->all(),
+                        'risk_reasons' => $groupReviews->pluck('reasons')->flatten(1)->filter()->unique()->values()->all(),
                     ],
                 ];
             })

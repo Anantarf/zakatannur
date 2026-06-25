@@ -89,6 +89,8 @@ class TransactionHistoryService
                 'riskyGroups' => 0,
                 'pendingReviewGroups' => 0,
                 'safeReviewGroups' => 0,
+                'warningGroups' => 0,
+                'followUpGroups' => 0,
             ];
         }
 
@@ -96,8 +98,10 @@ class TransactionHistoryService
             ->fromSub($this->baseHistoryQuery($filters, true), 'history_rows')
             ->selectRaw('COUNT(*) as total_groups')
             ->selectRaw('SUM(CASE WHEN risk_severity >= 2 THEN 1 ELSE 0 END) as risky_groups')
+            ->selectRaw('SUM(CASE WHEN risk_severity = 2 THEN 1 ELSE 0 END) as warning_groups')
             ->selectRaw('SUM(CASE WHEN review_severity = 1 THEN 1 ELSE 0 END) as pending_review_groups')
             ->selectRaw('SUM(CASE WHEN review_severity = 2 THEN 1 ELSE 0 END) as safe_review_groups')
+            ->selectRaw('SUM(CASE WHEN review_severity = 3 THEN 1 ELSE 0 END) as follow_up_groups')
             ->first();
 
         return [
@@ -105,6 +109,8 @@ class TransactionHistoryService
             'riskyGroups' => (int) ($summary->risky_groups ?? 0),
             'pendingReviewGroups' => (int) ($summary->pending_review_groups ?? 0),
             'safeReviewGroups' => (int) ($summary->safe_review_groups ?? 0),
+            'warningGroups' => (int) ($summary->warning_groups ?? 0),
+            'followUpGroups' => (int) ($summary->follow_up_groups ?? 0),
         ];
     }
 

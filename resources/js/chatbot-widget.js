@@ -95,6 +95,18 @@ document.addEventListener('alpine:init', () => {
             }
         },
 
+        formatMessage(content, role) {
+            if (!content) return '';
+            let div = document.createElement('div');
+            div.textContent = content;
+            let escaped = div.innerHTML;
+            if (role === 'bot') {
+                // Wrap 'Zakky' with extra bold green span
+                escaped = escaped.replace(/\b(Zakky)\b/gi, '<span class="font-extrabold text-brand-700">$1</span>');
+            }
+            return escaped;
+        },
+
         init() {
             this.checkInactivity();
             this.generateOrLoadSessionId();
@@ -153,8 +165,8 @@ document.addEventListener('alpine:init', () => {
 
         resetToWelcome() {
             this.messages = [{
-                role: 'assistant',
-                content: 'Halo! Saya Zakky, asisten virtual Masjid An-Nur. Saya bisa membantu:\n• Hitung zakat fitrah, fidyah, atau mal\n• Jawab pertanyaan seputar zakat\n• Info jadwal dan cara bayar\n\nAda yang bisa saya bantu?',
+                role: 'bot',
+                content: "Assalamu'alaikum. Saya Zakky. Saya bisa bantu cek data zakat atau jawab pertanyaan Anda.",
                 createdAt: nowIso(),
                 isWelcome: true,
             }];

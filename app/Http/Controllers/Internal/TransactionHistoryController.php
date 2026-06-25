@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Internal;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use App\Models\ZakatTransaction;
+use App\Services\Admin\ZakkyAdminInsightService;
 use App\Services\Transactions\TransactionGroupLifecycleService;
 use App\Services\Transactions\TransactionHistoryService;
 use Illuminate\Http\RedirectResponse;
@@ -13,17 +14,19 @@ use Illuminate\View\View;
 
 class TransactionHistoryController extends Controller
 {
-    public function index(Request $request, TransactionHistoryService $historyService): View
+    public function index(Request $request, TransactionHistoryService $historyService, ZakkyAdminInsightService $insightService): View
     {
         $canViewRisk = in_array($request->user()->role, [User::ROLE_ADMIN, User::ROLE_SUPER_ADMIN], true);
         $filters = $historyService->parseFilters($request, $canViewRisk);
         $transactions = $historyService->paginatedHistory($filters, $request->query(), $canViewRisk);
+        $overview = $historyService->historyOverview($filters, $canViewRisk);
 
         return view('internal.transactions.index', array_merge(
             $historyService->indexViewData($filters, $canViewRisk),
             [
                 'transactions' => $transactions,
                 'canViewRisk' => $canViewRisk,
+                'zakkyAnomalyInsight' => $insightService->anomalyListInsight($overview),
             ]
         ));
     }

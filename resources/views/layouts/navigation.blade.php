@@ -11,7 +11,6 @@
     $userMeta = $user?->username ? '@' . $user->username : ($roleLabels[$user?->role] ?? 'Pengguna Sistem');
     $isAdminAreaActive = request()->routeIs('internal.users.*')
         || request()->routeIs('internal.audit_logs.*')
-        || request()->routeIs('internal.anomalies.*')
         || request()->routeIs('internal.settings.period.*')
         || request()->routeIs('internal.templates.*');
     $pendingAnomalyCount = $isAdmin
@@ -50,16 +49,6 @@
                                 </x-dropdown-link>
                                 <x-dropdown-link :href="route('internal.audit_logs.index')">
                                     {{ __('Audit Logs') }}
-                                </x-dropdown-link>
-                                <x-dropdown-link :href="route('internal.anomalies.index')">
-                                    <span class="flex items-center justify-between gap-3">
-                                        <span>{{ __('Deteksi Anomali') }}</span>
-                                        @if (($pendingAnomalyCount ?? 0) > 0)
-                                            <span class="inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-amber-500 px-1.5 text-[10px] font-bold text-white">
-                                                {{ $pendingAnomalyCount > 99 ? '99+' : $pendingAnomalyCount }}
-                                            </span>
-                                        @endif
-                                    </span>
                                 </x-dropdown-link>
 
                                 @if ($user->isSuperAdmin())
