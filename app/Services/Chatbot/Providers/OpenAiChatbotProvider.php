@@ -83,7 +83,7 @@ class OpenAiChatbotProvider implements ChatbotServiceInterface
                         ['role' => 'user', 'content' => $message],
                     ],
                     'temperature' => 0.1,
-                    'max_tokens' => 500,
+                    'max_completion_tokens' => 500,
                 ]);
 
             if ($response->successful()) {

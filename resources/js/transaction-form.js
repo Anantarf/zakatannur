@@ -32,6 +32,7 @@ if (transactionFormConfig) {
         pendingNavigation: null,
         initialSnapshot: null,
         lastPembayarName: transactionFormConfig.pembayarName,
+        hasInputStarted: false,
         fitrahBase: transactionFormConfig.fitrahBase,
         fidyahBase: transactionFormConfig.fidyahBase,
         suggestions: [],
@@ -342,10 +343,26 @@ if (transactionFormConfig) {
                 });
             };
 
+            // Track when user starts input
+            document.addEventListener('input', (e) => {
+                const input = e.target.closest('input[name], textarea[name], select[name]');
+                if (!input) return;
+
+                const value = input.value?.trim() || '';
+                if (value.length > 0) {
+                    this.hasInputStarted = true;
+                } else {
+                    // Check if any other form field has value
+                    const formInputs = document.querySelectorAll('form input[name], form textarea[name], form select[name]');
+                    const hasAnyValue = Array.from(formInputs).some(f => (f.value?.trim() || '').length > 0);
+                    this.hasInputStarted = hasAnyValue;
+                }
+            });
+
             // Intercept navigation links to show custom unsaved modal
             document.addEventListener('click', (e) => {
                 const link = e.target.closest('a[href]');
-                if (!link || this.submitting || !this.hasChanged) return;
+                if (!link || this.submitting || !this.hasInputStarted) return;
 
                 // Allow same-page navigation (hash links)
                 const href = link.getAttribute('href');
@@ -358,9 +375,12 @@ if (transactionFormConfig) {
         },
 
         discardChanges() {
+            const nav = this.pendingNavigation;
             this.showUnsavedModal = false;
-            if (this.pendingNavigation) {
-                window.location.href = this.pendingNavigation;
+            this.hasInputStarted = false;
+            this.pendingNavigation = null;
+            if (nav) {
+                window.location.href = nav;
             }
         },
         syncFirstName() {

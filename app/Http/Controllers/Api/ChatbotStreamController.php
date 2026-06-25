@@ -61,7 +61,7 @@ class ChatbotStreamController
                     echo "data: [DONE]\n\n";
                 } else {
                     echo "data: " . json_encode([
-                        'error' => $response->message,
+                        'error' => $response->reply,
                         'retryable' => $response->retryable,
                     ]) . "\n\n";
                 }
