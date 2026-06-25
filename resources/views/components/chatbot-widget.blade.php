@@ -296,9 +296,9 @@
                     @keydown="handleKeydown($event)"
                     maxlength="500"
                     rows="1"
-                    class="chat-scroll flex-1 resize-none rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-[13px] text-slate-800 transition-all placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent disabled:opacity-60 disabled:cursor-not-allowed max-h-[120px] overflow-y-auto"
+                    class="chat-scroll flex-1 resize-none rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-[13px] text-slate-800 transition-all placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent disabled:opacity-60 disabled:cursor-not-allowed max-h-[120px] overflow-hidden"
                     style="min-height: 40px;"
-                    placeholder="Tanya Zakky... (Shift+Enter u/ baris baru)"
+                    placeholder="Tanya Zakky..."
                     :disabled="isTyping"
                 ></textarea>
                 <button

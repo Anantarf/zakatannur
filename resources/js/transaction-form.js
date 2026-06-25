@@ -28,6 +28,8 @@ if (transactionFormConfig) {
         formNotice: '',
         is_transfer_global: false,
         show_tf_modal: false,
+        showUnsavedModal: false,
+        pendingNavigation: null,
         initialSnapshot: null,
         lastPembayarName: transactionFormConfig.pembayarName,
         fitrahBase: transactionFormConfig.fitrahBase,
@@ -340,12 +342,34 @@ if (transactionFormConfig) {
                 });
             };
 
+            // Prevent browser default dialog, show custom modal instead
             window.addEventListener('beforeunload', (e) => {
                 if (!this.submitting && this.hasChanged) {
                     e.preventDefault();
                     e.returnValue = '';
                 }
             });
+
+            // Intercept navigation links to show custom unsaved modal
+            document.addEventListener('click', (e) => {
+                const link = e.target.closest('a[href]');
+                if (!link || this.submitting || !this.hasChanged) return;
+
+                // Allow same-page navigation (hash links)
+                const href = link.getAttribute('href');
+                if (href.startsWith('#') || href === window.location.pathname) return;
+
+                e.preventDefault();
+                this.pendingNavigation = href;
+                this.showUnsavedModal = true;
+            }, true);
+        },
+
+        discardChanges() {
+            this.showUnsavedModal = false;
+            if (this.pendingNavigation) {
+                window.location.href = this.pendingNavigation;
+            }
         },
         syncFirstName() {
             if (this.persons.length > 0) {

@@ -36,7 +36,9 @@ document.addEventListener('alpine:init', () => {
         autoResize() {
             if (!this.$refs.chatInput) return;
             this.$refs.chatInput.style.height = 'auto';
-            this.$refs.chatInput.style.height = Math.min(this.$refs.chatInput.scrollHeight, 120) + 'px';
+            const scrollHeight = this.$refs.chatInput.scrollHeight;
+            this.$refs.chatInput.style.height = Math.min(scrollHeight, 120) + 'px';
+            this.$refs.chatInput.style.overflowY = scrollHeight >= 120 ? 'auto' : 'hidden';
         },
 
         handleKeydown(e) {
