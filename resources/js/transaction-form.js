@@ -342,14 +342,6 @@ if (transactionFormConfig) {
                 });
             };
 
-            // Prevent browser default dialog, show custom modal instead
-            window.addEventListener('beforeunload', (e) => {
-                if (!this.submitting && this.hasChanged) {
-                    e.preventDefault();
-                    e.returnValue = '';
-                }
-            });
-
             // Intercept navigation links to show custom unsaved modal
             document.addEventListener('click', (e) => {
                 const link = e.target.closest('a[href]');
