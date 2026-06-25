@@ -226,7 +226,7 @@
  }
 
  .public-report-table-row {
-  @apply grid items-center gap-2.5 px-5 py-3 transition-colors hover:bg-[rgb(223_243_235_/_0.35)];
+  @apply grid items-center gap-2.5 px-5 py-3 transition-colors cursor-pointer border border-transparent hover:bg-brand-50 hover:border-brand-200;
  }
 
  .public-report-eyebrow {

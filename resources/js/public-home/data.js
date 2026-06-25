@@ -24,6 +24,7 @@ export const createDataMethods = (config, chartService, animateValue = noopAnima
 
         this.lastFetchTime = now;
         this.error = null;
+        this.isLoading = true;
 
         const controller = new AbortController();
         const timeoutId = setTimeout(() => controller.abort(), 15000);
@@ -63,6 +64,8 @@ export const createDataMethods = (config, chartService, animateValue = noopAnima
         } catch (error) {
             clearTimeout(timeoutId);
             this.error = error.name === 'AbortError' ? 'Koneksi lambat.' : 'Gagal menghubungi server.';
+        } finally {
+            this.isLoading = false;
         }
     },
 
@@ -74,7 +77,7 @@ export const createDataMethods = (config, chartService, animateValue = noopAnima
         const animate = (id, start, end, type) => {
             const element = document.getElementById(id);
             if (element && end > start) {
-                boundAnimate(element, start, end, 2000, type);
+                boundAnimate(element, start, end, 1500, type);
             }
         };
 

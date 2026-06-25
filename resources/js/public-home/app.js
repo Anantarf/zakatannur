@@ -12,6 +12,7 @@ const scrollToTop = () => {
 const initialState = (config) => ({
     openLogin: config.openLogin,
     activeTab: 'beranda',
+    isLoading: false,
     selectedYear: config.selectedYear,
     items: config.items ?? [],
     totals: config.totals ?? {},

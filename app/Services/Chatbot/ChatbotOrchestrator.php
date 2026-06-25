@@ -208,10 +208,10 @@ class ChatbotOrchestrator
         $totalBeras = $count * $berasPerJiwa;
 
         $reply = sprintf(
-            "✅ Perhitungan Zakat Fitrah untuk %d orang:\n\n"
-            . "💰 UANG:\n%d × Rp %s = Rp %s\n\n"
-            . "🌾 BERAS:\n%d × %.1f kg = %.1f kg\n\n"
-            . "⚠️ Silakan konfirmasi ke Panitia Zakat An-Nur untuk validasi.",
+            "PERHITUNGAN ZAKAT FITRAH UNTUK %d ORANG:\n\n"
+            . "UANG:\n%d × Rp %s = Rp %s\n\n"
+            . "BERAS:\n%d × %.1f kg = %.1f kg\n\n"
+            . "Silakan konfirmasi ke Panitia Zakat An-Nur untuk validasi.",
             $count,
             $count, number_format($cashPerJiwa, 0, ',', '.'), number_format($totalCash, 0, ',', '.'),
             $count, $berasPerJiwa, $totalBeras
@@ -239,10 +239,10 @@ class ChatbotOrchestrator
         $totalBeras = $days * $berasPerHari;
 
         $reply = sprintf(
-            "✅ Perhitungan Fidyah untuk %d hari:\n\n"
-            . "💰 UANG:\n%d × Rp %s = Rp %s\n\n"
-            . "🌾 BERAS:\n%d × %.2f kg = %.2f kg\n\n"
-            . "⚠️ Silakan konfirmasi ke Panitia Zakat An-Nur untuk validasi.",
+            "PERHITUNGAN FIDYAH UNTUK %d HARI:\n\n"
+            . "UANG:\n%d × Rp %s = Rp %s\n\n"
+            . "BERAS:\n%d × %.2f kg = %.2f kg\n\n"
+            . "Silakan konfirmasi ke Panitia Zakat An-Nur untuk validasi.",
             $days,
             $days, number_format($cashPerHari, 0, ',', '.'), number_format($totalCash, 0, ',', '.'),
             $days, $berasPerHari, $totalBeras
@@ -267,15 +267,15 @@ class ChatbotOrchestrator
         $result = $guide->calculate($data);
 
         if (!$result['is_above_nishab']) {
-            $reply = "📊 Perhitungan Zakat Mal Anda:\n\n" .
+            $reply = "PERHITUNGAN ZAKAT MAL ANDA:\n\n" .
                 sprintf("Total Aset Neto: Rp %s\nNishab minimum: Rp %s\n\n",
                     number_format($result['nett_assets'], 0, ',', '.'),
                     number_format($result['nishab'], 0, ',', '.')
                 ) .
-                "❌ Aset Anda BELUM mencapai nishab, jadi belum wajib zakat mal.\n\n" .
-                "⚠️ Perhitungan bersifat estimasi. Silakan konfirmasi ke Panitia Zakat An-Nur untuk kepastian.";
+                "Aset Anda BELUM mencapai nishab, jadi belum wajib zakat mal.\n\n" .
+                "Perhitungan bersifat estimasi. Silakan konfirmasi ke Panitia Zakat An-Nur untuk kepastian.";
         } else {
-            $reply = "📊 PERHITUNGAN ZAKAT MAL ESTIMASI ANDA:\n\n" .
+            $reply = "PERHITUNGAN ZAKAT MAL ESTIMASI ANDA:\n\n" .
                 sprintf("A. ASET YANG DIHITUNG:\n" .
                     "   • Penghasilan setahun: Rp %s\n" .
                     "   • Tabungan/cash: Rp %s\n" .
@@ -286,7 +286,7 @@ class ChatbotOrchestrator
                     "   • Hutang: Rp %s\n\n" .
                     "C. CEK NISHAB:\n" .
                     "   Aset Neto: Rp %s (Nishab: Rp %s)\n" .
-                    "   ✓ MELEBIHI NISHAB → WAJIB ZAKAT\n\n" .
+                    "   MELEBIHI NISHAB → WAJIB ZAKAT\n\n" .
                     "D. ZAKAT 2.5%%:\n" .
                     "   Rp %s × 2.5%% = Rp %s per tahun\n" .
                     "   (~Rp %s per bulan jika dicicil)\n\n",
@@ -303,7 +303,7 @@ class ChatbotOrchestrator
                     number_format($result['zakat_amount'], 0, ',', '.'),
                     number_format((int)($result['zakat_amount'] / 12), 0, ',', '.')
                 ) .
-                "⚠️ PENTING:\n" .
+                "PENTING:\n" .
                 "• Perhitungan menggunakan standar umum ulama (BAZNAS, Syafi'i)\n" .
                 "• Tarif An-Nur mungkin berbeda dari standar umum\n" .
                 "• Harga emas fluktuatif, gunakan rate hari ini untuk akurasi\n" .
@@ -322,7 +322,7 @@ class ChatbotOrchestrator
             "• Perhitungan membutuhkan verifikasi aset dan dokumen langsung\n" .
             "• Ada perbedaan fatwa antar mazhab untuk kasus Anda\n" .
             "• Panitia An-Nur mungkin punya ketentuan khusus yang tidak tercakup dalam kalkulator Zakky\n\n" .
-            "📞 HUBUNGI PANITIA ZAKAT MASJID AN-NUR:\n" .
+            "HUBUNGI PANITIA ZAKAT MASJID AN-NUR:\n" .
             "Mereka siap memberikan konsultasi gratis untuk kasus pribadi Anda.\n" .
             "Panitia akan membantu Anda:\n" .
             "  1. Memahami aset kompleks Anda\n" .

@@ -38,9 +38,9 @@ export const formatJiwa = (value) => jiwaFormatter.format(safeNumber(value)) + '
 
 export const formatJiwaPlain = (value) => jiwaFormatter.format(safeNumber(value));
 
-export const easeOutExpo = (t) => (t === 1 ? 1 : 1 - Math.pow(2, -10 * t));
+export const easeOutCubic = (t) => 1 - Math.pow(1 - t, 3);
 
-export const animateValue = (obj, start, end, duration = 2000, type = 'uang') => {
+export const animateValue = (obj, start, end, duration = 1500, type = 'uang') => {
     if (!obj) {
         return;
     }
@@ -73,7 +73,7 @@ export const animateValue = (obj, start, end, duration = 2000, type = 'uang') =>
 
         const elapsed = timestamp - startTimestamp;
         const progress = Math.min(elapsed / duration, 1);
-        const easedProgress = easeOutExpo(progress);
+        const easedProgress = easeOutCubic(progress);
         const current = easedProgress * (end - start) + start;
 
         if (type === 'uang' || type === 'jiwa') {

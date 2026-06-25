@@ -18,16 +18,16 @@ return [
         'keywords' => ['zakat fitrah', 'fitrah', 'beras fitrah', 'uang fitrah', 'jiwa', 'fitrah berapa', 'hitung fitrah'],
         'answer' => 'Zakat fitrah adalah zakat wajib menjelang Hari Raya Idul Fitri, dibayar per jiwa.
 
-📊 TAKARAN DI MASJID AN-NUR (Tahun 2026):
+TAKARAN DI MASJID AN-NUR (Tahun 2026):
 • Uang: Rp 50.000 per jiwa
 • Beras: 2,5 kg per jiwa (atau setara)
 
-💡 CONTOH PERHITUNGAN:
+CONTOH PERHITUNGAN:
 Jika keluarga Anda 4 orang:
 • Uang: 4 × Rp 50.000 = Rp 200.000
 • Beras: 4 × 2,5 kg = 10 kg
 
-⚠️ Takaran mengikuti periode aktif di Masjid An-Nur. Jika ada perubahan, silakan konfirmasi ke panitia.',
+Takaran mengikuti periode aktif di Masjid An-Nur. Jika ada perubahan, silakan konfirmasi ke panitia.',
         'source_label' => 'Panduan Zakat Masjid An-Nur',
         'actions' => [
             ['type' => 'suggested_reply', 'label' => 'Total jiwa', 'message' => 'Berapa total jiwa zakat fitrah?'],
@@ -40,16 +40,16 @@ Jika keluarga Anda 4 orang:
         'keywords' => ['zakat mal', 'zakat harta', 'apa itu zakat mal', 'mal', 'harta', 'penghasilan', 'nishab', 'nisab'],
         'answer' => 'Zakat mal adalah zakat atas harta/aset yang mencapai nishab (nilai minimum wajib zakat).
 
-📌 DEFINISI:
+DEFINISI:
 Harta yang telah disimpan selama 1 tahun hijriyah (haul) dan mencapai nilai minimum tertentu.
 
-💡 MANFAAT:
+MANFAAT:
 • Membersihkan harta dari hak mustahik (fakir miskin)
 • Membantu kategori asnaf yang ditentukan (QS 9:60)
 • Ibadah mendekatkan diri kepada Allah
 • Membangun kesadaran sosial ekonomi
 
-📊 STANDAR UMUM SAAT INI (Global):
+STANDAR UMUM SAAT INI (Global):
 • Nishab emas: 85 gram emas murni (~Rp 50-80 juta, tergantung harga emas)
 • Nishab perak: 595 gram (~Rp 10-15 juta)
 • Tarif zakat: 2.5% dari total aset yang memenuhi syarat
@@ -58,7 +58,7 @@ Harta yang telah disimpan selama 1 tahun hijriyah (haul) dan mencapai nilai mini
 Harta yang dihitung: Uang, emas, perak, barang dagangan, investasi, dll
 Dikurangi: Kebutuhan hidup dan hutang yang mengikat
 
-⚠️ PENTING:
+PENTING:
 • Perhitungan kompleks tergantung jenis aset
 • Fatwa berbeda antar mazhab
 • ZAKKY TIDAK BISA MENETAPKAN KEWAJIBAN PRIBADI
@@ -75,19 +75,19 @@ Dikurangi: Kebutuhan hidup dan hutang yang mengikat
         'keywords' => ['contoh zakat mal', 'hitung zakat mal', 'skenario zakat', 'case zakat mal', 'berapa zakat'],
         'answer' => 'Contoh BUKAN keputusan final Anda — setiap kasus berbeda per mazhab dan kondisi.
 
-📌 SKENARIO 1: PNS dengan gaji + tabungan
+SKENARIO 1: PNS dengan gaji + tabungan
 Gaji bulanan: Rp 10 juta × 12 bulan = Rp 120 juta/tahun
 Tabungan: Rp 50 juta
 Total aset bruto: Rp 170 juta
 
 Dikurangi kebutuhan hidup (1 tahun): ~Rp 30 juta
-Aset neto: Rp 140 juta (di atas nishab ~Rp 50-80 juta ✓)
+Aset neto: Rp 140 juta (di atas nishab ~Rp 50-80 juta)
 
 Zakat 2.5%: Rp 140 juta × 2.5% = Rp 3.5 juta per tahun
 
 ───────────────────────────────────────────
 
-📌 SKENARIO 2: Pedagang dengan usaha
+SKENARIO 2: Pedagang dengan usaha
 Pendapatan kotor per tahun: Rp 300 juta
 Biaya operasional: Rp 150 juta
 Laba bersih: Rp 150 juta
@@ -98,7 +98,7 @@ Zakat 2.5%: Rp 120 juta × 2.5% = Rp 3 juta per tahun
 
 ───────────────────────────────────────────
 
-⚠️ DISCLAIMER PENTING:
+DISCLAIMER PENTING:
 • Contoh ini BUKAN fatwa pribadi Anda
 • Nishab actual berbeda: harga emas fluktuatif, jenis harta beragam
 • Hutang dan kebutuhan hidup dihitung berbeda per mazhab
@@ -118,16 +118,16 @@ Untuk hitung yang akurat, silakan konsultasi dengan Panitia atau ustadz terperca
         'keywords' => ['fidyah', 'bayar fidyah', 'puasa', 'hari', 'fidyah berapa', 'hitung fidyah'],
         'answer' => 'Fidyah adalah pembayaran untuk kondisi tidak menjalankan puasa Ramadan. Dibayar per hari puasa yang tertinggal.
 
-📊 TAKARAN DI MASJID AN-NUR (Tahun 2026):
+TAKARAN DI MASJID AN-NUR (Tahun 2026):
 • Uang: Rp 30.000 per hari
 • Beras: 0,75 kg per hari (atau setara)
 
-💡 CONTOH PERHITUNGAN:
+CONTOH PERHITUNGAN:
 Jika tidak bisa puasa 5 hari:
 • Uang: 5 × Rp 30.000 = Rp 150.000
 • Beras: 5 × 0,75 kg = 3,75 kg
 
-⚠️ Takaran berlaku periode aktif Ramadan. Silakan konfirmasi ke panitia untuk periode berbeda.',
+Takaran berlaku periode aktif Ramadan. Silakan konfirmasi ke panitia untuk periode berbeda.',
         'source_label' => 'Panduan Zakat Masjid An-Nur',
         'actions' => [
             ['type' => 'suggested_reply', 'label' => 'Apa itu fidyah?', 'message' => 'Apa perbedaan fidyah dan zakat fitrah?'],
