@@ -156,23 +156,23 @@
  /* Buttons & Interactive Elements */
 
  .ui-btn {
-  @apply inline-flex items-center justify-center gap-2 rounded-button font-bold transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50;
+  @apply inline-flex items-center justify-center gap-2 rounded-button font-bold transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 active:scale-95;
  }
 
  .ui-btn-primary {
-  @apply bg-brand-600 px-4 py-2.5 text-sm text-white shadow-md shadow-brand-600/30 hover:bg-brand-500 hover:-translate-y-[2px] hover:shadow-glow-brand focus:ring-brand-500;
+  @apply bg-brand-600 px-4 py-2.5 text-sm text-white shadow-md shadow-brand-600/30 hover:bg-brand-500 hover:-translate-y-[2px] hover:shadow-glow-brand hover:scale-105 focus:ring-brand-500;
  }
 
  .ui-btn-secondary {
-  @apply border border-slate-200 bg-white px-4 py-2.5 text-sm text-slate-700 shadow-sm hover:bg-slate-50 hover:-translate-y-[2px] hover:shadow-md focus:ring-brand-500;
+  @apply border border-slate-200 bg-white px-4 py-2.5 text-sm text-slate-700 shadow-sm hover:bg-slate-50 hover:-translate-y-[2px] hover:shadow-md hover:scale-105 focus:ring-brand-500;
  }
 
  .ui-btn-accent {
-  @apply bg-blue-600 px-4 py-2.5 text-sm text-white shadow-md shadow-blue-600/30 hover:bg-blue-500 hover:-translate-y-[2px] hover:shadow-lg focus:ring-blue-500;
+  @apply bg-blue-600 px-4 py-2.5 text-sm text-white shadow-md shadow-blue-600/30 hover:bg-blue-500 hover:-translate-y-[2px] hover:shadow-lg hover:scale-105 focus:ring-blue-500;
  }
 
  .ui-btn-danger {
-  @apply bg-red-600 px-4 py-2.5 text-sm text-white shadow-sm hover:bg-red-500 hover:-translate-y-[2px] hover:shadow-md focus:ring-red-500;
+  @apply bg-red-600 px-4 py-2.5 text-sm text-white shadow-sm hover:bg-red-500 hover:-translate-y-[2px] hover:shadow-md hover:scale-105 focus:ring-red-500;
  }
 
  .ui-btn-loading {
@@ -214,15 +214,15 @@
  /* Form Inputs */
 
  .ui-input {
-  @apply rounded-button border-slate-200 bg-white px-4 py-2.5 text-sm text-slate-700 shadow-sm focus:border-brand-500 focus:ring-brand-500;
+  @apply rounded-button border-slate-200 bg-white px-4 py-2.5 text-sm text-slate-700 shadow-sm transition-all duration-200 focus:border-brand-500 focus:ring-2 focus:ring-brand-400/50 focus:ring-offset-2 focus:shadow-lg;
  }
 
  .ui-select {
-  @apply rounded-button border-slate-200 bg-slate-50 px-4 py-2.5 text-sm font-medium text-slate-600 focus:border-brand-500 focus:ring-brand-500;
+  @apply rounded-button border-slate-200 bg-slate-50 px-4 py-2.5 text-sm font-medium text-slate-600 transition-all duration-200 focus:border-brand-500 focus:ring-2 focus:ring-brand-400/50 focus:ring-offset-2 focus:shadow-lg;
  }
 
  .ui-textarea {
-  @apply rounded-button border-slate-200 bg-white px-4 py-2.5 text-sm text-slate-700 shadow-sm focus:border-brand-500 focus:ring-brand-500;
+  @apply rounded-button border-slate-200 bg-white px-4 py-2.5 text-sm text-slate-700 shadow-sm transition-all duration-200 focus:border-brand-500 focus:ring-2 focus:ring-brand-400/50 focus:ring-offset-2 focus:shadow-lg;
  }
 
  .ui-file-input {

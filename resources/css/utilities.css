@@ -9,6 +9,32 @@
  100% { background-position: 200% 0; }
 }
 
+@keyframes slide-in-toast {
+ from { transform: translateX(100%); opacity: 0; }
+ to { transform: translateX(0); opacity: 1; }
+}
+
+@keyframes slide-out-toast {
+ from { transform: translateX(0); opacity: 1; }
+ to { transform: translateX(100%); opacity: 0; }
+}
+
+@keyframes pop-scale {
+ 0% { transform: scale(0.95); opacity: 0; }
+ 50% { transform: scale(1.05); }
+ 100% { transform: scale(1); opacity: 1; }
+}
+
+@keyframes stagger-fade-up {
+ from { transform: translateY(8px); opacity: 0; }
+ to { transform: translateY(0); opacity: 1; }
+}
+
+@keyframes pulse-glow {
+ 0%, 100% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.7); }
+ 50% { box-shadow: 0 0 0 8px rgba(34, 197, 94, 0); }
+}
+
 @layer components {
 
  .skeleton {
@@ -27,6 +53,59 @@
 
  .ui-skeleton {
   @apply animate-pulse rounded bg-slate-200;
+ }
+
+ /* Button micro-interactions */
+ .btn-hover {
+  @apply transition-all duration-200 ease-out;
+ }
+
+ .btn-hover:hover {
+  @apply scale-105 shadow-lg;
+ }
+
+ .btn-hover:active {
+  @apply scale-95;
+ }
+
+ /* Input focus glow */
+ .input-focus {
+  @apply transition-all duration-200;
+ }
+
+ .input-focus:focus {
+  @apply ring-2 ring-brand-400/50 ring-offset-2;
+ }
+
+ /* Toast animations */
+ .toast-enter {
+  animation: slide-in-toast 0.3s ease-out;
+ }
+
+ .toast-exit {
+  animation: slide-out-toast 0.3s ease-in forwards;
+ }
+
+ /* Pop/scale animations */
+ .animate-pop {
+  animation: pop-scale 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+ }
+
+ /* Stagger animations for list items */
+ .stagger-item {
+  animation: stagger-fade-up 0.4s ease-out backwards;
+ }
+
+ .stagger-item:nth-child(1) { animation-delay: 0ms; }
+ .stagger-item:nth-child(2) { animation-delay: 80ms; }
+ .stagger-item:nth-child(3) { animation-delay: 160ms; }
+ .stagger-item:nth-child(4) { animation-delay: 240ms; }
+ .stagger-item:nth-child(5) { animation-delay: 320ms; }
+ .stagger-item:nth-child(n+6) { animation-delay: 400ms; }
+
+ /* Pulse glow for alerts */
+ .pulse-glow {
+  animation: pulse-glow 2s infinite;
  }
 
 }
