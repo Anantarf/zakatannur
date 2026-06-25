@@ -28,6 +28,8 @@ document.addEventListener('alpine:init', () => {
         lastSeenMessageCount: 0,
         conversationContext: {},
         sessionId: null,
+        messageCount: 0,
+        activityInterval: null,
 
         get isInputEmpty() {
             return this.input.trim() === '';
@@ -94,23 +96,13 @@ document.addEventListener('alpine:init', () => {
         },
 
         init() {
+            this.checkInactivity();
             this.generateOrLoadSessionId();
             this.loadHistory();
             this.lastSeenMessageCount = this.messages.length;
 
-            // Inject welcome message untuk first-time users
             if (this.messages.length === 0) {
-                this.messages.push({
-                    role: 'assistant',
-                    content: 'Halo! Saya Zakky, asisten virtual Masjid An-Nur. Saya bisa membantu:\n• Hitung zakat fitrah, fidyah, atau mal\n• Jawab pertanyaan seputar zakat\n• Info jadwal dan cara bayar\n\nAda yang bisa saya bantu?',
-                    createdAt: nowIso(),
-                    isWelcome: true,
-                });
-                this.quickReplies = [
-                    { label: 'Hitung zakat fitrah', message: 'Zakat fitrah 4 orang berapa?' },
-                    { label: 'Cara bayar zakat', message: 'Bagaimana cara membayar zakat?' },
-                    { label: 'Apa itu zakat mal?', message: 'Apa itu zakat mal?' },
-                ];
+                this.resetToWelcome();
             }
 
             setTimeout(() => {
@@ -141,6 +133,39 @@ document.addEventListener('alpine:init', () => {
                     this.lastSeenMessageCount = next.length;
                 }
             });
+
+            this.activityInterval = setInterval(() => {
+                this.checkInactivity();
+            }, 60000);
+        },
+
+        updateActivity() {
+            localStorage.setItem('zakky_last_activity', Date.now().toString());
+        },
+
+        checkInactivity() {
+            const lastActivity = localStorage.getItem('zakky_last_activity');
+            if (lastActivity && Date.now() - parseInt(lastActivity, 10) > 10 * 60 * 1000) {
+                this.clearHistory();
+                this.resetToWelcome();
+            }
+        },
+
+        resetToWelcome() {
+            this.messages = [{
+                role: 'assistant',
+                content: 'Halo! Saya Zakky, asisten virtual Masjid An-Nur. Saya bisa membantu:\n• Hitung zakat fitrah, fidyah, atau mal\n• Jawab pertanyaan seputar zakat\n• Info jadwal dan cara bayar\n\nAda yang bisa saya bantu?',
+                createdAt: nowIso(),
+                isWelcome: true,
+            }];
+            this.quickReplies = [
+                { label: 'Hitung zakat fitrah', message: 'Zakat fitrah 4 orang berapa?' },
+                { label: 'Cara bayar zakat', message: 'Bagaimana cara membayar zakat?' },
+                { label: 'Apa itu zakat mal?', message: 'Apa itu zakat mal?' },
+            ];
+            this.messageCount = 0;
+            localStorage.setItem('zakky_message_count_' + this.sessionId, '0');
+            this.updateActivity();
         },
 
         generateOrLoadSessionId() {
@@ -167,6 +192,15 @@ document.addEventListener('alpine:init', () => {
                         this.messages = parsed;
                     }
                 }
+                const count = localStorage.getItem('zakky_message_count_' + this.sessionId);
+                if (count) {
+                    this.messageCount = parseInt(count, 10);
+                    if (this.messageCount >= 50) {
+                        this.clearHistory();
+                        this.resetToWelcome();
+                        return;
+                    }
+                }
             } catch (e) {
                 console.warn('Failed to load chat history:', e);
             }
@@ -186,6 +220,10 @@ document.addEventListener('alpine:init', () => {
             try {
                 const key = 'zakky_history_' + (this.sessionId || 'default');
                 localStorage.removeItem(key);
+                localStorage.removeItem('zakky_message_count_' + this.sessionId);
+                localStorage.removeItem('zakky_session_id');
+                this.sessionId = null;
+                this.generateOrLoadSessionId();
                 this.showTooltip = true;
             } catch (e) {
                 console.warn('Failed to clear chat history:', e);
@@ -226,6 +264,23 @@ document.addEventListener('alpine:init', () => {
                 return;
             }
 
+            if (this.messageCount >= 50) {
+                this.messages.push({
+                    role: 'bot',
+                    content: 'Anda telah mencapai batas 50 pesan untuk sesi ini. Silakan muat ulang halaman (Refresh) untuk memulai sesi percakapan baru dengan Zakky.',
+                    isError: true,
+                    isRetryable: false,
+                    createdAt: nowIso(),
+                });
+                this.input = '';
+                this.$nextTick(() => this.scrollToBottom());
+                return;
+            }
+
+            this.updateActivity();
+            this.messageCount++;
+            localStorage.setItem('zakky_message_count_' + this.sessionId, this.messageCount.toString());
+
             const userMessage = this.input.trim();
 
             // Validate message length
@@ -238,7 +293,10 @@ document.addEventListener('alpine:init', () => {
             this.messages.push({ role: 'user', content: userMessage, createdAt: nowIso() });
             this.input = '';
             this.$nextTick(() => {
-                if (this.$refs.chatInput) this.$refs.chatInput.style.height = 'auto';
+                if (this.$refs.chatInput) {
+                    this.$refs.chatInput.style.height = 'auto';
+                    this.$refs.chatInput.style.overflowY = 'hidden';
+                }
             });
 
             if (localAction) {

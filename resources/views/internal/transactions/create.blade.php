@@ -108,18 +108,18 @@
                 </div>
             </form>
 
-            <!-- Unsaved Changes Modal -->
+            <!-- Unsaved Changes Modal (Light Confirmation) -->
             <div x-show="showUnsavedModal" x-transition class="fixed inset-0 z-50 flex items-center justify-center">
-                <div x-show="showUnsavedModal" class="absolute inset-0 bg-slate-900/75" x-transition></div>
-                <div x-show="showUnsavedModal" class="relative bg-white rounded-lg shadow-xl max-w-sm mx-4 p-6 z-10" x-transition>
-                    <h3 class="text-lg font-bold text-slate-900 mb-2">Perubahan Belum Disimpan</h3>
-                    <p class="text-sm text-slate-600 mb-6">Anda memiliki perubahan yang belum disimpan. Navigasi ke halaman lain akan membuang semua perubahan.</p>
-                    <div class="flex gap-3 justify-end">
-                        <button type="button" @click="showUnsavedModal = false; pendingNavigation = null" class="px-4 py-2 bg-slate-100 text-slate-700 font-semibold rounded-lg hover:bg-slate-200 transition">
-                            Kembali
+                <div x-show="showUnsavedModal" class="absolute inset-0 bg-slate-900/40" @click="showUnsavedModal = false" x-transition></div>
+                <div x-show="showUnsavedModal" class="relative bg-white rounded-xl shadow-lg max-w-sm mx-4 p-5 z-10" x-transition>
+                    <h3 class="text-base font-semibold text-slate-900 mb-1">Perubahan belum disimpan</h3>
+                    <p class="text-sm text-slate-500 mb-5">Anda akan keluar dari halaman ini.</p>
+                    <div class="flex gap-2 justify-end">
+                        <button type="button" @click="showUnsavedModal = false; pendingNavigation = null" class="px-4 py-2 text-sm font-semibold text-slate-700 rounded-lg hover:bg-slate-100 transition">
+                            Batal
                         </button>
-                        <button type="button" @click="discardChanges()" class="px-4 py-2 bg-red-600 text-white font-semibold rounded-lg hover:bg-red-700 transition">
-                            Buang Perubahan
+                        <button type="button" @click="discardChanges()" class="px-4 py-2 text-sm font-semibold text-white bg-brand-600 rounded-lg hover:bg-brand-700 transition">
+                            Keluar
                         </button>
                     </div>
                 </div>
