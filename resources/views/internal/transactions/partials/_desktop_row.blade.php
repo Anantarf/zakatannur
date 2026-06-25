@@ -1,4 +1,4 @@
-<tr class="transition-colors hover:bg-brand-50/30">
+<tr class="transition-colors hover:bg-brand-50/30 stagger-item">
     <td class="whitespace-nowrap px-3 py-3 sm:px-5">
         <span class="font-sans text-xs font-semibold text-slate-600 bg-slate-100 px-2 py-1 rounded-md">{!! \App\Support\Format::highlight($t->no_transaksi, $q) !!}</span>
     </td>

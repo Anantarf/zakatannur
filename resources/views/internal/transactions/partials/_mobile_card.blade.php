@@ -1,4 +1,4 @@
-<article class="ui-mobile-card">
+<article class="ui-mobile-card stagger-item">
     <div class="flex items-start justify-between gap-3">
         <div class="min-w-0">
             <span class="inline-flex rounded-md bg-slate-100 px-2 py-1 font-sans text-[11px] font-semibold text-slate-600">{!! \App\Support\Format::highlight($t->no_transaksi, $q) !!}</span>
