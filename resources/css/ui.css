@@ -90,15 +90,23 @@
  /* Cards & Layouts */
 
  .ui-card {
-  @apply rounded-card border border-slate-100 bg-white shadow-sm transition-all duration-300;
+  @apply rounded-card border border-slate-100 bg-white transition-all duration-300;
+  box-shadow: var(--shadow-sm);
  }
 
  .ui-card-strong {
-  @apply rounded-card border border-brand-100/30 bg-white shadow-sm transition-all duration-300;
+  @apply rounded-card border border-brand-100/30 bg-white transition-all duration-300;
+  box-shadow: var(--shadow-sm);
  }
 
  .ui-card-muted {
-  @apply rounded-card border border-slate-200/80 bg-slate-50/70 shadow-sm transition-all duration-300;
+  @apply rounded-card border border-slate-200/80 bg-slate-50/70 transition-all duration-300;
+  box-shadow: var(--shadow-sm);
+ }
+
+ /* Card content padding — use consistently */
+ .ui-card > * + * {
+  @apply border-t border-slate-100;
  }
 
  .ui-card-dark {
@@ -157,22 +165,35 @@
 
  .ui-btn {
   @apply inline-flex items-center justify-center gap-2 rounded-button font-bold transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 active:scale-95;
+  padding: var(--pad-btn);
+  font-size: var(--text-btn);
+ }
+
+ /* Button size variants */
+ .ui-btn-sm {
+  padding: var(--pad-btn-sm);
+  @apply text-xs;
+ }
+
+ .ui-btn-lg {
+  padding: var(--pad-btn-lg);
+  @apply text-base;
  }
 
  .ui-btn-primary {
-  @apply bg-brand-600 px-4 py-2.5 text-sm text-white shadow-md shadow-brand-600/30 hover:bg-brand-500 hover:-translate-y-[2px] hover:shadow-glow-brand hover:scale-105 focus:ring-brand-500;
+  @apply bg-brand-600 text-white shadow-md shadow-brand-600/30 hover:bg-brand-500 hover:-translate-y-[2px] hover:shadow-glow-brand hover:scale-105 focus:ring-brand-500;
  }
 
  .ui-btn-secondary {
-  @apply border border-slate-200 bg-white px-4 py-2.5 text-sm text-slate-700 shadow-sm hover:bg-slate-50 hover:-translate-y-[2px] hover:shadow-md hover:scale-105 focus:ring-brand-500;
+  @apply border border-slate-200 bg-white text-slate-700 shadow-sm hover:bg-slate-50 hover:-translate-y-[2px] hover:shadow-md hover:scale-105 focus:ring-brand-500;
  }
 
  .ui-btn-accent {
-  @apply bg-blue-600 px-4 py-2.5 text-sm text-white shadow-md shadow-blue-600/30 hover:bg-blue-500 hover:-translate-y-[2px] hover:shadow-lg hover:scale-105 focus:ring-blue-500;
+  @apply bg-blue-600 text-white shadow-md shadow-blue-600/30 hover:bg-blue-500 hover:-translate-y-[2px] hover:shadow-lg hover:scale-105 focus:ring-blue-500;
  }
 
  .ui-btn-danger {
-  @apply bg-red-600 px-4 py-2.5 text-sm text-white shadow-sm hover:bg-red-500 hover:-translate-y-[2px] hover:shadow-md hover:scale-105 focus:ring-red-500;
+  @apply bg-red-600 text-white shadow-sm hover:bg-red-700 hover:-translate-y-[2px] hover:shadow-md hover:scale-105 focus:ring-red-500;
  }
 
  .ui-btn-loading {
@@ -214,15 +235,33 @@
  /* Form Inputs */
 
  .ui-input {
-  @apply rounded-button border-slate-200 bg-white px-4 py-2.5 text-sm text-slate-700 shadow-sm transition-all duration-200 focus:border-brand-500 focus:ring-2 focus:ring-brand-400/50 focus:ring-offset-2 focus:shadow-lg;
+  @apply rounded-button border border-slate-200 bg-white text-slate-700 shadow-sm transition-all duration-200 focus:border-brand-500 focus:ring-2 focus:ring-brand-400/50 focus:ring-offset-2 focus:shadow-lg;
+  padding: var(--pad-form) 1rem;
+  font-size: var(--text-input);
+ }
+
+ .ui-input:disabled {
+  @apply bg-slate-100 border-dashed cursor-not-allowed text-slate-400;
  }
 
  .ui-select {
-  @apply rounded-button border-slate-200 bg-slate-50 px-4 py-2.5 text-sm font-medium text-slate-600 transition-all duration-200 focus:border-brand-500 focus:ring-2 focus:ring-brand-400/50 focus:ring-offset-2 focus:shadow-lg;
+  @apply rounded-button border border-slate-200 bg-white text-slate-700 transition-all duration-200 focus:border-brand-500 focus:ring-2 focus:ring-brand-400/50 focus:ring-offset-2 focus:shadow-lg;
+  padding: var(--pad-form) 1rem;
+  font-size: var(--text-input);
+ }
+
+ .ui-select:disabled {
+  @apply bg-slate-100 border-dashed cursor-not-allowed text-slate-400;
  }
 
  .ui-textarea {
-  @apply rounded-button border-slate-200 bg-white px-4 py-2.5 text-sm text-slate-700 shadow-sm transition-all duration-200 focus:border-brand-500 focus:ring-2 focus:ring-brand-400/50 focus:ring-offset-2 focus:shadow-lg;
+  @apply rounded-button border border-slate-200 bg-white text-slate-700 shadow-sm transition-all duration-200 focus:border-brand-500 focus:ring-2 focus:ring-brand-400/50 focus:ring-offset-2 focus:shadow-lg;
+  padding: var(--pad-form) 1rem;
+  font-size: var(--text-input);
+ }
+
+ .ui-textarea:disabled {
+  @apply bg-slate-100 border-dashed cursor-not-allowed text-slate-400;
  }
 
  .ui-file-input {
@@ -234,18 +273,38 @@
  }
 
  .ui-form-label {
-  @apply mb-1 block text-sm font-bold text-slate-700;
+  @apply mb-2 block font-bold text-slate-700;
+  font-size: var(--text-body-sm);
  }
 
  .ui-form-label-xs {
-  @apply block text-[10px] font-bold uppercase text-slate-400;
-  letter-spacing: 0.12em;
+  @apply block font-bold uppercase text-slate-600;
+  font-size: var(--text-eyebrow);
+  letter-spacing: var(--tracking-label);
+  margin-bottom: var(--space-sm);
  }
 
  /* Alerts & Notifications */
 
  .ui-alert {
-  @apply flex items-start gap-3 rounded-card border p-4 shadow-sm;
+  @apply flex items-start gap-3 rounded-card border p-4 border-l-4;
+  box-shadow: var(--shadow-sm);
+ }
+
+ .ui-alert-error {
+  @apply border-red-600 border-l-red-600 bg-red-50;
+ }
+
+ .ui-alert-error .ui-alert-title {
+  @apply text-red-900 font-bold;
+ }
+
+ .ui-alert-error ul {
+  @apply text-red-900;
+ }
+
+ .ui-alert-error li {
+  @apply text-red-800;
  }
 
  .ui-alert-icon {
@@ -287,7 +346,8 @@
  }
 
  .ui-mobile-meta-label {
-  @apply text-[10px] font-semibold uppercase text-slate-400;
+  font-size: var(--text-eyebrow);
+  @apply font-semibold uppercase text-slate-500;
   letter-spacing: var(--tracking-caption);
  }
 
@@ -310,7 +370,9 @@
  /* Badges & Status Indicators */
 
  .ui-role-badge {
-  @apply inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-bold uppercase;
+  @apply inline-flex items-center rounded-full font-bold uppercase;
+  padding: 0.25rem 0.75rem;
+  font-size: var(--text-eyebrow);
  }
 
  .ui-role-badge-super {
@@ -326,23 +388,31 @@
  }
 
  .ui-header-link {
-  @apply inline-flex w-full items-center justify-center gap-2 rounded-button border border-slate-200 bg-white px-4 py-3 text-sm font-bold text-slate-700 shadow-sm transition-all hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:ring-offset-2 sm:w-auto sm:py-2;
+  @apply inline-flex w-full items-center justify-center gap-2 rounded-button border border-slate-200 bg-white text-slate-700 shadow-sm transition-all hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:ring-offset-2 sm:w-auto;
+  padding: 0.75rem 1rem;
+  font-size: var(--text-body);
+  font-weight: 700;
  }
 
  .ui-badge {
-  @apply inline-flex items-center justify-center rounded border px-2 py-0.5 text-center leading-tight whitespace-nowrap;
+  @apply inline-flex items-center justify-center rounded border leading-tight whitespace-nowrap font-semibold;
+  padding: 0.25rem 0.5rem;
+  font-size: var(--text-caption);
  }
 
  .ui-badge-risk {
-  @apply text-[11px] font-bold uppercase;
+  font-size: var(--text-caption);
+  @apply font-bold uppercase;
  }
 
  .ui-badge-review {
-  @apply text-[10px] font-semibold;
+  font-size: var(--text-eyebrow);
+  @apply font-semibold;
  }
 
  .ui-badge-token {
-  @apply text-[11px] font-semibold uppercase;
+  font-size: var(--text-caption);
+  @apply font-semibold uppercase;
  }
 
  .ui-badge-risk-normal {

@@ -9,8 +9,8 @@
         </button>
     </div>
 
-    <div class="grid grid-cols-1 gap-3 border-t border-slate-100 pt-3 sm:grid-cols-2 lg:grid-cols-4">
-        <div class="rounded-xl border p-3 transition-colors" :class="person.zakat.fitrah.active ? 'border-brand-400 bg-brand-50/30 ring-1 ring-brand-300' : 'border-slate-200 bg-slate-50/50'">
+    <div class="grid grid-cols-1 gap-4 border-t border-slate-100 pt-4 sm:grid-cols-2 lg:grid-cols-4">
+        <div class="rounded-xl border p-4 transition-colors" :class="person.zakat.fitrah.active ? 'border-brand-400 bg-brand-50/30 ring-1 ring-brand-300' : 'border-slate-200 bg-slate-50/50'">
             <label class="flex cursor-pointer items-center gap-2 text-sm font-bold text-slate-800">
                 <input type="checkbox" x-model="person.zakat.fitrah.active" class="h-4 w-4 rounded border-slate-300 text-brand-600 focus:ring-brand-500">
                 Zakat Fitrah
@@ -18,7 +18,7 @@
             <div x-show="person.zakat.fitrah.active" class="mt-3 space-y-3" x-collapse x-transition:enter="transition ease-out duration-300" x-transition:leave="transition ease-in duration-200">
                 <div class="space-y-1">
                     <label class="ui-form-label-xs">Bentuk Zakat Fitrah</label>
-                    <select x-model="person.zakat.fitrah.metode" class="w-full rounded-lg border-slate-200 text-xs shadow-sm focus:border-brand-500 focus:ring-brand-500">
+                    <select x-model="person.zakat.fitrah.metode" class="ui-select w-full text-xs">
                         <option value="uang">Uang (Rp)</option>
                         <option value="beras">Beras (Kg)</option>
                     </select>
@@ -65,7 +65,7 @@
                 </div>
                 <div class="space-y-1">
                     <label class="ui-form-label-xs">Bentuk Fidyah</label>
-                    <select x-model="person.zakat.fidyah.metode" class="w-full rounded-lg border-slate-200 text-xs shadow-sm focus:border-amber-500 focus:ring-amber-500">
+                    <select x-model="person.zakat.fidyah.metode" class="ui-select w-full text-xs">
                         <option value="uang">Uang (Rp)</option>
                         <option value="beras">Beras (Kg)</option>
                     </select>
@@ -108,7 +108,7 @@
             <div x-show="person.zakat.mal.active" class="mt-3 space-y-2" x-collapse>
                 <div class="space-y-1">
                     <label class="ui-form-label-xs">Bentuk Zakat Mal</label>
-                    <select x-model="person.zakat.mal.metode" class="w-full rounded-lg border-slate-200 text-xs shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                    <select x-model="person.zakat.mal.metode" class="ui-select w-full text-xs">
                         <option value="uang">Uang (Rp)</option>
                         <option value="beras">Beras (Kg)</option>
                     </select>
@@ -132,7 +132,7 @@
             <div x-show="person.zakat.infaq.active" class="mt-3 space-y-2" x-collapse>
                 <div class="space-y-1">
                     <label class="ui-form-label-xs">Bentuk Infaq Sedekah</label>
-                    <select x-model="person.zakat.infaq.metode" class="w-full rounded-lg border-slate-200 text-xs shadow-sm focus:border-cyan-500 focus:ring-cyan-500">
+                    <select x-model="person.zakat.infaq.metode" class="ui-select w-full text-xs">
                         <option value="uang">Uang (Rp)</option>
                         <option value="beras">Beras (Kg)</option>
                     </select>

@@ -46,11 +46,25 @@
  --color-slate-900-rgb: 28 25 23;
  --color-slate-950-rgb: 12 10 9;
 
- /* Status Colors */
+ /* Semantic Status Colors */
  --color-status-success-rgb: 20 184 166;
  --color-status-warning-rgb: 245 158 11;
  --color-status-error-rgb: 220 38 38;
  --color-status-info-rgb: 56 189 248;
+
+ /* Semantic Color Roles */
+ --color-action: rgb(var(--color-brand-600-rgb)); /* primary actions, buttons */
+ --color-action-hover: rgb(var(--color-brand-500-rgb)); /* button hover */
+ --color-action-active: rgb(var(--color-brand-700-rgb)); /* button active */
+ --color-text-primary: rgb(var(--color-slate-900-rgb)); /* main text */
+ --color-text-secondary: rgb(var(--color-slate-600-rgb)); /* labels, muted text */
+ --color-text-muted: rgb(var(--color-slate-500-rgb)); /* captions, metadata */
+ --color-bg-primary: #ffffff; /* main content background */
+ --color-bg-secondary: rgb(var(--color-slate-50-rgb)); /* secondary sections */
+ --color-bg-tertiary: rgb(var(--color-slate-100-rgb)); /* hover/active backgrounds */
+ --color-danger: rgb(220, 38, 38); /* destructive actions */
+ --color-warning: rgb(245, 158, 11); /* warnings */
+ --color-success: rgb(20, 184, 166); /* confirmations */
 
  /* Border Radius */
  --radius-card: 1.75rem;
@@ -60,6 +74,17 @@
  /* Shadows */
  --shadow-topbar: 0 20px 40px -15px rgba(0, 0, 0, 0.08);
  --shadow-page-header: 0 25px 50px -12px rgba(0, 0, 0, 0.06);
+ --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+ --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+ --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+
+ /* Spacing Scale (4px base unit) */
+ --space-xs: 0.25rem;   /* 4px */
+ --space-sm: 0.5rem;    /* 8px */
+ --space-md: 1rem;      /* 16px */
+ --space-lg: 1.5rem;    /* 24px */
+ --space-xl: 2rem;      /* 32px */
+ --space-2xl: 3rem;     /* 48px */
 
  /* Typography Scale */
  --text-eyebrow: 10px; /* label badge, kicker, kolom uppercase */
@@ -67,11 +92,20 @@
  --text-body-sm: 13px; /* teks baris tabel, deskripsi pendek */
  --text-body: 14px; /* body copy operasional */
  --text-section-title: 16px; /* judul panel/card */
+ --text-btn: 14px; /* button text */
+ --text-input: 14px; /* form input text */
 
  /* Letter Spacing */
  --tracking-eyebrow: 0.12em; /* kicker utama, brand label */
  --tracking-label: 0.10em;   /* label stat, settings, kicker sekunder */
  --tracking-caption: 0.08em; /* metadata kompak, tabel header */
+
+ /* Component Padding */
+ --pad-btn: 0.625rem 1rem; /* button default py-2.5 px-4 */
+ --pad-btn-sm: 0.5rem 0.75rem; /* small button py-2 px-3 */
+ --pad-btn-lg: 0.75rem 1.5rem; /* large button py-3 px-6 */
+ --pad-card: 1rem; /* card content padding */
+ --pad-form: 0.625rem; /* form field padding */
 }
 
 @keyframes slideInRight {
