@@ -122,7 +122,7 @@
                             </button>
                             <button type="button" @click="toggleSection(6)" class="ui-settings-summary-card ui-settings-summary-card-emerald text-left hover:ring-2 hover:ring-brand-300 transition-all cursor-pointer">
                                 <div class="text-[11px] font-bold text-brand-700 flex items-center justify-between">
-                                    <span>Pusher Realtime</span>
+                                    <span>Notifikasi Realtime</span>
                                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" :class="expandedSection === 6 ? 'rotate-180' : ''" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
                                     </svg>
@@ -387,8 +387,8 @@
                             <button type="button" @click="toggleSection(6)" class="ui-settings-section-head group w-full text-left hover:bg-emerald-50/50 transition-colors">
                                 <span class="ui-section-accent"></span>
                                 <div class="flex-1">
-                                    <h4 class="ui-settings-section-title">Test Koneksi Pusher</h4>
-                                    <p class="ui-settings-section-copy">Gunakan tombol ini untuk menembakkan event transaksi palsu untuk mengetes update realtime di halaman depan.</p>
+                                    <h4 class="ui-settings-section-title">Test Notifikasi Realtime</h4>
+                                    <p class="ui-settings-section-copy">Gunakan tombol ini untuk menembakkan event transaksi palsu untuk mengetes kemunculan notifikasi popup realtime di halaman depan.</p>
                                 </div>
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-emerald-400 transition-transform" :class="expandedSection === 6 ? 'rotate-180' : ''" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
@@ -396,12 +396,12 @@
                             </button>
                             <div x-show="expandedSection === 6" x-transition class="pt-4">
                                 <div class="mb-4 rounded-xl bg-emerald-50 border border-emerald-100 p-4">
-                                    <p class="text-sm text-emerald-900 mb-3"><strong>Langkah Pengetesan:</strong> Buka halaman beranda publik di tab/jendela baru. Lalu tekan tombol di bawah ini. Jika Pusher aktif, Anda akan mendengar suara 'Pop' dan angka total di beranda akan berkedip hijau seketika tanpa perlu memuat ulang halaman.</p>
+                                    <p class="text-sm text-emerald-900 mb-3"><strong>Langkah Pengetesan:</strong> Buka halaman beranda publik di tab/jendela baru. Lalu tekan tombol di bawah ini. Jika sistem notifikasi aktif, Anda akan mendengar suara 'Pop', muncul popup notifikasi, dan angka total di beranda akan berkedip hijau seketika tanpa perlu memuat ulang halaman.</p>
                                     <button type="button" onclick="document.getElementById('form-test-pusher').submit();" class="ui-btn ui-btn-primary bg-indigo-600 hover:bg-indigo-700 text-white">
                                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
                                         </svg>
-                                        Tembakkan Event Pusher Sekarang
+                                        Tembakkan Notifikasi Sekarang
                                     </button>
                                 </div>
                             </div>
