@@ -145,7 +145,7 @@
                         </div>
                     </div>
 
-                    <form method="POST" action="{{ route('internal.settings.period.update') }}" class="space-y-3" @submit="isDirty = false">
+                    <form method="POST" action="{{ route('internal.settings.period.update') }}" class="space-y-3" @submit="isDirty = false" @input="isDirty = true" @change="isDirty = true">
                         @csrf
 
                         {{-- Section 1: Dasar Sistem (Always Visible) --}}
@@ -427,7 +427,8 @@
                                     <a href="{{ route('dashboard') }}" class="ui-btn ui-btn-secondary w-full sm:w-auto">Kembali</a>
                                     <button type="submit"
                                             @click="isSubmitting = true"
-                                            :disabled="isSubmitting"
+                                            :disabled="isSubmitting || !isDirty"
+                                            :class="{'opacity-50 cursor-not-allowed': !isDirty}"
                                             class="ui-btn ui-btn-primary w-full px-6 py-3 sm:w-auto">
                                         <template x-if="isSubmitting">
                                             <svg xmlns="http://www.w3.org/2000/svg" class="animate-spin h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">

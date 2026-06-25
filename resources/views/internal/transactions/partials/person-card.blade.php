@@ -18,7 +18,7 @@
             <div x-show="person.zakat.fitrah.active" class="mt-3 space-y-3" x-collapse x-transition:enter="transition ease-out duration-300" x-transition:leave="transition ease-in duration-200">
                 <div class="space-y-1">
                     <label class="ui-form-label-xs">Bentuk Zakat Fitrah</label>
-                    <select x-model="person.zakat.fitrah.metode" class="ui-select w-full text-xs">
+                    <select x-model="person.zakat.fitrah.metode" class="ui-select w-full">
                         <option value="uang">Uang (Rp)</option>
                         <option value="beras">Beras (Kg)</option>
                     </select>
@@ -65,7 +65,7 @@
                 </div>
                 <div class="space-y-1">
                     <label class="ui-form-label-xs">Bentuk Fidyah</label>
-                    <select x-model="person.zakat.fidyah.metode" class="ui-select w-full text-xs">
+                    <select x-model="person.zakat.fidyah.metode" class="ui-select w-full">
                         <option value="uang">Uang (Rp)</option>
                         <option value="beras">Beras (Kg)</option>
                     </select>
@@ -108,7 +108,7 @@
             <div x-show="person.zakat.mal.active" class="mt-3 space-y-2" x-collapse>
                 <div class="space-y-1">
                     <label class="ui-form-label-xs">Bentuk Zakat Mal</label>
-                    <select x-model="person.zakat.mal.metode" class="ui-select w-full text-xs">
+                    <select x-model="person.zakat.mal.metode" class="ui-select w-full">
                         <option value="uang">Uang (Rp)</option>
                         <option value="beras">Beras (Kg)</option>
                     </select>
@@ -132,7 +132,7 @@
             <div x-show="person.zakat.infaq.active" class="mt-3 space-y-2" x-collapse>
                 <div class="space-y-1">
                     <label class="ui-form-label-xs">Bentuk Infaq Sedekah</label>
-                    <select x-model="person.zakat.infaq.metode" class="ui-select w-full text-xs">
+                    <select x-model="person.zakat.infaq.metode" class="ui-select w-full">
                         <option value="uang">Uang (Rp)</option>
                         <option value="beras">Beras (Kg)</option>
                     </select>

@@ -60,7 +60,7 @@ class DashboardInsightsService
             ->when($metode, fn ($query) => $query->where('metode', $metode));
 
         $todayCount = (clone $baseTransactions)
-            ->whereRaw('DATE(' . $effectiveTimestamp . ') = ?', [now(config('zakat.timezone'))->toDateString()])
+            ->whereDate(DB::raw($effectiveTimestamp), now(config('zakat.timezone'))->toDateString())
             ->distinct('no_transaksi')
             ->count('no_transaksi');
 
@@ -93,7 +93,7 @@ class DashboardInsightsService
 
             $hasRecentData = ZakatTransaction::valid()
                 ->where('tahun_zakat', $activeYear)
-                ->whereRaw("{$effectiveTimestamp} >= ?", [now(config('zakat.timezone'))->subDays($purgeDays)->startOfDay()])
+                ->where(DB::raw($effectiveTimestamp), '>=', now(config('zakat.timezone'))->subDays($purgeDays)->startOfDay())
                 ->exists();
 
             if ($hasRecentData) {
@@ -132,8 +132,8 @@ class DashboardInsightsService
                 ->valid()
                 ->where('tahun_zakat', $year)
                 ->when($periodId !== null, fn ($query) => $query->where('zakat_period_id', $periodId))
-                ->whereRaw("{$effectiveTimestamp} >= ?", [$startBoundary])
-                ->whereRaw("{$effectiveTimestamp} <= ?", [$endBoundary])
+                ->where(DB::raw($effectiveTimestamp), '>=', $startBoundary)
+                ->where(DB::raw($effectiveTimestamp), '<=', $endBoundary)
                 ->groupBy('date')
                 ->orderBy('date', 'ASC')
                 ->get();

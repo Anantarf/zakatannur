@@ -6,14 +6,14 @@
             <article class="rounded-card border border-slate-100 bg-white p-4 shadow-sm">
                 <div class="flex items-start justify-between gap-3">
                     <div class="min-w-0">
-                        <span class="inline-flex rounded-md bg-slate-100 px-2 py-1 font-sans text-[11px] font-semibold text-slate-600">{{ $t->no_transaksi }}</span>
+                        <span class="inline-flex rounded-md bg-slate-100 px-2 py-1 font-sans font-semibold text-slate-600" style="font-size: var(--text-caption);">{{ $t->no_transaksi }}</span>
                         <div class="mt-2 text-sm font-semibold leading-tight text-slate-800">{{ $t->pembayar_nama }}</div>
                         @if($t->muzakki_total > 1)
-                            <div class="mt-1 text-[11px] text-slate-500">+ {{ $t->muzakki_total - 1 }} muzakki lainnya</div>
+                            <div class="mt-1 text-slate-500" style="font-size: var(--text-caption);">+ {{ $t->muzakki_total - 1 }} muzakki lainnya</div>
                         @endif
                     </div>
                     <div class="shrink-0 text-right">
-                        <div class="text-[11px] font-semibold text-slate-500">
+                        <div class="font-semibold text-slate-500" style="font-size: var(--text-caption);">
                             @if ($t->waktu_terima)
                                 {{ $t->waktu_terima->timezone('Asia/Jakarta')->format('d/m/Y') }}
                             @else
@@ -32,24 +32,24 @@
 
                 <div class="mt-3 grid grid-cols-1 gap-3 rounded-xl bg-slate-50 px-3 py-3">
                     <div class="flex items-start justify-between gap-3">
-                        <span class="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-400">Kategori</span>
+                        <span class="font-semibold uppercase text-slate-400" style="font-size: var(--text-eyebrow); letter-spacing: var(--tracking-eyebrow);">Kategori</span>
                         <div class="max-w-[65%]">
                             <x-zakat-category-tags :categories="$t->categories_list" />
                         </div>
                     </div>
                     <div class="flex items-start justify-between gap-3">
-                        <span class="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-400">Bentuk</span>
+                        <span class="font-semibold uppercase text-slate-400" style="font-size: var(--text-eyebrow); letter-spacing: var(--tracking-eyebrow);">Bentuk</span>
                         <div class="flex max-w-[65%] flex-wrap justify-end gap-1">
                             @foreach(explode(',', $t->methods_list ?? '') as $met)
                                 @php $met = trim($met); @endphp
                                 @if($met)
-                                    <span class="inline-flex items-center justify-center rounded px-1.5 py-1 text-[10px] font-bold uppercase tracking-wide bg-amber-50 text-amber-700 border border-amber-100 whitespace-nowrap leading-tight text-center">{{ \App\Models\ZakatTransaction::METHOD_LABELS[$met] ?? strtoupper($met) }}</span>
+                                    <span class="inline-flex items-center justify-center rounded px-1.5 py-1 font-bold uppercase bg-amber-50 text-amber-700 border border-amber-100 whitespace-nowrap leading-tight text-center" style="font-size: var(--text-eyebrow); letter-spacing: var(--tracking-eyebrow);">{{ \App\Models\ZakatTransaction::METHOD_LABELS[$met] ?? strtoupper($met) }}</span>
                                 @endif
                             @endforeach
                         </div>
                     </div>
                     <div class="flex items-start justify-between gap-3">
-                        <span class="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-400">Nominal</span>
+                        <span class="font-semibold uppercase text-slate-400" style="font-size: var(--text-eyebrow); letter-spacing: var(--tracking-eyebrow);">Nominal</span>
                         <div class="text-right">
                             @if($t->total_uang > 0)
                                 <div class="flex items-center justify-end gap-1.5">
@@ -65,10 +65,10 @@
                         </div>
                     </div>
                     <div class="flex items-start justify-between gap-3">
-                        <span class="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-400">Petugas</span>
+                        <span class="font-semibold uppercase text-slate-400" style="font-size: var(--text-eyebrow); letter-spacing: var(--tracking-eyebrow);">Petugas</span>
                         <div class="text-right">
                             <div class="text-sm font-medium text-slate-700">{{ $t->petugas?->name ?? '-' }}</div>
-                            <span class="mt-1 inline-flex items-center justify-center rounded px-2 py-0.5 text-[10px] font-bold uppercase bg-brand-50 text-brand-700 border border-brand-100 whitespace-nowrap leading-tight text-center">
+                            <span class="mt-1 inline-flex items-center justify-center rounded px-2 py-0.5 font-bold uppercase bg-brand-50 text-brand-700 border border-brand-100 whitespace-nowrap leading-tight text-center" style="font-size: var(--text-eyebrow);">
                                 {{ $t->shift_label }}
                             </span>
                         </div>
@@ -89,9 +89,9 @@
 </div>
 
 <div class="hidden overflow-x-auto md:block">
-    <table class="min-w-full text-[10px] sm:text-sm">
+    <table class="min-w-full sm:text-sm" style="font-size: var(--text-eyebrow);">
         <thead>
-            <tr class="border-b border-slate-100 bg-slate-50 text-left text-[11px] font-semibold uppercase tracking-[0.14em] text-slate-400 sm:text-xs">
+            <tr class="border-b border-slate-100 bg-slate-50 text-left font-semibold uppercase text-slate-400 sm:text-xs" style="font-size: var(--text-caption); letter-spacing: var(--tracking-label);">
                 <th class="px-3 py-3 sm:px-5">No. Transaksi</th>
                 <th class="px-3 py-3 sm:px-5">Waktu</th>
                 <th class="px-3 py-3 sm:px-5">Pembayar</th>
@@ -118,7 +118,7 @@
                     <td class="whitespace-nowrap px-3 py-3 sm:px-5">
                         <div class="text-xs font-semibold text-slate-700 sm:text-sm">{{ $t->pembayar_nama }}</div>
                         @if($t->muzakki_total > 1)
-                            <div class="mt-0.5 text-[10px] text-slate-500">+ {{ $t->muzakki_total - 1 }} Muzakki Lainnya</div>
+                            <div class="mt-0.5 text-slate-500" style="font-size: var(--text-eyebrow);">+ {{ $t->muzakki_total - 1 }} Muzakki Lainnya</div>
                         @endif
                     </td>
                     <td class="px-3 py-3">
@@ -129,7 +129,7 @@
                             @foreach(explode(',', $t->methods_list ?? '') as $met)
                                 @php $met = trim($met); @endphp
                                 @if($met)
-                                    <span class="inline-flex items-center justify-center rounded px-1.5 py-1 text-[10px] sm:text-[11px] font-bold uppercase tracking-wide bg-amber-50 text-amber-700 border border-amber-100 whitespace-nowrap leading-tight text-center">{{ \App\Models\ZakatTransaction::METHOD_LABELS[$met] ?? strtoupper($met) }}</span>
+                                    <span class="inline-flex items-center justify-center rounded px-1.5 py-1 font-bold uppercase bg-amber-50 text-amber-700 border border-amber-100 whitespace-nowrap leading-tight text-center" style="font-size: var(--text-eyebrow); letter-spacing: var(--tracking-eyebrow);">{{ \App\Models\ZakatTransaction::METHOD_LABELS[$met] ?? strtoupper($met) }}</span>
                                 @endif
                             @endforeach
                         </div>
@@ -140,7 +140,7 @@
                                     <div class="flex items-center justify-end gap-1.5">
                                         <div class="text-xs font-bold text-slate-800 sm:text-sm">{{ $t->total_uang_display }}</div>
                                         @if($t->has_transfer)
-                                            <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-bold bg-brand-100 text-brand-700 border border-brand-200 uppercase">TF</span>
+                                            <span class="inline-flex items-center px-1.5 py-0.5 rounded font-bold bg-brand-100 text-brand-700 border border-brand-200 uppercase" style="font-size: var(--text-eyebrow);">TF</span>
                                         @endif
                                     </div>
                                 @endif
@@ -149,10 +149,10 @@
                                 @endif
                         </div>
                     </td>
-                    <td class="whitespace-nowrap px-3 py-3 text-center text-[10px] text-slate-500 sm:text-sm">
+                    <td class="whitespace-nowrap px-3 py-3 text-center text-slate-500 sm:text-sm" style="font-size: var(--text-eyebrow);">
                         <div class="flex flex-col items-center gap-1 mx-auto w-fit">
                             <span class="text-center font-medium font-sans text-slate-700">{{ $t->petugas?->name ?? '-' }}</span>
-                            <span class="inline-flex items-center justify-center rounded px-2 py-0.5 text-[10px] font-bold uppercase bg-brand-50 text-brand-700 border border-brand-100 whitespace-nowrap leading-tight text-center">
+                            <span class="inline-flex items-center justify-center rounded px-2 py-0.5 font-bold uppercase bg-brand-50 text-brand-700 border border-brand-100 whitespace-nowrap leading-tight text-center" style="font-size: var(--text-eyebrow);">
                                 {{ $t->shift_label }}
                             </span>
                         </div>

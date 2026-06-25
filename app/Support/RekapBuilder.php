@@ -56,7 +56,7 @@ final class RekapBuilder
         $grandTotalBeras = 0.0;
 
         foreach (ZakatTransaction::CATEGORIES as $category) {
-            /** @var \App\Models\ZakatTransaction|null $row */
+            /** @var ZakatTransaction|null $row */
             $row = $rows->get($category);
 
             $totalUang = (int) data_get($row, 'total_uang', 0);
@@ -114,8 +114,8 @@ final class RekapBuilder
         $rows = ZakatTransaction::query()
             ->valid()
             ->forPeriodOrYear($periodId ?? ($range['period_id'] ?? null), $year)
-            ->whereRaw("{$effectiveTimestamp} >= ?", [$start])
-            ->whereRaw("{$effectiveTimestamp} <= ?", [$end])
+            ->where(DB::raw($effectiveTimestamp), '>=', $start)
+            ->where(DB::raw($effectiveTimestamp), '<=', $end)
             ->select(
                 DB::raw(SqlDialect::dateExpression($effectiveTimestamp, 'day')),
                 DB::raw('COALESCE(SUM(nominal_uang), 0) as total_uang'),

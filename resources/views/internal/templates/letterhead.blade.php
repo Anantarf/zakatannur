@@ -72,13 +72,13 @@
                         <div class="ui-section-title text-sm">Upload Template Baru</div>
                         <div class="mt-1 text-xs text-slate-600">Hanya PDF. Ukuran maks 10MB.</div>
                     </div>
-                    <div class="p-5 text-slate-900">
-                        <form method="POST" action="{{ route('internal.templates.letterhead.store') }}" enctype="multipart/form-data" class="space-y-4">
+                    <div class="p-5 text-slate-900" x-data="{ hasFile: false, isSubmitting: false }">
+                        <form method="POST" action="{{ route('internal.templates.letterhead.store') }}" enctype="multipart/form-data" class="space-y-4" @submit="if(!hasFile) { $event.preventDefault(); return false; } isSubmitting = true">
                             @csrf
 
                             <div class="ui-settings-panel border-dashed border-brand-200 bg-brand-50/50">
                                 <label class="ui-form-label" for="file">File PDF</label>
-                                <input id="file" name="file" type="file" accept="application/pdf" class="ui-file-input" required />
+                                <input id="file" name="file" type="file" accept="application/pdf" class="ui-file-input w-full" required @change="hasFile = $event.target.files.length > 0" />
                                 <p class="mt-2 text-xs text-brand-700">Preview dulu, lalu aktifkan versi yang benar.</p>
                             </div>
 
@@ -86,8 +86,9 @@
                                 <p class="mb-3 text-xs font-semibold text-slate-500 sm:mb-0">Upload PDF, preview, lalu aktifkan.</p>
                                 <div class="flex flex-col-reverse gap-3 sm:flex-row sm:items-center">
                                     <a href="{{ route('dashboard') }}" class="ui-btn ui-btn-secondary w-full sm:w-auto">Kembali</a>
-                                    <button type="submit" class="ui-btn ui-btn-primary w-full sm:w-auto">
-                                        Upload
+                                    <button type="submit" class="ui-btn ui-btn-primary w-full sm:w-auto" :disabled="!hasFile || isSubmitting" :class="{'opacity-50 cursor-not-allowed': !hasFile}">
+                                        <span x-show="!isSubmitting">Upload</span>
+                                        <span x-show="isSubmitting" x-cloak>Mengunggah...</span>
                                     </button>
                                 </div>
                             </div>

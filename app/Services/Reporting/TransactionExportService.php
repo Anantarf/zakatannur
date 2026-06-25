@@ -6,6 +6,7 @@ use App\Models\ZakatTransaction;
 use App\Support\SqlDialect;
 use Carbon\Carbon;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\DB;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Style\Alignment;
 use PhpOffice\PhpSpreadsheet\Style\Border;
@@ -137,8 +138,8 @@ class TransactionExportService
                 ZakatTransaction::METHOD_UANG,
             ])
             ->valid()
-            ->whereRaw("{$effectiveTimestamp} >= ?", [$start])
-            ->whereRaw("{$effectiveTimestamp} <= ?", [$end])
+            ->where(DB::raw($effectiveTimestamp), '>=', $start)
+            ->where(DB::raw($effectiveTimestamp), '<=', $end)
             ->groupBy('no_transaksi')
             ->orderBy('sort_time', 'asc')
             ->get();

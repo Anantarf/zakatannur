@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Services\Chatbot\ChatbotOrchestrator;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Log;
@@ -17,7 +18,7 @@ class ChatbotStreamController
         $this->chatbot = $chatbot;
     }
 
-    public function stream(Request $request): StreamedResponse|Response
+    public function stream(Request $request): StreamedResponse|JsonResponse|Response
     {
         $request->validate([
             'message' => 'required|string|min:1|max:500',
@@ -42,7 +43,7 @@ class ChatbotStreamController
             try {
                 $response = $this->chatbot->handle($message, $context, $sessionId);
 
-                if ($response->statusCode === 200 && $response->status === 'success') {
+                if ($response->statusCode === 200) {
                     $reply = $response->reply;
                     $wordBuffer = '';
 
