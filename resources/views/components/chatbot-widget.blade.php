@@ -264,19 +264,22 @@
         </div>
 
         <div class="border-t border-slate-200 bg-white p-3">
-            <form @submit.prevent="sendMessage" class="relative flex items-center gap-2">
-                <input
-                    type="text"
+            <form @submit.prevent="sendMessage" class="relative flex items-end gap-2">
+                <textarea
+                    x-ref="chatInput"
                     x-model="input"
+                    @input="autoResize()"
+                    @keydown="handleKeydown($event)"
                     maxlength="500"
-                    class="flex-1 rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-sm text-slate-800 transition-all placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent disabled:opacity-60 disabled:cursor-not-allowed"
-                    placeholder="Tanya Zakky..."
+                    rows="1"
+                    class="flex-1 resize-none rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-sm text-slate-800 transition-all placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent disabled:opacity-60 disabled:cursor-not-allowed max-h-[120px] overflow-y-auto"
+                    style="min-height: 42px;"
+                    placeholder="Tanya Zakky... (Shift+Enter u/ baris baru)"
                     :disabled="isTyping"
-                    autocomplete="off"
-                >
+                ></textarea>
                 <button
                     type="submit"
-                    class="flex h-10 w-10 items-center justify-center rounded-lg bg-brand-600 text-white transition-all hover:bg-brand-700 active:scale-95 disabled:cursor-not-allowed disabled:opacity-50 flex-shrink-0 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:ring-offset-1"
+                    class="mb-0.5 flex h-10 w-10 items-center justify-center rounded-lg bg-brand-600 text-white transition-all hover:bg-brand-700 active:scale-95 disabled:cursor-not-allowed disabled:opacity-50 flex-shrink-0 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:ring-offset-1"
                     :disabled="isTyping || isInputEmpty"
                     aria-label="Kirim pesan"
                 >

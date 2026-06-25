@@ -21,11 +21,11 @@ export const buildNotificationMessage = (items, formatCategory, joinGrammaticall
     const sumBeras = items.reduce((sum, item) => sum + (item.beras || 0), 0);
 
     if (sumUang > 0) {
-        parts.push('Rp ' + sumUang.toLocaleString('id-ID'));
+        parts.push('Rp\u00A0' + sumUang.toLocaleString('id-ID'));
     }
 
     if (sumBeras > 0) {
-        parts.push(new Intl.NumberFormat('id-ID', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(sumBeras) + ' Kg');
+        parts.push(new Intl.NumberFormat('id-ID', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(sumBeras) + '\u00A0Kg');
     }
 
     return `Alhamdulillah! Diperoleh ${joinGrammatically(categories)}: ${parts.join(' dan ')}`;

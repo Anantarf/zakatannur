@@ -33,6 +33,49 @@ document.addEventListener('alpine:init', () => {
             return this.input.trim() === '';
         },
 
+        autoResize() {
+            if (!this.$refs.chatInput) return;
+            this.$refs.chatInput.style.height = 'auto';
+            this.$refs.chatInput.style.height = Math.min(this.$refs.chatInput.scrollHeight, 120) + 'px';
+        },
+
+        handleKeydown(e) {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                this.sendMessage();
+            }
+        },
+
+        playPopSound() {
+            try {
+                const AudioContext = window.AudioContext || window.webkitAudioContext;
+                if (!AudioContext) return;
+                
+                if (!window.zakkyAudioCtx) {
+                    window.zakkyAudioCtx = new AudioContext();
+                }
+                const ctx = window.zakkyAudioCtx;
+                if (ctx.state === 'suspended') ctx.resume();
+
+                const osc = ctx.createOscillator();
+                const gain = ctx.createGain();
+
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(600, ctx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(300, ctx.currentTime + 0.1);
+
+                gain.gain.setValueAtTime(0, ctx.currentTime);
+                gain.gain.linearRampToValueAtTime(0.1, ctx.currentTime + 0.01);
+                gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.1);
+
+                osc.connect(gain);
+                gain.connect(ctx.destination);
+
+                osc.start(ctx.currentTime);
+                osc.stop(ctx.currentTime + 0.1);
+            } catch (e) {}
+        },
+
         formatTime(iso) {
             if (!iso) {
                 return '';
@@ -54,7 +97,7 @@ document.addEventListener('alpine:init', () => {
             this.lastSeenMessageCount = this.messages.length;
 
             setTimeout(() => {
-                if (!this.isOpen && !localStorage.getItem('zakky_tooltip_dismissed')) {
+                if (!this.isOpen) {
                     this.showTooltip = true;
                 }
             }, 3000);
@@ -63,15 +106,15 @@ document.addEventListener('alpine:init', () => {
                 if (open) {
                     this.unreadBadge = 0;
                     this.lastSeenMessageCount = this.messages.length;
-                    this.$nextTick(() => this.scrollToBottom());
+                    this.$nextTick(() => this.scrollToBottom(false));
                     this.$nextTick(() => {
-                        const input = document.querySelector('[data-chatbot-widget] input[type="text"]');
+                        const input = document.querySelector('[data-chatbot-widget] textarea');
                         if (input && window.matchMedia('(pointer: fine)').matches) input.focus();
                     });
                 }
             });
             this.$watch('messages', (next) => {
-                this.$nextTick(() => this.scrollToBottom());
+                this.$nextTick(() => this.scrollToBottom(true));
                 this.saveHistory();
                 if (this.isOpen) {
                     this.lastSeenMessageCount = next.length;
@@ -126,6 +169,7 @@ document.addEventListener('alpine:init', () => {
             try {
                 const key = 'zakky_history_' + (this.sessionId || 'default');
                 localStorage.removeItem(key);
+                this.showTooltip = true;
             } catch (e) {
                 console.warn('Failed to clear chat history:', e);
             }
@@ -136,7 +180,7 @@ document.addEventListener('alpine:init', () => {
             if (this.isOpen) {
                 this.dismissTooltip();
                 this.$nextTick(() => {
-                    const input = document.querySelector('[data-chatbot-widget] input[type="text"]');
+                    const input = document.querySelector('[data-chatbot-widget] textarea');
                     if (input && window.matchMedia('(pointer: fine)').matches) input.focus();
                 });
             }
@@ -148,14 +192,16 @@ document.addEventListener('alpine:init', () => {
 
         dismissTooltip() {
             this.showTooltip = false;
-            localStorage.setItem('zakky_tooltip_dismissed', 'true');
         },
 
-        scrollToBottom() {
+        scrollToBottom(smooth = true) {
             if (!this.$refs.chatContainer) {
                 return;
             }
-            this.$refs.chatContainer.scrollTop = this.$refs.chatContainer.scrollHeight;
+            this.$refs.chatContainer.scrollTo({
+                top: this.$refs.chatContainer.scrollHeight,
+                behavior: smooth ? 'smooth' : 'auto'
+            });
         },
 
         async sendMessage() {
@@ -174,6 +220,9 @@ document.addEventListener('alpine:init', () => {
             const localAction = this.resolveLocalAction(userMessage);
             this.messages.push({ role: 'user', content: userMessage, createdAt: nowIso() });
             this.input = '';
+            this.$nextTick(() => {
+                if (this.$refs.chatInput) this.$refs.chatInput.style.height = 'auto';
+            });
 
             if (localAction) {
                 this.openTab(localAction);
@@ -225,6 +274,7 @@ document.addEventListener('alpine:init', () => {
                     this.conversationContext = this.sanitizeContext(data.context || {});
                     this.executeActions(data.actions || []);
                     this.isOnline = true;
+                    this.playPopSound();
                     return;
                 }
 
@@ -356,6 +406,7 @@ document.addEventListener('alpine:init', () => {
                 };
 
                 this.messages.push(botMessage);
+                let firstChunkPlayed = false;
 
                 while (true) {
                     const { done, value } = await reader.read();
@@ -369,8 +420,12 @@ document.addEventListener('alpine:init', () => {
                         if (line.startsWith('data: ')) {
                             const data = JSON.parse(line.slice(6));
                             if (data.chunk) {
+                                if (!firstChunkPlayed) {
+                                    this.playPopSound();
+                                    firstChunkPlayed = true;
+                                }
                                 botMessage.content += data.chunk;
-                                this.$nextTick(() => this.scrollToBottom());
+                                this.$nextTick(() => this.scrollToBottom(true));
                             } else if (data.error) {
                                 botMessage.isError = true;
                                 botMessage.isRetryable = data.retryable;

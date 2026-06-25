@@ -210,6 +210,36 @@ export const createPublicHomeApp = (config, chartService) => {
             });
         },
 
+        playPopSound() {
+            try {
+                const AudioContext = window.AudioContext || window.webkitAudioContext;
+                if (!AudioContext) return;
+                
+                if (!window.zakkyAudioCtx) {
+                    window.zakkyAudioCtx = new AudioContext();
+                }
+                const ctx = window.zakkyAudioCtx;
+                if (ctx.state === 'suspended') ctx.resume();
+
+                const osc = ctx.createOscillator();
+                const gain = ctx.createGain();
+
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(800, ctx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(300, ctx.currentTime + 0.1);
+
+                gain.gain.setValueAtTime(0, ctx.currentTime);
+                gain.gain.linearRampToValueAtTime(0.1, ctx.currentTime + 0.01);
+                gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.1);
+
+                osc.connect(gain);
+                gain.connect(ctx.destination);
+
+                osc.start(ctx.currentTime);
+                osc.stop(ctx.currentTime + 0.1);
+            } catch (e) {}
+        },
+
         async initRealtime() {
             const echo = await getEcho();
             if (!echo) {
@@ -227,6 +257,7 @@ export const createPublicHomeApp = (config, chartService) => {
                     this.refreshSummary();
                 }
 
+                this.playPopSound();
                 this.pushTransactionNotification(items);
             });
         },

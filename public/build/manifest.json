@@ -1,6 +1,6 @@
 {
   "resources/css/app.css": {
-    "file": "assets/app-BS8QqVjU.css",
+    "file": "assets/app-CS-NOwjs.css",
     "name": "app",
     "names": [
       "app.css"
@@ -9,7 +9,7 @@
     "isEntry": true
   },
   "resources/js/app.js": {
-    "file": "assets/app-BYHo9Evi.js",
+    "file": "assets/app-B38W3DX9.js",
     "name": "app",
     "src": "resources/js/app.js",
     "isEntry": true,
@@ -20,13 +20,13 @@
     ]
   },
   "resources/js/chatbot-widget.js": {
-    "file": "assets/chatbot-widget-CY2j6mjj.js",
+    "file": "assets/chatbot-widget-CGfcqpZf.js",
     "name": "chatbot-widget",
     "src": "resources/js/chatbot-widget.js",
     "isDynamicEntry": true
   },
   "resources/js/public-home.js": {
-    "file": "assets/public-home-D9OIPRp9.js",
+    "file": "assets/public-home-CCcq7-KM.js",
     "name": "public-home",
     "src": "resources/js/public-home.js",
     "isDynamicEntry": true,

@@ -71,6 +71,18 @@ Route::middleware(['auth', 'role:staff,admin,super_admin'])
 
             Route::get('/audit-logs', [AuditLogController::class, 'index'])->name('audit_logs.index');
             Route::get('/chatbot-analytics', [ChatbotAnalyticsController::class, 'index'])->name('chatbot_analytics.index');
+
+            Route::post('/test-pusher', function () {
+                $transaction = \App\Models\ZakatTransaction::first() ?? new \App\Models\ZakatTransaction([
+                    'id' => rand(90000, 99999),
+                    'no_transaksi' => 'TEST-' . time(),
+                    'category' => 'fitrah',
+                    'nominal_uang' => rand(50000, 100000),
+                    'jumlah_beras_kg' => 2.5
+                ]);
+                event(new \App\Events\ZakatTransactionCreated($transaction));
+                return back()->with('status', 'Event Pusher berhasil ditembakkan! Silakan cek tab/jendela halaman depan (publik).');
+            })->name('test_pusher');
         });
 
         Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');

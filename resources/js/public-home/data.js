@@ -100,12 +100,26 @@ export const createDataMethods = (config, chartService, animateValue = noopAnima
             this.notification.message = nextMessage;
             this.notification.show = true;
 
-            setTimeout(() => {
-                this.notification.show = false;
-                this.notification.processing = false;
-                setTimeout(() => this.processQueue(), 1000);
+            this.notification.timeoutId = setTimeout(() => {
+                this.dismissNotification();
             }, 7000);
         }, 1000);
+    },
+
+    dismissNotification() {
+        if (!this.notification.show) return;
+        
+        if (this.notification.timeoutId) {
+            clearTimeout(this.notification.timeoutId);
+            this.notification.timeoutId = null;
+        }
+        
+        this.notification.show = false;
+        
+        setTimeout(() => {
+            this.notification.processing = false;
+            this.processQueue();
+        }, 300);
     },
 
     async pollLatest() {
