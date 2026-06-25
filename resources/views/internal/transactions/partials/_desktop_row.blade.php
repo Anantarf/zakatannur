@@ -50,10 +50,7 @@
                     <x-review-status-badge :status="$t->review_status" />
                 </button>
             @else
-                <div class="flex flex-col items-center gap-1">
-                    <x-risk-level-badge :level="$t->risk_level" />
-                    <x-review-status-badge :status="$t->review_status" />
-                </div>
+                <x-risk-level-badge :level="$t->risk_level" />
             @endif
         </td>
     @endif
