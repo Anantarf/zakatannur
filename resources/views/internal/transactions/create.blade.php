@@ -110,9 +110,9 @@
 
             <!-- Unsaved Changes Modal (Light Confirmation) -->
             <template x-if="showUnsavedModal">
-                <div class="fixed inset-0 z-50 flex items-center justify-center" x-transition>
-                    <div class="absolute inset-0 bg-slate-900/40" @click="showUnsavedModal = false" x-transition></div>
-                    <div class="relative bg-white rounded-xl shadow-lg max-w-sm mx-4 p-5 z-10" x-transition>
+                <div class="fixed inset-0 z-50 flex items-center justify-center" x-transition:enter="transition ease-out duration-300" x-transition:leave="transition ease-in duration-200">
+                    <div class="absolute inset-0 bg-slate-900/40" @click="showUnsavedModal = false" x-transition:enter="transition ease-out duration-300" x-transition:leave="transition ease-in duration-200"></div>
+                    <div class="relative bg-white rounded-xl shadow-lg max-w-sm mx-4 p-5 z-10" x-transition:enter="transition ease-out duration-300 transform" x-transition:enter-start="opacity-0 scale-95" x-transition:enter-end="opacity-100 scale-100" x-transition:leave="transition ease-in duration-200 transform" x-transition:leave-start="opacity-100 scale-100" x-transition:leave-end="opacity-0 scale-95">
                         <h3 class="text-base font-semibold text-slate-900 mb-1">Perubahan belum disimpan</h3>
                         <p class="text-sm text-slate-500 mb-5">Anda akan keluar dari halaman ini.</p>
                         <div class="flex gap-2 justify-end">

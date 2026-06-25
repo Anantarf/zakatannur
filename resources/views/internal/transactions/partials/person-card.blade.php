@@ -15,7 +15,7 @@
                 <input type="checkbox" x-model="person.zakat.fitrah.active" class="h-4 w-4 rounded border-slate-300 text-brand-600 focus:ring-brand-500">
                 Zakat Fitrah
             </label>
-            <div x-show="person.zakat.fitrah.active" class="mt-3 space-y-3" x-collapse>
+            <div x-show="person.zakat.fitrah.active" class="mt-3 space-y-3" x-collapse x-transition:enter="transition ease-out duration-300" x-transition:leave="transition ease-in duration-200">
                 <div class="space-y-1">
                     <label class="ui-form-label-xs">Bentuk Zakat Fitrah</label>
                     <select x-model="person.zakat.fitrah.metode" class="w-full rounded-lg border-slate-200 text-xs shadow-sm focus:border-brand-500 focus:ring-brand-500">

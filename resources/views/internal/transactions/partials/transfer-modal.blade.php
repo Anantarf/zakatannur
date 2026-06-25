@@ -1,12 +1,14 @@
 <div x-show="show_tf_modal"
     class="fixed inset-0 z-[100] overflow-y-auto"
-    x-cloak>
+    x-cloak
+    x-transition:enter="transition ease-out duration-300"
+    x-transition:leave="transition ease-in duration-200">
     <div class="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:block sm:p-0">
-        <div class="fixed inset-0 bg-slate-900/60 transition-opacity" @click="show_tf_modal = false"></div>
+        <div class="fixed inset-0 bg-slate-900/60 transition-opacity" @click="show_tf_modal = false" x-transition:enter="transition ease-out duration-300" x-transition:leave="transition ease-in duration-200"></div>
 
         <span class="hidden sm:inline-block sm:align-middle sm:h-screen">&#8203;</span>
 
-        <div class="inline-block transform overflow-hidden rounded-card border border-slate-100 bg-white text-left align-bottom shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-2xl sm:align-middle">
+        <div class="inline-block transform overflow-hidden rounded-card border border-slate-100 bg-white text-left align-bottom shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-2xl sm:align-middle" x-transition:enter="transition ease-out duration-300 transform" x-transition:enter-start="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95" x-transition:enter-end="opacity-100 translate-y-0 sm:scale-100" x-transition:leave="transition ease-in duration-200 transform" x-transition:leave-start="opacity-100 translate-y-0 sm:scale-100" x-transition:leave-end="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95">
             <div class="flex items-center justify-between bg-brand-600 px-5 py-4">
                 <div class="flex items-center gap-3">
                     <div class="rounded-xl bg-white/20 p-2">

@@ -108,6 +108,32 @@
   animation: pulse-glow 2s infinite;
  }
 
+ /* Fade-in animation for error messages, validation feedback */
+ @keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+ }
+
+ .fade-in {
+  animation: fade-in 0.3s ease-out;
+ }
+
+ /* Hover lift effect for interactive cards */
+ .hover-lift {
+  @apply transition-all duration-200;
+ }
+
+ .hover-lift:hover {
+  @apply -translate-y-1 shadow-md;
+ }
+
+ /* Skeleton shimmer (consistent with skeleton component) */
+ .skeleton-shimmer {
+  background: linear-gradient(90deg, #f0f0f0 25%, #e5e5e5 37%, #f0f0f0 63%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+ }
+
 }
 
 /* Wide-screen table label: tampil hanya di > 1800px */

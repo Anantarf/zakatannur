@@ -1,5 +1,5 @@
 @if ($errors->any())
-    <div class="ui-alert ui-alert-error mb-6">
+    <div class="ui-alert ui-alert-error mb-6 fade-in">
         <div class="w-full">
             <div class="ui-alert-title text-red-700">
                 <svg xmlns="http://www.w3.org/2000/svg" class="ui-alert-icon" viewBox="0 0 20 20" fill="currentColor">

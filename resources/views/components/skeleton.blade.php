@@ -4,8 +4,8 @@
 ])
 
 @php
-    $baseClass = 'ui-skeleton animate-pulse bg-slate-200 rounded';
-    
+    $baseClass = 'ui-skeleton skeleton-shimmer rounded';
+
     $typeClasses = [
         'text' => 'h-4 w-full',
         'title' => 'h-6 w-3/4',
