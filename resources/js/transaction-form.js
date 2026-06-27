@@ -314,6 +314,27 @@ if (transactionFormConfig) {
 
             return false;
         },
+        handleSelectAllTransfers() {
+            const inputs = document.querySelectorAll('.muzakki-name-input');
+            let firstInvalid = null;
+
+            this.persons.forEach((person, index) => {
+                if (person.name.trim() === '' && inputs[index] && !firstInvalid) {
+                    firstInvalid = inputs[index];
+                }
+            });
+
+            if (firstInvalid) {
+                this.showFormNotice('Silakan isi nama muzakki terlebih dahulu sebelum mengaktifkan transfer.');
+                firstInvalid.focus();
+                return;
+            }
+
+            this.is_bank_transfer_global = true;
+            this.persons.forEach(p => Object.values(p.zakat).forEach(z => {
+                if(z.active && z.metode === 'uang') z.is_bank_transfer = true
+            }));
+        },
         handleTfGlobalChange() {
             if (this.is_bank_transfer_global) {
                 const inputs = document.querySelectorAll('.muzakki-name-input');

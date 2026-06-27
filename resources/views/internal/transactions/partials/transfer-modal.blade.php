@@ -55,7 +55,7 @@
                     <div x-show="txs.filter(t => t.metode === 'uang').length === 0" class="rounded-card border-2 border-dashed border-slate-200 bg-slate-50 px-6 py-10 text-center">
                         <svg class="mx-auto mb-3 h-10 w-10 text-slate-300" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 00-2 2H6a2 2 0 00-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" /></svg>
                         <p class="text-sm font-bold uppercase tracking-tight text-slate-500">Belum ada item uang</p>
-                        <p class="mt-1 text-[10px] font-bold uppercase text-slate-400">Isi nominal zakat terlebih dahulu</p>
+                        <p class="mt-1 text-[10px] font-bold uppercase text-slate-400">Transfer hanya berlaku untuk pembayaran uang. Isi nominal zakat (uang) terlebih dahulu.</p>
                     </div>
                 </div>
             </div>
@@ -64,7 +64,7 @@
                 <button @click="show_tf_modal = false" type="button" class="w-full rounded-button bg-brand-600 px-6 py-3 text-sm font-bold text-white transition-all hover:bg-brand-700 active:scale-[0.98] sm:w-auto">
                     Simpan
                 </button>
-                <button @click="is_bank_transfer_global = true; persons.forEach(p => Object.values(p.zakat).forEach(z => { if(z.active && z.metode === 'uang') z.is_bank_transfer = true }));" type="button" class="w-full rounded-button border border-slate-200 bg-white px-4 py-3 text-xs font-bold text-slate-600 transition-all hover:bg-slate-100 sm:w-auto">
+                <button @click="handleSelectAllTransfers()" type="button" class="w-full rounded-button border border-slate-200 bg-white px-4 py-3 text-xs font-bold text-slate-600 transition-all hover:bg-slate-100 sm:w-auto">
                     Pilih Semua
                 </button>
             </div>

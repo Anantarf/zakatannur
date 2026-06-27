@@ -32,16 +32,11 @@
             @if($t->total_uang > 0)
                 <div class="flex items-center justify-end gap-1 text-sm font-semibold text-slate-800">
                     {{ $t->total_uang_display }}
-                    @php
-                        $debugHasTransfer = $t->has_transfer;
-                        $debugIsTransfer = $t->is_transfer ?? 'undefined';
-                    @endphp
                     @if($t->has_transfer)
                         <x-transfer-badge />
                     @else
                         <x-cash-badge />
                     @endif
-                    <!-- DEBUG: has_transfer={{ $debugHasTransfer }}, is_transfer={{ $debugIsTransfer }} -->
                 </div>
             @endif
             @if($t->total_beras > 0)

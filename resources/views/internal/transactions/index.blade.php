@@ -112,13 +112,10 @@
                                 <th class="w-[1%] pl-3 pr-6 py-4 text-center sm:pl-5 sm:pr-8">Aksi</th>
                             </tr>
                         </thead>
+                        <tbody class="divide-y divide-slate-100/80">
                             @forelse ($transactions as $t)
-                                <tbody class="divide-y divide-slate-100/80" x-data="{ open: false }">
-                                    @include("internal.transactions.partials._desktop_row", ["t" => $t])
-                                </tbody>
+                                @include("internal.transactions.partials._desktop_row", ["t" => $t])
                             @empty
-                                <tbody class="divide-y divide-slate-100/80">
-                            </tbody>
                                 <tr>
                                     <td colspan="{{ $canViewRisk ? 9 : 8 }}" class="px-6 py-12 text-center">
                                         <div class="flex flex-col items-center">
@@ -132,7 +129,6 @@
                                     </td>
                                 </tr>
                             @endforelse
-
                         </tbody>
                     </table>
                 </div>
