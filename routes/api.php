@@ -28,4 +28,6 @@ Route::withoutMiddleware('throttle:api')->group(function () {
 
     Route::post('/chatbot/stream', [ChatbotStreamController::class, 'stream'])
         ->middleware('throttle:50,1');
+
+    Route::get('/autocomplete/data', [\App\Http\Controllers\Api\AutocompleteController::class, 'data']);
 });
