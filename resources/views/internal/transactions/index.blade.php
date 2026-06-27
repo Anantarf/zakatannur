@@ -275,29 +275,4 @@
         </form>
     </x-modal>
 
-    @push('scripts')
-    <script src="{{ asset('js/autocomplete.js') }}" type="module"></script>
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const searchInput = document.querySelector('input[name="q"]');
-            if (searchInput && window.AutocompleteMatcher) {
-                // Wrap input in autocomplete container
-                if (!searchInput.parentElement.classList.contains('autocomplete-wrapper')) {
-                    const wrapper = document.createElement('div');
-                    wrapper.className = 'autocomplete-wrapper';
-                    searchInput.parentNode.insertBefore(wrapper, searchInput);
-                    wrapper.appendChild(searchInput);
-                }
-
-                // Attach fuzzy matching to search
-                window.AutocompleteMatcher.attachInput(searchInput, {
-                    type: 'pembayar_name', // searches pembayar names
-                    minChars: 1,
-                    maxResults: 8,
-                    debounceMs: 200,
-                });
-            }
-        });
-    </script>
-    @endpush
 </x-app-layout>
