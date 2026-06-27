@@ -13,8 +13,20 @@ class AuditLogController extends Controller
     {
         $sortBy = $request->get('sort_by', 'created_at');
         $sortDir = $request->get('sort_dir', 'desc') === 'asc' ? 'asc' : 'desc';
+        $q = $request->input('q');
 
         $query = AuditLog::with('actorUser');
+
+        if ($q) {
+            $query->where(function($builder) use ($q) {
+                $builder->where('action', 'like', "%{$q}%")
+                        ->orWhere('ip', 'like', "%{$q}%")
+                        ->orWhere('details', 'like', "%{$q}%")
+                        ->orWhereHas('actorUser', function($userBuilder) use ($q) {
+                            $userBuilder->where('name', 'like', "%{$q}%");
+                        });
+            });
+        }
 
         if ($sortBy === 'petugas') {
             $query->leftJoin('users', 'audit_logs.actor_user_id', '=', 'users.id')
@@ -31,6 +43,6 @@ class AuditLogController extends Controller
         $latestLog = AuditLog::query()->latest('created_at')->first();
         $zakkyInsight = $zakkyInsightService->auditLogInsight();
 
-        return view('internal.audit_logs.index', compact('logs', 'sortBy', 'sortDir', 'totalLogs', 'latestLog', 'zakkyInsight'));
+        return view('internal.audit_logs.index', compact('logs', 'sortBy', 'sortDir', 'totalLogs', 'latestLog', 'zakkyInsight', 'q'));
     }
 }

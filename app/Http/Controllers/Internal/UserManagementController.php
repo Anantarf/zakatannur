@@ -19,8 +19,17 @@ class UserManagementController extends Controller
 
     public function index(Request $request)
     {
-        $users = User::query()
-            ->orderByRaw("CASE WHEN role = 'super_admin' THEN 1 WHEN role = 'admin' THEN 2 WHEN role = 'staff' THEN 3 ELSE 4 END")
+        $q = $request->input('q');
+        $query = User::query();
+
+        if ($q) {
+            $query->where(function($builder) use ($q) {
+                $builder->where('name', 'like', "%{$q}%")
+                        ->orWhere('username', 'like', "%{$q}%");
+            });
+        }
+
+        $users = $query->orderByRaw("CASE WHEN role = 'super_admin' THEN 1 WHEN role = 'admin' THEN 2 WHEN role = 'staff' THEN 3 ELSE 4 END")
             ->orderBy('name')
             ->paginate(20)
             ->appends($request->query());
@@ -28,6 +37,7 @@ class UserManagementController extends Controller
         return view('internal.users.index', [
             'users' => $users,
             'roleLabels' => User::ROLE_LABELS,
+            'q' => $q,
         ]);
     }
 

@@ -11,8 +11,8 @@
         </div>
     </x-slot>
 
-    <div class="py-6 sm:py-10">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
+    <div class="py-5 sm:py-8">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-4 sm:space-y-5">
             <x-zakky-insight
                 :tone="$zakkyInsight['tone']"
                 :label="$zakkyInsight['label']"
@@ -22,9 +22,23 @@
             />
 
             <div class="ui-card overflow-hidden shadow-md">
-                <div class="ui-card-header ui-card-header-slate">
-                    <div class="ui-section-accent h-6 w-2"></div>
-                    <h3 class="ui-card-header-title">Riwayat Aktivitas</h3>
+                <div class="border-b border-slate-100 bg-slate-50/50 p-4">
+                    <form method="GET" action="{{ route('internal.audit_logs.index') }}" class="flex w-full flex-col gap-2 sm:flex-row sm:items-center">
+                        <input type="text" name="q" value="{{ $q ?? '' }}" placeholder="Cari aktivitas, petugas, atau IP..." class="ui-input w-full sm:flex-1" />
+                        <div class="flex w-full flex-none items-center gap-2 sm:w-auto">
+                            <button type="submit" class="ui-btn ui-btn-secondary flex-1 sm:flex-none px-4 py-2.5">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                                </svg>
+                                Cari
+                            </button>
+                            @if($q ?? null)
+                                <a href="{{ route('internal.audit_logs.index') }}" class="ui-btn ui-btn-secondary flex-1 text-center sm:flex-none px-4 py-2.5" title="Reset Pencarian">
+                                    Reset
+                                </a>
+                            @endif
+                        </div>
+                    </form>
                 </div>
                 <div class="p-4 sm:p-6 text-slate-900">
 

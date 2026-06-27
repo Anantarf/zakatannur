@@ -111,15 +111,14 @@
                         </select>
                     </form>
                 </div>
-                <div class="p-4 sm:p-6">
-                    <p class="mb-4 text-sm leading-6 text-slate-500">Pantau penerimaan zakat harian dan lihat pergerakan setiap hari.</p>
+                <div class="px-4 pb-4 pt-3 sm:px-6 sm:pb-6 sm:pt-4">
                     @if (!empty($dashboardChartSourceNote))
-                        <div class="mb-4 rounded-2xl border border-slate-100 bg-slate-50 px-4 py-3 text-xs leading-relaxed text-slate-600">
+                        <div class="mb-3 rounded-xl border border-slate-100 bg-slate-50 px-4 py-2.5 text-xs leading-relaxed text-slate-600">
                             {{ $dashboardChartSourceNote }}
                         </div>
                     @endif
                     @if (!empty($dashboardChartRange['fallback_note']))
-                        <div class="mb-4 rounded-2xl border border-amber-100 bg-amber-50 px-4 py-3 text-xs leading-relaxed text-amber-800">
+                        <div class="mb-3 rounded-xl border border-amber-100 bg-amber-50 px-4 py-2.5 text-xs leading-relaxed text-amber-800">
                             {{ $dashboardChartRange['fallback_note'] }}
                         </div>
                     @endif

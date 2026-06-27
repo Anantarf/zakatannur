@@ -24,8 +24,8 @@
         </div>
     </x-slot>
 
-    <div class="py-6 sm:py-10">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
+    <div class="py-5 sm:py-8">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-4">
             @if (session('status'))
                 <div class="ui-alert ui-alert-success">
                     <svg xmlns="http://www.w3.org/2000/svg" class="ui-alert-icon text-brand-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -53,22 +53,30 @@
                 </div>
             @endif
 
-            <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
+            <div class="grid grid-cols-1 gap-3 md:grid-cols-3">
                 <x-ui-stat-card title="Total Akun" :value="$totalUsers" description="Jumlah akun yang tampil di daftar saat ini." />
                 <x-ui-stat-card title="Akses Anda" :value="$roleLabels[$currentUser->role] ?? ucfirst($currentUser->role)" description="Hak kelola mengikuti role yang sedang Anda pakai." tone="info" />
+                <x-info-box class="h-full" tone="info" title="Catatan Akses" message="Admin hanya boleh mengelola akun petugas. Akun sesama admin dan super admin tetap terlindungi dan tidak dapat diubah oleh admin lain." />
             </div>
 
-            <x-info-box tone="info" title="Catatan Akses" message="Admin hanya boleh mengelola akun petugas. Akun sesama admin dan super admin tetap terlindungi dan tidak dapat diubah oleh admin lain." />
-
-            <div class="ui-card overflow-hidden shadow-md">
-                <div class="ui-toolbar-soft xl:flex-row xl:items-start">
-                    <div class="max-w-full space-y-1 xl:max-w-[260px] xl:flex-none">
-                        <div class="ui-section-title">
-                            <div class="ui-section-accent"></div>
-                            <h3 class="font-semibold text-slate-800">Daftar Pengguna</h3>
+            <div class="ui-card overflow-hidden">
+                <div class="border-b border-slate-200 bg-slate-50/50 p-4">
+                    <form method="GET" action="{{ route('internal.users.index') }}" class="flex w-full flex-col gap-2 sm:flex-row sm:items-center">
+                        <input type="text" name="q" value="{{ $q ?? '' }}" placeholder="Cari nama atau username..." class="ui-input w-full sm:flex-1" />
+                        <div class="flex w-full flex-none items-center gap-2 sm:w-auto">
+                            <button type="submit" class="ui-btn ui-btn-secondary flex-1 sm:flex-none px-4 py-2.5">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                                </svg>
+                                Cari
+                            </button>
+                            @if($q ?? null)
+                                <a href="{{ route('internal.users.index') }}" class="ui-btn ui-btn-secondary flex-1 text-center sm:flex-none px-4 py-2.5" title="Reset Pencarian">
+                                    Reset
+                                </a>
+                            @endif
                         </div>
-                        <p class="text-sm leading-6 text-slate-500">Role ditampilkan dengan label operasional agar mudah dipahami.</p>
-                    </div>
+                    </form>
                 </div>
                 <div class="space-y-3 px-4 pb-4 pt-4 md:hidden">
                     @if (count($users) > 0)
@@ -77,7 +85,7 @@
                                 <div class="flex items-start justify-between gap-3">
                                     <div class="min-w-0">
                                         <div class="text-sm font-bold leading-tight text-slate-800">{{ $u->name }}</div>
-                                        <div class="mt-1 font-sans text-xs text-slate-500">{{ $u->username }}</div>
+                                        <div class="mt-1 font-sans text-xs font-medium text-slate-600">{{ $u->username }}</div>
                                     </div>
                                     <span class="ui-role-badge {{ $u->role === 'super_admin' ? 'ui-role-badge-super' : ($u->role === 'admin' ? 'ui-role-badge-admin' : 'ui-role-badge-staff') }}">
                                         {{ $roleLabels[$u->role] ?? ucfirst($u->role) }}
@@ -112,19 +120,19 @@
                 <div class="hidden overflow-x-auto w-full md:block">
                     <table class="min-w-full text-sm">
                         <thead>
-                            <tr class="border-b border-slate-100 bg-slate-50 text-left text-[11px] font-semibold uppercase tracking-[0.14em] text-slate-400 sm:text-xs">
+                            <tr class="border-b border-slate-200 bg-slate-50 text-left text-[11px] font-bold uppercase tracking-[0.14em] text-slate-600 sm:text-xs">
                                 <th class="px-6 py-4">Nama</th>
                                 <th class="px-6 py-4">Username</th>
                                 <th class="px-6 py-4">Role</th>
                                 <th class="px-6 py-4 text-center">Aksi</th>
                             </tr>
                         </thead>
-                        <tbody class="divide-y divide-slate-50">
+                        <tbody class="divide-y divide-slate-100">
                             @if (count($users) > 0)
                                 @foreach ($users as $u)
-                                <tr class="hover:bg-slate-50 transition-colors">
+                                <tr class="hover:bg-slate-50 transition-colors border-b border-slate-100">
                                     <td class="px-6 py-4 font-bold text-slate-800">{{ $u->name }}</td>
-                                    <td class="px-6 py-4 text-slate-500 font-sans text-xs">{{ $u->username }}</td>
+                                    <td class="px-6 py-4 font-medium text-slate-600 font-sans text-xs">{{ $u->username }}</td>
                                     <td class="px-6 py-4">
                                         <span class="ui-role-badge {{ $u->role === 'super_admin' ? 'ui-role-badge-super' : ($u->role === 'admin' ? 'ui-role-badge-admin' : 'ui-role-badge-staff') }}">
                                             {{ $roleLabels[$u->role] ?? ucfirst($u->role) }}
