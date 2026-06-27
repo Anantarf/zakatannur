@@ -15,7 +15,9 @@ class AutocompleteController extends Controller
             ? explode(',', $request->query('types'))
             : [];
 
-        $data = AutocompleteService::getAutocompleteData($types);
+        $category = $request->query('category');
+
+        $data = AutocompleteService::getAutocompleteData($types, $category);
 
         return response()->json($data);
     }
