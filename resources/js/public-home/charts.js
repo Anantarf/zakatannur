@@ -205,15 +205,17 @@ const buildChart = (canvas, type, config, palette) => {
                                     const diff = current - prev;
                                     let diffStr = '';
                                     if (diff > 0) {
-                                        diffStr = '↑ ' + (type === 'uang' ? new Intl.NumberFormat('id-ID').format(diff) : diff.toFixed(2) + ' Kg');
+                                        diffStr = '↑ ' + (type === 'uang' ? new Intl.NumberFormat('id-ID').format(Math.abs(diff)) : Math.abs(diff).toFixed(2) + ' Kg');
                                     } else if (diff < 0) {
                                         diffStr = '↓ ' + (type === 'uang' ? new Intl.NumberFormat('id-ID').format(Math.abs(diff)) : Math.abs(diff).toFixed(2) + ' Kg');
-                                    } else {
-                                        diffStr = '-';
                                     }
-                                    res.push('Selisih Harian: ' + diffStr);
+                                    if (diff === 0) {
+                                        res.push('', ' Stabil dibanding kemarin');
+                                    } else {
+                                        res.push('', ' ' + diffStr + ' dari kemarin');
+                                    }
                                 } else {
-                                    res.push('Selisih Harian: -');
+                                    // Tidak ada data kemarin
                                 }
                             }
                             return res;

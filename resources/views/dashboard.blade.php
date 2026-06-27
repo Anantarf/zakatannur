@@ -112,7 +112,7 @@
                     </form>
                 </div>
                 <div class="p-4 sm:p-6">
-                    <p class="mb-4 text-sm leading-6 text-slate-500">Pantau penerimaan zakat harian.</p>
+                    <p class="mb-4 text-sm leading-6 text-slate-500">Pantau penerimaan zakat harian dan lihat pergerakan setiap hari.</p>
                     @if (!empty($dashboardChartSourceNote))
                         <div class="mb-4 rounded-2xl border border-slate-100 bg-slate-50 px-4 py-3 text-xs leading-relaxed text-slate-600">
                             {{ $dashboardChartSourceNote }}

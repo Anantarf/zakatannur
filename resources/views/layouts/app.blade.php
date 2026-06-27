@@ -143,11 +143,10 @@
                                                     
                                                     if (diff === 0) return ['', ' Stabil dibanding kemarin'];
                                                     
-                                                    const sign = diff > 0 ? '+' : '';
-                                                    const trend = diff > 0 ? '↗ Naik' : '↘ Turun';
+                                                    const trend = diff > 0 ? '↑ Naik' : '↓ Turun';
                                                     return [
                                                         '',
-                                                        ` ${trend} ${sign}${new Intl.NumberFormat('id-ID').format(diff)} dari kemarin`
+                                                        ` ${trend} ${new Intl.NumberFormat('id-ID').format(Math.abs(diff))} dari kemarin`
                                                     ];
                                                 },
                                             },
