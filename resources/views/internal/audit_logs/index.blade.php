@@ -86,69 +86,94 @@
                     </div>
 
                     <div class="hidden overflow-x-auto w-full rounded-2xl border border-slate-200 md:block">
-                        <table class="w-full text-left text-sm font-medium text-slate-700">
+                        <table class="w-full text-left text-sm">
                             <thead>
                                 <tr class="border-b border-slate-200 bg-slate-50 text-slate-600 text-xs font-bold uppercase tracking-[0.14em]">
-                                    <th class="px-4 sm:px-6 py-4">
-                                        <a href="{{ route('internal.audit_logs.index', ['sort_by' => 'created_at', 'sort_dir' => ($sortBy === 'created_at' && $sortDir === 'desc') ? 'asc' : 'desc', 'page' => 1]) }}" class="flex items-center gap-1 hover:text-slate-700 transition-colors group">
+                                    <th class="px-4 sm:px-6 py-4 w-40">
+                                        <a href="{{ route('internal.audit_logs.index', ['sort_by' => 'created_at', 'sort_dir' => ($sortBy === 'created_at' && $sortDir === 'desc') ? 'asc' : 'desc', 'page' => 1]) }}" class="flex items-center gap-1 hover:text-slate-700 transition-colors">
                                             Waktu
                                             <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 transition-colors {{ $sortBy === 'created_at' ? 'text-brand-500' : 'text-slate-300' }} {{ $sortBy === 'created_at' && $sortDir === 'asc' ? 'rotate-180' : '' }}" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
                                             </svg>
                                         </a>
                                     </th>
-                                    <th class="px-4 sm:px-6 py-4">
-                                        <a href="{{ route('internal.audit_logs.index', ['sort_by' => 'petugas', 'sort_dir' => ($sortBy === 'petugas' && $sortDir === 'asc') ? 'desc' : 'asc', 'page' => 1]) }}" class="flex items-center gap-1 hover:text-slate-700 transition-colors group">
+                                    <th class="px-4 sm:px-6 py-4 flex-1">
+                                        <a href="{{ route('internal.audit_logs.index', ['sort_by' => 'petugas', 'sort_dir' => ($sortBy === 'petugas' && $sortDir === 'asc') ? 'desc' : 'asc', 'page' => 1]) }}" class="flex items-center gap-1 hover:text-slate-700 transition-colors">
                                             Petugas
                                             <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 transition-colors {{ $sortBy === 'petugas' ? 'text-brand-500' : 'text-slate-300' }} {{ $sortBy === 'petugas' && $sortDir === 'desc' ? 'rotate-180' : '' }}" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
                                             </svg>
                                         </a>
                                     </th>
-                                    <th class="px-4 sm:px-6 py-4">
-                                        <a href="{{ route('internal.audit_logs.index', ['sort_by' => 'action', 'sort_dir' => ($sortBy === 'action' && $sortDir === 'asc') ? 'desc' : 'asc', 'page' => 1]) }}" class="flex items-center gap-1 hover:text-slate-700 transition-colors group">
+                                    <th class="px-4 sm:px-6 py-4 w-48">
+                                        <a href="{{ route('internal.audit_logs.index', ['sort_by' => 'action', 'sort_dir' => ($sortBy === 'action' && $sortDir === 'asc') ? 'desc' : 'asc', 'page' => 1]) }}" class="flex items-center gap-1 hover:text-slate-700 transition-colors">
                                             Aksi
                                             <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 transition-colors {{ $sortBy === 'action' ? 'text-brand-500' : 'text-slate-300' }} {{ $sortBy === 'action' && $sortDir === 'desc' ? 'rotate-180' : '' }}" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
                                             </svg>
                                         </a>
                                     </th>
-                                    <th class="px-4 sm:px-6 py-4">Tabel</th>
-                                    <th class="px-4 sm:px-6 py-4">ID</th>
-                                    <th class="px-4 sm:px-6 py-4">Detail Perubahan</th>
+                                    <th class="px-4 sm:px-6 py-4 w-20 text-center">Detail</th>
                                 </tr>
                             </thead>
                             <tbody class="divide-y divide-slate-100">
                                 @if (count($logs) > 0)
                                     @foreach ($logs as $log)
-                                    <tr class="transition-colors hover:bg-slate-50">
-                                        <td class="px-6 py-4 font-sans text-xs text-slate-500">
-                                            {{ $log->created_at->timezone('Asia/Jakarta')->format('d/m/Y H:i:s') }}
-                                            <div class="mt-1 font-sans text-[10px] font-bold text-slate-300">WIB</div>
-                                        </td>
-                                        <td class="px-6 py-4">
-                                            <div class="flex flex-col">
-                                                <span class="font-bold text-slate-800">{{ $log->actorUser->name ?? 'System' }}</span>
-                                                <span class="text-[10px] text-slate-400 font-medium tracking-tight">{{ $log->ip }}</span>
-                                            </div>
-                                        </td>
-                                        <td class="px-6 py-4">
-                                            @include('internal.audit_logs.partials.action-badge', ['log' => $log])
-                                        </td>
-                                        <td class="px-6 py-4 text-xs font-bold text-slate-500">
-                                            {{ class_basename($log->subject_type) }}
-                                        </td>
-                                        <td class="px-6 py-4 text-xs font-sans text-slate-400">
-                                            {{ $log->subject_id ? '#' . substr($log->subject_id, 0, 8) . '...' : '-' }}
-                                        </td>
-                                        <td class="px-6 py-4">
-                                            @include('internal.audit_logs.partials.detail-panel', ['log' => $log])
-                                        </td>
-                                    </tr>
+                                    <tbody x-data="{ open: false }" class="border-b border-slate-100">
+                                        <tr class="transition-colors hover:bg-slate-50">
+                                            <td class="px-6 py-4">
+                                                <div class="flex flex-col gap-0.5">
+                                                    <span class="font-bold text-sm text-slate-800">{{ $log->created_at->timezone('Asia/Jakarta')->format('d/m/Y') }}</span>
+                                                    <span class="font-medium text-xs text-slate-600">{{ $log->created_at->timezone('Asia/Jakarta')->format('H:i:s') }}</span>
+                                                </div>
+                                            </td>
+                                            <td class="px-6 py-4">
+                                                <div class="flex flex-col gap-1">
+                                                    <span class="font-bold text-slate-800">{{ $log->actorUser->name ?? 'System' }}</span>
+                                                    <span class="text-xs text-slate-600 font-medium">{{ $log->ip }}</span>
+                                                </div>
+                                            </td>
+                                            <td class="px-6 py-4">
+                                                @include('internal.audit_logs.partials.action-badge', ['log' => $log])
+                                            </td>
+                                            <td class="px-6 py-4 text-center">
+                                                <button type="button" @click="open = !open" class="flex items-center justify-center gap-1 text-xs font-bold text-brand-600 hover:text-brand-700 transition-colors mx-auto">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 transform transition-transform" :class="open ? 'rotate-180' : ''" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3" />
+                                                    </svg>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                        @if ($log)
+                                        <tr x-show="open" x-transition x-cloak class="bg-slate-50/50">
+                                            <td colspan="4" class="px-6 py-4">
+                                                <div class="space-y-4">
+                                                    <div class="grid grid-cols-3 gap-4">
+                                                        <div class="bg-white rounded-lg border border-slate-200 p-3">
+                                                            <div class="text-xs font-semibold text-slate-500 uppercase tracking-[0.08em] mb-1">Tabel Terkena</div>
+                                                            <div class="text-sm font-bold text-slate-800">{{ class_basename($log->subject_type) }}</div>
+                                                        </div>
+                                                        <div class="bg-white rounded-lg border border-slate-200 p-3">
+                                                            <div class="text-xs font-semibold text-slate-500 uppercase tracking-[0.08em] mb-1">Record ID</div>
+                                                            <div class="text-sm font-mono text-slate-700">{{ $log->subject_id ?? '-' }}</div>
+                                                        </div>
+                                                        <div class="bg-white rounded-lg border border-slate-200 p-3">
+                                                            <div class="text-xs font-semibold text-slate-500 uppercase tracking-[0.08em] mb-1">Waktu Akurat</div>
+                                                            <div class="text-sm font-mono text-slate-700">{{ $log->created_at->timezone('Asia/Jakarta')->format('H:i:s') }}</div>
+                                                        </div>
+                                                    </div>
+                                                    <div>
+                                                        @include('internal.audit_logs.partials.detail-panel', ['log' => $log])
+                                                    </div>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        @endif
+                                    </tbody>
                                     @endforeach
                                 @else
                                     <tr>
-                                        <td colspan="6" class="px-6 py-12 text-center">
+                                        <td colspan="4" class="px-6 py-12 text-center">
                                             <div class="flex flex-col items-center">
                                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 text-slate-200 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414A1 1 0 0119 9.414V19a2 2 0 01-2 2z" />
