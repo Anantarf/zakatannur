@@ -415,8 +415,8 @@
   @apply font-semibold uppercase;
  }
 
- .ui-badge-risk-normal {
-  @apply border-brand-100 bg-brand-50 text-brand-700;
+ .ui-badge-risk-safe {
+  @apply border-blue-100 bg-blue-50 text-blue-700;
  }
 
  .ui-badge-risk-warning {

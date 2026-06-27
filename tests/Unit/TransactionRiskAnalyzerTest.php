@@ -38,7 +38,7 @@ class TransactionRiskAnalyzerTest extends TestCase
 
         $result = $analyzer->analyze($this->makeTx());
 
-        $this->assertSame(TransactionRiskReview::LEVEL_NORMAL, $result['risk_level']);
+        $this->assertSame(TransactionRiskReview::LEVEL_SAFE, $result['risk_level']);
         $this->assertSame(0, $result['risk_score']);
     }
 
@@ -48,7 +48,7 @@ class TransactionRiskAnalyzerTest extends TestCase
 
         $result = $analyzer->analyze($this->makeTx());
 
-        $this->assertSame(TransactionRiskReview::LEVEL_NORMAL, $result['risk_level']);
+        $this->assertSame(TransactionRiskReview::LEVEL_SAFE, $result['risk_level']);
         $this->assertSame(19, $result['risk_score']);
     }
 

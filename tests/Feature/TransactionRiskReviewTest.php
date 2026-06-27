@@ -32,8 +32,8 @@ class TransactionRiskReviewTest extends TestCase
         $review = TransactionRiskReview::query()->where('zakat_transaction_id', $transaction->id)->first();
 
         $this->assertNotNull($review);
-        $this->assertSame(TransactionRiskReview::LEVEL_NORMAL, $review->risk_level);
-        $this->assertSame(TransactionRiskReview::REVIEW_BELUM_DITINJAU, $review->review_status);
+        $this->assertSame(TransactionRiskReview::LEVEL_SAFE, $review->risk_level);
+        $this->assertSame(TransactionRiskReview::REVIEW_AMAN, $review->review_status);
     }
 
     public function test_update_transaction_refreshes_risk_review_analysis(): void
@@ -195,7 +195,7 @@ class TransactionRiskReviewTest extends TestCase
         $review = TransactionRiskReview::query()->where('zakat_transaction_id', $transaction->id)->firstOrFail();
 
         $this->assertSame(2026, $transaction->tahun_zakat);
-        $this->assertSame(TransactionRiskReview::LEVEL_NORMAL, $review->risk_level);
+        $this->assertSame(TransactionRiskReview::LEVEL_SAFE, $review->risk_level);
     }
 
     public function test_same_payer_different_beneficiary_is_not_marked_warning(): void
@@ -217,7 +217,7 @@ class TransactionRiskReviewTest extends TestCase
         $transaction = ZakatTransaction::query()->latest('id')->firstOrFail();
         $review = TransactionRiskReview::query()->where('zakat_transaction_id', $transaction->id)->firstOrFail();
 
-        $this->assertSame(TransactionRiskReview::LEVEL_NORMAL, $review->risk_level);
+        $this->assertSame(TransactionRiskReview::LEVEL_SAFE, $review->risk_level);
     }
 
     public function test_update_after_receipt_printed_creates_warning_review(): void
@@ -405,7 +405,7 @@ class TransactionRiskReviewTest extends TestCase
         $transaction = ZakatTransaction::query()->latest('id')->firstOrFail();
         $review = TransactionRiskReview::query()->where('zakat_transaction_id', $transaction->id)->firstOrFail();
 
-        $this->assertSame(TransactionRiskReview::LEVEL_NORMAL, $review->risk_level);
+        $this->assertSame(TransactionRiskReview::LEVEL_SAFE, $review->risk_level);
         $this->assertNotContains('infaq_outlier', $review->risk_flags ?? []);
     }
 
@@ -450,7 +450,7 @@ class TransactionRiskReviewTest extends TestCase
         $transaction = ZakatTransaction::query()->latest('id')->firstOrFail();
         $review = TransactionRiskReview::query()->where('zakat_transaction_id', $transaction->id)->firstOrFail();
 
-        $this->assertSame(TransactionRiskReview::LEVEL_NORMAL, $review->risk_level);
+        $this->assertSame(TransactionRiskReview::LEVEL_SAFE, $review->risk_level);
         $this->assertNotContains('infaq_outlier', $review->risk_flags ?? []);
     }
 
@@ -476,7 +476,7 @@ class TransactionRiskReviewTest extends TestCase
         TransactionRiskReview::query()->create([
             'zakat_transaction_id' => $txB->id,
             'group_no_transaksi' => $txB->no_transaksi,
-            'risk_level' => TransactionRiskReview::LEVEL_NORMAL,
+            'risk_level' => TransactionRiskReview::LEVEL_SAFE,
             'risk_score' => 0,
             'risk_flags' => [],
             'reasons' => [],

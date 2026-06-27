@@ -322,7 +322,7 @@
  }
 
  .public-nav-action {
-  @apply inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-[#d7e5df] bg-white/75 text-brand-700 shadow-sm transition hover:bg-[#dff3eb] hover:text-brand-800 sm:w-auto sm:justify-start sm:gap-2 sm:px-3 sm:py-2;
+  @apply inline-flex min-h-10 w-auto shrink-0 items-center justify-center rounded-full bg-[#e8f0ec] px-5 py-2 text-slate-700 shadow-sm transition-all hover:bg-white hover:text-slate-950 hover:shadow-md active:scale-95 sm:justify-start sm:gap-2;
  }
 
  .public-nav-mobile-tabs {

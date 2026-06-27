@@ -25,7 +25,7 @@ class TransactionReviewAssistantService
             }
 
             $analysis = $this->riskAnalyzer->analyze($transaction);
-            $reviewStatus = $analysis['risk_level'] === TransactionRiskReview::LEVEL_NORMAL
+            $reviewStatus = $analysis['risk_level'] === TransactionRiskReview::LEVEL_SAFE
                 ? TransactionRiskReview::REVIEW_AMAN
                 : TransactionRiskReview::REVIEW_BELUM_DITINJAU;
 
@@ -203,7 +203,7 @@ class TransactionReviewAssistantService
         return match ($level) {
             TransactionRiskReview::LEVEL_SUSPICIOUS => 3,
             TransactionRiskReview::LEVEL_WARNING => 2,
-            TransactionRiskReview::LEVEL_NORMAL => 1,
+            TransactionRiskReview::LEVEL_SAFE => 1,
             default => 0,
         };
     }
@@ -233,7 +233,7 @@ class TransactionReviewAssistantService
     {
         return match ($severity) {
             2 => TransactionRiskReview::LEVEL_WARNING,
-            1 => TransactionRiskReview::LEVEL_NORMAL,
+            1 => TransactionRiskReview::LEVEL_SAFE,
             default => null,
         };
     }
@@ -252,7 +252,7 @@ class TransactionReviewAssistantService
     {
         return match ($riskLevel) {
             TransactionRiskReview::LEVEL_WARNING => 'Transaksi ini perlu dicek ulang sebelum ditutup aman atau diteruskan ke tindak lanjut.',
-            TransactionRiskReview::LEVEL_NORMAL => 'Tidak ada sinyal risiko utama yang terdeteksi pada transaksi ini.',
+            TransactionRiskReview::LEVEL_SAFE => 'Tidak ada sinyal risiko utama yang terdeteksi pada transaksi ini.',
             default => 'Belum ada hasil analisis risiko untuk transaksi ini.',
         };
     }

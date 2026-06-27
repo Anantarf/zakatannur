@@ -40,10 +40,7 @@
                         :class="activeTab === 'beranda' ? 'opacity-100' : 'opacity-0 pointer-events-none'"
                         class="public-nav-action" title="MASUK">
                 @endauth
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 sm:h-3.5 sm:w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" />
-                    </svg>
-                    <span class="ml-2 hidden text-[10px] font-semibold tracking-[0.04em] sm:inline-block">Masuk</span>
+                    <span class="text-sm font-bold tracking-wide">Login</span>
                 @auth
                     </a>
                 @else

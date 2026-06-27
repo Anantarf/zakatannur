@@ -58,7 +58,7 @@
             <div class="ui-mobile-meta-item col-span-2">
                 <p class="ui-mobile-meta-label">Risiko</p>
                 <div class="mt-1">
-                    @if ($t->risk_level !== \App\Models\TransactionRiskReview::LEVEL_NORMAL)
+                    @if ($t->risk_level !== \App\Models\TransactionRiskReview::LEVEL_SAFE)
                         <button type="button" @click="open = !open" class="flex flex-col items-start gap-1 cursor-pointer hover:opacity-75 transition-opacity">
                             <x-risk-level-badge :level="$t->risk_level" />
                             <x-review-status-badge :status="$t->review_status" />
@@ -71,7 +71,7 @@
         @endif
     </div>
 
-    @if ($canViewRisk && $t->risk_level !== \App\Models\TransactionRiskReview::LEVEL_NORMAL)
+    @if ($canViewRisk && $t->risk_level !== \App\Models\TransactionRiskReview::LEVEL_SAFE)
     <div x-show="open" x-transition class="mt-3 pt-3 border-t border-amber-100 space-y-3">
         @if (!empty($t->risk_flags))
         <div class="flex flex-wrap gap-2">

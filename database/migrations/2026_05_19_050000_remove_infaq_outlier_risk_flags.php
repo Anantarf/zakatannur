@@ -29,7 +29,7 @@ return new class extends Migration
                         'risk_score' => $newScore,
                         'risk_level' => $newScore >= 20
                             ? TransactionRiskReview::LEVEL_WARNING
-                            : TransactionRiskReview::LEVEL_NORMAL,
+                            : TransactionRiskReview::LEVEL_SAFE,
                     ])->save();
                 }
             });

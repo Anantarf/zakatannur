@@ -10,7 +10,7 @@ class TransactionRiskReview extends Model
 {
     use HasFactory;
 
-    public const LEVEL_NORMAL = 'normal';
+    public const LEVEL_SAFE = 'safe';
     public const LEVEL_WARNING = 'warning';
     public const LEVEL_SUSPICIOUS = 'suspicious';
 
@@ -32,13 +32,13 @@ class TransactionRiskReview extends Model
     public const SCORE_SIGNIFICANT_NOMINAL_CHANGE = 35;
 
     public const LEVELS = [
-        self::LEVEL_NORMAL,
+        self::LEVEL_SAFE,
         self::LEVEL_WARNING,
         self::LEVEL_SUSPICIOUS,
     ];
 
     public const LEVEL_LABELS = [
-        self::LEVEL_NORMAL => 'Normal',
+        self::LEVEL_SAFE => 'Aman',
         self::LEVEL_WARNING => 'Warning',
         self::LEVEL_SUSPICIOUS => 'Suspicious',
     ];

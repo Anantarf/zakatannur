@@ -15,7 +15,7 @@
         </svg>
     SVG;
 
-    $profileAvatar = '<img src="' . asset('images/muslim.png') . '" alt="Avatar Zakky" class="h-full w-full object-cover">';
+    $profileAvatar = '<img src="' . asset('images/zakky-new.webp') . '" alt="Avatar Zakky" class="h-full w-full object-cover scale-125 translate-y-1">';
 @endphp
 
 <style>
@@ -45,26 +45,8 @@
     data-chatbot-widget
     x-data="chatbotWidget({ endpoint: '{{ url('/api/chatbot/message') }}', quickReplies: {{ json_encode($quickReplies) }} })"
     x-cloak
-    class="fixed bottom-4 right-4 z-50 sm:bottom-6 sm:right-6"
+    class="fixed bottom-4 right-4 z-50 sm:bottom-6 sm:right-6 flex flex-col items-end"
 >
-    <button
-        type="button"
-        @click="toggleChat()"
-        class="zakky-fab relative flex h-14 w-14 items-center justify-center rounded-full bg-brand-600 text-white shadow-lg transition-all duration-300 hover:bg-brand-700 hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-brand-500 focus:ring-offset-2 active:scale-95"
-        :class="isOpen ? 'scale-0 opacity-0 pointer-events-none' : 'scale-100 opacity-100'"
-        aria-label="Buka chat"
-    >
-        <span class="flex h-full w-full items-center justify-center overflow-hidden rounded-full">
-            {!! $profileAvatar !!}
-        </span>
-        <span
-            x-show="unreadBadge"
-            x-cloak
-            class="absolute -top-1 -right-1 z-20 flex h-5 min-w-[1.25rem] items-center justify-center rounded-full bg-red-500 px-1 text-[10px] font-bold text-white ring-2 ring-white shadow-md"
-            x-text="unreadBadge"
-        ></span>
-    </button>
-
     <!-- Tooltip CTA -->
     <div
         x-show="showTooltip && !isOpen"
@@ -75,7 +57,7 @@
         x-transition:leave="transition ease-in duration-300"
         x-transition:leave-start="translate-y-0 opacity-100"
         x-transition:leave-end="translate-y-2 opacity-0"
-        class="absolute bottom-[4.5rem] right-0 z-40 mb-2 w-64 origin-bottom-right"
+        class="relative z-40 mb-4 w-max origin-bottom-right"
     >
         <div class="relative rounded-2xl bg-brand-600 px-4 py-3 text-white shadow-xl ring-1 ring-brand-700/50">
             <!-- Close Button -->
@@ -89,21 +71,39 @@
                 <svg class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
             </button>
             
-            <div class="flex items-start gap-3 pr-4">
+            <div class="flex items-start gap-3 pr-6">
                 <!-- Avatar mini -->
-                <div class="mt-0.5 h-8 w-8 shrink-0 overflow-hidden rounded-full border border-brand-400/50 bg-brand-500">
+                <div class="mt-0.5 h-10 w-10 shrink-0 overflow-hidden rounded-full border border-brand-400/50 bg-brand-500">
                     {!! $profileAvatar !!}
                 </div>
                 <div>
                     <p class="text-sm font-bold leading-tight tracking-wide">Assalamu'alaikum!</p>
-                    <p class="mt-1 text-xs text-brand-100 leading-relaxed">Ada pertanyaan seputar Zakat? Tanya Zakky di sini 👇</p>
+                    <p class="mt-1 text-xs text-brand-100 leading-relaxed">Ada pertanyaan seputar Zakat?<br>Tanya Zakky di sini 👇</p>
                 </div>
             </div>
             
             <!-- Tail pointing to the button -->
-            <div class="absolute -bottom-2 right-6 h-4 w-4 rotate-45 rounded-sm bg-brand-600 shadow-[2px_2px_2px_rgba(0,0,0,0.05)] ring-1 ring-brand-700/50"></div>
+            <div class="absolute -bottom-[7px] right-8 z-10 h-4 w-4 rotate-45 rounded-br-sm bg-brand-600 shadow-[2px_2px_2px_rgba(0,0,0,0.05)]"></div>
         </div>
     </div>
+
+    <button
+        type="button"
+        @click="toggleChat()"
+        class="zakky-fab relative flex h-16 w-16 items-center justify-center rounded-full bg-brand-600 text-white shadow-lg transition-all duration-300 hover:bg-brand-700 hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-brand-500 focus:ring-offset-2 active:scale-95"
+        :class="isOpen ? 'scale-0 opacity-0 pointer-events-none' : 'scale-100 opacity-100'"
+        aria-label="Buka chat"
+    >
+        <span class="flex h-full w-full items-center justify-center overflow-hidden rounded-full">
+            {!! $profileAvatar !!}
+        </span>
+        <span
+            x-show="unreadBadge"
+            x-cloak
+            class="absolute -top-1 -right-1 z-20 flex h-5 min-w-[1.25rem] items-center justify-center rounded-full bg-red-500 px-1 text-[10px] font-bold text-white ring-2 ring-white shadow-md"
+            x-text="unreadBadge"
+        ></span>
+    </button>
 
     <div
         x-show="isOpen"

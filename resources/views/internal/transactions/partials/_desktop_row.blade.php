@@ -44,7 +44,7 @@
     </td>
     @if ($canViewRisk)
         <td class="whitespace-nowrap px-2 py-3 text-center sm:px-4">
-            @if ($t->risk_level !== \App\Models\TransactionRiskReview::LEVEL_NORMAL)
+            @if ($t->risk_level !== \App\Models\TransactionRiskReview::LEVEL_SAFE)
                 <button type="button" @click="open = !open" class="flex flex-col items-center gap-1 cursor-pointer hover:opacity-75 transition-opacity">
                     <x-risk-level-badge :level="$t->risk_level" />
                     <x-review-status-badge :status="$t->review_status" />
@@ -105,7 +105,7 @@
     </td>
 </tr>
 
-@if ($canViewRisk && $t->risk_level !== \App\Models\TransactionRiskReview::LEVEL_NORMAL)
+@if ($canViewRisk && $t->risk_level !== \App\Models\TransactionRiskReview::LEVEL_SAFE)
 <tr x-show="open" x-transition x-cloak class="bg-amber-50/50 border-b border-amber-100">
     <td :colspan="{{ $canViewRisk ? 9 : 8 }}" class="px-5 py-4">
         <div class="space-y-3">

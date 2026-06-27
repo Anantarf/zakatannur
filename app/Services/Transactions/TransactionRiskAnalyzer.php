@@ -39,6 +39,6 @@ class TransactionRiskAnalyzer
             return TransactionRiskReview::LEVEL_WARNING;
         }
 
-        return TransactionRiskReview::LEVEL_NORMAL;
+        return TransactionRiskReview::LEVEL_SAFE;
     }
 }
