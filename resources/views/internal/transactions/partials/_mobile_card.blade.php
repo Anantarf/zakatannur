@@ -46,6 +46,8 @@
                         <span class="text-sm font-semibold text-slate-800">{{ $t->total_uang_display }}</span>
                         @if($t->has_transfer)
                             <x-transfer-badge />
+                        @else
+                            <x-cash-badge />
                         @endif
                     </div>
                 @endif

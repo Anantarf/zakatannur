@@ -34,6 +34,8 @@
                     {{ $t->total_uang_display }}
                     @if($t->has_transfer)
                         <x-transfer-badge />
+                    @else
+                        <x-cash-badge />
                     @endif
                 </div>
             @endif

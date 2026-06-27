@@ -227,6 +227,11 @@ class ZakatTransaction extends Model
         return Attribute::get(fn() => \App\Support\Format::kg((float)($this->total_beras ?? $this->jumlah_beras_kg ?? 0)));
     }
 
+    protected function hasTransfer(): Attribute
+    {
+        return Attribute::get(fn() => (bool) $this->is_transfer);
+    }
+
     public function scopeFilter(Builder $query, array $filters): Builder
     {
         return $query

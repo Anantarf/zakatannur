@@ -98,7 +98,9 @@
                                                 <div class="flex items-center justify-end gap-1.5">
                                                     <div class="text-sm font-bold text-slate-800">{{ $t->total_uang_display }}</div>
                                                     @if($t->has_transfer)
-                                                        <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-semibold bg-brand-100 text-brand-700 border border-brand-200 uppercase">TF</span>
+                                                        <x-transfer-badge />
+                                                    @else
+                                                        <x-cash-badge />
                                                     @endif
                                                 </div>
                                             @endif
@@ -206,7 +208,9 @@
                                                 <div class="flex items-center justify-end gap-1">
                                                     <div class="text-sm font-semibold text-slate-800">{{ $t->total_uang_display }}</div>
                                                     @if($t->has_transfer)
-                                                        <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-semibold bg-brand-100 text-brand-700 border border-brand-200 uppercase">TF</span>
+                                                        <x-transfer-badge />
+                                                    @else
+                                                        <x-cash-badge />
                                                     @endif
                                                 </div>
                                             @endif
