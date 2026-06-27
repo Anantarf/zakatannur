@@ -99,17 +99,17 @@
                     <table class="min-w-full text-sm">
                         <thead>
                             <tr class="border-b border-slate-100 bg-slate-50 text-left text-[11px] font-semibold uppercase tracking-[0.14em] text-slate-400 sm:text-xs">
-                                <th class="px-3 py-3 sm:px-5">No. Transaksi</th>
-                                <th class="px-3 py-3 sm:px-5">Waktu</th>
-                                <th class="px-3 py-3 sm:px-5">Pembayar</th>
-                                <th class="px-2 py-3 text-center">Kategori</th>
-                                <th class="px-2 py-3 text-center">Bentuk</th>
-                                <th class="px-3 py-3 text-right sm:px-5">Total Nominal</th>
+                                <th class="px-3 py-4 sm:px-5">No. Transaksi</th>
+                                <th class="px-3 py-4 sm:px-5">Waktu</th>
+                                <th class="px-3 py-4 sm:px-5">Pembayar</th>
+                                <th class="px-2 py-4 text-center">Kategori</th>
+                                <th class="px-2 py-4 text-center">Bentuk</th>
+                                <th class="px-3 py-4 text-right sm:px-5">Total Nominal</th>
                                 @if ($canViewRisk)
-                                    <th class="px-2 py-3 text-center sm:px-4">Risiko</th>
+                                    <th class="px-2 py-4 text-center sm:px-4">Risiko</th>
                                 @endif
-                                <th class="px-3 py-3 text-center sm:px-5">Petugas</th>
-                                <th class="min-w-[120px] px-3 py-3 text-center">Aksi</th>
+                                <th class="px-3 py-4 text-center sm:px-5">Petugas</th>
+                                <th class="w-[1%] pl-3 pr-6 py-4 text-center sm:pl-5 sm:pr-8">Aksi</th>
                             </tr>
                         </thead>
                             @forelse ($transactions as $t)

@@ -2,31 +2,25 @@
     <input type="text" name="q" value="{{ $q ?? '' }}" placeholder="Cari nomor transaksi atau nama..." class="ui-input w-full sm:min-w-[260px] sm:flex-[1_1_280px] xl:max-w-[320px]" @input="clearTimeout(submitTimeout); submitTimeout = setTimeout(() => $el.closest('form').submit(), 400)" @keydown.enter="$el.closest('form').submit()" />
 
     <div class="relative w-full sm:min-w-[170px] sm:flex-[1_1_170px] xl:max-w-[190px]">
-        <select name="category" class="ui-select w-full appearance-none pr-10">
+        <select name="category" class="ui-select w-full">
             <option value="">Semua Kategori</option>
             @foreach ($categories ?? [] as $c)
                 <option value="{{ $c }}" @selected(($category ?? '') === $c)>{{ \App\Models\ZakatTransaction::CATEGORY_LABELS[$c] ?? strtoupper($c) }}</option>
             @endforeach
         </select>
-        <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-slate-400">
-            <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
-        </div>
     </div>
 
     <div class="relative w-full sm:min-w-[140px] sm:flex-[0.8_1_140px] xl:max-w-[150px]">
-        <select name="year" class="ui-select w-full appearance-none pr-10">
+        <select name="year" class="ui-select w-full">
             <option value="">Semua Tahun</option>
             @foreach ($years ?? [] as $y)
                 <option value="{{ $y }}" @selected((string) ($year ?? '') === (string) $y)>{{ $y }}</option>
             @endforeach
         </select>
-        <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-slate-400">
-            <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
-        </div>
     </div>
 
     <div class="relative w-full sm:min-w-[210px] sm:flex-[1_1_210px] xl:max-w-[240px]">
-        <select name="period_id" class="ui-select w-full appearance-none pr-10">
+        <select name="period_id" class="ui-select w-full">
             <option value="">Semua Periode</option>
             @foreach ($periods ?? [] as $period)
                 <option value="{{ $period->id }}" @selected((string) ($periodId ?? '') === (string) $period->id)>
@@ -34,9 +28,6 @@
                 </option>
             @endforeach
         </select>
-        <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-slate-400">
-            <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
-        </div>
     </div>
 
     <button type="submit" class="ui-btn ui-btn-secondary w-full sm:w-auto sm:flex-none">

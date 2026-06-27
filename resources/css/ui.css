@@ -245,7 +245,7 @@
  }
 
  .ui-select {
-  @apply rounded-button border border-slate-200 bg-white text-slate-700 transition-all duration-200 focus:border-brand-500 focus:ring-2 focus:ring-brand-400/50 focus:ring-offset-2 focus:shadow-lg;
+  @apply rounded-button border border-slate-200 bg-white text-slate-700 transition-all duration-200 focus:border-brand-500 focus:ring-2 focus:ring-brand-400/50 focus:ring-offset-2 focus:shadow-lg hover:border-slate-300 hover:bg-slate-50/50 cursor-pointer font-medium shadow-sm;
   padding: var(--pad-form) 1rem;
   font-size: var(--text-input);
  }

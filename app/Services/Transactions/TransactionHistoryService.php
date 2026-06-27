@@ -132,6 +132,7 @@ class TransactionHistoryService
 
         $purgeDays = (int) config('zakat.retention.purge_days', 30);
 
+        /** @var \Illuminate\Pagination\LengthAwarePaginator $groupSummaries */
         $groupSummaries->getCollection()->transform(function ($groupSummary) use ($purgeDays) {
             $deletedAt = $groupSummary->deleted_at
                 ? Carbon::parse($groupSummary->deleted_at)->setTimezone(config('zakat.timezone'))

@@ -17,7 +17,7 @@ class GroupedTransactionQueryService
     {
         $query = $onlyTrashed ? ZakatTransaction::onlyTrashed() : ZakatTransaction::query();
 
-        return $query->select([
+        $query->select([
             'no_transaksi',
             DB::raw('MAX(id) as id'),
             DB::raw('MAX(waktu_terima) as waktu_terima'),
@@ -31,9 +31,12 @@ class GroupedTransactionQueryService
             DB::raw(SqlDialect::stringAggregateDistinct('category', 'categories_list')),
             DB::raw(SqlDialect::stringAggregateDistinct('metode', 'methods_list')),
             DB::raw('COUNT(DISTINCT muzakki_id) as muzakki_total'),
+            DB::raw('MAX(is_transfer) as is_transfer'),
             DB::raw(SqlDialect::moneyTransferAggregate()),
             ...($onlyTrashed ? [DB::raw('MAX(deleted_at) as deleted_at')] : []),
         ]);
+
+        return $query;
     }
 
     public function make(bool $onlyTrashed = false): Builder
