@@ -22,8 +22,8 @@
         </div>
     </x-slot>
 
-    <div class="py-6 sm:py-10">
-        <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="py-4 sm:py-6">
+        <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 space-y-4">
             @if (session('status'))
                 <div class="ui-alert ui-alert-success mb-6">
                     <svg xmlns="http://www.w3.org/2000/svg" class="ui-alert-icon text-brand-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -35,80 +35,78 @@
 
             <x-form-errors />
 
-            <div class="ui-card overflow-hidden">
+            <div class="ui-card overflow-hidden shadow-md">
                 @if ($user)
-                    <div class="ui-toolbar-soft rounded-none">
-                        <div class="space-y-1">
-                            <div class="ui-label text-brand-700">Akun yang Diedit</div>
-                            <div class="ui-section-title">
-                                <h3 class="text-lg font-bold text-slate-900">{{ $user->name }}</h3>
-                            </div>
-                            <p class="text-sm text-slate-500">{{ '@' . $user->username }} · {{ $roleLabels[$user->role] ?? ucfirst($user->role) }}</p>
+                    <div class="flex items-center gap-3 border-b border-slate-100 bg-slate-50/50 px-4 py-3 sm:px-6">
+                        <div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-brand-100 text-sm font-bold uppercase text-brand-700">
+                            {{ substr($user->name, 0, 1) }}
+                        </div>
+                        <div>
+                            <div class="text-sm font-bold text-slate-700">{{ $user->name }}</div>
+                            <div class="text-xs font-medium text-slate-500">{{ '@' . $user->username }} &middot; {{ $roleLabels[$user->role] ?? ucfirst($user->role) }}</div>
                         </div>
                     </div>
                 @endif
-                <div class="ui-card-header ui-card-header-emerald">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="ui-card-header-icon text-brand-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                    </svg>
-                    <h3 class="ui-card-header-title text-brand-900">Data Pengguna</h3>
-                </div>
-                <form method="POST" action="{{ $user ? route('internal.users.update', ['user' => data_get($user, 'id')]) : route('internal.users.store') }}" class="flex flex-col">
-                    @csrf
-                    @if ($user)
-                        @method('PATCH')
-                    @endif
 
-                    <div class="space-y-5 p-6">
+                <div class="p-4 sm:p-5">
+                    <form method="POST" action="{{ $user ? route('internal.users.update', ['user' => data_get($user, 'id')]) : route('internal.users.store') }}" class="space-y-4">
+                        @csrf
+                        @if ($user)
+                            @method('PATCH')
+                        @endif
+
+                        <!-- Identitas Pengguna Section -->
                         <div>
-                            <label class="ui-form-label" for="name">Nama</label>
-                            <input id="name" name="name" type="text" value="{{ old('name', data_get($user, 'name', '')) }}" maxlength="{{ $nameMax }}" class="ui-input w-full" required />
-                            <x-input-error class="mt-2" :messages="$errors->get('name')" />
-                            <p class="mt-1 text-xs text-slate-500">Maksimal {{ $nameMax }} karakter.</p>
+                            <h3 class="mb-2 text-sm font-bold text-slate-800 border-b border-slate-100 pb-2">Identitas Pengguna</h3>
+                            <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                                <div>
+                                    <label class="ui-form-label" for="name">Nama Lengkap</label>
+                                    <input id="name" name="name" type="text" value="{{ old('name', data_get($user, 'name', '')) }}" maxlength="{{ $nameMax }}" class="ui-input w-full block" required />
+                                    <x-input-error class="mt-1" :messages="$errors->get('name')" />
+                                </div>
+
+                                <div>
+                                    <label class="ui-form-label" for="username">Username</label>
+                                    <input id="username" name="username" type="text" value="{{ old('username', data_get($user, 'username', '')) }}" maxlength="{{ $usernameMax }}" class="ui-input w-full block" required />
+                                    <x-input-error class="mt-1" :messages="$errors->get('username')" />
+                                </div>
+                            </div>
+
+                            <div class="mt-3 grid grid-cols-1 sm:grid-cols-2">
+                                <div>
+                                    <label class="ui-form-label" for="role">Role</label>
+                                    <select id="role" name="role" class="ui-select w-full block" required>
+                                        @foreach ($allowedRoles as $r)
+                                            <option value="{{ $r }}" @selected(old('role', data_get($user, 'role', '')) === $r)>{{ $roleLabels[$r] ?? ucfirst($r) }}</option>
+                                        @endforeach
+                                    </select>
+                                    <x-input-error class="mt-1" :messages="$errors->get('role')" />
+                                </div>
+                            </div>
                         </div>
 
+                        <!-- Keamanan & Password Section -->
                         <div>
-                            <label class="ui-form-label" for="username">Username</label>
-                            <input id="username" name="username" type="text" value="{{ old('username', data_get($user, 'username', '')) }}" maxlength="{{ $usernameMax }}" class="ui-input w-full" required />
-                            <x-input-error class="mt-2" :messages="$errors->get('username')" />
-                            <p class="mt-1 text-xs text-slate-500">Gunakan huruf, angka, atau garis bawah tanpa spasi.</p>
+                            <h3 class="mb-2 text-sm font-bold text-slate-800 border-b border-slate-100 pb-2">Keamanan & Password</h3>
+                            <div class="grid grid-cols-1 sm:grid-cols-2">
+                                <div>
+                                    <x-password-input
+                                        name="password"
+                                        :label="'Kata Sandi' . ($user ? ' (Opsional)' : '')"
+                                        hint="{{ $user ? 'Kosongkan jika tidak ingin ganti.' : '' }}"
+                                        :required="!$user" />
+                                </div>
+                            </div>
                         </div>
 
-                        <div>
-                            <label class="ui-form-label" for="role">Role</label>
-                            <select id="role" name="role" class="ui-select w-full" required>
-                                @foreach ($allowedRoles as $r)
-                                    <option value="{{ $r }}" @selected(old('role', data_get($user, 'role', '')) === $r)>{{ $roleLabels[$r] ?? ucfirst($r) }}</option>
-                                @endforeach
-                            </select>
-                            <x-input-error class="mt-2" :messages="$errors->get('role')" />
-                            @if (empty($allowedRoles))
-                                <p class="mt-1 text-xs text-slate-500 not-italic">Role tidak tersedia untuk akun ini.</p>
-                            @else
-                                <p class="mt-1 text-xs text-slate-500">Pilih role sesuai tanggung jawab operasional pengguna.</p>
-                            @endif
-                        </div>
-
-                        <x-password-input
-                            name="password"
-                            :label="'Kata Sandi' . ($user ? ' (opsional, isi jika ingin ganti)' : '')"
-                            hint="Minimal {{ $passwordMin }} karakter. {{ $user ? 'Kosongkan jika tidak ingin mengganti password.' : '' }}"
-                            :required="!$user" />
-                    </div>
-
-                    <div class="flex flex-col-reverse items-stretch gap-3 border-t border-slate-100 bg-slate-50 px-6 py-4 sm:flex-row sm:items-center sm:justify-between">
-                        <div class="flex flex-col-reverse gap-3 sm:flex-row sm:items-center">
-                            <a href="{{ route('internal.users.index') }}" class="ui-btn ui-btn-secondary w-full sm:w-auto">Batal</a>
+                        <div class="mt-4 flex flex-col-reverse sm:flex-row justify-end gap-3 pt-2">
+                            <a href="{{ route('internal.users.index') }}" class="ui-btn ui-btn-secondary w-full sm:w-auto text-center">Batal</a>
                             <button type="submit" class="ui-btn ui-btn-primary w-full sm:w-auto">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" />
-                                </svg>
                                 Simpan
                             </button>
                         </div>
-                        <p class="hidden text-xs font-semibold text-slate-500 sm:block">Pastikan role sesuai wewenang pengguna.</p>
-                    </div>
-                </form>
+                    </form>
+                </div>
             </div>
         </div>
     </div>

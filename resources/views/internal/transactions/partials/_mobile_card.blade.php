@@ -112,24 +112,19 @@
         <a class="ui-btn ui-btn-secondary px-3 py-3 text-xs" href="{{ route('internal.transactions.show', ['transaction' => $t->id]) }}">
             Lihat
         </a>
-        <a class="ui-btn ui-btn-accent px-3 py-3 text-xs" href="{{ route('internal.transactions.receipt', ['transaction' => $t->id]) }}" target="_blank" rel="noopener">
+        <a class="ui-btn ui-btn-secondary px-3 py-3 text-xs" href="{{ route('internal.transactions.receipt', ['transaction' => $t->id]) }}" target="_blank" rel="noopener">
             Cetak
         </a>
-
-        @can('update', $t)
-            <a class="ui-btn ui-btn-secondary px-3 py-3 text-xs border-amber-200 text-amber-700 hover:bg-amber-50" href="{{ route('internal.transactions.edit', ['transaction' => $t->id]) }}">
-                Ubah
-            </a>
-            <button type="button" @click="$dispatch('open-modal', 'trash-modal'); $dispatch('open-trash-modal', { id: {{ $t->id }}, no: '{{ $t->no_transaksi }}' })" class="ui-btn ui-btn-danger px-3 py-3 text-xs">
-                Hapus
-            </button>
-        @else
-            <button type="button" @click="$dispatch('open-modal', 'restricted-modal')" class="ui-btn ui-btn-secondary px-3 py-3 text-xs text-slate-400">
-                Ubah
-            </button>
-            <button type="button" @click="$dispatch('open-modal', 'restricted-modal')" class="ui-btn ui-btn-secondary px-3 py-3 text-xs text-slate-400">
-                Hapus
-            </button>
-        @endcan
     </div>
+
+    @can('update', $t)
+    <div class="mt-2 grid grid-cols-2 gap-2">
+        <a class="ui-btn ui-btn-secondary px-3 py-3 text-xs border-amber-200 text-amber-700 hover:bg-amber-50" href="{{ route('internal.transactions.edit', ['transaction' => $t->id]) }}">
+            Ubah
+        </a>
+        <button type="button" @click="$dispatch('open-modal', 'trash-modal'); $dispatch('open-trash-modal', { id: {{ $t->id }}, no: '{{ $t->no_transaksi }}' })" class="ui-btn ui-btn-danger px-3 py-3 text-xs">
+            Hapus
+        </button>
+    </div>
+    @endcan
 </article>

@@ -11,7 +11,7 @@
         </div>
     </x-slot>
 
-    <div class="pt-0 pb-4 sm:pt-0 sm:pb-6">
+    <div class="py-4 sm:py-6">
         <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 space-y-4">
             @if (session('status'))
                 <div class="ui-alert ui-alert-success mb-4">

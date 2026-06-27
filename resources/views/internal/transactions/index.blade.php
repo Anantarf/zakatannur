@@ -91,17 +91,15 @@
                     <table class="min-w-full text-sm">
                         <thead>
                             <tr class="border-b border-slate-200 bg-slate-50 text-left text-[11px] font-bold uppercase tracking-[0.14em] text-slate-600 sm:text-xs">
-                                <th class="px-3 py-4 sm:px-5">No. Transaksi</th>
-                                <th class="px-3 py-4 sm:px-5">Waktu</th>
-                                <th class="px-3 py-4 sm:px-5">Pembayar</th>
-                                <th class="px-2 py-4 text-center">Kategori</th>
-                                <th class="px-2 py-4 text-center">Bentuk</th>
-                                <th class="px-3 py-4 text-right sm:px-5">Total Nominal</th>
+                                <th class="px-3 py-4 sm:px-5 w-32">No. Transaksi</th>
+                                <th class="px-3 py-4 sm:px-5 w-32">Waktu</th>
+                                <th class="px-3 py-4 sm:px-5 flex-1">Pembayar</th>
+                                <th class="px-3 py-4 text-right sm:px-5 w-40">Total Nominal</th>
                                 @if ($canViewRisk)
-                                    <th class="px-2 py-4 text-center sm:px-4">Risiko</th>
+                                    <th class="px-2 py-4 text-center sm:px-4 w-20">Risiko</th>
                                 @endif
-                                <th class="px-3 py-4 text-center sm:px-5">Petugas</th>
-                                <th class="w-[1%] pl-3 pr-6 py-4 text-center sm:pl-5 sm:pr-8">Aksi</th>
+                                <th class="px-3 py-4 text-center sm:px-5 w-32">Petugas</th>
+                                <th class="px-3 py-4 text-center sm:px-5 w-32">Aksi</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-slate-100">
@@ -109,7 +107,7 @@
                                 @include("internal.transactions.partials._desktop_row", ["t" => $t])
                             @empty
                                 <tr>
-                                    <td colspan="{{ $canViewRisk ? 9 : 8 }}" class="px-6 py-12 text-center">
+                                    <td colspan="{{ $canViewRisk ? 7 : 6 }}" class="px-6 py-12 text-center">
                                         <div class="flex flex-col items-center">
                                             <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 text-slate-200 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />

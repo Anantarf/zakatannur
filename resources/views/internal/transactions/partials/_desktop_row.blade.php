@@ -2,30 +2,30 @@
     <td class="whitespace-nowrap px-3 py-3 sm:px-5">
         <span class="font-sans text-xs font-semibold text-slate-600 transition-colors group-hover:text-brand-700 bg-slate-100 group-hover:bg-brand-100/50 px-2 py-1 rounded-md">{!! \App\Support\Format::highlight($t->no_transaksi, $q) !!}</span>
     </td>
-    <td class="whitespace-nowrap px-3 py-3 text-[13px] text-slate-500 sm:px-5">
+    <td class="whitespace-nowrap px-3 py-3 sm:px-5">
         @if ($t->waktu_terima)
             <div class="leading-tight">
-                <div>{{ $t->waktu_terima->timezone('Asia/Jakarta')->format('d/m/Y') }}</div>
-                <div class="mt-1 text-[12px] text-slate-400">{{ $t->waktu_terima->timezone('Asia/Jakarta')->format('H:i') }}</div>
+                <div class="font-bold text-sm text-slate-800">{{ $t->waktu_terima->timezone('Asia/Jakarta')->format('d/m/Y') }}</div>
+                <div class="mt-0.5 text-xs font-medium text-slate-600">{{ $t->waktu_terima->timezone('Asia/Jakarta')->format('H:i') }}</div>
             </div>
         @else
             <div class="leading-tight">
-                <div>{{ $t->created_at->timezone('Asia/Jakarta')->format('d/m/Y') }}</div>
-                <div class="mt-1 text-[12px] text-slate-400">{{ $t->created_at->timezone('Asia/Jakarta')->format('H:i') }}</div>
+                <div class="font-bold text-sm text-slate-800">{{ $t->created_at->timezone('Asia/Jakarta')->format('d/m/Y') }}</div>
+                <div class="mt-0.5 text-xs font-medium text-slate-600">{{ $t->created_at->timezone('Asia/Jakarta')->format('H:i') }}</div>
             </div>
         @endif
     </td>
-    <td class="px-3 py-3 sm:px-5">
-        <div class="max-w-[180px] whitespace-normal break-words text-sm font-semibold leading-tight text-slate-700">{!! \App\Support\Format::highlight($t->pembayar_nama, $q) !!}</div>
+    <td class="px-3 py-3 sm:px-5 flex-1">
+        <div class="max-w-xs whitespace-normal break-words text-sm font-bold leading-tight text-slate-800">{!! \App\Support\Format::highlight($t->pembayar_nama, $q) !!}</div>
         @if($t->muzakki_total > 1)
-            <div class="mt-1 whitespace-nowrap text-[11px] text-slate-400">+ {{ $t->muzakki_total - 1 }} Muzakki Lainnya</div>
+            <div class="mt-1 whitespace-nowrap text-xs text-slate-600 font-medium">+ {{ $t->muzakki_total - 1 }} Muzakki Lainnya</div>
         @endif
-    </td>
-    <td class="px-2 py-3 text-center">
-        <x-zakat-category-tags :categories="$t->categories_list" />
-    </td>
-    <td class="px-2 py-3">
-        <x-transaction-method-tags :methods="$t->methods_list" class="mx-auto max-w-[90px]" />
+        @if($t->categories_list || $t->methods_list)
+            <div class="mt-2 flex flex-wrap gap-1">
+                <x-zakat-category-tags :categories="$t->categories_list" />
+                <x-transaction-method-tags :methods="$t->methods_list" />
+            </div>
+        @endif
     </td>
     <td class="whitespace-nowrap px-3 py-3 text-right sm:px-5">
         <div class="space-y-0.5">
@@ -56,53 +56,46 @@
             @endif
         </td>
     @endif
-    <td class="whitespace-nowrap px-3 py-3 text-center text-[13px] text-slate-500 sm:px-5">
-        <div class="flex flex-col items-center gap-1 text-center">
-            <span class="font-medium text-slate-700">{{ $t->petugas?->name ?? '-' }}</span>
-            <span class="inline-flex items-center justify-center rounded px-2 py-0.5 text-[11px] font-bold uppercase bg-brand-50 text-brand-700 border border-brand-100 whitespace-nowrap leading-tight text-center">
+    <td class="whitespace-nowrap px-3 py-3 text-center sm:px-5">
+        <div class="flex flex-col items-center gap-1">
+            <span class="font-medium text-slate-700 text-sm">{{ $t->petugas?->name ?? '-' }}</span>
+            <span class="inline-flex items-center justify-center rounded px-2 py-0.5 text-[11px] font-bold uppercase bg-brand-50 text-brand-700 border border-brand-100 whitespace-nowrap leading-tight">
                 {{ $t->shift_label }}
             </span>
         </div>
     </td>
-    <td class="w-[1%] whitespace-nowrap pl-3 pr-6 py-3 text-center sm:pl-5 sm:pr-8">
+    <td class="whitespace-nowrap px-3 py-3 text-center sm:px-5">
         <div class="flex items-center justify-center gap-1">
-            <a class="ui-icon-button ui-icon-button-slate px-1.5" href="{{ route('internal.transactions.show', ['transaction' => $t->id]) }}" title="Lihat" aria-label="Lihat transaksi">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
-                <span class="ui-table-action-label">Lihat</span>
+            <a class="ui-btn ui-btn-secondary px-3 py-1.5 text-xs" href="{{ route('internal.transactions.show', ['transaction' => $t->id]) }}" title="Lihat">
+                Lihat
             </a>
-
-            @can('update', $t)
-                <a class="ui-icon-button ui-icon-button-amber px-1.5" href="{{ route('internal.transactions.edit', ['transaction' => $t->id]) }}" title="Ubah" aria-label="Ubah transaksi">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
-                    <span class="ui-table-action-label">Ubah</span>
-                </a>
-            @else
-                <button type="button" @click="$dispatch('open-modal', 'restricted-modal')" class="ui-icon-button ui-icon-button-disabled px-1.5" title="Ubah Terbatas" aria-label="Ubah terbatas">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
-                    <span class="ui-table-action-label">Ubah</span>
-                </button>
-            @endcan
-
-            <a class="ui-icon-button ui-icon-button-blue px-1.5" href="{{ route('internal.transactions.receipt', ['transaction' => $t->id]) }}" target="_blank" rel="noopener" title="Cetak Tanda Terima" aria-label="Cetak tanda terima">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" /></svg>
-                <span class="ui-table-action-label">Cetak</span>
+            <a class="ui-btn ui-btn-secondary px-3 py-1.5 text-xs" href="{{ route('internal.transactions.receipt', ['transaction' => $t->id]) }}" target="_blank" rel="noopener" title="Cetak">
+                Cetak
             </a>
-
-            @can('update', $t)
-                <button type="button" @click="$dispatch('open-modal', 'trash-modal'); $dispatch('open-trash-modal', { id: {{ $t->id }}, no: '{{ $t->no_transaksi }}' })" class="ui-icon-button ui-icon-button-danger px-1.5" title="Hapus" aria-label="Hapus transaksi">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+            <div class="relative group">
+                <button type="button" class="ui-btn ui-btn-secondary px-2 py-1.5 text-xs" title="Opsi lainnya">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M12 8c1.1 0 2-0.9 2-2s-0.9-2-2-2-2 0.9-2 2 0.9 2 2 2zm0 2c-1.1 0-2 0.9-2 2s0.9 2 2 2 2-0.9 2-2-0.9-2-2-2zm0 6c-1.1 0-2 0.9-2 2s0.9 2 2 2 2-0.9 2-2-0.9-2-2-2z"/>
                     </svg>
-                    <span class="ui-table-action-label">Hapus</span>
                 </button>
-            @else
-                <button type="button" @click="$dispatch('open-modal', 'restricted-modal')" class="ui-icon-button ui-icon-button-disabled px-1.5" title="Hapus Terbatas" aria-label="Hapus terbatas">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                    </svg>
-                    <span class="ui-table-action-label">Hapus</span>
-                </button>
-            @endcan
+                <div class="absolute right-0 mt-1 hidden group-hover:block bg-white border border-slate-200 rounded-lg shadow-lg z-10 min-w-[140px]">
+                    @can('update', $t)
+                        <a href="{{ route('internal.transactions.edit', ['transaction' => $t->id]) }}" class="block px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 first:rounded-t-lg">
+                            Ubah
+                        </a>
+                        <button type="button" @click="$dispatch('open-modal', 'trash-modal'); $dispatch('open-trash-modal', { id: {{ $t->id }}, no: '{{ $t->no_transaksi }}' })" class="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 last:rounded-b-lg border-t border-slate-200">
+                            Hapus
+                        </button>
+                    @else
+                        <button type="button" @click="$dispatch('open-modal', 'restricted-modal')" class="block w-full text-left px-4 py-2 text-sm text-slate-400 hover:bg-slate-50 first:rounded-t-lg">
+                            Ubah (Terbatas)
+                        </button>
+                        <button type="button" @click="$dispatch('open-modal', 'restricted-modal')" class="block w-full text-left px-4 py-2 text-sm text-slate-400 hover:bg-red-50 last:rounded-b-lg border-t border-slate-200">
+                            Hapus (Terbatas)
+                        </button>
+                    @endcan
+                </div>
+            </div>
         </div>
     </td>
 </tr>
