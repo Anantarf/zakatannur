@@ -1,7 +1,7 @@
-<form method="GET" action="{{ route('internal.transactions.index') }}" class="flex w-full flex-col items-stretch gap-2 sm:flex-row sm:flex-wrap sm:items-center xl:justify-end" x-data="{ submitTimeout: null }" @submit.prevent>
-    <input type="text" name="q" value="{{ $q ?? '' }}" placeholder="Cari nomor transaksi atau nama..." class="ui-input w-full sm:min-w-[260px] sm:flex-[1_1_280px] xl:max-w-[320px]" @input="clearTimeout(submitTimeout); submitTimeout = setTimeout(() => $el.closest('form').submit(), 400)" @keydown.enter="$el.closest('form').submit()" />
+<form method="GET" action="{{ route('internal.transactions.index') }}" class="flex w-full flex-col flex-wrap items-center gap-2 sm:flex-row" x-data="{ submitTimeout: null }" @submit.prevent>
+    <input type="text" name="q" value="{{ $q ?? '' }}" placeholder="Cari nomor transaksi atau nama..." class="ui-input w-full sm:min-w-[240px] sm:flex-[1_1_240px]" @input="clearTimeout(submitTimeout); submitTimeout = setTimeout(() => $el.closest('form').submit(), 400)" @keydown.enter="$el.closest('form').submit()" />
 
-    <div class="relative w-full sm:min-w-[170px] sm:flex-[1_1_170px] xl:max-w-[190px]">
+    <div class="relative w-full sm:min-w-[150px] sm:flex-[0_1_150px]">
         <select name="category" class="ui-select w-full">
             <option value="">Semua Kategori</option>
             @foreach ($categories ?? [] as $c)
@@ -10,7 +10,7 @@
         </select>
     </div>
 
-    <div class="relative w-full sm:min-w-[140px] sm:flex-[0.8_1_140px] xl:max-w-[150px]">
+    <div class="relative w-full sm:min-w-[130px] sm:flex-[0_1_130px]">
         <select name="year" class="ui-select w-full">
             <option value="">Semua Tahun</option>
             @foreach ($years ?? [] as $y)
@@ -19,7 +19,7 @@
         </select>
     </div>
 
-    <div class="relative w-full sm:min-w-[210px] sm:flex-[1_1_210px] xl:max-w-[240px]">
+    <div class="relative w-full sm:min-w-[180px] sm:flex-[0_1_180px]">
         <select name="period_id" class="ui-select w-full">
             <option value="">Semua Periode</option>
             @foreach ($periods ?? [] as $period)
@@ -30,16 +30,18 @@
         </select>
     </div>
 
-    <button type="submit" class="ui-btn ui-btn-secondary w-full sm:w-auto sm:flex-none">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-        </svg>
-        Terapkan
-    </button>
+    <div class="flex w-full flex-none items-center gap-2 sm:w-auto">
+        <button type="submit" class="ui-btn ui-btn-secondary flex-1 sm:flex-none">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            </svg>
+            Terapkan
+        </button>
 
-    @if (($q ?? null) || ($category ?? null) || ($year ?? null) || ($periodId ?? null))
-        <a href="{{ route('internal.transactions.index') }}" class="ui-btn ui-btn-secondary w-full sm:w-auto sm:flex-none">
-            Reset
-        </a>
-    @endif
+        @if (($q ?? null) || ($category ?? null) || ($year ?? null) || ($periodId ?? null))
+            <a href="{{ route('internal.transactions.index') }}" class="ui-btn ui-btn-secondary flex-1 text-center sm:flex-none">
+                Reset
+            </a>
+        @endif
+    </div>
 </form>

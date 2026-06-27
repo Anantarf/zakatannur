@@ -63,15 +63,7 @@
 
             {{-- Transactions Table --}}
             <div class="ui-card overflow-hidden">
-                <div class="ui-toolbar-soft xl:flex-row xl:items-start">
-                    <div class="max-w-full space-y-1 xl:max-w-[260px] xl:flex-none">
-                        <div class="ui-section-title">
-                            <div class="ui-section-accent"></div>
-                            <h3 class="font-semibold text-slate-800">Daftar Transaksi</h3>
-                        </div>
-                        <p class="text-sm leading-6 text-slate-500">Filter dan aksi cepat per transaksi.</p>
-                    </div>
-
+                <div class="border-b border-slate-100 bg-slate-50/50 p-4">
                     @include('internal.transactions.partials.history-filters')
                 </div>
 

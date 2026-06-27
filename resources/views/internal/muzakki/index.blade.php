@@ -59,25 +59,19 @@
 
             {{-- Table --}}
             <div class="ui-card overflow-hidden shadow-md">
-                <div class="ui-toolbar-soft">
-                    <div class="flex items-center gap-2">
-                        <div class="ui-section-accent h-6 w-2"></div>
-                        <h3 class="ui-section-title">Daftar Muzakki</h3>
-                    </div>
-
-                    <form method="GET" action="{{ route('internal.muzakki.index') }}" class="flex w-full flex-col items-stretch gap-2 sm:w-auto sm:flex-row sm:items-center">
-                        <input type="text" name="q" value="{{ $q }}" placeholder="Cari nama/alamat..." class="ui-input w-full sm:min-w-[200px]" />
-                        <div class="flex items-center justify-end gap-2 shrink-0">
-                            <button type="submit" class="ui-btn ui-btn-secondary px-3 py-2.5 text-slate-600">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <div class="border-b border-slate-100 bg-slate-50/50 p-4">
+                    <form method="GET" action="{{ route('internal.muzakki.index') }}" class="flex w-full flex-col gap-2 sm:flex-row sm:items-center">
+                        <input type="text" name="q" value="{{ $q }}" placeholder="Cari nama/alamat..." class="ui-input w-full sm:flex-1" />
+                        <div class="flex w-full flex-none items-center gap-2 sm:w-auto">
+                            <button type="submit" class="ui-btn ui-btn-secondary flex-1 sm:flex-none px-4 py-2.5">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                                 </svg>
+                                Cari
                             </button>
                             @if($q)
-                                <a href="{{ route('internal.muzakki.index') }}" class="ui-icon-button ui-icon-button-danger" title="Reset">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
-                                    </svg>
+                                <a href="{{ route('internal.muzakki.index') }}" class="ui-btn ui-btn-secondary flex-1 text-center sm:flex-none px-4 py-2.5" title="Reset Pencarian">
+                                    Reset
                                 </a>
                             @endif
                         </div>
