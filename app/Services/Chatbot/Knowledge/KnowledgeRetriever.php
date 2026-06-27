@@ -60,13 +60,20 @@ class KnowledgeRetriever
 
     private function searchViaEmbeddings(string $message, array $entries, float $threshold = 0.45): array
     {
+        if (empty(trim($message))) {
+            \Illuminate\Support\Facades\Log::warning('KnowledgeRetriever: empty message for semantic search');
+            return [];
+        }
+
         $messageEmbedding = $this->embeddingsProvider->getEmbedding($message);
         if (!$messageEmbedding) {
+            \Illuminate\Support\Facades\Log::warning('KnowledgeRetriever: embedding generation failed', ['message_length' => strlen($message)]);
             return [];
         }
 
         $knowledgeEmbeddings = $this->embeddingsCache->getCachedEmbeddings();
         if (empty($knowledgeEmbeddings)) {
+            \Illuminate\Support\Facades\Log::warning('KnowledgeRetriever: no cached embeddings available');
             return [];
         }
 

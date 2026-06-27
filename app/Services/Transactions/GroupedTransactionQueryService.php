@@ -31,7 +31,7 @@ class GroupedTransactionQueryService
             DB::raw(SqlDialect::stringAggregateDistinct('category', 'categories_list')),
             DB::raw(SqlDialect::stringAggregateDistinct('metode', 'methods_list')),
             DB::raw('COUNT(DISTINCT muzakki_id) as muzakki_total'),
-            DB::raw('MAX(is_transfer) as is_transfer'),
+            DB::raw("MAX(CASE WHEN metode = 'uang' THEN is_transfer ELSE 0 END) as is_transfer"),
             DB::raw(SqlDialect::moneyTransferAggregate()),
             ...($onlyTrashed ? [DB::raw('MAX(deleted_at) as deleted_at')] : []),
         ]);

@@ -5,7 +5,7 @@
                 <h4 class="text-sm font-bold uppercase text-slate-900">
                     {{ \App\Models\ZakatTransaction::CATEGORY_LABELS[$item['category']] ?? strtoupper($item['category']) }}
                 </h4>
-                <span class="rounded-full bg-slate-100 px-3 py-1 font-bold text-slate-600" style="font-size: var(--text-caption);">
+                <span class="rounded-full bg-slate-100 px-3 py-1 text-xs font-bold text-slate-600">
                     {{ number_format($item['jumlah_transaksi']) }} trx
                 </span>
             </div>
@@ -42,10 +42,10 @@
 </div>
 
 <div class="hidden overflow-x-auto md:block">
-    <table class="min-w-full sm:text-sm" style="font-size: var(--text-eyebrow);">
+    <table class="min-w-full text-sm">
         <thead>
-            <tr class="border-b border-slate-100 bg-slate-50 text-left font-semibold uppercase text-slate-400 sm:text-xs" style="font-size: var(--text-caption); letter-spacing: var(--tracking-caption);">
-                <th class="px-3 py-4 sm:px-6 sm:py-4 text-left">Kategori</th>
+            <tr class="border-b border-slate-100 bg-slate-50 text-left text-xs font-semibold uppercase tracking-wider text-slate-500 sm:text-sm">
+                <th class="px-3 py-4 text-left sm:px-6 sm:py-4">Kategori</th>
                 <th class="px-3 py-4 sm:px-6 sm:py-4 text-center">Total Transaksi</th>
                 <th class="px-3 py-4 sm:px-6 sm:py-4 text-right">Total Uang</th>
                 <th class="px-3 py-4 sm:px-6 sm:py-4 text-right">Total Beras</th>
@@ -64,8 +64,8 @@
             @endforeach
         </tbody>
         <tfoot>
-            <tr class="border-t-2 border-brand-100 bg-brand-50/60">
-                <td class="px-3 py-4 font-bold text-brand-900 sm:px-6 sm:text-sm" style="font-size: var(--text-body-sm);">GRAND TOTAL</td>
+            <tr class="border-t-2 border-brand-100 bg-brand-50/60 text-sm sm:text-base">
+                <td class="px-3 py-4 font-bold text-brand-900 sm:px-6">GRAND TOTAL</td>
                 <td class="px-3 py-4 text-center font-bold text-brand-900 sm:px-6">{{ number_format($payload['totals']['jumlah_transaksi']) }}</td>
                 <td class="whitespace-nowrap px-3 py-4 text-right font-bold text-brand-900 sm:px-6">{{ $payload['totals']['total_uang_display'] }}</td>
                 <td class="whitespace-nowrap px-3 py-4 text-right font-bold text-brand-900 sm:px-6">{{ $payload['totals']['total_beras_kg_display'] }}</td>
