@@ -85,7 +85,7 @@ if (transactionFormConfig) {
         shift: transactionFormConfig.shift,
         submitting: false,
         formNotice: '',
-        is_transfer_global: false,
+        is_bank_transfer_global: false,
         show_tf_modal: false,
         showUnsavedModal: false,
         pendingNavigation: null,
@@ -112,7 +112,7 @@ if (transactionFormConfig) {
                 a: this.pembayar_address,
                 ph: this.pembayar_phone,
                 s: this.shift,
-                tg: this.is_transfer_global,
+                tg: this.is_bank_transfer_global,
                 txs: this.txs,
             });
         },
@@ -315,7 +315,7 @@ if (transactionFormConfig) {
             return false;
         },
         handleTfGlobalChange() {
-            if (this.is_transfer_global) {
+            if (this.is_bank_transfer_global) {
                 const inputs = document.querySelectorAll('.muzakki-name-input');
                 let firstInvalid = null;
 
@@ -326,7 +326,7 @@ if (transactionFormConfig) {
                 });
 
                 if (firstInvalid) {
-                    this.is_transfer_global = false;
+                    this.is_bank_transfer_global = false;
                     firstInvalid.reportValidity();
                     firstInvalid.scrollIntoView({ behavior: 'smooth', block: 'center' });
                     return;
@@ -336,14 +336,14 @@ if (transactionFormConfig) {
                 this.persons.forEach((person) => {
                     Object.values(person.zakat).forEach((zakat) => {
                         if (zakat.active && zakat.metode === 'uang') {
-                            zakat.is_transfer = true;
+                            zakat.is_bank_transfer = true;
                         }
                     });
                 });
             } else {
                 this.persons.forEach((person) => {
                     Object.values(person.zakat).forEach((zakat) => {
-                        zakat.is_transfer = false;
+                        zakat.is_bank_transfer = false;
                     });
                 });
             }
@@ -353,8 +353,8 @@ if (transactionFormConfig) {
                 this.persons.forEach((person) => {
                     if (person.zakat) {
                         Object.values(person.zakat).forEach((zakat) => {
-                            if (zakat.is_transfer) {
-                                this.is_transfer_global = true;
+                            if (zakat.is_bank_transfer) {
+                                this.is_bank_transfer_global = true;
                             }
                         });
                     }
@@ -373,10 +373,10 @@ if (transactionFormConfig) {
                             id: index + 1000,
                             name,
                             zakat: {
-                                fitrah: { active: false, metode: 'uang', is_custom: false, is_transfer: false, nominal: '' },
-                                fidyah: { active: false, metode: 'uang', is_custom: false, is_transfer: false, hari: '', nominal: '' },
-                                mal: { active: false, metode: 'uang', is_transfer: false, nominal: '' },
-                                infaq: { active: false, metode: 'uang', is_transfer: false, nominal: '' },
+                                fitrah: { active: false, metode: 'uang', is_custom: false, is_bank_transfer: false, nominal: '' },
+                                fidyah: { active: false, metode: 'uang', is_custom: false, is_bank_transfer: false, hari: '', nominal: '' },
+                                mal: { active: false, metode: 'uang', is_bank_transfer: false, nominal: '' },
+                                infaq: { active: false, metode: 'uang', is_bank_transfer: false, nominal: '' },
                             },
                         };
                         this.persons.push(personMap[name]);
@@ -388,9 +388,9 @@ if (transactionFormConfig) {
                         zakat.active = true;
                         zakat.metode = item.metode || 'uang';
                         zakat.id = item.id || null;
-                        zakat.is_transfer = !!item.is_transfer;
-                        if (zakat.is_transfer) {
-                            this.is_transfer_global = true;
+                        zakat.is_bank_transfer = !!item.is_bank_transfer;
+                        if (zakat.is_bank_transfer) {
+                            this.is_bank_transfer_global = true;
                         }
                         if (category === 'fidyah') {
                             zakat.hari = item.hari || '';
@@ -478,10 +478,10 @@ if (transactionFormConfig) {
                 id: Date.now(),
                 name: '',
                 zakat: {
-                    fitrah: { active: true, metode: 'uang', is_custom: false, is_transfer: false, nominal: '' },
-                    fidyah: { active: false, metode: 'uang', is_custom: false, is_transfer: false, hari: '', nominal: '' },
-                    mal: { active: false, metode: 'uang', is_transfer: false, nominal: '' },
-                    infaq: { active: false, metode: 'uang', is_transfer: false, nominal: '' },
+                    fitrah: { active: true, metode: 'uang', is_custom: false, is_bank_transfer: false, nominal: '' },
+                    fidyah: { active: false, metode: 'uang', is_custom: false, is_bank_transfer: false, hari: '', nominal: '' },
+                    mal: { active: false, metode: 'uang', is_bank_transfer: false, nominal: '' },
+                    infaq: { active: false, metode: 'uang', is_bank_transfer: false, nominal: '' },
                 },
             });
         },
@@ -525,7 +525,7 @@ if (transactionFormConfig) {
                             nominal_uang: zakat.metode !== 'beras' ? (isCustom ? value : null) : null,
                             jumlah_beras_kg: zakat.metode === 'beras' ? (isCustom ? value : null) : null,
                             is_custom: isCustom,
-                            is_transfer: zakat.is_transfer || false,
+                            is_bank_transfer: zakat.is_bank_transfer || false,
                         });
                     }
                 });
@@ -565,8 +565,8 @@ if (transactionFormConfig) {
                 return;
             }
 
-            if (this.is_transfer_global) {
-                const hasTransferItem = this.txs.some((tx) => tx.is_transfer);
+            if (this.is_bank_transfer_global) {
+                const hasTransferItem = this.txs.some((tx) => tx.is_bank_transfer);
                 if (!hasTransferItem) {
                     event.preventDefault();
                     this.showFormNotice('Metode transfer sudah diaktifkan, tetapi item yang dibayar via transfer belum dipilih. Silakan tentukan item transfer terlebih dahulu.');

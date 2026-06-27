@@ -61,8 +61,8 @@
                         <template x-if="tx.is_custom">
                             <input type="hidden" :name="`items[${i}][is_custom]`" value="1">
                         </template>
-                        <template x-if="tx.is_transfer">
-                            <input type="hidden" :name="`items[${i}][is_transfer]`" value="1">
+                        <template x-if="tx.is_bank_transfer">
+                            <input type="hidden" :name="`items[${i}][is_bank_transfer]`" value="1">
                         </template>
                     </div>
                 </template>
@@ -137,10 +137,10 @@
                 'id' => 1,
                 'name' => '',
                 'zakat' => [
-                    'fitrah' => ['active' => false, 'metode' => 'uang', 'is_custom' => false, 'is_transfer' => false, 'nominal' => ''],
-                    'fidyah' => ['active' => false, 'metode' => 'uang', 'is_custom' => false, 'is_transfer' => false, 'hari' => '', 'nominal' => ''],
-                    'mal' => ['active' => false, 'metode' => 'uang', 'is_transfer' => false, 'nominal' => ''],
-                    'infaq' => ['active' => false, 'metode' => 'uang', 'is_transfer' => false, 'nominal' => '']
+                    'fitrah' => ['active' => false, 'metode' => 'uang', 'is_custom' => false, 'is_bank_transfer' => false, 'nominal' => ''],
+                    'fidyah' => ['active' => false, 'metode' => 'uang', 'is_custom' => false, 'is_bank_transfer' => false, 'hari' => '', 'nominal' => ''],
+                    'mal' => ['active' => false, 'metode' => 'uang', 'is_bank_transfer' => false, 'nominal' => ''],
+                    'infaq' => ['active' => false, 'metode' => 'uang', 'is_bank_transfer' => false, 'nominal' => '']
                 ]
             ]
         ]);

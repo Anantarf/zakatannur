@@ -17,8 +17,8 @@
                         </svg>
                     </div>
                     <div>
-                        <h3 class="text-lg font-bold leading-none text-white">Pilih Item Transfer</h3>
-                        <p class="mt-1 text-[10px] font-bold uppercase tracking-[0.14em] text-brand-100">Hanya item uang</p>
+                        <h3 class="text-lg font-bold leading-none text-white">Transfer Bank</h3>
+                        <p class="mt-1 text-[10px] font-bold uppercase tracking-[0.14em] text-brand-100">Pilih zakat yang dibayar via transfer</p>
                     </div>
                 </div>
                 <button @click="show_tf_modal = false" class="text-white/80 hover:text-white transition-colors">
@@ -35,22 +35,18 @@
                                 <span class="text-xs font-bold uppercase tracking-tight text-slate-700" x-text="person.name || '(Tanpa Nama)'"></span>
                             </div>
 
-                            <div class="grid grid-cols-1 gap-2 pb-3 sm:grid-cols-2">
+                            <div class="space-y-2">
                                 <template x-for="(label, cat) in {'fitrah': 'Zakat Fitrah', 'fidyah': 'Fidyah', 'mal': 'Zakat Mal', 'infaq': 'Infaq' }">
-                                    <div x-show="person.zakat[cat].active && person.zakat[cat].metode === 'uang'"
-                                        class="relative group">
-                                        <label class="flex cursor-pointer items-center gap-3 rounded-card border-2 p-3 transition-all"
-                                            :class="person.zakat[cat].is_transfer ? 'border-brand-500 bg-brand-50 shadow-sm' : 'border-slate-100 bg-slate-50 hover:border-slate-200'">
-                                            <input type="checkbox" x-model="person.zakat[cat].is_transfer" class="h-5 w-5 rounded-lg border-slate-300 text-brand-600 transition-all focus:ring-brand-500">
-                                            <div class="flex-1">
-                                                <p class="text-[11px] font-bold uppercase tracking-tight text-slate-800" x-text="label"></p>
-                                                <p class="text-[10px] font-bold text-slate-500" x-text="'Rp ' + getEffectiveNominal(person, cat)"></p>
-                                            </div>
-                                            <div x-show="person.zakat[cat].is_transfer" class="text-brand-600">
-                                                <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" /></svg>
+                                    <template x-if="person.zakat[cat].active && person.zakat[cat].metode === 'uang'">
+                                        <label class="flex cursor-pointer items-center gap-3 rounded-lg border-2 p-3 transition-all"
+                                            :class="person.zakat[cat].is_bank_transfer ? 'border-brand-500 bg-brand-50' : 'border-slate-200 bg-white hover:border-brand-200'">
+                                            <input type="checkbox" x-model="person.zakat[cat].is_bank_transfer" class="h-4 w-4 rounded border-slate-300 text-brand-600">
+                                            <div class="flex-1 min-w-0">
+                                                <p class="text-sm font-semibold text-slate-800" x-text="label"></p>
+                                                <p class="text-xs text-slate-500 mt-0.5" x-text="'Rp ' + getEffectiveNominal(person, cat)"></p>
                                             </div>
                                         </label>
-                                    </div>
+                                    </template>
                                 </template>
                             </div>
                         </div>
@@ -68,8 +64,8 @@
                 <button @click="show_tf_modal = false" type="button" class="w-full rounded-button bg-brand-600 px-6 py-3 text-sm font-bold text-white transition-all hover:bg-brand-700 active:scale-[0.98] sm:w-auto">
                     Simpan
                 </button>
-                <button @click="is_transfer_global = true; persons.forEach(p => Object.values(p.zakat).forEach(z => { if(z.active && z.metode === 'uang') z.is_transfer = true }));" type="button" class="w-full rounded-button border border-slate-200 bg-white px-4 py-3 text-xs font-bold text-slate-600 transition-all hover:bg-slate-100 sm:w-auto">
-                    Pilih Semua (TF)
+                <button @click="is_bank_transfer_global = true; persons.forEach(p => Object.values(p.zakat).forEach(z => { if(z.active && z.metode === 'uang') z.is_bank_transfer = true }));" type="button" class="w-full rounded-button border border-slate-200 bg-white px-4 py-3 text-xs font-bold text-slate-600 transition-all hover:bg-slate-100 sm:w-auto">
+                    Pilih Semua
                 </button>
             </div>
         </div>
