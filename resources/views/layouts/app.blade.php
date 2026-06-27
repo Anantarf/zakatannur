@@ -106,14 +106,26 @@
                                             borderRadius: 6,
                                             padding: { top: 3, bottom: 3, left: 6, right: 6 },
                                             font: { family: "'Plus Jakarta Sans', sans-serif", weight: '700', size: 10 },
+                                            formatter: (value) => new Intl.NumberFormat('id-ID').format(value) + ' Transaksi',
                                         }
                                     }]
                                 },
                                 options: {
                                     responsive: true,
                                     maintainAspectRatio: false,
-                                    interaction: { mode: 'index', intersect: false },
-                                    animation: { duration: 900, easing: 'easeOutQuart' },
+                                    interaction: { mode: 'index', intersect: false, axis: 'x' },
+                                    animation: { 
+                                        duration: 1200, 
+                                        easing: 'easeOutQuart',
+                                        delay: (context) => {
+                                            let delay = 0;
+                                            if (context.type === 'data' && context.mode === 'default' && !context.dropped) {
+                                                delay = context.dataIndex * 60;
+                                                context.dropped = true;
+                                            }
+                                            return delay;
+                                        }
+                                    },
                                     layout: { padding: { top: 36, right: 18, bottom: 8, left: 4 } },
                                     plugins: {
                                         legend: { display: false },

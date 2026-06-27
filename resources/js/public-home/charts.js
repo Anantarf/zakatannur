@@ -145,8 +145,19 @@ const buildChart = (canvas, type, config, palette) => {
         options: {
             responsive: true,
             maintainAspectRatio: false,
-            interaction: { mode: 'index', intersect: false },
-            animation: { duration: 1100, easing: 'easeOutQuart' },
+            interaction: { mode: 'index', intersect: false, axis: 'x' },
+            animation: { 
+                duration: 1200, 
+                easing: 'easeOutQuart',
+                delay: (context) => {
+                    let delay = 0;
+                    if (context.type === 'data' && context.mode === 'default' && !context.dropped) {
+                        delay = context.dataIndex * 60;
+                        context.dropped = true;
+                    }
+                    return delay;
+                }
+            },
             layout: { padding: { top: 40, right: 20, bottom: 8, left: 4 } },
             scales: {
                 y: {

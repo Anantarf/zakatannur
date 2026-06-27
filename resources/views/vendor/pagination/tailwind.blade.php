@@ -24,17 +24,17 @@
 
         <div class="hidden flex-1 sm:flex sm:items-center sm:justify-between">
             <div>
-                <p class="text-sm leading-5 text-slate-500">
+                <p class="text-sm leading-5 text-slate-700 font-medium">
                     Menampilkan
                     @if ($paginator->firstItem())
-                        <span class="font-bold text-slate-800">{{ $paginator->firstItem() }}</span>
+                        <span class="font-bold text-slate-900">{{ $paginator->firstItem() }}</span>
                         sampai
-                        <span class="font-bold text-slate-800">{{ $paginator->lastItem() }}</span>
+                        <span class="font-bold text-slate-900">{{ $paginator->lastItem() }}</span>
                     @else
                         {{ $paginator->count() }}
                     @endif
                     dari
-                    <span class="font-bold text-slate-800">{{ $paginator->total() }}</span>
+                    <span class="font-bold text-slate-900">{{ $paginator->total() }}</span>
                     hasil
                 </p>
             </div>

@@ -8,10 +8,10 @@
 
 @php
     $toneClass = match ($tone) {
-        'warning' => 'border-rose-200 bg-rose-50/70 text-rose-950',
-        'attention' => 'border-amber-200 bg-amber-50/70 text-amber-950',
-        'success' => 'border-emerald-100 bg-emerald-50/60 text-emerald-950',
-        default => 'border-emerald-100 bg-emerald-50/60 text-slate-800',
+        'warning' => 'border-rose-200 bg-white text-rose-950',
+        'attention' => 'border-amber-200 bg-white text-amber-950',
+        'success' => 'border-emerald-200 bg-white text-emerald-950',
+        default => 'border-emerald-200 bg-white text-slate-800',
     };
 
     $iconClass = match ($tone) {

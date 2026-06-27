@@ -51,6 +51,16 @@
             @if ($errors->any())
                 <x-form-errors />
             @endif
+            
+            @if ($canViewRisk && !empty($zakkyAnomalyInsight['message']))
+                <x-zakky-insight
+                    :tone="$zakkyAnomalyInsight['tone']"
+                    :label="$zakkyAnomalyInsight['label']"
+                    :message="$zakkyAnomalyInsight['message']"
+                    :items="$zakkyAnomalyInsight['items'] ?? []"
+                />
+            @endif
+
             {{-- Transactions Table --}}
             <div class="ui-card overflow-hidden">
                 <div class="ui-toolbar-soft xl:flex-row xl:items-start">
@@ -65,16 +75,7 @@
                     @include('internal.transactions.partials.history-filters')
                 </div>
 
-                @if ($canViewRisk && !empty($zakkyAnomalyInsight['message']))
-                    <div class="px-4 py-3 border-b border-slate-100">
-                        <x-zakky-insight
-                            :tone="$zakkyAnomalyInsight['tone']"
-                            :label="$zakkyAnomalyInsight['label']"
-                            :message="$zakkyAnomalyInsight['message']"
-                            :items="$zakkyAnomalyInsight['items'] ?? []"
-                        />
-                    </div>
-                @endif
+
 
                 <div class="space-y-3 px-4 pb-4 pt-4 md:hidden">
                     @forelse ($transactions as $t)

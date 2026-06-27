@@ -15,12 +15,12 @@ class KnowledgeRetriever
         $this->embeddingsCache = $embeddingsCache;
     }
 
-    public function search(string $message, int $limit = 3): array
+    public function search(string $message, int $limit = 3, float $threshold = 0.45): array
     {
         $entries = config('zakky_knowledge', []);
 
         // 1. Semantic Search via Embeddings
-        $rankedViaSemantic = $this->searchViaEmbeddings($message, $entries);
+        $rankedViaSemantic = $this->searchViaEmbeddings($message, $entries, $threshold);
         
         if (!empty($rankedViaSemantic)) {
             // Semantic search succeeded
@@ -58,7 +58,7 @@ class KnowledgeRetriever
         return $top;
     }
 
-    private function searchViaEmbeddings(string $message, array $entries): array
+    private function searchViaEmbeddings(string $message, array $entries, float $threshold = 0.45): array
     {
         $messageEmbedding = $this->embeddingsProvider->getEmbedding($message);
         if (!$messageEmbedding) {
@@ -78,8 +78,12 @@ class KnowledgeRetriever
             }
 
             $similarity = KnowledgeEmbeddingsCache::cosineSimilarity($messageEmbedding, $knowledgeEmbeddings[$entryId]);
-            $entry['_cosine_similarity'] = $similarity;
-            $ranked[] = $entry;
+            
+            // Filter out low-relevance results immediately
+            if ($similarity >= $threshold) {
+                $entry['_cosine_similarity'] = $similarity;
+                $ranked[] = $entry;
+            }
         }
 
         usort($ranked, fn ($a, $b) => $b['_cosine_similarity'] <=> $a['_cosine_similarity']);
