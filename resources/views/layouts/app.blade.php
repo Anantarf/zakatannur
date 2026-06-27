@@ -16,6 +16,175 @@
 
         <!-- Scripts -->
         @vite(['resources/css/app.css', 'resources/js/app.js'])
+        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0"></script>
+        <script>
+            document.addEventListener('alpine:init', () => {
+                Alpine.data('dailyTrendChart', (config) => ({
+                    statusText: "Sedang memuat grafik...",
+                    
+                    async init() {
+                        try {
+                            if (typeof Chart === 'undefined') {
+                                this.statusText = "Error: Chart.js gagal dimuat. Matikan AdBlocker atau cek koneksi.";
+                                return;
+                            }
+
+                            if (typeof ChartDataLabels !== 'undefined' && typeof Chart.registry !== 'undefined') {
+                                try { Chart.register(ChartDataLabels); } catch (_) {}
+                            }
+
+                            const canvas = this.$refs.canvas;
+                            const ctx = canvas.getContext('2d');
+                            const _t = getComputedStyle(document.documentElement);
+                            
+                            // Parse CSS variables to ensure comma-separated values (Tailwind outputs space-separated)
+                            const parseRgb = (val) => val.replace(/[\s,]+/g, ',');
+                            
+                            const _b6 = parseRgb(_t.getPropertyValue('--color-brand-600-rgb').trim() || '2,132,199');
+                            const _b7 = parseRgb(_t.getPropertyValue('--color-brand-700-rgb').trim() || '3,105,161');
+                            const _b5 = parseRgb(_t.getPropertyValue('--color-brand-500-rgb').trim() || '14,165,233');
+                            const _slate = parseRgb(_t.getPropertyValue('--color-slate-300-rgb').trim() || '203,213,225');
+
+                            const CHART_COLORS = {
+                                brand: { line: `rgb(${_b6})`, lineSoft: `rgba(${_b6}, 0.92)`, gradFrom: `rgba(${_b5}, 0.2)`, label: `rgb(${_b7})` },
+                            };
+
+                            const lineColor     = CHART_COLORS.brand.line;
+                            const lineColorSoft = CHART_COLORS.brand.lineSoft;
+                            const gradFrom      = CHART_COLORS.brand.gradFrom;
+                            const labelColor    = CHART_COLORS.brand.label;
+
+                            const gradient = ctx.createLinearGradient(0, 0, 0, 300);
+                            gradient.addColorStop(0, gradFrom);
+                            gradient.addColorStop(1, 'rgba(0,0,0,0)');
+
+                            const chartValues = config.chartValues || [];
+                            const chartLabels = config.chartLabels || [];
+                            const chartLabel = config.chartLabel || 'Jumlah Transaksi';
+
+                            const sumValues = chartValues.reduce((a, b) => a + (Number(b) || 0), 0);
+                            const maxValues = Math.max(...chartValues, 0);
+                            const pointColors = chartValues.map(v => (v > 0 ? lineColor : `rgb(${_slate})`));
+                            const avgValues = chartValues.length ? sumValues / chartValues.length : 0;
+                            const lastValue = chartValues[chartValues.length - 1] ?? 0;
+                            const prevValue = chartValues.length > 1 ? chartValues[chartValues.length - 2] ?? 0 : 0;
+                            const delta = lastValue - prevValue;
+
+                            if (window._dailyTrendChartInstance) {
+                                window._dailyTrendChartInstance.destroy();
+                            }
+
+                            const pointSizes = chartValues.map(v => (v > 0 ? 4.5 : 2.5));
+
+                            window._dailyTrendChartInstance = new Chart(ctx, {
+                                type: 'line',
+                                data: {
+                                    labels: chartLabels,
+                                    datasets: [{
+                                        label: chartLabel,
+                                        data: chartValues,
+                                        borderColor: lineColor,
+                                        backgroundColor: gradient,
+                                        borderWidth: 3,
+                                        fill: true,
+                                        tension: 0.36,
+                                        pointBackgroundColor: pointColors,
+                                        pointBorderColor: '#ffffff',
+                                        pointBorderWidth: 2.5,
+                                        pointRadius: pointSizes,
+                                        pointHoverRadius: 7,
+                                        datalabels: {
+                                            display: (ctx) => Number(ctx.dataset.data[ctx.dataIndex]) > 0,
+                                            align: 'top',
+                                            anchor: 'end',
+                                            offset: 6,
+                                            color: labelColor,
+                                            backgroundColor: 'rgba(255, 255, 255, 0.94)',
+                                            borderColor: labelColor,
+                                            borderWidth: 1,
+                                            borderRadius: 6,
+                                            padding: { top: 3, bottom: 3, left: 6, right: 6 },
+                                            font: { family: "'Plus Jakarta Sans', sans-serif", weight: '700', size: 10 },
+                                        }
+                                    }]
+                                },
+                                options: {
+                                    responsive: true,
+                                    maintainAspectRatio: false,
+                                    interaction: { mode: 'index', intersect: false },
+                                    animation: { duration: 900, easing: 'easeOutQuart' },
+                                    layout: { padding: { top: 36, right: 18, bottom: 8, left: 4 } },
+                                    plugins: {
+                                        legend: { display: false },
+                                        tooltip: {
+                                            backgroundColor: '#0f172a',
+                                            padding: 14,
+                                            cornerRadius: 12,
+                                            borderColor: 'rgba(148, 163, 184, 0.2)',
+                                            borderWidth: 1,
+                                            titleFont: { family: "'Plus Jakarta Sans', sans-serif", size: 12, weight: '700' },
+                                            titleColor: '#94a3b8',
+                                            bodyFont: { family: "'Plus Jakarta Sans', sans-serif", size: 12, weight: '600' },
+                                            bodyColor: '#f0fdf4',
+                                            displayColors: false,
+                                            boxPadding: 6,
+                                            callbacks: {
+                                                title: (items) => items[0]?.label ?? '',
+                                                label: (ctx) => ' ' + chartLabel + ': ' + new Intl.NumberFormat('id-ID').format(ctx.parsed.y || 0),
+                                                afterBody: (items) => {
+                                                    const ctx = items[0];
+                                                    const currentIndex = ctx.dataIndex;
+                                                    if (currentIndex === 0) return []; // tidak ada data kemarin
+                                                    
+                                                    const currentVal = ctx.parsed.y || 0;
+                                                    const prevVal = Number(ctx.dataset.data[currentIndex - 1]) || 0;
+                                                    const diff = currentVal - prevVal;
+                                                    
+                                                    if (diff === 0) return ['', ' Stabil dibanding kemarin'];
+                                                    
+                                                    const sign = diff > 0 ? '+' : '';
+                                                    const trend = diff > 0 ? '↗ Naik' : '↘ Turun';
+                                                    return [
+                                                        '',
+                                                        ` ${trend} ${sign}${new Intl.NumberFormat('id-ID').format(diff)} dari kemarin`
+                                                    ];
+                                                },
+                                            },
+                                        },
+                                    },
+                                    scales: {
+                                        y: {
+                                            beginAtZero: true,
+                                            suggestedMax: Math.ceil(maxValues / 10) * 10 + 20,
+                                            grid: { display: false },
+                                            ticks: {
+                                                stepSize: 10,
+                                                color: '#334155',
+                                                font: { family: "'Plus Jakarta Sans', sans-serif", size: 11, weight: '600' },
+                                                padding: 8,
+                                            },
+                                        },
+                                        x: {
+                                            grid: { display: false },
+                                            ticks: {
+                                                color: '#334155',
+                                                font: { family: "'Plus Jakarta Sans', sans-serif", size: 11, weight: '600' },
+                                                padding: 6,
+                                            },
+                                        },
+                                    },
+                                },
+                            });
+                            this.statusText = ""; // berhasil, sembunyikan teks
+                        } catch (e) {
+                            console.error("Chart Error: ", e);
+                            this.statusText = "Error: " + e.message;
+                        }
+                    }
+                }));
+            });
+        </script>
     </head>
     @if (session('status'))
     <script>
@@ -79,16 +248,26 @@
             <main class="pb-10">
                 {{ $slot }}
             </main>
+            @stack('scripts')
         </div>
         </div>
-
-        @stack('scripts')
         <script src="https://unpkg.com/swup@4"></script>
-        <script src="https://unpkg.com/@swup/scripts-plugin@2"></script>
+        <script src="https://unpkg.com/@swup/scripts-plugin@3"></script>
         <script>
             document.addEventListener('DOMContentLoaded', () => {
                 const swup = new Swup({
                     plugins: [new SwupScriptsPlugin()]
+                });
+                
+                // Fallback manual script evaluator to guarantee inline scripts execution
+                swup.hooks.on('content:replace', () => {
+                    const scripts = document.querySelectorAll('#swup script');
+                    scripts.forEach(oldScript => {
+                        const newScript = document.createElement('script');
+                        Array.from(oldScript.attributes).forEach(attr => newScript.setAttribute(attr.name, attr.value));
+                        newScript.appendChild(document.createTextNode(oldScript.innerHTML));
+                        oldScript.parentNode.replaceChild(newScript, oldScript);
+                    });
                 });
             });
         </script>

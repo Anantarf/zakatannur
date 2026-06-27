@@ -89,7 +89,7 @@
                 <div class="px-4 sm:px-6 py-3 sm:py-4 border-b border-slate-50 flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4">
                     <div class="flex items-center gap-2 flex-wrap">
                         <div class="w-1.5 h-5 sm:w-2 sm:h-6 bg-brand-500 rounded-full flex-shrink-0"></div>
-                        <h3 class="ui-section-title text-sm sm:text-base">Tren Penerimaan</h3>
+                        <h3 class="ui-section-title text-sm sm:text-base">Grafik Penerimaan</h3>
                         @if($chartPeriodLabel)
                             <span class="inline-flex items-center gap-1 rounded-full bg-amber-100 border border-amber-200 px-2.5 py-0.5 text-[10px] font-semibold text-amber-700 uppercase tracking-[0.08em] whitespace-nowrap">
                                 <svg class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
@@ -112,7 +112,7 @@
                     </form>
                 </div>
                 <div class="p-4 sm:p-6">
-                    <p class="mb-4 text-sm leading-6 text-slate-500">Visualisasi tren transaksi aktif. Untuk laporan terperinci, gunakan menu Rekapitulasi atau Riwayat.</p>
+                    <p class="mb-4 text-sm leading-6 text-slate-500">Pantau penerimaan zakat harian.</p>
                     @if (!empty($dashboardChartSourceNote))
                         <div class="mb-4 rounded-2xl border border-slate-100 bg-slate-50 px-4 py-3 text-xs leading-relaxed text-slate-600">
                             {{ $dashboardChartSourceNote }}
@@ -123,8 +123,17 @@
                             {{ $dashboardChartRange['fallback_note'] }}
                         </div>
                     @endif
-                    <div class="relative h-[320px] w-full sm:h-[380px]">
-                        <canvas id="dailyTrendChart"></canvas>
+                    <div 
+                        x-data="dailyTrendChart({
+                            chartValues: {{ json_encode($chartData['datasets'][0]['values'] ?? $chartData['values'] ?? []) }},
+                            chartLabels: {{ json_encode($chartData['labels'] ?? []) }},
+                            chartLabel: '{{ $chartData['datasets'][0]['label'] ?? 'Jumlah Transaksi' }}',
+                            isOffSeason: {{ $offSeason ? 'true' : 'false' }}
+                        })"
+                        class="relative w-full flex items-center justify-center bg-slate-50 rounded-xl" style="height: 320px; min-height: 320px;" id="chart-container">
+                        <div x-show="statusText" x-text="statusText" class="absolute inset-0 flex items-center justify-center text-slate-400 font-medium text-sm">Sedang memuat grafik...</div>
+
+                        <canvas x-ref="canvas" class="absolute inset-0 w-full h-full z-10"></canvas>
                     </div>
                 </div>
             </div>
@@ -210,152 +219,4 @@
     </div>
 </x-app-layout>
 
-@push('scripts')
-<script src="https://cdn.jsdelivr.net/npm/chart.js" defer></script>
-<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0" defer></script>
-<script>
-(function() {
-    const isOffSeason = {{ $offSeason ? 'true' : 'false' }};
-    const _t = getComputedStyle(document.documentElement);
-    const _b6 = _t.getPropertyValue('--color-brand-600-rgb').trim();
-    const _b7 = _t.getPropertyValue('--color-brand-700-rgb').trim();
-    const _b5 = _t.getPropertyValue('--color-brand-500-rgb').trim();
 
-    const CHART_COLORS = {
-        brand:     { line: `rgb(${_b6})`,            lineSoft: `rgba(${_b6}, 0.92)`, gradFrom: `rgba(${_b5}, 0.2)`, label: `rgb(${_b7})` },
-        offSeason: { line: '#d97706', lineSoft: 'rgba(217, 119, 6, 0.92)', gradFrom: 'rgba(217, 119, 6, 0.18)', label: '#92400e' },
-    };
-
-    const lineColor     = isOffSeason ? CHART_COLORS.offSeason.line     : CHART_COLORS.brand.line;
-    const lineColorSoft = isOffSeason ? CHART_COLORS.offSeason.lineSoft : CHART_COLORS.brand.lineSoft;
-    const gradFrom      = isOffSeason ? CHART_COLORS.offSeason.gradFrom : CHART_COLORS.brand.gradFrom;
-    const labelColor    = isOffSeason ? CHART_COLORS.offSeason.label    : CHART_COLORS.brand.label;
-
-    function initChart() {
-        try {
-            if (typeof Chart === 'undefined') {
-                setTimeout(initChart, 100);
-                return;
-            }
-            if (typeof ChartDataLabels !== 'undefined' && typeof Chart.registry !== 'undefined') {
-                try { Chart.register(ChartDataLabels); } catch (_) {}
-            }
-
-            const canvas = document.getElementById('dailyTrendChart');
-            if (!canvas) return;
-
-            const ctx = canvas.getContext('2d');
-            const gradient = ctx.createLinearGradient(0, 0, 0, 300);
-            gradient.addColorStop(0, gradFrom);
-            gradient.addColorStop(1, 'rgba(0,0,0,0)');
-
-            const chartValues = {!! json_encode($chartData['datasets'][0]['values'] ?? $chartData['values'] ?? []) !!};
-            const chartLabels = {!! json_encode($chartData['labels'] ?? []) !!};
-            const chartLabel = {!! json_encode($chartData['datasets'][0]['label'] ?? 'Jumlah Transaksi') !!};
-
-            const sumValues = chartValues.reduce((a, b) => a + (Number(b) || 0), 0);
-            const maxValues = Math.max(...chartValues, 0);
-            const avgValues = chartValues.length ? sumValues / chartValues.length : 0;
-            const lastValue = chartValues[chartValues.length - 1] ?? 0;
-            const prevValue = chartValues.length > 1 ? chartValues[chartValues.length - 2] ?? 0 : 0;
-            const delta = lastValue - prevValue;
-
-            new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: chartLabels,
-                    datasets: [{
-                        label: chartLabel,
-                        data: chartValues,
-                        borderColor: lineColor,
-                        backgroundColor: gradient,
-                        borderWidth: 3,
-                        fill: true,
-                        tension: 0.36,
-                        pointBackgroundColor: '#fff',
-                        pointBorderColor: lineColor,
-                        pointBorderWidth: 2.5,
-                        pointRadius: 4.5,
-                        pointHoverRadius: 7,
-                        datalabels: {
-                            display: (ctx) => Number(ctx.dataset.data[ctx.dataIndex]) > 0,
-                            align: 'top',
-                            anchor: 'end',
-                            offset: 6,
-                            color: labelColor,
-                            backgroundColor: 'rgba(255, 255, 255, 0.92)',
-                            borderColor: labelColor,
-                            borderWidth: 1,
-                            borderRadius: 6,
-                            padding: { top: 3, bottom: 3, left: 6, right: 6 },
-                            font: { family: "'Plus Jakarta Sans', sans-serif", weight: '700', size: 10 },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    interaction: { mode: 'index', intersect: false },
-                    animation: { duration: 900, easing: 'easeOutQuart' },
-                    layout: { padding: { top: 36, right: 18, bottom: 8, left: 4 } },
-                    plugins: {
-                        legend: { display: false },
-                        tooltip: {
-                            backgroundColor: '#0f172a',
-                            padding: 14,
-                            cornerRadius: 12,
-                            borderColor: 'rgba(148, 163, 184, 0.2)',
-                            borderWidth: 1,
-                            titleFont: { family: "'Plus Jakarta Sans', sans-serif", size: 12, weight: '700' },
-                            titleColor: '#94a3b8',
-                            bodyFont: { family: "'Plus Jakarta Sans', sans-serif", size: 12, weight: '600' },
-                            bodyColor: '#f0fdf4',
-                            displayColors: false,
-                            boxPadding: 6,
-                            callbacks: {
-                                title: (items) => items[0]?.label ?? '',
-                                label: (ctx) => ' ' + chartLabel + ': ' + new Intl.NumberFormat('id-ID').format(ctx.parsed.y || 0),
-                                afterBody: (items) => {
-                                    return [
-                                        '',
-                                        'Periode ini: ' + new Intl.NumberFormat('id-ID').format(sumValues) + ' total',
-                                        'Rata-rata: ' + new Intl.NumberFormat('id-ID').format(Math.round(avgValues)) + ' / hari',
-                                        'Tertinggi: ' + new Intl.NumberFormat('id-ID').format(maxValues),
-                                        'Delta vs kemarin: ' + (delta >= 0 ? '+' : '') + new Intl.NumberFormat('id-ID').format(delta),
-                                    ];
-                                },
-                            },
-                        },
-                    },
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            grid: { display: false },
-                            ticks: {
-                                stepSize: 1,
-                                color: '#334155',
-                                font: { family: "'Plus Jakarta Sans', sans-serif", size: 11, weight: '600' },
-                                padding: 8,
-                            },
-                        },
-                        x: {
-                            grid: { display: false },
-                            ticks: {
-                                color: '#334155',
-                                font: { family: "'Plus Jakarta Sans', sans-serif", size: 11, weight: '600' },
-                                padding: 6,
-                            },
-                        },
-                    },
-                },
-            });
-        } catch (e) {
-            console.error("Chart Error: ", e);
-        }
-    }
-
-    if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', initChart);
-    } else {
-        initChart();
-    }
-})();
-</script>
-@endpush
