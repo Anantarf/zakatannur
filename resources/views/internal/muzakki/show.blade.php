@@ -60,8 +60,8 @@
                                 'success' => 'border-brand-100 bg-brand-50 text-brand-800',
                                 'info' => 'border-blue-100 bg-blue-50 text-blue-800',
                                 'warning' => 'border-amber-100 bg-amber-50 text-amber-800',
-                                'muted' => 'border-slate-100 bg-slate-50 text-slate-700',
-                            ][$summary['segment']['tone'] ?? 'muted'] ?? 'border-slate-100 bg-slate-50 text-slate-700';
+                                'muted' => 'border-slate-200 bg-slate-50 text-slate-700',
+                            ][$summary['segment']['tone'] ?? 'muted'] ?? 'border-slate-200 bg-slate-50 text-slate-700';
                         @endphp
                         <div class="rounded-2xl border px-4 py-3 {{ $segmentTone }}">
                             <p class="ui-label">Segmentasi</p>
@@ -118,7 +118,7 @@
                 </div>
                 <div class="hidden overflow-x-auto md:block">
                     <table class="min-w-full text-sm">
-                        <thead class="bg-slate-50 text-left text-xs font-semibold uppercase tracking-[0.08em] text-slate-400">
+                        <thead class="bg-slate-50 text-left text-xs font-bold uppercase tracking-[0.14em] text-slate-600">
                             <tr>
                                 <th class="px-6 py-4">Periode</th>
                                 <th class="px-6 py-4">Transaksi</th>

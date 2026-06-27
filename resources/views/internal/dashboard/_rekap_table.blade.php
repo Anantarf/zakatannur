@@ -44,7 +44,7 @@
 <div class="hidden overflow-x-auto md:block">
     <table class="min-w-full text-sm">
         <thead>
-            <tr class="border-b border-slate-100 bg-slate-50 text-left text-xs font-semibold uppercase tracking-wider text-slate-500 sm:text-sm">
+            <tr class="border-b border-slate-200 bg-slate-50 text-left text-xs font-semibold uppercase tracking-wider text-slate-500 sm:text-sm">
                 <th class="px-3 py-4 text-left sm:px-6 sm:py-4">Kategori</th>
                 <th class="px-3 py-4 sm:px-6 sm:py-4 text-center">Total Transaksi</th>
                 <th class="px-3 py-4 sm:px-6 sm:py-4 text-right">Total Uang</th>

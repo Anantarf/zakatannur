@@ -18,7 +18,7 @@
             <div class="ui-card-strong overflow-hidden">
                 <div>
                     <!-- Penyetor & Meta Header -->
-                    <div class="border-b border-slate-100 px-4 py-4 sm:px-6">
+                    <div class="border-b border-slate-200 px-4 py-4 sm:px-6">
                          <div class="mb-5 flex flex-col items-center justify-between gap-3 text-center sm:flex-row sm:items-start sm:text-left">
                             <div class="w-full sm:w-auto">
                                 <p class="mb-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-slate-400">Nomor Transaksi</p>
@@ -68,9 +68,9 @@
                                                 <p class="ui-mobile-meta-label">Keterangan</p>
                                                 <div class="mt-1 text-right text-xs font-medium text-slate-500">
                                                     @if($tx->category === 'fitrah' && $tx->jiwa)
-                                                        <span class="rounded-md border border-slate-100 bg-white px-2 py-1 font-bold text-slate-600">{{ $tx->jiwa }} Jiwa</span>
+                                                        <span class="rounded-md border border-slate-200 bg-white px-2 py-1 font-bold text-slate-600">{{ $tx->jiwa }} Jiwa</span>
                                                     @elseif($tx->category === 'fidyah' && $tx->hari)
-                                                        <span class="rounded-md border border-slate-100 bg-white px-2 py-1 font-bold text-slate-600">{{ $tx->hari }} Hari</span>
+                                                        <span class="rounded-md border border-slate-200 bg-white px-2 py-1 font-bold text-slate-600">{{ $tx->hari }} Hari</span>
                                                     @else
                                                         -
                                                     @endif
@@ -97,10 +97,10 @@
                             @endforeach
                         </div>
 
-                        <div class="hidden w-full overflow-x-auto rounded-xl border border-slate-100 bg-white md:block">
+                        <div class="hidden w-full overflow-x-auto rounded-xl border border-slate-200 bg-white md:block">
                             <table class="min-w-full text-sm">
                                 <thead>
-                                    <tr class="border-b border-slate-100 bg-slate-50 text-left text-[11px] font-semibold uppercase tracking-[0.14em] text-slate-400 sm:text-xs">
+                                    <tr class="border-b border-slate-200 bg-slate-50 text-left text-[11px] font-semibold uppercase tracking-[0.14em] text-slate-400 sm:text-xs">
                                         <th class="px-5 py-3">Nama Muzakki</th>
                                         <th class="px-3 py-3 sm:px-5">Kategori</th>
                                         <th class="px-3 py-3 sm:px-5">Bentuk</th>
@@ -114,7 +114,7 @@
                                         @php $txCount = count($txsArr); @endphp
                                         @foreach ($txsArr as $i => $tx)
                                             {{-- @var \App\Models\ZakatTransaction $tx --}}
-                                            <tr class="transition-colors hover:bg-brand-50/30 {{ $i > 0 ? 'border-t border-dashed border-slate-100' : '' }}">
+                                            <tr class="transition-colors hover:bg-brand-50/30 {{ $i > 0 ? 'border-t border-dashed border-slate-200' : '' }}">
                                                 {{-- Nama hanya muncul di baris pertama --}}
                                                 @if($i === 0)
                                                     <td class="px-3 py-3 align-top sm:px-5" rowspan="{{ $txCount }}">
@@ -134,9 +134,9 @@
                                                 </td>
                                                 <td class="px-3 py-3 text-right text-xs font-medium text-slate-500 sm:px-5">
                                                     @if($tx->category === 'fitrah' && $tx->jiwa)
-                                                        <span class="rounded-md border border-slate-100 bg-slate-50 px-2 py-1 font-bold text-slate-600">{{ $tx->jiwa }} Jiwa</span>
+                                                        <span class="rounded-md border border-slate-200 bg-slate-50 px-2 py-1 font-bold text-slate-600">{{ $tx->jiwa }} Jiwa</span>
                                                     @elseif($tx->category === 'fidyah' && $tx->hari)
-                                                        <span class="rounded-md border border-slate-100 bg-slate-50 px-2 py-1 font-bold text-slate-600">{{ $tx->hari }} Hari</span>
+                                                        <span class="rounded-md border border-slate-200 bg-slate-50 px-2 py-1 font-bold text-slate-600">{{ $tx->hari }} Hari</span>
                                                     @else
                                                         -
                                                     @endif
@@ -176,7 +176,7 @@
                         </div>
 
                         <!-- Ringkasan Total Akhir -->
-                        <div class="mt-4 border-t border-slate-100 pt-4">
+                        <div class="mt-4 border-t border-slate-200 pt-4">
                             <div class="rounded-card border border-brand-100 bg-brand-50/50 px-4 py-4 sm:px-5">
                                 @if($totalUang > 0)
                                     <div class="flex w-full items-center justify-between gap-4 sm:justify-end">
@@ -207,7 +207,7 @@
                         </div>
 
                         <!-- Footer Action Buttons -->
-                        <div class="mt-5 grid gap-3 border-t border-slate-100 px-2 pt-4 sm:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_auto] sm:px-0">
+                        <div class="mt-5 grid gap-3 border-t border-slate-200 px-2 pt-4 sm:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_auto] sm:px-0">
                              <a href="{{ route('internal.transactions.receipt', ['transaction' => $mainTx->id]) }}" target="_blank" class="ui-btn ui-btn-primary px-5 py-3 text-sm font-bold">
                                  <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" /></svg>
                                  Cetak Tanda Terima

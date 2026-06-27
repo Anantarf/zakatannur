@@ -56,7 +56,7 @@
 
 
             {{-- Table --}}
-            <div class="ui-card overflow-hidden shadow-md">
+            <div class="ui-card overflow-hidden">
                 <div class="ui-toolbar-soft">
                     <div class="flex items-center gap-2">
                         <div class="ui-section-accent h-6 w-2"></div>
@@ -149,7 +149,7 @@
                 <div class="hidden overflow-x-auto w-full md:block">
                     <table class="min-w-full text-sm">
                         <thead>
-                            <tr class="bg-slate-50 text-left text-xs font-semibold text-slate-400 uppercase tracking-[0.08em] border-b border-slate-100">
+                            <tr class="bg-slate-50 text-left text-xs font-semibold text-slate-400 uppercase tracking-[0.08em] border-b border-slate-200">
                                 <th class="px-6 py-4">Nama</th>
                                 <th class="px-6 py-4">Alamat</th>
                                 <th class="px-6 py-4 text-center">Waktu Hapus</th>
@@ -157,7 +157,7 @@
                                 <th class="px-6 py-4 text-center">Aksi</th>
                             </tr>
                         </thead>
-                        <tbody class="divide-y divide-slate-50">
+                        <tbody class="divide-y divide-slate-100">
                             @if (count($muzakki) > 0)
                                 @foreach ($muzakki as $m)
                                 <tr class="transition-colors hover:bg-slate-50">
@@ -216,7 +216,7 @@
                     </table>
                 </div>
                 @if ($muzakki->hasPages())
-                    <div class="border-t border-slate-100 px-5 py-3">
+                    <div class="border-t border-slate-200 px-5 py-3">
                         {{ $muzakki->links() }}
                     </div>
                 @endif

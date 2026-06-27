@@ -3,7 +3,7 @@
 <div class="space-y-3 md:hidden">
     @if (count($items) > 0)
         @foreach ($items as $t)
-            <article class="rounded-card border border-slate-100 bg-white p-4 shadow-sm">
+            <article class="rounded-card border border-slate-200 bg-white p-4 shadow-sm">
                 <div class="flex items-start justify-between gap-3">
                     <div class="min-w-0">
                         <span class="inline-flex rounded-md bg-slate-100 px-2 py-1 font-sans font-semibold text-slate-600" style="font-size: var(--text-caption);">{{ $t->no_transaksi }}</span>
@@ -93,7 +93,7 @@
 <div class="hidden overflow-x-auto md:block">
     <table class="min-w-full sm:text-sm" style="font-size: var(--text-eyebrow);">
         <thead>
-            <tr class="border-b border-slate-100 bg-slate-50 text-left font-semibold uppercase text-slate-400 sm:text-xs" style="font-size: var(--text-caption); letter-spacing: var(--tracking-label);">
+            <tr class="border-b border-slate-200 bg-slate-50 text-left font-semibold uppercase text-slate-400 sm:text-xs" style="font-size: var(--text-caption); letter-spacing: var(--tracking-label);">
                 <th class="px-3 py-3 sm:px-5">No. Transaksi</th>
                 <th class="px-3 py-3 sm:px-5">Waktu</th>
                 <th class="px-3 py-3 sm:px-5">Pembayar</th>

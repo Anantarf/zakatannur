@@ -58,8 +58,8 @@
             </div>
 
             {{-- Table --}}
-            <div class="ui-card overflow-hidden shadow-md">
-                <div class="border-b border-slate-100 bg-slate-50/50 p-4">
+            <div class="ui-card overflow-hidden">
+                <div class="border-b border-slate-200 bg-slate-50/50 p-4">
                     <form method="GET" action="{{ route('internal.muzakki.index') }}" class="flex w-full flex-col gap-2 sm:flex-row sm:items-center">
                         <input type="text" name="q" value="{{ $q }}" placeholder="Cari nama/alamat..." class="ui-input w-full sm:flex-1" />
                         <div class="flex w-full flex-none items-center gap-2 sm:w-auto">
@@ -127,7 +127,7 @@
                 <div class="hidden overflow-x-auto w-full md:block">
                     <table class="min-w-full text-sm">
                         <thead>
-                            <tr class="bg-slate-50 text-left text-xs font-semibold text-slate-400 uppercase tracking-[0.08em] border-b border-slate-100">
+                            <tr class="border-b border-slate-200 bg-slate-50 text-left text-[11px] font-bold uppercase tracking-[0.14em] text-slate-600 sm:text-xs">
                                 <th class="px-3 sm:px-5 py-3">Nama</th>
                                 <th class="px-3 sm:px-5 py-3">No HP</th>
                                 <th class="px-3 sm:px-5 py-3">Alamat</th>
@@ -135,13 +135,13 @@
                                 <th class="px-3 sm:px-5 py-3 text-center">Aksi</th>
                             </tr>
                         </thead>
-                        <tbody class="divide-y divide-slate-50">
+                        <tbody class="divide-y divide-slate-100">
                             @if (count($muzakki) > 0)
                                 @foreach ($muzakki as $m)
-                                <tr class="transition-colors hover:bg-slate-50">
-                                    <td class="px-3 sm:px-5 py-3 font-bold text-slate-800">{!! \App\Support\Format::highlight($m->name, $q) !!}</td>
-                                    <td class="px-3 sm:px-5 py-3 text-slate-500">{{ $m->phone ?? '-' }}</td>
-                                    <td class="px-3 sm:px-5 py-3 text-slate-500 text-sm">{!! \App\Support\Format::highlight($m->address ?? '-', $q) !!}</td>
+                                <tr class="transition-colors hover:bg-slate-50 border-b border-slate-100">
+                                    <td class="px-3 sm:px-5 py-4 font-bold text-slate-800">{!! \App\Support\Format::highlight($m->name, $q) !!}</td>
+                                    <td class="px-3 sm:px-5 py-4 font-medium text-slate-600">{{ $m->phone ?? '-' }}</td>
+                                    <td class="px-3 sm:px-5 py-4 font-medium text-slate-600 text-sm">{!! \App\Support\Format::highlight($m->address ?? '-', $q) !!}</td>
                                     <td class="px-3 sm:px-5 py-3">
                                         <div class="space-y-1 text-xs">
                                             <div class="font-bold text-slate-800">{{ (int) ($m->valid_transactions_count ?? 0) }} transaksi</div>
@@ -189,7 +189,7 @@
                     </table>
                 </div>
                 @if ($muzakki->hasPages())
-                    <div class="border-t border-slate-100 px-5 py-3">
+                    <div class="border-t border-slate-200 px-5 py-3">
                         {{ $muzakki->links() }}
                     </div>
                 @endif

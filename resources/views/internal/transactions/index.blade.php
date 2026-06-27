@@ -90,7 +90,7 @@
                 <div class="hidden overflow-x-auto w-full md:block">
                     <table class="min-w-full text-sm">
                         <thead>
-                            <tr class="border-b border-slate-100 bg-slate-50 text-left text-[11px] font-semibold uppercase tracking-[0.14em] text-slate-400 sm:text-xs">
+                            <tr class="border-b border-slate-200 bg-slate-50 text-left text-[11px] font-bold uppercase tracking-[0.14em] text-slate-600 sm:text-xs">
                                 <th class="px-3 py-4 sm:px-5">No. Transaksi</th>
                                 <th class="px-3 py-4 sm:px-5">Waktu</th>
                                 <th class="px-3 py-4 sm:px-5">Pembayar</th>
@@ -104,7 +104,7 @@
                                 <th class="w-[1%] pl-3 pr-6 py-4 text-center sm:pl-5 sm:pr-8">Aksi</th>
                             </tr>
                         </thead>
-                        <tbody class="divide-y divide-slate-100/80">
+                        <tbody class="divide-y divide-slate-100">
                             @forelse ($transactions as $t)
                                 @include("internal.transactions.partials._desktop_row", ["t" => $t])
                             @empty

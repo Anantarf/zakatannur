@@ -53,10 +53,10 @@
                 </div>
             @endif
 
-            <div class="grid grid-cols-1 gap-3 md:grid-cols-3">
+            <div class="grid grid-cols-1 gap-3 md:grid-cols-4">
                 <x-ui-stat-card title="Total Akun" :value="$totalUsers" description="Jumlah akun yang tampil di daftar saat ini." />
                 <x-ui-stat-card title="Akses Anda" :value="$roleLabels[$currentUser->role] ?? ucfirst($currentUser->role)" description="Hak kelola mengikuti role yang sedang Anda pakai." tone="info" />
-                <x-info-box class="h-full" tone="info" title="Catatan Akses" message="Admin hanya boleh mengelola akun petugas. Akun sesama admin dan super admin tetap terlindungi dan tidak dapat diubah oleh admin lain." />
+                <x-info-box class="h-full md:col-span-2" tone="info" title="Catatan Akses" message="Admin hanya boleh mengelola akun petugas. Akun sesama admin dan super admin tetap terlindungi dan tidak dapat diubah oleh admin lain." />
             </div>
 
             <div class="ui-card overflow-hidden">

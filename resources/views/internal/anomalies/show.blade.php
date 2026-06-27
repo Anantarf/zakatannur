@@ -47,7 +47,7 @@
                     />
 
                     <div class="ui-card-strong overflow-hidden" x-data="{ tab: 'signals' }">
-                        <div class="border-b border-slate-100/80 px-5 py-4 sm:px-6 sm:py-5">
+                        <div class="border-b border-slate-200/80 px-5 py-4 sm:px-6 sm:py-5">
                             <div class="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
                                 <div class="space-y-3">
                                     <div class="flex flex-wrap items-center gap-2">
@@ -92,7 +92,7 @@
                             </button>
                         </div>
 
-                        <div x-show="tab === 'signals'" x-transition class="space-y-4 border-b border-slate-100/80 bg-slate-50/70 px-5 py-4 sm:px-6 sm:py-5">
+                        <div x-show="tab === 'signals'" x-transition class="space-y-4 border-b border-slate-200/80 bg-slate-50/70 px-5 py-4 sm:px-6 sm:py-5">
                             <section class="rounded-2xl border border-slate-200 bg-white p-4">
                                 <div class="mb-4 space-y-1">
                                     <p class="ui-label text-slate-500">Kenapa Ditandai</p>
@@ -101,7 +101,7 @@
                                 @if (!empty($riskReview['reasons']))
                                     <ul class="space-y-3 text-sm text-slate-700">
                                         @foreach ($riskReview['reasons'] as $reason)
-                                            <li class="flex items-start gap-3 rounded-xl border border-slate-100 bg-slate-50/60 px-4 py-3">
+                                            <li class="flex items-start gap-3 rounded-xl border border-slate-200 bg-slate-50/60 px-4 py-3">
                                                 <span class="mt-1.5 h-2 w-2 flex-shrink-0 rounded-full bg-amber-500"></span>
                                                 <span class="leading-6">{{ $reason }}</span>
                                             </li>
@@ -120,7 +120,7 @@
                                     </div>
                                     <div class="space-y-3">
                                         @foreach ($riskReview['duplicate_candidates'] as $candidate)
-                                            <div class="rounded-xl border border-slate-100 bg-slate-50/70 px-4 py-4">
+                                            <div class="rounded-xl border border-slate-200 bg-slate-50/70 px-4 py-4">
                                                 <div class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                                                     <div class="min-w-0">
                                                         <p class="font-sans text-xs font-semibold text-slate-600">{{ $candidate['no_transaksi'] ?? '-' }}</p>
@@ -177,9 +177,9 @@
                                                     <p class="ui-mobile-meta-label">Keterangan</p>
                                                     <div class="mt-1 text-right text-xs font-medium text-slate-500">
                                                         @if($tx->category === 'fitrah' && $tx->jiwa)
-                                                            <span class="rounded-md border border-slate-100 bg-white px-2 py-1 font-bold text-slate-600">{{ $tx->jiwa }} Jiwa</span>
+                                                            <span class="rounded-md border border-slate-200 bg-white px-2 py-1 font-bold text-slate-600">{{ $tx->jiwa }} Jiwa</span>
                                                         @elseif($tx->category === 'fidyah' && $tx->hari)
-                                                            <span class="rounded-md border border-slate-100 bg-white px-2 py-1 font-bold text-slate-600">{{ $tx->hari }} Hari</span>
+                                                            <span class="rounded-md border border-slate-200 bg-white px-2 py-1 font-bold text-slate-600">{{ $tx->hari }} Hari</span>
                                                         @else
                                                             -
                                                         @endif
@@ -206,7 +206,7 @@
                                 @endforeach
                             </div>
 
-                            <div class="hidden overflow-hidden rounded-xl border border-slate-100 bg-white shadow-sm md:block">
+                            <div class="hidden overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm md:block">
                                 <table class="w-full table-fixed text-sm">
                                     <colgroup>
                                         <col class="w-[30%]">
@@ -216,7 +216,7 @@
                                         <col class="w-[20%]">
                                     </colgroup>
                                     <thead>
-                                        <tr class="border-b border-slate-100 bg-slate-50 text-left text-[11px] font-semibold uppercase tracking-[0.08em] text-slate-400 sm:text-xs">
+                                        <tr class="border-b border-slate-200 bg-slate-50 text-left text-[11px] font-bold uppercase tracking-[0.14em] text-slate-600 sm:text-xs">
                                             <th class="px-5 py-4">Nama Muzakki</th>
                                             <th class="px-3 py-4 sm:px-4">Kategori</th>
                                             <th class="px-3 py-4 sm:px-4">Bentuk</th>
@@ -224,12 +224,12 @@
                                             <th class="px-3 py-4 text-right sm:px-5">Nominal</th>
                                         </tr>
                                     </thead>
-                                    <tbody class="divide-y divide-slate-50">
+                                    <tbody class="divide-y divide-slate-100">
                                         @php $rowNo = 1; @endphp
                                         @foreach ($groupedArr as $muzakkiName => $txsArr)
                                             @php $txCount = count($txsArr); @endphp
                                             @foreach ($txsArr as $i => $tx)
-                                                <tr class="transition-colors hover:bg-brand-50/30 {{ $i > 0 ? 'border-t border-dashed border-slate-100' : '' }}">
+                                                <tr class="transition-colors hover:bg-brand-50/30 {{ $i > 0 ? 'border-t border-dashed border-slate-200' : '' }}">
                                                     @if($i === 0)
                                                         <td class="px-4 py-4 align-top sm:px-5" rowspan="{{ $txCount }}">
                                                             <div class="flex items-start gap-3">
@@ -242,15 +242,15 @@
                                                         <x-zakat-category-tags :categories="[$tx->category]" />
                                                     </td>
                                                     <td class="px-3 py-4 sm:px-4">
-                                                        <span class="inline-flex items-center rounded px-2.5 py-1 text-[11px] font-semibold uppercase tracking-[0.08em] {{ $tx->metode === 'beras' ? 'bg-amber-100 text-amber-700' : 'bg-brand-100 text-brand-700' }}">
+                                                        <span class="inline-flex items-center rounded px-2.5 py-1 text-[11px] font-bold uppercase tracking-[0.14em] {{ $tx->metode === 'beras' ? 'bg-amber-100 text-amber-700' : 'bg-brand-100 text-brand-700' }}">
                                                             {{ $tx->metode_label }}
                                                         </span>
                                                     </td>
                                                     <td class="px-3 py-4 text-right text-xs font-medium text-slate-500 sm:px-4">
                                                         @if($tx->category === 'fitrah' && $tx->jiwa)
-                                                            <span class="rounded-md border border-slate-100 bg-slate-50 px-2 py-1 font-bold text-slate-600">{{ $tx->jiwa }} Jiwa</span>
+                                                            <span class="rounded-md border border-slate-200 bg-slate-50 px-2 py-1 font-bold text-slate-600">{{ $tx->jiwa }} Jiwa</span>
                                                         @elseif($tx->category === 'fidyah' && $tx->hari)
-                                                            <span class="rounded-md border border-slate-100 bg-slate-50 px-2 py-1 font-bold text-slate-600">{{ $tx->hari }} Hari</span>
+                                                            <span class="rounded-md border border-slate-200 bg-slate-50 px-2 py-1 font-bold text-slate-600">{{ $tx->hari }} Hari</span>
                                                         @else
                                                             -
                                                         @endif
@@ -286,7 +286,7 @@
                         </div>
                         <p class="text-sm leading-6 text-slate-600">{{ $riskReview['summary_text'] ?? 'Belum ada hasil analisis risiko untuk transaksi ini.' }}</p>
 
-                        <div class="mt-4 space-y-3 rounded-xl border border-slate-100 bg-slate-50/70 p-4">
+                        <div class="mt-4 space-y-3 rounded-xl border border-slate-200 bg-slate-50/70 p-4">
                             <div>
                                 <p class="ui-label text-slate-400">Status Kwitansi</p>
                                 <p class="mt-1 text-sm font-semibold text-slate-700">

@@ -47,8 +47,8 @@
                 </a>
             </div>
 
-            <div class="ui-card overflow-hidden shadow-md">
-                <div class="border-b border-slate-100 px-4 py-3 sm:px-5">
+            <div class="ui-card overflow-hidden">
+                <div class="border-b border-slate-200 px-4 py-3 sm:px-5">
                     <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                         <div class="flex flex-wrap gap-2">
                             <a
@@ -168,7 +168,7 @@
                 </div>
 
                 @if (($scope ?? 'active') === 'active')
-                    <div class="border-t border-slate-100 bg-amber-50/60 px-4 py-3 text-sm leading-6 text-amber-900 sm:px-5">
+                    <div class="border-t border-slate-200 bg-amber-50/60 px-4 py-3 text-sm leading-6 text-amber-900 sm:px-5">
                         Warning bukan berarti transaksi salah. Halaman ini dipakai untuk memeriksa sinyal sistem, lalu memutuskan apakah kasus cukup ditutup aman atau perlu tindak lanjut.
                     </div>
                 @endif
@@ -184,7 +184,7 @@
                 <div class="hidden overflow-x-auto md:block">
                     <table class="min-w-full text-sm">
                         <thead>
-                            <tr class="border-b border-slate-100 bg-slate-50 text-left text-[11px] font-semibold uppercase tracking-[0.08em] text-slate-400 sm:text-xs">
+                            <tr class="border-b border-slate-200 bg-slate-50 text-left text-[11px] font-bold uppercase tracking-[0.14em] text-slate-600 sm:text-xs">
                                 <th class="px-3 py-3 sm:px-5">No. Transaksi</th>
                                 <th class="px-3 py-3 sm:px-5">Waktu</th>
                                 <th class="px-3 py-3 sm:px-5">Pembayar</th>
@@ -196,7 +196,7 @@
                                 <th class="px-3 py-3 text-center">Aksi</th>
                             </tr>
                         </thead>
-                        <tbody class="divide-y divide-slate-100/80">
+                        <tbody class="divide-y divide-slate-100">
                             @forelse ($groups as $group)
                                 @include('internal.anomalies.partials._desktop_row', ['group' => $group])
                             @empty
@@ -211,7 +211,7 @@
                 </div>
 
                 @if ($groups->hasPages())
-                    <div class="border-t border-slate-100 px-5 py-3">
+                    <div class="border-t border-slate-200 px-5 py-3">
                         {{ $groups->links() }}
                     </div>
                 @endif

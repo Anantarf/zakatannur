@@ -67,7 +67,7 @@
             </div>
 
             <div class="grid grid-cols-1 gap-4 lg:grid-cols-2">
-                <div class="ui-card overflow-hidden shadow-md">
+                <div class="ui-card overflow-hidden">
                     <div class="ui-inline-note rounded-none border-b border-brand-100/70">
                         <div class="ui-section-title text-sm">Upload Template Baru</div>
                         <div class="mt-1 text-xs text-slate-600">Hanya PDF. Ukuran maks 10MB.</div>
@@ -96,7 +96,7 @@
                     </div>
                 </div>
 
-                <div class="ui-card overflow-hidden shadow-md">
+                <div class="ui-card overflow-hidden">
                 <div class="ui-card-header ui-card-header-slate">
                     <div>
                         <div class="ui-section-title text-sm">Daftar Versi</div>
