@@ -2,10 +2,13 @@
     <x-slot name="header">
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div class="space-y-1 text-center sm:text-left">
-                <h2 class="text-xl font-bold leading-tight text-brand-900 sm:text-2xl">
+                <h2 class="ui-page-title">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="ui-page-title-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 13h6m-3-3v6m5 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                    </svg>
                     {{ isset($isEdit) ? 'Ubah Transaksi ' . $mainTx->no_transaksi : 'Input Transaksi' }}
                 </h2>
-                <p class="text-sm text-slate-500">
+                <p class="ui-page-title-copy">
                     {{ isset($isEdit) ? 'Perbarui data transaksi, lalu simpan.' : 'Isi pembayar dan pilih kategori zakat per jiwa.' }}
                 </p>
             </div>
@@ -15,18 +18,11 @@
         </div>
     </x-slot>
 
-    <div class="py-4 sm:py-6" x-data="zakatForm()">
+    <div class="pt-2 pb-4 sm:pt-3 sm:pb-6" x-data="zakatForm()">
         <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             
             @if ($errors->any())
-                <div class="mb-4 rounded-xl border border-red-200 bg-red-50 p-4 text-red-900 shadow-sm">
-                    <div class="font-bold text-red-800 mb-3 border-b border-red-200 pb-2">Terdapat Kesalahan Input:</div>
-                    <ul class="list-disc pl-5 text-sm space-y-1">
-                        @foreach ($errors->all() as $error)
-                            <li>{{ $error }}</li>
-                        @endforeach
-                    </ul>
-                </div>
+                <x-form-errors />
             @endif
 
             @include('internal.transactions.partials.form-notice')
@@ -77,9 +73,9 @@
 
                     <!-- Right Column (Matrix Members) -->
                     <div class="lg:col-span-3 space-y-4 max-w-full">
-                        <div class="ui-card-strong p-4 sm:p-5">
-                            <h3 class="text-lg font-bold text-slate-800">Detail Pembayaran</h3>
-                            <p class="mt-1 text-sm text-slate-500">Aktifkan jenis zakat, lalu isi nominal atau beratnya.</p>
+                        <div class="ui-card px-4 py-2 sm:px-4 sm:py-3">
+                            <h3 class="font-bold text-slate-800 text-sm sm:text-base">Detail Pembayaran</h3>
+                            <p class="text-[11px] sm:text-xs text-slate-500 mt-0.5">Aktifkan jenis zakat, lalu isi nominal atau beratnya.</p>
                         </div>
 
                         <template x-for="(person, index) in persons" :key="person.id">
@@ -88,12 +84,10 @@
                         
                         <!-- Button Tambah Orang di Bawah Box Terakhir -->
                         <div class="pb-4">
-                            <button type="button" @click="addPerson()" class="group flex w-full items-center justify-center gap-2 rounded-card border-2 border-dashed border-brand-200 bg-brand-50 px-4 py-3 font-bold text-brand-700 transition-all hover:border-brand-300 hover:bg-brand-100">
-                                <div class="rounded-full bg-brand-500 p-1 text-white transition-transform group-hover:scale-110">
-                                    <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M12 4v16m8-8H4" />
-                                    </svg>
-                                </div>
+                            <button type="button" @click="addPerson()" class="group flex w-full items-center justify-center gap-2 rounded-lg border-2 border-dashed border-brand-200 bg-brand-50 px-4 py-3 font-bold text-brand-700 transition-all hover:border-brand-300 hover:bg-brand-100">
+                                <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4" />
+                                </svg>
                                 Tambah Orang / Anggota Keluarga
                             </button>
                         </div>

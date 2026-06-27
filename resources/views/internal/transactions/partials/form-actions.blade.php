@@ -1,13 +1,5 @@
-<div class="ui-card-strong sticky bottom-4 z-10 mt-4 bg-white/95 p-3 backdrop-blur-md sm:p-4">
-    <div class="mb-3 flex flex-col gap-3 border-b border-slate-100 pb-3 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-            <p class="text-sm font-bold text-slate-900">{{ isset($isEdit) ? 'Selesaikan perubahan transaksi' : 'Simpan transaksi yang sudah diperiksa' }}</p>
-            <p class="text-xs text-slate-500">{{ isset($isEdit) ? 'Cek nominal, kategori, dan pembayar.' : 'Simpan setelah data anggota terisi.' }}</p>
-        </div>
-        <div class="inline-flex w-full justify-center rounded-full border border-brand-100 bg-brand-50 px-3 py-1 text-[11px] font-semibold text-brand-700 sm:w-auto">
-            <span x-text="submitting ? 'Sedang menyimpan' : 'Siap diproses'"></span>
-        </div>
-    </div>
+<div class="ui-card sticky bottom-4 z-10 mt-4 p-4 sm:p-5">
+
 
     @if(isset($isEdit))
         <div class="flex flex-col items-stretch gap-3 sm:flex-row">

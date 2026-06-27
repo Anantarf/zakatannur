@@ -99,13 +99,29 @@
                             </div>
                         </div>
 
-                        <div class="mt-4 flex flex-col-reverse sm:flex-row justify-end gap-3 pt-2">
-                            <a href="{{ route('internal.users.index') }}" class="ui-btn ui-btn-secondary w-full sm:w-auto text-center">Batal</a>
-                            <button type="submit" class="ui-btn ui-btn-primary w-full sm:w-auto">
-                                Simpan
-                            </button>
+                        <div class="mt-4 flex flex-col-reverse sm:flex-row items-center justify-between gap-3 pt-2">
+                            <div class="w-full sm:w-auto">
+                                @if ($user && auth()->id() !== $user->id)
+                                    <button type="button" class="ui-btn bg-white text-red-600 border-red-200 hover:bg-red-50 hover:border-red-300 w-full sm:w-auto" onclick="if(confirm('Apakah Anda yakin ingin menghapus pengguna ini?')) document.getElementById('delete-form').submit();">
+                                        Hapus Pengguna
+                                    </button>
+                                @endif
+                            </div>
+                            <div class="flex flex-col-reverse sm:flex-row gap-3 w-full sm:w-auto">
+                                <a href="{{ route('internal.users.index') }}" class="ui-btn ui-btn-secondary w-full sm:w-auto text-center">Batal</a>
+                                <button type="submit" class="ui-btn ui-btn-primary w-full sm:w-auto">
+                                    Simpan
+                                </button>
+                            </div>
                         </div>
                     </form>
+
+                    @if ($user && auth()->id() !== $user->id)
+                        <form id="delete-form" action="{{ route('internal.users.destroy', ['user' => $user->id]) }}" method="POST" class="hidden">
+                            @csrf
+                            @method('DELETE')
+                        </form>
+                    @endif
                 </div>
             </div>
         </div>

@@ -68,6 +68,7 @@ Route::middleware(['auth', 'role:staff,admin,super_admin'])
             Route::post('/users', [UserManagementController::class, 'store'])->name('users.store');
             Route::get('/users/{user}/edit', [UserManagementController::class, 'edit'])->name('users.edit');
             Route::patch('/users/{user}', [UserManagementController::class, 'update'])->name('users.update');
+            Route::delete('/users/{user}', [UserManagementController::class, 'destroy'])->name('users.destroy');
 
             Route::get('/audit-logs', [AuditLogController::class, 'index'])->name('audit_logs.index');
             Route::get('/chatbot-analytics', [ChatbotAnalyticsController::class, 'index'])->name('chatbot_analytics.index');

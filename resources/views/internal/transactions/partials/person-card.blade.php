@@ -2,9 +2,9 @@
     <div class="mb-3 flex flex-col justify-between gap-3 sm:flex-row sm:items-center xl:justify-start">
         <div class="flex items-center gap-2 flex-1 w-full lg:max-w-sm">
             <div class="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-brand-500 text-xs font-bold text-white sm:h-7 sm:w-7" x-text="index + 1"></div>
-            <input type="text" x-model="person.name" class="muzakki-name-input ui-input w-full text-sm" placeholder="Nama..." required>
+            <input type="text" x-model="person.name" class="muzakki-name-input ui-input w-full" placeholder="Nama..." required>
         </div>
-        <button type="button" @click="removePerson(index)" x-show="persons.length > 1" class="ui-btn ui-btn-secondary w-full border-red-100 bg-red-50 py-2 text-xs text-red-500 hover:bg-red-50 hover:text-red-600 sm:w-auto sm:px-3 sm:py-1.5">
+        <button type="button" @click="removePerson(index)" x-show="persons.length > 1" class="ui-btn ui-btn-danger w-full sm:w-auto sm:px-3 py-2">
             Hapus Baris
         </button>
     </div>
@@ -32,7 +32,7 @@
                     <p class="text-[10px] text-brand-600/70 leading-tight">Standar: Rp {{ number_format($fitrahUang, 0, ',', '.') }} / {{ $berasPerJiwa }}kg</p>
 
                     <template x-if="!person.zakat.fitrah.is_custom">
-                        <div class="rounded border border-brand-200 bg-brand-100/50 px-2 py-1.5 text-[11px] font-medium not-italic text-brand-800">
+                        <div class="text-[11px] bg-brand-50 text-brand-700 px-2 py-1.5 rounded border border-brand-200 font-medium not-italic">
                             Sesuai Standar
                         </div>
                     </template>
@@ -79,7 +79,7 @@
                     <p class="text-[10px] text-amber-600/70 leading-tight">Standar: Rp {{ number_format($fidyahUang, 0, ',', '.') }} / {{ $berasPerJiwa }}kg per hari</p>
 
                     <template x-if="!person.zakat.fidyah.is_custom">
-                        <div class="text-[11px] bg-amber-100/50 text-amber-800 px-2 py-1.5 rounded border border-amber-200 font-medium not-italic">
+                        <div class="text-[11px] bg-amber-50 text-amber-700 px-2 py-1.5 rounded border border-amber-200 font-medium not-italic">
                             Sesuai Standar
                         </div>
                     </template>

@@ -29,13 +29,41 @@ class ZakkyAdminInsightService
         return cache()->remember($cacheKey, 3600, function () use ($today) {
             $logs = AuditLog::query()
                 ->where('created_at', '>=', $today)
-                ->get(['id', 'action', 'created_at']);
+                ->get(['id', 'action', 'created_at', 'metadata', 'actor_user_id']);
 
             if ($logs->isEmpty()) {
                 return $this->insight(
                     'Informasi dari Zakky',
                     'success',
                     'Belum ada aktivitas penting yang tercatat hari ini.',
+                );
+            }
+
+            // Deteksi aktivitas mencurigakan
+            $riskLogs = $logs->filter(fn($log) => $log->has_risk_flags)->values();
+
+            if ($riskLogs->isNotEmpty()) {
+                $items = [];
+                $riskLogs->take(3)->each(function ($log) use (&$items) {
+                    $riskDescriptions = [
+                        'perubahan_nominal_besar' => 'perubahan nominal > 50%',
+                        'penghapusan_multipel' => 'penghapusan > 3 item',
+                        'pembayar_berubah' => 'pembayar diubah',
+                    ];
+
+                    $flags = collect($log->risk_flags)
+                        ->map(fn($f) => $riskDescriptions[$f] ?? $f)
+                        ->implode(', ');
+
+                    $userName = $log->actorUser ? $log->actorUser->name : 'Sistem';
+                    $items[] = "{$userName} ({$flags}) jam {$log->created_at->format('H:i')}";
+                });
+
+                return $this->insight(
+                    'Perhatian dari Zakky',
+                    'warning',
+                    "Terdeteksi {$riskLogs->count()} aktivitas mencurigakan hari ini yang perlu dicek. Sebaiknya verifikasi perubahan nominal besar, penghapusan item multipel, dan perubahan pembayar.",
+                    $items,
                 );
             }
 

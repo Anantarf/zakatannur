@@ -61,4 +61,43 @@ class AuditLog extends Model
             default => 'bg-slate-100 text-slate-700',
         };
     }
+
+    public function getRiskFlagsAttribute(): array
+    {
+        $flags = [];
+
+        if (!is_array($this->metadata)) {
+            return $flags;
+        }
+
+        // Perubahan nominal > 50%
+        if (in_array($this->action, ['Updated.Transaction']) && isset($this->metadata['totals'])) {
+            $old = (int) ($this->metadata['totals']['old']['uang'] ?? 0);
+            $new = (int) ($this->metadata['totals']['new']['uang'] ?? 0);
+            if ($old > 0 && abs($new - $old) / $old > 0.5) {
+                $flags[] = 'perubahan_nominal_besar';
+            }
+        }
+
+        // Penghapusan > 3 item
+        if (in_array($this->action, ['Updated.Transaction']) && isset($this->metadata['summary']['removed'])) {
+            if ($this->metadata['summary']['removed'] > 3) {
+                $flags[] = 'penghapusan_multipel';
+            }
+        }
+
+        // Perubahan pembayar setelah dibuat
+        if ($this->action === 'Updated.Transaction' && isset($this->metadata['old']['pembayar_nama']) && isset($this->metadata['new']['pembayar_nama'])) {
+            if ($this->metadata['old']['pembayar_nama'] !== $this->metadata['new']['pembayar_nama']) {
+                $flags[] = 'pembayar_berubah';
+            }
+        }
+
+        return $flags;
+    }
+
+    public function hasRiskFlags(): bool
+    {
+        return count($this->risk_flags) > 0;
+    }
 }

@@ -148,6 +148,30 @@ class UserManagementController extends Controller
             ->with('status', 'Perubahan tersimpan.');
     }
 
+    public function destroy(Request $request, User $user)
+    {
+        /** @var User $actor */
+        $actor = $request->user();
+
+        if (!$actor->canManageUser($user)) {
+            abort(Response::HTTP_FORBIDDEN);
+        }
+
+        if ($actor->id === $user->id) {
+            return back()->withErrors(['name' => 'Anda tidak dapat menghapus akun Anda sendiri.']);
+        }
+
+        $user->delete();
+
+        Audit::log($request, 'user.deleted', $user, [
+            'name' => $user->name,
+            'role' => $user->role,
+        ]);
+
+        return redirect()->route('internal.users.index')
+            ->with('status', 'Pengguna berhasil dihapus.');
+    }
+
     /** @return array<int,string> */
     private function allowedRolesForActor(User $actor, ?User $editingUser = null): array
     {

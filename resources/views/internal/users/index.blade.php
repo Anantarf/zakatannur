@@ -61,8 +61,8 @@
 
             <div class="ui-card overflow-hidden">
                 <div class="border-b border-slate-200 bg-slate-50/50 p-4">
-                    <form method="GET" action="{{ route('internal.users.index') }}" class="flex w-full flex-col gap-2 sm:flex-row sm:items-center">
-                        <input type="text" name="q" value="{{ $q ?? '' }}" placeholder="Cari nama atau username..." class="ui-input w-full sm:flex-1" />
+                    <form method="GET" action="{{ route('internal.users.index') }}" class="flex w-full flex-col gap-2 sm:flex-row sm:items-center" x-data="{ submitTimeout: null }" @submit.prevent>
+                        <input type="text" name="q" value="{{ $q ?? '' }}" placeholder="Cari nama atau username..." class="ui-input w-full sm:flex-1" @input="clearTimeout(submitTimeout); submitTimeout = setTimeout(() => $el.closest('form').submit(), 400)" @keydown.enter="$el.closest('form').submit()" />
                         <div class="flex w-full flex-none items-center gap-2 sm:w-auto">
                             <button type="submit" class="ui-btn ui-btn-secondary flex-1 sm:flex-none px-4 py-2.5">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">

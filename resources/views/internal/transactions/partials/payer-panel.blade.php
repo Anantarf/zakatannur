@@ -1,11 +1,11 @@
 <div class="ui-card overflow-hidden">
-    <div class="flex items-center gap-2 border-b border-blue-100 bg-blue-50 px-5 py-3">
-        <svg class="h-5 w-5 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+    <div class="bg-blue-100 border-b border-blue-200 px-5 py-3 flex items-center gap-3">
+        <svg class="h-5 w-5 text-slate-900 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
         </svg>
-        <h3 class="font-bold text-blue-900">Pembayar</h3>
+        <h3 class="font-bold text-slate-800">Pembayar</h3>
     </div>
-    <div class="space-y-4 p-4">
+    <div class="space-y-4 px-4 pb-4 pt-2">
         @if(isset($isEdit))
             <div class="mb-2 rounded-xl border border-blue-400 bg-blue-600 p-3 text-white shadow-sm">
                 <p class="mb-0.5 text-[10px] font-bold uppercase leading-none tracking-[0.14em] opacity-80">Sedang Mengedit:</p>
@@ -14,52 +14,6 @@
         @endif
 
         <input type="hidden" name="tahun_zakat" value="{{ $activeYear }}">
-
-        <div>
-            <label class="ui-form-label">Shift Petugas <span class="text-red-500">*</span></label>
-            <select name="shift" x-model="shift" class="ui-select w-full" required>
-                <option value="">-- Pilih Shift --</option>
-                @foreach($shifts as $shift)
-                    <option value="{{ $shift }}" {{ (old('shift', $mainTx->shift ?? (\Carbon\Carbon::now('Asia/Jakarta')->hour < 14 ? 'pagi' : (\Carbon\Carbon::now('Asia/Jakarta')->hour < 18 ? 'siang' : 'malam'))) == $shift) ? 'selected' : '' }}>
-                        {{ $shiftLabels[$shift] }}
-                    </option>
-                @endforeach
-            </select>
-        </div>
-
-        @if(isset($isEdit))
-            <div>
-                <label class="ui-form-label">Petugas Pelayan (Data Asli)</label>
-                <div class="relative">
-                    <select disabled class="w-full cursor-not-allowed rounded-lg border-slate-200 bg-slate-50 text-sm text-slate-500 shadow-sm">
-                        @foreach($officers as $off)
-                            <option value="{{ $off->id }}" {{ (old('petugas_id', $mainTx->petugas_id) == $off->id) ? 'selected' : '' }}>
-                                {{ $off->name }} ({{ strtoupper($off->role) }})
-                            </option>
-                        @endforeach
-                    </select>
-                    <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
-                        <svg class="h-4 w-4 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>
-                    </div>
-                </div>
-            </div>
-            <div>
-                <label class="ui-form-label flex items-center gap-1.5">
-                    Waktu Transaksi (Asal)
-                    <span title="Waktu akan diperbarui otomatis ke waktu sekarang saat disimpan">
-                        <svg class="h-3.5 w-3.5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-                    </span>
-                </label>
-                <div class="relative">
-                    <input type="datetime-local" readonly
-                        value="{{ old('waktu_terima', ($mainTx->waktu_terima ?? $mainTx->created_at)->timezone('Asia/Jakarta')->format('Y-m-d\TH:i')) }}"
-                        class="pointer-events-none w-full cursor-not-allowed rounded-lg border-slate-200 bg-slate-50 text-sm text-slate-500 shadow-sm">
-                    <div class="absolute inset-y-0 right-0 flex items-center pr-3">
-                        <svg class="h-4 w-4 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-                    </div>
-                </div>
-            </div>
-        @endif
 
         <div>
             <label class="ui-form-label">Nama Pembayar <span class="text-red-500">*</span></label>
@@ -112,5 +66,51 @@
             <label class="ui-form-label">Nomor HP / WhatsApp (Opsional)</label>
             <input type="text" name="pembayar_phone" x-model="pembayar_phone" placeholder="08xxx" class="ui-input w-full">
         </div>
+
+        <div>
+            <label class="ui-form-label">Shift Petugas <span class="text-red-500">*</span></label>
+            <select name="shift" x-model="shift" class="ui-select w-full" required>
+                <option value="">-- Pilih Shift --</option>
+                @foreach($shifts as $shift)
+                    <option value="{{ $shift }}" {{ (old('shift', $mainTx->shift ?? (\Carbon\Carbon::now('Asia/Jakarta')->hour < 14 ? 'pagi' : (\Carbon\Carbon::now('Asia/Jakarta')->hour < 18 ? 'siang' : 'malam'))) == $shift) ? 'selected' : '' }}>
+                        {{ $shiftLabels[$shift] }}
+                    </option>
+                @endforeach
+            </select>
+        </div>
+
+        @if(isset($isEdit))
+            <div>
+                <label class="ui-form-label">Petugas Pelayan (Data Asli)</label>
+                <div class="relative">
+                    <select disabled class="w-full cursor-not-allowed rounded-lg border-slate-200 bg-slate-50 text-sm text-slate-500 shadow-sm">
+                        @foreach($officers as $off)
+                            <option value="{{ $off->id }}" {{ (old('petugas_id', $mainTx->petugas_id) == $off->id) ? 'selected' : '' }}>
+                                {{ $off->name }} ({{ strtoupper($off->role) }})
+                            </option>
+                        @endforeach
+                    </select>
+                    <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
+                        <svg class="h-4 w-4 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>
+                    </div>
+                </div>
+            </div>
+            <div>
+                <label class="ui-form-label flex items-center gap-1.5">
+                    Waktu Transaksi (Asal)
+                    <span title="Waktu akan diperbarui otomatis ke waktu sekarang saat disimpan">
+                        <svg class="h-3.5 w-3.5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                    </span>
+                </label>
+                <div class="relative">
+                    <input type="datetime-local" readonly
+                        value="{{ old('waktu_terima', ($mainTx->waktu_terima ?? $mainTx->created_at)->timezone('Asia/Jakarta')->format('Y-m-d\TH:i')) }}"
+                        class="pointer-events-none w-full cursor-not-allowed rounded-lg border-slate-200 bg-slate-50 text-sm text-slate-500 shadow-sm">
+                    <div class="absolute inset-y-0 right-0 flex items-center pr-3">
+                        <svg class="h-4 w-4 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                    </div>
+                </div>
+            </div>
+        @endif
     </div>
 </div>

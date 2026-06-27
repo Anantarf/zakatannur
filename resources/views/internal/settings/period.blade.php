@@ -90,7 +90,7 @@
                 </div>
 
                 {{-- Tab: Konfigurasi --}}
-                <div x-show="tab === 'config'" class="p-4 sm:p-5">
+                <div x-show="tab === 'config'" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 translate-y-2" x-transition:enter-end="opacity-100 translate-y-0" class="p-4 sm:p-5">
                     <div class="mb-6">
                         <div class="ui-settings-kicker text-brand-700 mb-3">Status Saat Ini</div>
                         <div class="grid grid-cols-1 gap-3 text-sm md:grid-cols-3">
@@ -115,7 +115,7 @@
                                 </div>
                                 <div class="mt-1 text-base font-bold text-brand-950">{{ $chartRange['label'] ?? '-' }}</div>
                                 <div class="mt-1 text-xs leading-5 text-brand-800">
-                                    Klik untuk adjust tanggal grafik
+                                    Klik untuk sesuaikan rentang grafik
                                 </div>
                             </button>
                             <button type="button" @click="toggleSection(5)" class="ui-settings-summary-card ui-settings-summary-card-emerald text-left hover:ring-2 hover:ring-brand-300 transition-all cursor-pointer">
@@ -193,7 +193,7 @@
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
                                 </svg>
                             </button>
-                            <div x-show="expandedSection === 2" x-transition class="pt-4">
+                            <div x-show="expandedSection === 2" x-collapse class="pt-4">
                                 <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
                                     <div class="sm:col-span-2">
                                         <label class="ui-form-label" for="period_label">Nama Periode</label>
@@ -231,7 +231,7 @@
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
                                 </svg>
                             </button>
-                            <div x-show="expandedSection === 3" x-transition class="pt-4">
+                            <div x-show="expandedSection === 3" x-collapse class="pt-4">
                                 <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
                                     <div>
                                         <label class="ui-form-label" for="default_fitrah_cash_per_jiwa">Nominal Fitrah Uang / Jiwa (Rp)</label>
@@ -268,7 +268,7 @@
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
                                 </svg>
                             </button>
-                            <div x-show="expandedSection === 4" x-transition class="pt-4">
+                            <div x-show="expandedSection === 4" x-collapse class="pt-4">
                                 <div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
                                     <div>
                                         <label class="ui-form-label" for="chart_starts_at">Tanggal Awal Grafik</label>
@@ -281,9 +281,9 @@
                                         <x-input-error class="mt-2" :messages="$errors->get('chart_ends_at')" />
                                     </div>
                                     <div>
-                                        <label class="ui-form-label" for="chart_fallback_buffer_days">Buffer Hari Setelah</label>
+                                        <label class="ui-form-label" for="chart_fallback_buffer_days">Jarak Ekstra (Hari Setelah Selesai)</label>
                                         <input id="chart_fallback_buffer_days" name="chart_fallback_buffer_days" type="number" min="0" max="14" value="{{ old('chart_fallback_buffer_days', $chartFallbackBufferDays) }}" class="ui-input w-full" required />
-                                        <p class="mt-1 text-xs leading-5 text-emerald-700">Agar grafik tidak berhenti tepat di tanggal selesai.</p>
+                                        <p class="mt-1 text-xs leading-5 text-emerald-700">Agar grafik tidak langsung terhenti tepat pada hari penutupan.</p>
                                         <x-input-error class="mt-2" :messages="$errors->get('chart_fallback_buffer_days')" />
                                     </div>
                                 </div>
@@ -302,7 +302,7 @@
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
                                 </svg>
                             </button>
-                            <div x-show="expandedSection === 5" x-transition class="pt-4">
+                            <div x-show="expandedSection === 5" x-collapse class="pt-4">
                                 <div class="mb-4 rounded-xl bg-emerald-50 border border-emerald-100 p-3">
                                     <div class="text-xs font-bold text-emerald-700 mb-1">📍 Status Grafik Saat Ini</div>
                                     <div class="text-sm font-bold text-slate-900">{{ $dashboardChartRange['period_label'] ?? 'Belum ada periode' }}</div>
@@ -379,12 +379,12 @@
 
                                 <div x-show="dashboardMode === '{{ \App\Services\Charts\ChartRangeResolver::DASHBOARD_MODE_MANUAL_PERIOD }}'" x-transition class="mb-4 grid grid-cols-1 gap-3 sm:grid-cols-2">
                                     <div>
-                                        <label class="ui-form-label" for="dashboard_chart_starts_at">Override Tanggal Awal (opsional)</label>
+                                        <label class="ui-form-label" for="dashboard_chart_starts_at">Timpa Tanggal Awal (opsional)</label>
                                         <input id="dashboard_chart_starts_at" name="dashboard_chart_starts_at" type="date" value="{{ old('dashboard_chart_starts_at', $dashboardChartStartsAt) }}" class="ui-input w-full" />
                                         <x-input-error class="mt-2" :messages="$errors->get('dashboard_chart_starts_at')" />
                                     </div>
                                     <div>
-                                        <label class="ui-form-label" for="dashboard_chart_ends_at">Override Tanggal Akhir (opsional)</label>
+                                        <label class="ui-form-label" for="dashboard_chart_ends_at">Timpa Tanggal Akhir (opsional)</label>
                                         <input id="dashboard_chart_ends_at" name="dashboard_chart_ends_at" type="date" value="{{ old('dashboard_chart_ends_at', $dashboardChartEndsAt) }}" class="ui-input w-full" />
                                         <x-input-error class="mt-2" :messages="$errors->get('dashboard_chart_ends_at')" />
                                     </div>
@@ -404,14 +404,14 @@
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
                                 </svg>
                             </button>
-                            <div x-show="expandedSection === 6" x-transition class="pt-4">
+                            <div x-show="expandedSection === 6" x-collapse class="pt-4">
                                 <div class="mb-4 rounded-xl bg-emerald-50 border border-emerald-100 p-4">
                                     <p class="text-sm text-emerald-900 mb-3"><strong>Langkah Pengetesan:</strong> Buka halaman beranda publik di tab/jendela baru. Lalu tekan tombol di bawah ini. Jika sistem notifikasi aktif, Anda akan mendengar suara 'Pop', muncul popup notifikasi, dan angka total di beranda akan berkedip hijau seketika tanpa perlu memuat ulang halaman.</p>
                                     <button type="button" onclick="document.getElementById('form-test-pusher').submit();" class="ui-btn ui-btn-primary bg-indigo-600 hover:bg-indigo-700 text-white">
                                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
                                         </svg>
-                                        Tembakkan Notifikasi Sekarang
+                                        Uji Notifikasi Sekarang
                                     </button>
                                 </div>
                             </div>
@@ -421,7 +421,7 @@
                             <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                                 <div>
                                     <p class="text-sm font-bold text-slate-900">Siap menyimpan perubahan?</p>
-                                    <p class="mt-1 text-xs leading-5 text-slate-500">Semua perubahan di bawah akan disimpan. Membuka tahun baru ada di tab terpisah.</p>
+                                    <p class="mt-1 text-xs leading-5 text-slate-500">Semua perubahan di atas akan disimpan. Pengaturan tahun baru dikelola di tab terpisah.</p>
                                 </div>
                                 <div class="flex flex-col items-stretch gap-2 sm:flex-row sm:items-center">
                                     <a href="{{ route('dashboard') }}" class="ui-btn ui-btn-secondary w-full sm:w-auto">Kembali</a>
@@ -452,7 +452,7 @@
                 </div>
 
                 {{-- Tab: Mulai Periode Baru --}}
-                <div x-show="tab === 'new_period'" x-cloak class="p-4 sm:p-5">
+                <div x-show="tab === 'new_period'" x-cloak x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 translate-y-2" x-transition:enter-end="opacity-100 translate-y-0" class="p-4 sm:p-5">
                     <div class="ui-settings-panel ui-settings-panel-amber p-3 text-sm text-amber-900 sm:p-4">
                         <p class="font-bold">Gunakan hanya saat benar-benar masuk periode/tahun zakat baru.</p>
                         <p class="mt-1 text-xs leading-5 text-amber-700">Aksi ini membuat periode aktif baru dan mengubah default sistem. Backup database sebelum lanjut.</p>
