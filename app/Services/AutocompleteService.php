@@ -6,8 +6,8 @@ use App\Models\ZakatTransaction;
 
 class AutocompleteService
 {
-    private const AVAILABLE_TYPES = ['pembayar_name', 'penerima_name', 'category'];
-    private const DEFAULT_TYPES = ['pembayar_name', 'penerima_name', 'category'];
+    private const AVAILABLE_TYPES = ['pembayar_name', 'penerima_name', 'category', 'no_transaksi'];
+    private const DEFAULT_TYPES = ['pembayar_name', 'penerima_name', 'category', 'no_transaksi'];
 
     public static function getAutocompleteData(array $types = []): array
     {
@@ -49,6 +49,16 @@ class AutocompleteService
 
         if ($type === 'category') {
             return ['Zakat Mal', 'Zakat Fitrah', 'Infaq', 'Shadaqah'];
+        }
+
+        if ($type === 'no_transaksi') {
+            return ZakatTransaction::query()
+                ->select('no_transaksi')
+                ->whereNotNull('no_transaksi')
+                ->orderByDesc('created_at')
+                ->limit(100)
+                ->pluck('no_transaksi')
+                ->toArray();
         }
 
         return [];
