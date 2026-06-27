@@ -53,21 +53,24 @@
                 </div>
             @endif
 
-            <div class="grid grid-cols-1 gap-3 sm:grid-cols-3">
+            <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
                 <x-ui-stat-card title="Total Akun" :value="$totalUsers" description="Jumlah akun yang tampil di daftar saat ini." />
                 <x-ui-stat-card title="Akses Anda" :value="$roleLabels[$currentUser->role] ?? ucfirst($currentUser->role)" description="Hak kelola mengikuti role yang sedang Anda pakai." tone="info" />
-                <x-ui-stat-card title="Catatan" value="Admin hanya boleh mengelola petugas." description="Akun admin dan super admin lain tetap terlindungi." tone="muted" />
             </div>
 
+            <x-info-box tone="info" title="Catatan Akses" message="Admin hanya boleh mengelola akun petugas. Akun sesama admin dan super admin tetap terlindungi dan tidak dapat diubah oleh admin lain." />
+
             <div class="ui-card overflow-hidden shadow-md">
-                <div class="ui-card-header ui-card-header-slate">
-                    <div class="ui-section-accent h-6 w-2"></div>
-                    <div>
-                        <h3 class="ui-card-header-title">Daftar Pengguna</h3>
-                        <p class="text-xs text-slate-500">Role ditampilkan dengan label operasional agar mudah dipahami.</p>
+                <div class="ui-toolbar-soft xl:flex-row xl:items-start">
+                    <div class="max-w-full space-y-1 xl:max-w-[260px] xl:flex-none">
+                        <div class="ui-section-title">
+                            <div class="ui-section-accent"></div>
+                            <h3 class="font-semibold text-slate-800">Daftar Pengguna</h3>
+                        </div>
+                        <p class="text-sm leading-6 text-slate-500">Role ditampilkan dengan label operasional agar mudah dipahami.</p>
                     </div>
                 </div>
-                <div class="space-y-3 p-4 md:hidden">
+                <div class="space-y-3 px-4 pb-4 pt-4 md:hidden">
                     @if (count($users) > 0)
                         @foreach ($users as $u)
                             <article class="ui-mobile-card">
@@ -109,7 +112,7 @@
                 <div class="hidden overflow-x-auto w-full md:block">
                     <table class="min-w-full text-sm">
                         <thead>
-                            <tr class="bg-slate-50 text-left text-xs font-semibold text-slate-400 uppercase tracking-[0.08em] border-b border-slate-100">
+                            <tr class="border-b border-slate-100 bg-slate-50 text-left text-[11px] font-semibold uppercase tracking-[0.14em] text-slate-400 sm:text-xs">
                                 <th class="px-6 py-4">Nama</th>
                                 <th class="px-6 py-4">Username</th>
                                 <th class="px-6 py-4">Role</th>

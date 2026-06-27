@@ -92,7 +92,9 @@ Route::middleware(['auth', 'role:staff,admin,super_admin'])
             Route::get('/settings/period', [PeriodSettingsController::class, 'edit'])->name('settings.period.edit');
             Route::post('/settings/period', [PeriodSettingsController::class, 'update'])->name('settings.period.update');
             Route::post('/settings/period/start-new', [PeriodSettingsController::class, 'startNewPeriod'])->name('settings.period.start_new');
+        });
 
+        Route::middleware(['role:admin'])->group(function () {
             Route::get('/templates/letterhead', [TemplateController::class, 'index'])->name('templates.letterhead');
             Route::post('/templates/letterhead', [TemplateController::class, 'store'])->name('templates.letterhead.store');
             Route::post('/templates/{template}/activate', [TemplateController::class, 'activate'])->name('templates.activate');

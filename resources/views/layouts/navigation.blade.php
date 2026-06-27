@@ -51,13 +51,14 @@
                                     {{ __('Audit Logs') }}
                                 </x-dropdown-link>
 
+                                <x-dropdown-link :href="route('internal.templates.letterhead')">
+                                    {{ __('Template Kop Surat') }}
+                                </x-dropdown-link>
+
                                 @if ($user->isSuperAdmin())
                                     <div class="ui-label mt-1 border-y border-slate-50 px-4 py-2 text-slate-400">Khusus Super Admin</div>
                                     <x-dropdown-link :href="route('internal.settings.period.edit')">
                                         {{ __('Konfigurasi Periode') }}
-                                    </x-dropdown-link>
-                                    <x-dropdown-link :href="route('internal.templates.letterhead')">
-                                        {{ __('Template Kop Surat') }}
                                     </x-dropdown-link>
                                 @endif
                             </x-slot>

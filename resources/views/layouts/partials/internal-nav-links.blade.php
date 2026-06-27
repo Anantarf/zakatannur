@@ -36,12 +36,12 @@
         <x-dynamic-component :component="$linkComponent" :href="route('internal.audit_logs.index')" :active="request()->routeIs('internal.audit_logs.index')">
             {{ __('Audit Logs') }}
         </x-dynamic-component>
+        <x-dynamic-component :component="$linkComponent" :href="route('internal.templates.letterhead')" :active="request()->routeIs('internal.templates.*')">
+            {{ __('Template Kop Surat') }}
+        </x-dynamic-component>
         @if ($user?->isSuperAdmin())
             <x-dynamic-component :component="$linkComponent" :href="route('internal.settings.period.edit')" :active="request()->routeIs('internal.settings.period.*')">
                 {{ __('Konfigurasi Periode') }}
-            </x-dynamic-component>
-            <x-dynamic-component :component="$linkComponent" :href="route('internal.templates.letterhead')" :active="request()->routeIs('internal.templates.*')">
-                {{ __('Template Kop Surat') }}
             </x-dynamic-component>
         @endif
     </div>
@@ -54,12 +54,12 @@
     <x-dynamic-component :component="$linkComponent" :href="route('internal.audit_logs.index')" :active="request()->routeIs('internal.audit_logs.index')">
         {{ __('Audit') }}
     </x-dynamic-component>
+    <x-dynamic-component :component="$linkComponent" :href="route('internal.templates.letterhead')" :active="request()->routeIs('internal.templates.*')">
+        {{ __('Template') }}
+    </x-dynamic-component>
     @if ($user?->isSuperAdmin())
         <x-dynamic-component :component="$linkComponent" :href="route('internal.settings.period.edit')" :active="request()->routeIs('internal.settings.period.*')">
             {{ __('Periode') }}
-        </x-dynamic-component>
-        <x-dynamic-component :component="$linkComponent" :href="route('internal.templates.letterhead')" :active="request()->routeIs('internal.templates.*')">
-            {{ __('Template') }}
         </x-dynamic-component>
     @endif
 @endif

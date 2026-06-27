@@ -37,10 +37,14 @@
 
             <div class="ui-card overflow-hidden">
                 @if ($user)
-                    <div class="ui-inline-note border-b border-brand-100/70 rounded-none">
-                        <div class="ui-label text-brand-700">Akun yang Diedit</div>
-                        <div class="ui-metric-value mt-1 text-lg text-slate-900">{{ $user->name }}</div>
-                        <div class="mt-0.5 text-sm font-semibold text-brand-700">{{ '@' . $user->username }} - {{ $roleLabels[$user->role] ?? ucfirst($user->role) }}</div>
+                    <div class="ui-toolbar-soft rounded-none border-b-only">
+                        <div class="space-y-1">
+                            <div class="ui-label text-brand-700">Akun yang Diedit</div>
+                            <div class="ui-section-title">
+                                <h3 class="text-lg font-bold text-slate-900">{{ $user->name }}</h3>
+                            </div>
+                            <p class="text-sm text-slate-500">{{ '@' . $user->username }} · {{ $roleLabels[$user->role] ?? ucfirst($user->role) }}</p>
+                        </div>
                     </div>
                 @endif
                 <div class="ui-card-header ui-card-header-emerald">
@@ -91,17 +95,17 @@
                             hint="Minimal {{ $passwordMin }} karakter. {{ $user ? 'Kosongkan jika tidak ingin mengganti password.' : '' }}"
                             :required="!$user" />
 
-                        <div class="sticky bottom-3 z-10 -mx-2 rounded-2xl border border-brand-100 bg-white/90 p-3 shadow-xl shadow-slate-900/10 backdrop-blur sm:static sm:mx-0 sm:flex sm:items-center sm:justify-between sm:shadow-none sm:backdrop-blur-0">
-                            <p class="mb-3 hidden text-xs font-semibold text-slate-500 sm:mb-0 sm:block">Pastikan role sesuai wewenang pengguna.</p>
-                            <div class="flex flex-col-reverse items-stretch gap-3 sm:flex-row sm:items-center">
+                        <div class="flex flex-col-reverse items-stretch gap-3 border-t border-slate-100 bg-slate-50 px-6 py-4 sm:flex-row sm:items-center sm:justify-between">
+                            <div class="flex flex-col-reverse gap-3 sm:flex-row sm:items-center">
                                 <a href="{{ route('internal.users.index') }}" class="ui-btn ui-btn-secondary w-full sm:w-auto">Batal</a>
-                                <button type="submit" class="ui-btn ui-btn-primary w-full px-6 py-3 sm:w-auto">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" />
-                                </svg>
-                                Simpan
+                                <button type="submit" class="ui-btn ui-btn-primary w-full sm:w-auto">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" />
+                                    </svg>
+                                    Simpan
                                 </button>
                             </div>
+                            <p class="hidden text-xs font-semibold text-slate-500 sm:block">Pastikan role sesuai wewenang pengguna.</p>
                         </div>
                     </form>
                 </div>

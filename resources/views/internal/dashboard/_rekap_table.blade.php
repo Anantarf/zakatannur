@@ -1,6 +1,6 @@
 <div class="space-y-3 md:hidden">
     @foreach ($payload['items'] as $item)
-        <article class="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+        <article class="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-md">
             <div class="flex items-start justify-between gap-3">
                 <h4 class="text-sm font-bold uppercase text-slate-900">
                     {{ \App\Models\ZakatTransaction::CATEGORY_LABELS[$item['category']] ?? strtoupper($item['category']) }}
@@ -22,7 +22,7 @@
         </article>
     @endforeach
 
-    <article class="rounded-2xl border border-brand-200 bg-brand-50/60 p-4 shadow-sm">
+    <article class="rounded-2xl border border-brand-200 bg-brand-50/60 p-4 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-md">
         <p class="ui-label text-brand-700">Grand Total</p>
         <div class="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-3">
             <div>

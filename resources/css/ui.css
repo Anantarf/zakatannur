@@ -209,7 +209,7 @@
  }
 
  .ui-icon-button {
-  @apply inline-flex items-center justify-center rounded-lg p-2 transition-colors;
+  @apply inline-flex items-center justify-center rounded-lg p-2 transition-all duration-200 hover:scale-110 active:scale-95;
  }
 
  .ui-icon-button-slate {
