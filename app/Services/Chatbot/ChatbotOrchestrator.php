@@ -21,9 +21,9 @@ class ChatbotOrchestrator
     public function handle(string $message, array $rawContext = [], ?string $sessionId = null): ChatbotResponse
     {
         // Check cache for identical messages
-        $cached = ChatbotResponseCache::get($message);
+        $cached = ChatbotResponseCache::get($message, $sessionId);
         if ($cached) {
-            $this->saveChatLog($message, 'cached', 'cache', $cached->reply, $sessionId);
+            $this->saveChatLog($message, 'cached', $cached->source ?? 'cache', $cached->reply, $sessionId);
             return $cached;
         }
 
@@ -36,28 +36,28 @@ class ChatbotOrchestrator
             if ($intent === 'calculate_fitrah_case') {
                 $response = $this->calculateFitrah($message);
                 $this->saveChatLog($message, $intent, 'calculation', $response->reply, $sessionId, null, 'calculation');
-                ChatbotResponseCache::put($message, $response);
+                ChatbotResponseCache::put($message, $response, $sessionId);
                 return $response;
             }
 
             if ($intent === 'calculate_fidyah_case') {
                 $response = $this->calculateFidyah($message);
                 $this->saveChatLog($message, $intent, 'calculation', $response->reply, $sessionId, null, 'calculation');
-                ChatbotResponseCache::put($message, $response);
+                ChatbotResponseCache::put($message, $response, $sessionId);
                 return $response;
             }
 
             if ($intent === 'calculate_zakat_mal_case') {
                 $response = $this->calculateZakatMal($message);
                 $this->saveChatLog($message, $intent, 'calculation', $response->reply, $sessionId, null, 'calculation');
-                ChatbotResponseCache::put($message, $response);
+                ChatbotResponseCache::put($message, $response, $sessionId);
                 return $response;
             }
 
             if ($intent === 'refer_zakat_mal_complex') {
                 $response = $this->referTopanitia($message);
                 $this->saveChatLog($message, $intent, 'referral', $response->reply, $sessionId, null, 'calculation');
-                ChatbotResponseCache::put($message, $response);
+                ChatbotResponseCache::put($message, $response, $sessionId);
                 return $response;
             }
 
@@ -86,7 +86,7 @@ class ChatbotOrchestrator
                             [['id' => $knowledge['id'], 'label' => $knowledge['source_label'] ?? 'Panduan Zakat Masjid An-Nur']]
                         )->withContext($context->forIntent($entryId, 'knowledge')->toArray());
                         $this->saveChatLog($message, $intent, 'knowledge', $response->reply, $sessionId, null, 'knowledge');
-                        ChatbotResponseCache::put($message, $response);
+                        ChatbotResponseCache::put($message, $response, $sessionId);
                         return $response;
                     }
                 }
@@ -96,7 +96,7 @@ class ChatbotOrchestrator
             if ($publicData) {
                 $response = $publicData->withContext($context->forIntent($intent, 'public_data')->toArray());
                 $this->saveChatLog($message, $intent, 'public_data', $response->reply, $sessionId, null, 'knowledge');
-                ChatbotResponseCache::put($message, $response);
+                ChatbotResponseCache::put($message, $response, $sessionId);
                 return $response;
             }
 
@@ -104,31 +104,16 @@ class ChatbotOrchestrator
             if ($action) {
                 $response = $action->withContext($context->forIntent('navigation', 'action')->toArray());
                 $this->saveChatLog($message, 'navigation', 'action', $response->reply, $sessionId);
-                ChatbotResponseCache::put($message, $response);
+                ChatbotResponseCache::put($message, $response, $sessionId);
                 return $response;
             }
 
-            $knowledge = $this->knowledgeRetriever->best($message);
-            if ($knowledge) {
-                $response = ChatbotResponse::success(
-                    (string) $knowledge['answer'],
-                    'knowledge',
-                    $knowledge['actions'] ?? [],
-                    [[
-                        'id' => $knowledge['id'] ?? null,
-                        'label' => $knowledge['source_label'] ?? 'Panduan Zakat Masjid An-Nur',
-                    ]]
-                )->withContext($context->forIntent((string) ($knowledge['id'] ?? 'knowledge'), 'knowledge')->toArray());
-                $this->saveChatLog($message, (string) ($knowledge['id'] ?? 'knowledge'), 'knowledge', $response->reply, $sessionId, null, 'knowledge');
-                ChatbotResponseCache::put($message, $response);
-                return $response;
-            }
-
+            // Knowledge retrieval and AI processing are now correctly unified in answerFromAi()
             $sentiment = ChatbotSentimentDetector::detect($message);
-            $response = $this->answerFromAi($message);
+            $response = $this->answerFromAi($message, $sessionId);
             $confidenceSource = $this->aiProvider->wasLastReplyFallback() ? 'fallback' : 'ai';
             $this->saveChatLog($message, null, $response->source, $response->reply, $sessionId, $sentiment, $confidenceSource);
-            ChatbotResponseCache::put($message, $response);
+            ChatbotResponseCache::put($message, $response, $sessionId);
             return $response;
         } catch (Throwable $e) {
             Log::error('Chatbot orchestration failed.', [
@@ -161,11 +146,28 @@ class ChatbotOrchestrator
         }
     }
 
-    private function answerFromAi(string $message): ChatbotResponse
+    private function answerFromAi(string $message, ?string $sessionId): ChatbotResponse
     {
         $language = ChatbotLanguageDetector::detect($message);
         $sentiment = ChatbotSentimentDetector::detect($message);
         $contexts = $this->knowledgeRetriever->search($message, 2);
+
+        $history = [];
+        if ($sessionId) {
+            $recentLogs = AiChatLog::where('session_id', $sessionId)
+                ->whereNotNull('answer')
+                ->orderBy('created_at', 'desc')
+                ->limit(4)
+                ->get()
+                ->reverse();
+
+            foreach ($recentLogs as $log) {
+                $history[] = [
+                    'question' => $log->question,
+                    'answer' => $log->answer,
+                ];
+            }
+        }
 
         // Adjust system prompt based on sentiment
         if ($sentiment === 'frustrated') {
@@ -177,32 +179,88 @@ class ChatbotOrchestrator
             }
         }
 
-        $reply = $this->aiProvider->sendMessage($message, $contexts, $language);
+        $reply = $this->aiProvider->sendMessage($message, $contexts, $language, $history);
 
         $wasFallback = $this->aiProvider->wasLastReplyFallback();
         $cleanReply = $wasFallback && str_starts_with($reply, ChatbotServiceInterface::FALLBACK_PREFIX)
             ? substr($reply, strlen(ChatbotServiceInterface::FALLBACK_PREFIX))
             : $reply;
 
-        if ($wasFallback) {
-            return ChatbotResponse::error($cleanReply, true, 503);
+        $actions = [];
+        
+        // Include hardcoded actions from the highest ranked context if available
+        if (!empty($contexts[0]['actions'])) {
+            $actions = array_merge($actions, $contexts[0]['actions']);
         }
 
-        return ChatbotResponse::success($cleanReply, 'ai');
+        if (!$wasFallback) {
+            preg_match_all('/\[SUGGEST:\s*(.*?)\]/i', $cleanReply, $matches);
+            if (!empty($matches[1])) {
+                foreach ($matches[1] as $suggestText) {
+                    // Prevent duplicate labels if AI hallucinates the exact same suggestion as hardcoded
+                    $isDuplicate = collect($actions)->contains('label', trim($suggestText));
+                    if (!$isDuplicate) {
+                        $actions[] = [
+                            'type' => 'suggested_reply',
+                            'label' => trim($suggestText),
+                            'message' => trim($suggestText),
+                        ];
+                    }
+                }
+                $cleanReply = trim(preg_replace('/\[SUGGEST:\s*.*?\]/i', '', $cleanReply));
+            }
+        }
+
+        return $wasFallback
+            ? ChatbotResponse::error($cleanReply, true)
+            : ChatbotResponse::success($cleanReply, 'ai', $actions, $contexts);
+    }
+
+    private function extractNumberFromText(string $text, array $keywords): ?int
+    {
+        $normalized = strtolower($text);
+        
+        // 1. Try to find a digit near the keyword
+        foreach ($keywords as $keyword) {
+            if (preg_match('/(\d+)[\s]*' . preg_quote($keyword) . '/i', $normalized, $matches)) {
+                return (int) $matches[1];
+            }
+        }
+        
+        // 2. Try to map words to numbers near keyword
+        $map = [
+            'satu' => 1, 'dua' => 2, 'tiga' => 3, 'empat' => 4, 'lima' => 5,
+            'enam' => 6, 'tujuh' => 7, 'delapan' => 8, 'sembilan' => 9, 'sepuluh' => 10,
+            'sebelas' => 11, 'dua belas' => 12
+        ];
+        
+        foreach ($keywords as $keyword) {
+            foreach ($map as $word => $num) {
+                if (preg_match('/' . preg_quote($word) . '[\s]*' . preg_quote($keyword) . '/i', $normalized)) {
+                    return $num;
+                }
+            }
+        }
+        
+        // 3. Fallback: just try to find any number in the message
+        if (preg_match('/(\d+)/', $normalized, $matches)) {
+            return (int) $matches[1];
+        }
+
+        return null;
     }
 
     private function calculateFitrah(string $message): ChatbotResponse
     {
-        // ponytail: regex extract number, no NLP — upgrade if multi-language parsing needed
-        if (!preg_match('/(\d+)[\s]*(orang|jiwa|person)/', $message, $matches)) {
+        $count = $this->extractNumberFromText($message, ['orang', 'jiwa', 'person']);
+        
+        if (!$count) {
             return ChatbotResponse::success(
                 'Saya butuh tahu berapa orang yang membayar fitrah. Coba tanya: "Fitrah 4 orang berapa?"',
                 'knowledge',
                 [['type' => 'suggested_reply', 'label' => 'Contoh', 'message' => 'Fitrah keluarga 4 orang berapa?']]
             );
         }
-
-        $count = (int) $matches[1];
         $cashPerJiwa = config('zakat.annual_defaults.fitrah_cash_per_jiwa', 50000);
         $berasPerJiwa = config('zakat.annual_defaults.fitrah_beras_per_jiwa', 2.5);
 
@@ -224,16 +282,15 @@ class ChatbotOrchestrator
 
     private function calculateFidyah(string $message): ChatbotResponse
     {
-        // ponytail: regex extract number, no NLP
-        if (!preg_match('/(\d+)[\s]*(hari|day)/', $message, $matches)) {
+        $days = $this->extractNumberFromText($message, ['hari', 'day']);
+        
+        if (!$days) {
             return ChatbotResponse::success(
                 'Saya butuh tahu berapa hari fidyah yang Anda bayar. Coba tanya: "Fidyah 7 hari berapa?"',
                 'knowledge',
                 [['type' => 'suggested_reply', 'label' => 'Contoh', 'message' => 'Fidyah 5 hari berapa?']]
             );
         }
-
-        $days = (int) $matches[1];
         $cashPerHari = config('zakat.annual_defaults.fidyah_per_hari', 30000);
         $berasPerHari = config('zakat.annual_defaults.fidyah_beras_per_hari', 0.75);
 

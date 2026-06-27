@@ -45,18 +45,17 @@ class ChatbotStreamController
 
                 if ($response->statusCode === 200) {
                     $reply = $response->reply;
-                    $wordBuffer = '';
+                    // ponytail: batch chunks ~50 chars to reduce overhead, no artificial delay
+                    $chunkSize = 50;
+                    for ($i = 0; $i < strlen($reply); $i += $chunkSize) {
+                        $chunk = substr($reply, $i, $chunkSize);
+                        echo "data: " . json_encode(['chunk' => $chunk]) . "\n\n";
+                        flush();
+                    }
 
-                    for ($i = 0; $i < strlen($reply); $i++) {
-                        $char = $reply[$i];
-                        $wordBuffer .= $char;
-
-                        if ($char === ' ' || $char === ',' || $char === '.' || $char === '\n' || $i === strlen($reply) - 1) {
-                            echo "data: " . json_encode(['chunk' => $wordBuffer]) . "\n\n";
-                            flush();
-                            $wordBuffer = '';
-                            usleep(10000); // 10ms delay between chunks
-                        }
+                    if (!empty($response->actions)) {
+                        echo "data: " . json_encode(['actions' => $response->actions]) . "\n\n";
+                        flush();
                     }
 
                     echo "data: [DONE]\n\n";

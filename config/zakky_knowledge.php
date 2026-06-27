@@ -138,8 +138,19 @@ Takaran berlaku periode aktif Ramadan. Silakan konfirmasi ke panitia untuk perio
         'id' => 'infaq-shodaqoh',
         'title' => 'Infaq shodaqoh',
         'keywords' => ['infaq', 'infak', 'shodaqoh', 'sedekah', 'sodaqoh'],
-        'answer' => 'Infaq dan shodaqoh adalah penerimaan sosial yang dicatat terpisah dari kategori zakat. Di portal publik, nominalnya masuk dalam rekap kategori jika sudah ada transaksi valid.',
-        'source_label' => 'Panduan Zakat Masjid An-Nur',
+        'answer' => 'Secara fiqih, **Infaq** dan **Shodaqoh (Sedekah)** adalah pemberian harta secara sukarela yang tidak terikat oleh batas minimum (nishab) atau batas waktu (haul) seperti zakat.
+
+PERBEDAAN DASAR:
+• **Infaq**: Identik dengan pemberian berupa materi/harta benda (misal: menyumbang uang untuk masjid).
+• **Shodaqoh**: Maknanya lebih luas, tidak hanya materi tetapi juga non-materi (misal: tenaga, ilmu, bahkan senyuman).
+
+ATURAN UMUM:
+• Hukumnya Sunnah (sangat dianjurkan), berbeda dengan Zakat yang hukumnya Wajib.
+• Bisa diberikan kepada siapa saja, tidak terbatas pada 8 asnaf (golongan penerima zakat).
+
+CARA PEMBAYARAN DI MASJID AN-NUR:
+Jika Anda ingin menyalurkan donasi sukarela (bukan zakat wajib), silakan datang ke Masjid An-Nur dan sampaikan kepada panitia untuk dimasukkan ke dalam kategori **Infaq/Shodaqoh**.',
+        'source_label' => 'Fiqih Sunnah',
         'actions' => [
             ['type' => 'suggested_reply', 'label' => 'Kategori terbesar', 'message' => 'Kategori terbesar apa?'],
             ['type' => 'open_tab', 'target' => 'laporan', 'label' => 'Buka Ringkasan'],
@@ -237,8 +248,82 @@ Lokasi: https://maps.app.goo.gl/o4SULwNTn9QYkQba9
 Di sana panitia zakat siap membantu Anda dengan kasus yang lebih kompleks atau yang butuh verifikasi dokumen. Mereka juga bisa jawab detail peraturan An-Nur spesifik.',
         'source_label' => 'Informasi Masjid An-Nur',
         'actions' => [
+            ['type' => 'open_url', 'url' => 'https://maps.app.goo.gl/o4SULwNTn9QYkQba9', 'label' => 'Buka Peta Lokasi'],
             ['type' => 'suggested_reply', 'label' => 'Tanya panitia', 'message' => 'Bagaimana cara konsultasi langsung dengan panitia?'],
             ['type' => 'suggested_reply', 'label' => 'Kembali ke menu', 'message' => 'Menu utama'],
+        ],
+    ],
+    [
+        'id' => 'zakat-profesi-penghasilan',
+        'title' => 'Zakat Profesi atau Penghasilan',
+        'keywords' => ['zakat profesi', 'zakat penghasilan', 'zakat gaji', 'gaji bulanan', 'bonus', 'pendapatan', 'potong gaji'],
+        'answer' => 'Zakat profesi dikenakan pada penghasilan (gaji, bonus, honor) yang didapat dari pekerjaan halal.
+
+NISHAB & TARIF:
+• Nishab setara dengan 85 gram emas per tahun (atau di-qiyas-kan ke hasil panen 653 kg gabah).
+• Tarif zakat: 2,5% dari penghasilan.
+
+CARA PEMBAYARAN DI MASJID AN-NUR:
+Karena zakat profesi adalah bagian dari Zakat Harta (Mal), maka jika Anda ingin membayarnya di Masjid An-Nur, silakan masukkan nominal pembayarannya ke dalam kategori **ZAKAT MAL** saat Anda berhadapan dengan panitia atau sistem donasi.',
+        'source_label' => 'Fatwa MUI & BAZNAS',
+        'actions' => [
+            ['type' => 'suggested_reply', 'label' => 'Hitung zakat mal', 'message' => 'Contoh perhitungan zakat mal?'],
+            ['type' => 'suggested_reply', 'label' => 'Cara bayar', 'message' => 'Bagaimana cara bayar zakat di An-Nur?'],
+        ],
+    ],
+    [
+        'id' => 'zakat-emas-perak',
+        'title' => 'Zakat Emas dan Perak',
+        'keywords' => ['zakat emas', 'zakat perak', 'perhiasan', 'emas batangan', 'logam mulia', 'cincin', 'kalung'],
+        'answer' => 'Zakat Emas dan Perak dikenakan jika kepemilikannya sudah 1 tahun (haul) dan mencapai nishab.
+
+ATURAN UMUM:
+• Emas simpanan (batangan/koin): Wajib zakat 2,5% jika mencapai 85 gram.
+• Perak simpanan: Wajib zakat 2,5% jika mencapai 595 gram.
+• Perhiasan dipakai: Umumnya tidak wajib dizakati selama jumlahnya wajar dan murni dipakai, bukan disimpan sbg aset (tergantung fatwa wilayah).
+
+CARA PEMBAYARAN DI MASJID AN-NUR:
+Zakat Emas dan Perak masuk dalam rumpun Zakat Harta. Untuk membayarnya di Masjid An-Nur, silakan salurkan ke dalam kategori **ZAKAT MAL**.',
+        'source_label' => 'Hukum Fiqih Zakat Harta',
+        'actions' => [
+            ['type' => 'suggested_reply', 'label' => 'Nishab zakat mal', 'message' => 'Nishab zakat mal saat ini berapa?'],
+            ['type' => 'suggested_reply', 'label' => 'Cara bayar', 'message' => 'Bagaimana cara bayar zakat?'],
+        ],
+    ],
+    [
+        'id' => 'zakat-perniagaan',
+        'title' => 'Zakat Perniagaan atau Usaha',
+        'keywords' => ['zakat dagang', 'zakat usaha', 'perniagaan', 'bisnis', 'modal', 'untung dagang', 'toko', 'warung'],
+        'answer' => 'Zakat perniagaan diwajibkan bagi aset perdagangan (barang dagangan + uang tunai/modal yang berputar).
+
+RUMUS DASAR:
+(Modal Diputar + Keuntungan + Piutang Lancar) - Hutang Jatuh Tempo = Aset Zakat
+
+NISHAB & TARIF:
+• Nishab setara dengan 85 gram emas (setelah 1 tahun/haul).
+• Tarif zakat: 2,5%.
+
+CARA PEMBAYARAN DI MASJID AN-NUR:
+Zakat perniagaan adalah bagian langsung dari Zakat Harta. Untuk pembayaran di Masjid An-Nur, silakan pilih/salurkan ke dalam kategori **ZAKAT MAL**.',
+        'source_label' => 'Hukum Fiqih Zakat Harta',
+        'actions' => [
+            ['type' => 'suggested_reply', 'label' => 'Konsultasi Panitia', 'message' => 'Saya mau konsultasi dengan panitia langsung.'],
+        ],
+    ],
+    [
+        'id' => 'zakat-vs-hutang',
+        'title' => 'Kewajiban Zakat vs Hutang',
+        'keywords' => ['punya hutang', 'kpr', 'cicilan', 'kredit', 'hutang', 'potong hutang', 'syarat zakat hutang'],
+        'answer' => 'Hutang dapat memengaruhi kewajiban zakat, namun ada aturannya.
+
+PANDUAN UMUM:
+• Hutang mendesak/jatuh tempo: Bisa menjadi pengurang aset sebelum dihitung zakatnya. Jika setelah dikurangi hutang total harta turun di bawah nishab, tidak wajib zakat.
+• Hutang jangka panjang (seperti KPR/Cicilan Kendaraan): Yang dikurangkan sebagai pengurang harta hanyalah nominal cicilan yang jatuh tempo pada tahun tersebut (bukan total sisa hutang keseluruhan).
+
+Karena kasus hutang sangat personal dan rumit, AI Zakky menyarankan untuk **mengkonsultasikan detail keuangan Anda secara langsung dengan ustadz atau Panitia Zakat An-Nur** agar mendapat fatwa yang tepat sebelum membayar Zakat Mal.',
+        'source_label' => 'Fatwa MUI & Lembaga Zakat Nasional',
+        'actions' => [
+            ['type' => 'suggested_reply', 'label' => 'Kontak Panitia', 'message' => 'Bagaimana menghubungi panitia?'],
         ],
     ],
 ];

@@ -39,6 +39,14 @@
         scrollbar-width: thin;
         scrollbar-color: #cbd5e1 transparent;
     }
+    
+    /* Markdown Styles overrides */
+    [data-chatbot-widget] strong {
+        font-weight: 700 !important;
+    }
+    [data-chatbot-widget] em {
+        font-style: italic !important;
+    }
 </style>
 
 <div
@@ -169,7 +177,7 @@
             </div>
 
             <template x-for="(message, index) in messages" :key="`${message.role}-${index}`">
-                <div class="flex w-full animate-fade-in" :class="message.role === 'user' ? 'justify-end' : 'justify-start items-start'" style="animation-duration: 300ms;">
+                <div class="flex w-full animate-fade-in" data-message :data-index="index" :class="message.role === 'user' ? 'justify-end' : 'justify-start items-start'" style="animation-duration: 300ms;">
                     <template x-if="message.role === 'bot'">
                         <span class="mr-3 flex h-8 w-8 shrink-0 items-center justify-center overflow-hidden rounded-full bg-brand-600 text-white flex-shrink-0 transform-gpu">
                             {!! $profileAvatar !!}
@@ -178,10 +186,10 @@
 
                     <div class="flex max-w-[85%] flex-col group" :class="message.role === 'user' ? 'items-end' : 'items-start'">
                         <div
-                            class="px-3 py-2 text-[13px] font-medium leading-relaxed break-words whitespace-pre-wrap"
+                            class="px-3 py-2 text-[13px] font-medium leading-relaxed break-words"
                             style="word-break: break-word;"
                             :class="message.role === 'user'
-                                ? 'rounded-lg rounded-tr-none bg-brand-600 text-white'
+                                ? 'whitespace-pre-wrap rounded-lg rounded-tr-none bg-brand-600 text-white'
                                 : (message.isError
                                     ? 'rounded-lg rounded-tl-none border border-amber-200 bg-amber-50 text-amber-900'
                                     : 'rounded-lg rounded-tl-none border border-slate-200 bg-white text-slate-800')"
@@ -253,12 +261,16 @@
                                 <template x-for="(action, actionIndex) in message.actions" :key="`action-${index}-${actionIndex}`">
                                     <button
                                         type="button"
-                                        x-show="action.type === 'open_tab' || action.type === 'suggested_reply'"
+                                        x-show="action.type === 'open_tab' || action.type === 'suggested_reply' || action.type === 'open_url'"
                                         @click="executeAction(action)"
-                                        class="rounded-lg border border-slate-200 bg-white px-2.5 py-1.5 text-xs font-medium text-slate-700 transition-all hover:border-brand-300 hover:bg-brand-50 active:scale-95 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:ring-offset-1"
+                                        class="rounded-lg border border-slate-200 bg-white px-2.5 py-1.5 text-xs font-medium text-slate-700 transition-all hover:border-brand-300 hover:bg-brand-50 active:scale-95 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:ring-offset-1 inline-flex items-center gap-1"
                                         :title="action.label || (action.target === 'grafik' ? 'Lihat Grafik' : 'Buka Ringkasan')"
-                                        x-text="action.label || (action.target === 'grafik' ? 'Lihat Grafik' : 'Buka Ringkasan')"
-                                    ></button>
+                                    >
+                                        <span x-text="action.label || (action.target === 'grafik' ? 'Lihat Grafik' : 'Buka Ringkasan')"></span>
+                                        <template x-if="action.type === 'open_url'">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 text-brand-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" /></svg>
+                                        </template>
+                                    </button>
                                 </template>
                             </div>
                         </template>

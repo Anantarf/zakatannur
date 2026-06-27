@@ -264,7 +264,16 @@ class ZakatTransaction extends Model
     public function scopeForPeriodOrYear(Builder $query, ?int $periodId = null, ?int $year = null): Builder
     {
         return $query
-            ->when($periodId !== null, fn (Builder $q) => $q->where('zakat_period_id', $periodId))
+            ->when($periodId !== null, fn (Builder $q) => $q->where(function ($sub) use ($periodId, $year) {
+                $sub->where('zakat_period_id', $periodId);
+                if ($year !== null) {
+                    $sub->orWhere(function ($q2) use ($year) {
+                        $q2->whereNull('zakat_period_id')->where('tahun_zakat', $year);
+                    });
+                } else {
+                    $sub->orWhereNull('zakat_period_id');
+                }
+            }))
             ->when($periodId === null && $year !== null, fn (Builder $q) => $q->where('tahun_zakat', $year));
     }
 

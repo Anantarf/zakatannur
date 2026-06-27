@@ -194,23 +194,29 @@ const buildChart = (canvas, type, config, palette) => {
                             }
                             return ' ' + new Intl.NumberFormat('id-ID', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(c.parsed.y || 0) + ' Kg';
                         },
-                        afterBody: () => {
-                            const total = sumRange(data);
-                            const max = Math.max(...data, 0);
-                            const avg = data.length ? total / data.length : 0;
-                            const last = data[data.length - 1] || 0;
-                            const prev = data.length > 1 ? data[data.length - 2] || 0 : 0;
-                            const delta = last - prev;
-                            const tail = type === 'uang'
-                                ? '  ' + new Intl.NumberFormat('id-ID').format(total)
-                                : '  ' + new Intl.NumberFormat('id-ID', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(total) + ' Kg';
-                            return [
-                                '',
-                                'Total periode:' + tail,
-                                'Rata-rata: ' + (type === 'uang' ? new Intl.NumberFormat('id-ID').format(Math.round(avg)) : new Intl.NumberFormat('id-ID', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(avg) + ' Kg'),
-                                'Tertinggi: ' + (type === 'uang' ? new Intl.NumberFormat('id-ID').format(max) : max + ' Kg'),
-                                'Delta: ' + (delta >= 0 ? '+' : '') + (type === 'uang' ? new Intl.NumberFormat('id-ID').format(delta) : delta.toFixed(2) + ' Kg'),
-                            ];
+                        afterBody: (items) => {
+                            const res = [];
+                            
+                            if (items && items.length) {
+                                const idx = items[0].dataIndex;
+                                if (idx > 0) {
+                                    const current = data[idx] || 0;
+                                    const prev = data[idx - 1] || 0;
+                                    const diff = current - prev;
+                                    let diffStr = '';
+                                    if (diff > 0) {
+                                        diffStr = '↑ ' + (type === 'uang' ? new Intl.NumberFormat('id-ID').format(diff) : diff.toFixed(2) + ' Kg');
+                                    } else if (diff < 0) {
+                                        diffStr = '↓ ' + (type === 'uang' ? new Intl.NumberFormat('id-ID').format(Math.abs(diff)) : Math.abs(diff).toFixed(2) + ' Kg');
+                                    } else {
+                                        diffStr = '-';
+                                    }
+                                    res.push('Selisih Harian: ' + diffStr);
+                                } else {
+                                    res.push('Selisih Harian: -');
+                                }
+                            }
+                            return res;
                         },
                     },
                 },

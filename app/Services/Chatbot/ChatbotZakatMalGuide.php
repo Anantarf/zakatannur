@@ -74,18 +74,28 @@ class ChatbotZakatMalGuide
     private function extractNumber(string $message, array $keywords): ?int
     {
         foreach ($keywords as $keyword) {
-            // Look for pattern: keyword ... number
-            if (preg_match('/' . preg_quote($keyword) . '[\s\D]*(\d+[\s\.]*(?:juta|ribu|rb|jt|rp)?)/i', $message, $matches)) {
-                $numStr = $matches[1];
-                $num = (int) preg_replace('/[^\d]/', '', $numStr);
+            if (preg_match('/' . preg_quote($keyword) . '.*?([\d\.,]+[\s]*(?:juta|ribu|rb|jt|miliar)?)/i', $message, $matches)) {
+                $numStr = strtolower(trim($matches[1]));
                 
-                if (str_contains($numStr, 'juta') || str_contains($numStr, 'jt')) {
-                    $num *= 1000000;
+                $multiplier = 1;
+                if (str_contains($numStr, 'miliar')) {
+                    $multiplier = 1000000000;
+                } elseif (str_contains($numStr, 'juta') || str_contains($numStr, 'jt')) {
+                    $multiplier = 1000000;
                 } elseif (str_contains($numStr, 'ribu') || str_contains($numStr, 'rb')) {
-                    $num *= 1000;
+                    $multiplier = 1000;
                 }
                 
-                return $num ?: null;
+                $rawNumber = preg_replace('/[^\d\.,]/', '', $numStr);
+                
+                if ($multiplier > 1 && preg_match('/^(\d+)[\.,](\d+)$/', $rawNumber, $parts)) {
+                    $floatVal = (float) ($parts[1] . '.' . $parts[2]);
+                    return (int) ($floatVal * $multiplier);
+                }
+                
+                $cleanNum = (int) preg_replace('/[^\d]/', '', $rawNumber);
+                
+                return ($cleanNum * $multiplier) ?: null;
             }
         }
         return null;
@@ -103,7 +113,7 @@ class ChatbotZakatMalGuide
 
     private function normalize(string $message): string
     {
-        $message = preg_replace('/[^\pL\pN\s]/u', ' ', mb_strtolower($message)) ?? '';
+        $message = preg_replace('/[^\pL\pN\s\.,]/u', ' ', mb_strtolower($message)) ?? '';
         return trim(preg_replace('/\s+/', ' ', $message) ?? '');
     }
 }

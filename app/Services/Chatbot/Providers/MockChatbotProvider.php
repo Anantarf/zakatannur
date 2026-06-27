@@ -6,7 +6,7 @@ use App\Services\Chatbot\ChatbotServiceInterface;
 
 class MockChatbotProvider implements ChatbotServiceInterface
 {
-    public function sendMessage(string $message, array $context = [], string $language = 'id'): string
+    public function sendMessage(string $message, array $context = [], string $language = 'id', array $history = []): string
     {
         $lower = strtolower($message);
 

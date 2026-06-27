@@ -13,3 +13,14 @@
 [x-cloak] {
  display: none !important;
 }
+
+/* Swup Transition Styles */
+html.is-animating .transition-fade {
+    opacity: 0;
+    transform: translateY(15px);
+}
+.transition-fade {
+    transition: opacity 0.4s ease-out, transform 0.4s ease-out;
+    opacity: 1;
+    transform: translateY(0);
+}

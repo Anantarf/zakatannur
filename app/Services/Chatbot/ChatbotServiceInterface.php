@@ -23,7 +23,7 @@ interface ChatbotServiceInterface
      * @param string $language 'id' or 'en'
      * @return string
      */
-    public function sendMessage(string $message, array $context = [], string $language = 'id'): string;
+    public function sendMessage(string $message, array $context = [], string $language = 'id', array $history = []): string;
 
     /**
      * Apakah balasan terakhir merupakan fallback (layanan AI tidak tersedia).

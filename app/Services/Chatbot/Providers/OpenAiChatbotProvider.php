@@ -24,7 +24,7 @@ class OpenAiChatbotProvider implements ChatbotServiceInterface
         $this->timeout = $timeout;
     }
 
-    public function sendMessage(string $message, array $context = [], string $language = 'id'): string
+    public function sendMessage(string $message, array $context = [], string $language = 'id', array $history = []): string
     {
         $this->lastReplyWasFallback = false;
 
@@ -46,15 +46,18 @@ class OpenAiChatbotProvider implements ChatbotServiceInterface
     . "ALWAYS reply in the same language as the user's question.";
 
         if ($language === 'id') {
-            $systemInstruction = "Nama Anda adalah 'Zakky', asisten virtual untuk Zakat An-Nur. "
+            $systemInstruction = "Nama Anda adalah 'Zakky', asisten virtual sekaligus Customer Service Islami untuk Masjid An-Nur. "
         . "Tugas Anda: membantu dengan pertanyaan zakat, pembayaran, nishab, dan operasional masjid. "
-        . "Gaya: singkat, ramah, sopan, profesional. "
+        . "PERSONA (GAYA BAHASA): Gunakan bahasa yang sopan, hangat, dan profesional. Sapa pengguna dengan panggilan Bapak/Ibu/Kak. Sisipkan frasa empati Islami (seperti 'Insya Allah' atau 'Alhamdulillah') jika konteksnya tepat. Jangan kaku seperti robot. "
         . "ATURAN KRITIS: Anda HANYA BOLEH menjawab berdasarkan informasi di bagian 'Konteks resmi' di bawah ini. "
-        . "JANGAN gunakan pengetahuan umum Anda. JANGAN mengarang atau menebak data apa pun (nomor rekening, jadwal, nama panitia, nominal, hukum). "
-        . "Jika jawaban TIDAK ADA di dalam konteks resmi, Anda WAJIB menjawab 'Mohon maaf, informasi tersebut belum tersedia di sistem saya. Silakan hubungi panitia secara langsung'. "
+        . "JANGAN gunakan pengetahuan umum Anda. JANGAN mengarang data (nomor rekening, jadwal, nama panitia, nominal, hukum). "
+        . "Jika jawaban TIDAK ADA di dalam konteks resmi, Anda WAJIB menjawab dengan empati: 'Mohon maaf Bapak/Ibu, informasi tersebut belum tersedia di sistem saya. Silakan datang langsung ke Masjid An-Nur agar panitia bisa membantu menjelaskannya.' "
         . "Jika ditanya tentang topik di luar zakat/Islam/masjid, tolak dengan sopan dan kembalikan ke topik zakat. "
         . "SELALU balas dalam bahasa yang sama dengan pertanyaan user. "
-        . "PENTING: Di akhir setiap jawaban tentang zakat An-Nur, selalu tambahkan ajakan: 'Untuk detail lebih lanjut, datang aja ke Masjid An-Nur pada 10 hari terakhir Ramadhan atau setelah zakat dibuka. Panitia zakat siap membantu: https://maps.app.goo.gl/o4SULwNTn9QYkQba9'";
+        . "ATURAN LOKASI & PEMBAYARAN: JIKA user secara spesifik bertanya cara bayar, mau konsultasi, atau lokasi masjid, barulah Anda infokan: 'Untuk detail lebih lanjut atau pembayaran, silakan datang ke Masjid An-Nur pada 10 hari terakhir Ramadhan atau setelah panitia zakat dibuka. Lokasi: https://maps.app.goo.gl/o4SULwNTn9QYkQba9'. JANGAN tampilkan info ini jika tidak ditanya! "
+        . "PREDIKSI PERTANYAAN (SUGGESTIONS): Di baris paling akhir dari balasan Anda, Anda WAJIB memberikan 2-3 ide pertanyaan lanjutan singkat (maks 5-7 kata per pertanyaan) yang mungkin relevan dengan topik yang sedang dibahas. "
+        . "Gunakan format ini persis: [SUGGEST: <pertanyaan>] untuk setiap saran. "
+        . "Contoh: [SUGGEST: Bagaimana cara bayar?] [SUGGEST: Apa itu fidyah?]";
         }
 
         if (!empty($context)) {
@@ -78,10 +81,7 @@ class OpenAiChatbotProvider implements ChatbotServiceInterface
                 }, throw: false)
                 ->post($url, [
                     'model' => $this->model,
-                    'messages' => [
-                        ['role' => 'system', 'content' => $systemInstruction],
-                        ['role' => 'user', 'content' => $message],
-                    ],
+                    'messages' => $this->buildMessagesArray($systemInstruction, $history, $message),
                     'temperature' => 0.1,
                     'max_completion_tokens' => 500,
                 ]);
@@ -145,5 +145,28 @@ class OpenAiChatbotProvider implements ChatbotServiceInterface
     {
         $this->lastReplyWasFallback = true;
         return ChatbotServiceInterface::FALLBACK_PREFIX . $message;
+    }
+
+    private function buildMessagesArray(string $systemInstruction, array $history, string $currentMessage): array
+    {
+        $messages = [
+            ['role' => 'system', 'content' => $systemInstruction],
+        ];
+
+        // Sliding Window Memory: limit to the last 3 interactions (6 messages) to save tokens and keep LLM focused
+        $recentHistory = array_slice($history, -3);
+
+        foreach ($recentHistory as $hist) {
+            if (!empty($hist['question'])) {
+                $messages[] = ['role' => 'user', 'content' => $hist['question']];
+            }
+            if (!empty($hist['answer'])) {
+                $messages[] = ['role' => 'assistant', 'content' => $hist['answer']];
+            }
+        }
+
+        $messages[] = ['role' => 'user', 'content' => $currentMessage];
+
+        return $messages;
     }
 }

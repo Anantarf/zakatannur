@@ -95,16 +95,73 @@ document.addEventListener('alpine:init', () => {
             }
         },
 
+        parseMarkdown(text) {
+            if (!text) return '';
+            
+            // 1. Escape HTML first to prevent XSS
+            let div = document.createElement('div');
+            div.textContent = text;
+            let html = div.innerHTML;
+
+            // 2. Parse Bold (**text**)
+            html = html.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
+            
+            // 3. Parse Italic (*text*)
+            html = html.replace(/\*([^*]+)\*/g, '<em>$1</em>');
+            
+            // 4. Parse Links [text](url)
+            html = html.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank" rel="noopener noreferrer" class="text-brand-600 underline hover:text-brand-800">$1</a>');
+            
+            // 5. Parse Unordered Lists (- item or * item)
+            // We split by lines to handle block-level elements better
+            const lines = html.split('\n');
+            let inList = false;
+            let parsedLines = [];
+            
+            for (let i = 0; i < lines.length; i++) {
+                let line = lines[i];
+                const listMatch = line.match(/^(\s*)(?:-|\*)\s+(.+)$/);
+                
+                if (listMatch) {
+                    if (!inList) {
+                        parsedLines.push('<ul class="list-disc pl-5 my-1 space-y-1">');
+                        inList = true;
+                    }
+                    parsedLines.push(`<li>${listMatch[2]}</li>`);
+                } else {
+                    if (inList) {
+                        parsedLines.push('</ul>');
+                        inList = false;
+                    }
+                    if (line.trim() !== '') {
+                        parsedLines.push(`<p class="mb-2 last:mb-0">${line}</p>`);
+                    }
+                }
+            }
+            if (inList) {
+                parsedLines.push('</ul>');
+            }
+            
+            return parsedLines.join('');
+        },
+
         formatMessage(content, role) {
             if (!content) return '';
-            let div = document.createElement('div');
-            div.textContent = content;
-            let escaped = div.innerHTML;
-            if (role === 'bot') {
-                // Wrap 'Zakky' with extra bold green span
-                escaped = escaped.replace(/\b(Zakky)\b/gi, '<span class="font-extrabold text-brand-700">$1</span>');
+            
+            if (role === 'user') {
+                // User messages are strictly escaped text
+                let div = document.createElement('div');
+                div.textContent = content;
+                return div.innerHTML;
             }
-            return escaped;
+            
+            // Bot messages get Markdown parsing
+            let html = this.parseMarkdown(content);
+            
+            // Wrap 'Zakky' with extra bold green span
+            html = html.replace(/\b(Zakky)\b/gi, '<span class="font-extrabold text-brand-700">$1</span>');
+            
+            return html;
         },
 
         init() {
@@ -271,6 +328,15 @@ document.addEventListener('alpine:init', () => {
             });
         },
 
+        scrollToMessage(index) {
+            this.$nextTick(() => {
+                const message = this.$refs.chatContainer?.querySelector(`[data-message][data-index="${index}"]`);
+                if (message) {
+                    message.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            });
+        },
+
         async sendMessage() {
             if (this.isTyping || this.isInputEmpty) {
                 return;
@@ -431,6 +497,11 @@ document.addEventListener('alpine:init', () => {
         },
 
         executeAction(action) {
+            if (action?.type === 'open_url' && action?.url) {
+                window.open(action.url, '_blank', 'noopener,noreferrer');
+                return;
+            }
+
             if (action?.type === 'open_tab' && action?.target) {
                 this.openTab(action.target);
                 return;
@@ -493,7 +564,9 @@ document.addEventListener('alpine:init', () => {
                 };
 
                 this.messages.push(botMessage);
+                const msgIndex = this.messages.length - 1;
                 let firstChunkPlayed = false;
+                let scrolledToMessage = false;
 
                 while (true) {
                     const { done, value } = await reader.read();
@@ -505,18 +578,29 @@ document.addEventListener('alpine:init', () => {
                     for (let i = 0; i < lines.length - 1; i++) {
                         const line = lines[i].trim();
                         if (line.startsWith('data: ')) {
-                            const data = JSON.parse(line.slice(6));
+                            const dataString = line.slice(6).trim();
+                            if (dataString === '[DONE]') {
+                                continue;
+                            }
+
+                            const data = JSON.parse(dataString);
                             if (data.chunk) {
                                 if (!firstChunkPlayed) {
                                     this.playPopSound();
                                     firstChunkPlayed = true;
                                 }
-                                botMessage.content += data.chunk;
-                                this.$nextTick(() => this.scrollToBottom(true));
+                                this.messages[msgIndex].content += data.chunk;
+                                // Scroll to message only on first chunk, not every chunk
+                                if (!scrolledToMessage) {
+                                    this.scrollToMessage(msgIndex);
+                                    scrolledToMessage = true;
+                                }
+                            } else if (data.actions) {
+                                this.messages[msgIndex].actions = data.actions;
                             } else if (data.error) {
-                                botMessage.isError = true;
-                                botMessage.isRetryable = data.retryable;
-                                botMessage.content = data.error;
+                                this.messages[msgIndex].isError = true;
+                                this.messages[msgIndex].isRetryable = data.retryable;
+                                this.messages[msgIndex].content = data.error;
                                 break;
                             }
                         }

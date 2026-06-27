@@ -70,9 +70,6 @@ export const createDataMethods = (config, chartService, animateValue = noopAnima
     },
 
     animateSummaryCards(oldTotals, newTotals) {
-        if (this.isFirstLoad) {
-            return;
-        }
 
         const animate = (id, start, end, type) => {
             const element = document.getElementById(id);

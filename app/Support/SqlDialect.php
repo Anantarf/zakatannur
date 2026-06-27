@@ -40,6 +40,9 @@ final class SqlDialect
 
     public static function effectiveTimestamp(string $waktuTerimaColumn = 'waktu_terima', string $createdAtColumn = 'created_at'): string
     {
+        if ($waktuTerimaColumn === 'waktu_terima' && $createdAtColumn === 'created_at') {
+            return 'effective_time';
+        }
         return "COALESCE({$waktuTerimaColumn}, {$createdAtColumn})";
     }
 

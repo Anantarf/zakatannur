@@ -63,7 +63,8 @@
         <div class="ui-shell-main">
             @include('layouts.navigation')
 
-            <!-- Page Heading -->
+            <div id="swup" class="transition-fade">
+                <!-- Page Heading -->
             @if (isset($header))
                 <header class="pt-5 sm:pt-6">
                     <div class="ui-page-header">
@@ -79,7 +80,17 @@
                 {{ $slot }}
             </main>
         </div>
+        </div>
 
         @stack('scripts')
+        <script src="https://unpkg.com/swup@4"></script>
+        <script src="https://unpkg.com/@swup/scripts-plugin@2"></script>
+        <script>
+            document.addEventListener('DOMContentLoaded', () => {
+                const swup = new Swup({
+                    plugins: [new SwupScriptsPlugin()]
+                });
+            });
+        </script>
     </body>
 </html>
