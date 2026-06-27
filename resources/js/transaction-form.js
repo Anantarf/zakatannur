@@ -1,3 +1,62 @@
+// Fuzzy matching with typo tolerance
+function levenshteinDistance(a, b) {
+    const aa = a.toLowerCase();
+    const bb = b.toLowerCase();
+    const matrix = [];
+
+    for (let i = 0; i <= bb.length; i++) {
+        matrix[i] = [i];
+    }
+    for (let j = 0; j <= aa.length; j++) {
+        matrix[0][j] = j;
+    }
+
+    for (let i = 1; i <= bb.length; i++) {
+        for (let j = 1; j <= aa.length; j++) {
+            const cost = aa[j - 1] === bb[i - 1] ? 0 : 1;
+            matrix[i][j] = Math.min(
+                matrix[i][j - 1] + 1,
+                matrix[i - 1][j] + 1,
+                matrix[i - 1][j - 1] + cost
+            );
+        }
+    }
+    return matrix[bb.length][aa.length];
+}
+
+function fuzzyMatch(query, candidates) {
+    if (!query || query.length === 0) return [];
+
+    const queryLower = query.toLowerCase();
+    const matches = [];
+
+    for (const candidate of candidates) {
+        const candidateLower = candidate.toLowerCase();
+
+        // Exact substring match (prioritize)
+        if (candidateLower.includes(queryLower)) {
+            const position = candidateLower.indexOf(queryLower);
+            matches.push({ value: candidate, score: 1000 - position });
+            continue;
+        }
+
+        // Typo tolerance for queries >= 3 chars
+        if (query.length >= 3) {
+            const distance = levenshteinDistance(query, candidate);
+            if (distance <= 2) {
+                matches.push({ value: candidate, score: 100 - distance });
+            }
+        }
+    }
+
+    matches.sort((a, b) => {
+        if (a.score !== b.score) return b.score - a.score;
+        return a.value.localeCompare(b.value);
+    });
+
+    return matches.map(m => m.value);
+}
+
 const parseTransactionFormConfig = () => {
     const element = document.getElementById('transaction-form-config');
 
@@ -39,6 +98,7 @@ if (transactionFormConfig) {
         showSuggestions: false,
         activeIndex: -1,
         searchTimeout: null,
+        autocompleteCache: {},
         persons: cloneValue(transactionFormConfig.initialPersons),
         standards: {
             fitrahUang: transactionFormConfig.fitrahBase,
@@ -118,23 +178,35 @@ if (transactionFormConfig) {
         async handleInput() {
             this.syncFirstName();
 
-            if (this.pembayar_name.length < 2) {
+            if (this.pembayar_name.length < 1) {
                 this.suggestions = [];
                 this.showSuggestions = false;
                 return;
             }
 
             clearTimeout(this.searchTimeout);
-            this.searchTimeout = setTimeout(async () => {
-                try {
-                    const response = await fetch(`${transactionFormConfig.autocompleteUrl}?q=${encodeURIComponent(this.pembayar_name)}`);
-                    this.suggestions = await response.json();
-                    this.showSuggestions = this.suggestions.length > 0;
-                    this.activeIndex = -1;
-                } catch (error) {
-                    console.error('Autocomplete error:', error);
+            this.searchTimeout = setTimeout(() => {
+                // Load cache if not loaded
+                if (Object.keys(this.autocompleteCache).length === 0) {
+                    fetch('/api/autocomplete/data')
+                        .then(r => r.json())
+                        .then(data => {
+                            this.autocompleteCache = data;
+                            this.filterSuggestions();
+                        })
+                        .catch(err => console.error('Autocomplete cache load failed:', err));
+                    return;
                 }
-            }, 300);
+
+                this.filterSuggestions();
+            }, 200);
+        },
+        filterSuggestions() {
+            const candidates = this.autocompleteCache.pembayar_name || [];
+            const matches = fuzzyMatch(this.pembayar_name, candidates);
+            this.suggestions = matches.slice(0, 10).map(name => ({ name, address: '', phone: '' }));
+            this.showSuggestions = this.suggestions.length > 0;
+            this.activeIndex = -1;
         },
         selectSuggestion(suggestion) {
             this.pembayar_name = suggestion.name;
@@ -335,6 +407,14 @@ if (transactionFormConfig) {
             this.$nextTick(() => {
                 this.initialSnapshot = this.getSnapshot();
             });
+
+            // Pre-load autocomplete cache
+            fetch('/api/autocomplete/data')
+                .then(r => r.json())
+                .then(data => {
+                    this.autocompleteCache = data;
+                })
+                .catch(err => console.error('Autocomplete cache pre-load failed:', err));
 
             window.onpageshow = () => {
                 this.submitting = false;
