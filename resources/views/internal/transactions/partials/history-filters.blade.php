@@ -1,5 +1,5 @@
-<form method="GET" action="{{ route('internal.transactions.index') }}" class="flex w-full flex-col items-stretch gap-2 sm:flex-row sm:flex-wrap sm:items-center xl:justify-end">
-    <input type="text" name="q" value="{{ $q ?? '' }}" placeholder="Cari nomor transaksi atau nama..." class="ui-input w-full sm:min-w-[260px] sm:flex-[1_1_280px] xl:max-w-[320px]" />
+<form method="GET" action="{{ route('internal.transactions.index') }}" class="flex w-full flex-col items-stretch gap-2 sm:flex-row sm:flex-wrap sm:items-center xl:justify-end" x-data="{ submitTimeout: null }" @submit.prevent>
+    <input type="text" name="q" value="{{ $q ?? '' }}" placeholder="Cari nomor transaksi atau nama..." class="ui-input w-full sm:min-w-[260px] sm:flex-[1_1_280px] xl:max-w-[320px]" @input="clearTimeout(submitTimeout); submitTimeout = setTimeout(() => $el.closest('form').submit(), 400)" @keydown.enter="$el.closest('form').submit()" />
 
     <div class="relative w-full sm:min-w-[170px] sm:flex-[1_1_170px] xl:max-w-[190px]">
         <select name="category" class="ui-select w-full appearance-none pr-10">
