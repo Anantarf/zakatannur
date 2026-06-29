@@ -15,30 +15,42 @@ class ZakatTransactionCacheObserver
         Cache::forget(AppSetting::cacheKeyForPublicHomeStats($year));
     }
 
+    private function clearAnomalyAvgCache(ZakatTransaction $model): void
+    {
+        Cache::forget("anomaly:avg_nominal_uang:{$model->category}");
+    }
+
     public function created(ZakatTransaction $zakatTransaction): void
     {
         $this->clearPublicCache($zakatTransaction);
+        $this->clearAnomalyAvgCache($zakatTransaction);
     }
 
     public function updated(ZakatTransaction $zakatTransaction): void
     {
         if ($zakatTransaction->wasChanged()) {
             $this->clearPublicCache($zakatTransaction);
+            if ($zakatTransaction->wasChanged(['nominal_uang', 'category', 'metode', 'status'])) {
+                $this->clearAnomalyAvgCache($zakatTransaction);
+            }
         }
     }
 
     public function deleted(ZakatTransaction $zakatTransaction): void
     {
         $this->clearPublicCache($zakatTransaction);
+        $this->clearAnomalyAvgCache($zakatTransaction);
     }
 
     public function restored(ZakatTransaction $zakatTransaction): void
     {
         $this->clearPublicCache($zakatTransaction);
+        $this->clearAnomalyAvgCache($zakatTransaction);
     }
 
     public function forceDeleted(ZakatTransaction $zakatTransaction): void
     {
         $this->clearPublicCache($zakatTransaction);
+        $this->clearAnomalyAvgCache($zakatTransaction);
     }
 }

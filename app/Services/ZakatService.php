@@ -14,7 +14,6 @@ use App\Services\Transactions\TransactionReviewAssistantService;
 use App\Services\Transactions\TransactionRowPersister;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Database\QueryException;
 use Illuminate\Validation\ValidationException;
@@ -155,17 +154,9 @@ class ZakatService
     private function performSync(array $data, array $items, int $petugasId, Carbon $waktuTerima, ?string $noTransaksiOverride): array
     {
         $lockName = 'sync_tx_' . $waktuTerima->format('Ymd');
-
-        // NOTE: Cache::lock only serializes within a single host for file/database drivers.
-        // For multi-host deployments, set CACHE_DRIVER=redis in .env so this lock is shared.
-        // See .env.example for the full multi-host caveat.
-        $lock = Cache::lock($lockName, (int) config('zakat.cache.lock_timeout_seconds', 30));
+        $lockToken = $this->acquireTransactionLock($lockName);
 
         try {
-            if (!$lock->get()) {
-                throw new \RuntimeException("Gagal mendapatkan kunci transaksi setelah menunggu (Lock: {$lockName}). Silakan coba lagi.");
-            }
-
             $noTransaksi = $noTransaksiOverride ?? $this->numberGenerator->generate($waktuTerima);
             $wasReceiptPrinted = ZakatTransaction::withTrashed()
                 ->where('no_transaksi', $noTransaksi)
@@ -203,7 +194,51 @@ class ZakatService
                 'wasReceiptPrinted' => $wasReceiptPrinted,
             ];
         } finally {
-            if (isset($lock)) $lock->release();
+            $this->releaseTransactionLock($lockToken);
+        }
+    }
+
+    /**
+     * Serializes transaction number generation on the database connection.
+     *
+     * Cache locks are unsafe here with the file driver because the sequence is
+     * persisted in the database. The lock must live beside the row reads/writes.
+     *
+     * @return array{driver:string,name:string}|null
+     */
+    private function acquireTransactionLock(string $lockName): ?array
+    {
+        $driver = DB::connection()->getDriverName();
+        $timeout = (int) config('zakat.cache.lock_timeout_seconds', 30);
+
+        if (in_array($driver, ['mysql', 'mariadb'], true)) {
+            $result = DB::selectOne('SELECT GET_LOCK(?, ?) AS acquired', [$lockName, $timeout]);
+
+            if ((int) ($result->acquired ?? 0) !== 1) {
+                throw new \RuntimeException("Gagal mendapatkan kunci transaksi setelah menunggu (Lock: {$lockName}). Silakan coba lagi.");
+            }
+
+            return ['driver' => $driver, 'name' => $lockName];
+        }
+
+        if ($driver === 'pgsql') {
+            DB::select('SELECT pg_advisory_xact_lock(hashtext(?))', [$lockName]);
+        }
+
+        return null;
+    }
+
+    /**
+     * @param array{driver:string,name:string}|null $lockToken
+     */
+    private function releaseTransactionLock(?array $lockToken): void
+    {
+        if ($lockToken === null) {
+            return;
+        }
+
+        if (in_array($lockToken['driver'], ['mysql', 'mariadb'], true)) {
+            DB::select('SELECT RELEASE_LOCK(?)', [$lockToken['name']]);
         }
     }
 

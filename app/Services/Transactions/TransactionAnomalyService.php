@@ -187,9 +187,15 @@ class TransactionAnomalyService
         return self::flagMeta();
     }
 
+    public static function bustOverviewCache(): void
+    {
+        Cache::increment('anomaly:overview:version');
+    }
+
     private function overview(array $filters): array
     {
-        $cacheKey = 'anomaly:overview:' . md5(json_encode($filters));
+        $version = Cache::get('anomaly:overview:version', 0);
+        $cacheKey = 'anomaly:overview:' . $version . ':' . md5(json_encode($filters));
 
         return Cache::remember($cacheKey, 300, function () use ($filters) {
             $summary = DB::query()

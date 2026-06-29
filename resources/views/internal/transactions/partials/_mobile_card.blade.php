@@ -118,7 +118,7 @@
         <a class="ui-btn ui-btn-secondary px-3 py-3 text-xs border-amber-200 text-amber-700 hover:bg-amber-50" href="{{ route('internal.transactions.edit', ['transaction' => $t->id]) }}">
             Ubah
         </a>
-        <button type="button" @click="$dispatch('open-modal', 'trash-modal'); $dispatch('open-trash-modal', { id: {{ $t->id }}, no: '{{ $t->no_transaksi }}' })" class="ui-btn ui-btn-danger px-3 py-3 text-xs">
+        <button type="button" @click="$dispatch('open-modal', 'trash-modal'); $dispatch('open-trash-modal', { id: {{ $t->id }}, no: '{{ addslashes($t->no_transaksi) }}' })" class="ui-btn ui-btn-danger px-3 py-3 text-xs">
             Hapus
         </button>
     </div>

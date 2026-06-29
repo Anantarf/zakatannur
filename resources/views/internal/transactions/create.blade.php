@@ -40,7 +40,7 @@
                         <input type="hidden" :name="`items[${i}][category]`" :value="tx.category">
                         <input type="hidden" :name="`items[${i}][metode]`" :value="tx.metode">
                         <template x-if="tx.category === 'fitrah'">
-                            <input type="hidden" :name="`items[${i}][jiwa]`" value="1">
+                            <input type="hidden" :name="`items[${i}][jiwa]`" :value="tx.jiwa">
                         </template>
                         <template x-if="tx.hari">
                             <input type="hidden" :name="`items[${i}][hari]`" :value="tx.hari">

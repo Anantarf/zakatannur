@@ -72,6 +72,7 @@ class TransactionAnomalyController extends Controller
             filled($reviewNote) ? $reviewNote : null,
             (int) $request->user()->id
         );
+        TransactionAnomalyService::bustOverviewCache();
         $afterReview = $reviewAssistantService->detailReviewForGroup($noTransaksi);
 
         if (

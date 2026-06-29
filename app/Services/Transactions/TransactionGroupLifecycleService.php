@@ -114,16 +114,14 @@ class TransactionGroupLifecycleService
                 'restored_by' => $user->id,
             ]);
 
+            ZakatTransaction::where('no_transaksi', $noTransaksi)
+                ->update(['anomaly_context' => json_encode(['restored_after_delete' => true])]);
+
             $restoredTransactions = ZakatTransaction::query()
                 ->where('no_transaksi', $noTransaksi)
                 ->orderBy('id')
                 ->get();
 
-            $restoredTransactions->each(function (ZakatTransaction $transaction): void {
-                $transaction->setAttribute('anomaly_context', [
-                    'restored_after_delete' => true,
-                ]);
-            });
             $this->reviewAssistantService->syncForTransactions($restoredTransactions);
 
             return [
