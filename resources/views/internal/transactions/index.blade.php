@@ -90,24 +90,28 @@
                 <div class="hidden overflow-x-auto w-full md:block">
                     <table class="min-w-full text-sm">
                         <thead>
-                            <tr class="border-b border-slate-200 bg-slate-50 text-left text-[11px] font-bold uppercase tracking-[0.14em] text-slate-600 sm:text-xs">
-                                <th class="px-3 py-4 sm:px-5 w-32">No. Transaksi</th>
-                                <th class="px-3 py-4 sm:px-5 w-32">Waktu</th>
-                                <th class="px-3 py-4 sm:px-5 flex-1">Pembayar</th>
-                                <th class="px-3 py-4 text-right sm:px-5 w-40">Total Nominal</th>
+                            <tr class="ui-table-header">
+                                <th class="pl-4 pr-2 py-3">No. Transaksi</th>
+                                <th class="px-2 py-3">Waktu</th>
+                                <th class="px-2 py-3">Pembayar</th>
+                                <th class="px-1 py-3 text-center">Kategori</th>
+                                <th class="px-1 py-3 text-center">Bentuk</th>
+                                <th class="px-2 py-3 text-right">Total Nominal</th>
                                 @if ($canViewRisk)
-                                    <th class="px-2 py-4 text-center sm:px-4 w-20">Risiko</th>
+                                    <th class="px-1 py-3 text-center">Risiko</th>
                                 @endif
-                                <th class="px-3 py-4 text-center sm:px-5 w-32">Petugas</th>
-                                <th class="px-3 py-4 text-center sm:px-5 w-32">Aksi</th>
+                                <th class="px-2 py-3 text-center">Petugas</th>
+                                <th class="min-w-[90px] pl-2 pr-4 py-3 text-center">Aksi</th>
                             </tr>
                         </thead>
-                        <tbody class="divide-y divide-slate-100">
-                            @forelse ($transactions as $t)
+                        @forelse ($transactions as $t)
+                            <tbody x-data="{ open: false }" class="border-b border-slate-100 last:border-0">
                                 @include("internal.transactions.partials._desktop_row", ["t" => $t])
-                            @empty
+                            </tbody>
+                        @empty
+                            <tbody>
                                 <tr>
-                                    <td colspan="{{ $canViewRisk ? 7 : 6 }}" class="px-6 py-12 text-center">
+                                    <td colspan="{{ $canViewRisk ? 9 : 8 }}" class="px-6 py-12 text-center">
                                         <div class="flex flex-col items-center">
                                             <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 text-slate-200 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
@@ -118,8 +122,8 @@
                                         </div>
                                     </td>
                                 </tr>
-                            @endforelse
-                        </tbody>
+                            </tbody>
+                        @endforelse
                     </table>
                 </div>
 
@@ -136,7 +140,7 @@
     <x-modal name="trash-modal" :show="$errors->has('deleted_reason')" focusable>
         <form method="POST" x-data="{ id: '', no: '' }" x-on:open-trash-modal.window="id = $event.detail.id; no = $event.detail.no; $el.action = '{{ url('/internal/transactions') }}/' + id + '/trash';" class="p-6">
             @csrf
-            <h2 class="text-lg font-medium text-slate-900">
+            <h2 class="text-lg font-bold text-slate-900">
                 Yakin ingin memindahkan transaksi <span x-text="no" class="font-bold font-sans text-red-600"></span> ke Sampah?
             </h2>
             <p class="mt-1 text-sm text-slate-600">
@@ -153,11 +157,11 @@
                 >{{ old('deleted_reason') }}</textarea>
                 <x-input-error :messages="$errors->get('deleted_reason')" class="mt-2" />
             </div>
-            <div class="mt-6 flex justify-end">
+            <div class="ui-modal-actions">
                 <x-secondary-button x-on:click="$dispatch('close')">
                     Batal
                 </x-secondary-button>
-                <x-danger-button class="ml-3">
+                <x-danger-button>
                     Ya, Pindahkan ke Sampah
                 </x-danger-button>
             </div>
@@ -187,7 +191,7 @@
     <!-- Modal Export Harian -->
     <x-modal name="export-daily-modal" focusable maxWidth="sm">
         <form method="GET" action="{{ route('internal.rekap.export.daily') }}" class="p-6">
-            <h2 class="text-lg font-semibold text-slate-900 flex items-center gap-2 mb-4">
+            <h2 class="text-lg font-bold text-slate-900 flex items-center gap-2 mb-4">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-brand-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
                 Pilih Tanggal (Rekap Harian)
             </h2>
@@ -198,12 +202,13 @@
             <div class="mb-6">
                 <x-input-label for="daily_date" :value="'Tanggal Transaksi'" class="mb-2" />
                 @if(isset($availableDates) && count($availableDates) > 0)
-                        <select id="daily_date" name="date" required class="ui-select w-full bg-white">
-                            <option value="">-- Pilih Tanggal --</option>
-                            @foreach ($availableDates as $rawDate => $formattedDate)
-                                <option value="{{ $rawDate }}">{{ $formattedDate }}</option>
-                            @endforeach
-                        </select>
+                        @php
+                            $dateOptions = ['' => '-- Pilih Tanggal --'];
+                            foreach ($availableDates as $rawDate => $formattedDate) {
+                                $dateOptions[$rawDate] = $formattedDate;
+                            }
+                        @endphp
+                        <x-ui-select-custom name="date" :options="$dateOptions" placeholder="-- Pilih Tanggal --" />
                 @else
                     <div class="p-4 bg-slate-50 border border-slate-200 rounded-lg text-sm text-slate-500 not-italic text-center">
                         Belum ada transaksi valid yang tersedia untuk diekspor.
@@ -226,7 +231,7 @@
     <!-- Modal Export Tahunan -->
     <x-modal name="export-yearly-modal" focusable maxWidth="sm">
         <form method="GET" action="{{ route('internal.rekap.export.yearly') }}" class="p-6">
-            <h2 class="text-lg font-semibold text-slate-900 flex items-center gap-2 mb-4">
+            <h2 class="text-lg font-bold text-slate-900 flex items-center gap-2 mb-4">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
                 Pilih Tahun (Rekap Tahunan)
             </h2>
@@ -237,12 +242,13 @@
             <div class="mb-6">
                 <x-input-label for="yearly_year" :value="'Tahun Zakat'" class="mb-2" />
                 @if(isset($availableYears) && count($availableYears) > 0)
-                        <select id="yearly_year" name="year" required class="ui-select w-full bg-white focus:border-blue-500 focus:ring-blue-500">
-                            <option value="">-- Pilih Tahun --</option>
-                            @foreach ($availableYears as $optYear)
-                                <option value="{{ $optYear }}">{{ $optYear }}</option>
-                            @endforeach
-                        </select>
+                        @php
+                            $yearlyOptions = ['' => '-- Pilih Tahun --'];
+                            foreach ($availableYears as $optYear) {
+                                $yearlyOptions[$optYear] = $optYear;
+                            }
+                        @endphp
+                        <x-ui-select-custom name="year" :options="$yearlyOptions" placeholder="-- Pilih Tahun --" />
                 @else
                     <div class="p-4 bg-slate-50 border border-slate-200 rounded-lg text-sm text-slate-500 not-italic text-center">
                         Belum ada transaksi valid yang tersedia untuk diekspor.

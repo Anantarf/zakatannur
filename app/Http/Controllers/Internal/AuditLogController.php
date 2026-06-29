@@ -39,7 +39,8 @@ class AuditLogController extends Controller
         }
 
         $logs = $query->paginate(50)->appends($request->query());
-        $totalLogs = AuditLog::query()->count();
+        // ponytail: paginator already computed total; one query for latest instead of two separate ones
+        $totalLogs = $logs->total();
         $latestLog = AuditLog::query()->latest('created_at')->first();
         $zakkyInsight = $zakkyInsightService->auditLogInsight();
 

@@ -153,7 +153,10 @@
                                                     const prevVal = Number(ctx.dataset.data[currentIndex - 1]) || 0;
                                                     const diff = currentVal - prevVal;
                                                     
-                                                    if (diff === 0) return ['', ' Stabil dibanding kemarin'];
+                                                    if (diff === 0) {
+                                                        if (currentVal === 0) return ['', ' Tidak ada transaksi'];
+                                                        return ['', ' Stabil dibanding kemarin'];
+                                                    }
                                                     
                                                     const trend = diff > 0 ? '↑ Naik' : '↓ Turun';
                                                     return [
@@ -243,44 +246,42 @@
         <div class="ui-shell-main">
             @include('layouts.navigation')
 
-            <div id="swup" class="transition-fade">
+            <div>
                 <!-- Page Heading -->
-            @if (isset($header))
-                <header class="pt-5 sm:pt-6">
-                    <div class="ui-page-header">
-                        <div class="ui-page-header-card">
-                            {{ $header }}
+                @if (isset($header))
+                    <header class="pt-5 sm:pt-6">
+                        <div class="ui-page-header">
+                            <div class="ui-page-header-card">
+                                {{ $header }}
+                            </div>
                         </div>
-                    </div>
-                </header>
-            @endif
+                    </header>
+                @endif
 
-            <!-- Page Content -->
-            <main class="pb-10">
-                {{ $slot }}
-            </main>
-            @stack('scripts')
-        </div>
-        </div>
-        <script src="https://unpkg.com/swup@4"></script>
-        <script src="https://unpkg.com/@swup/scripts-plugin@3"></script>
-        <script>
-            document.addEventListener('DOMContentLoaded', () => {
-                const swup = new Swup({
-                    plugins: [new SwupScriptsPlugin()]
-                });
-                
-                // Fallback manual script evaluator to guarantee inline scripts execution
-                swup.hooks.on('content:replace', () => {
-                    const scripts = document.querySelectorAll('#swup script');
-                    scripts.forEach(oldScript => {
-                        const newScript = document.createElement('script');
-                        Array.from(oldScript.attributes).forEach(attr => newScript.setAttribute(attr.name, attr.value));
-                        newScript.appendChild(document.createTextNode(oldScript.innerHTML));
-                        oldScript.parentNode.replaceChild(newScript, oldScript);
+                <!-- Page Content -->
+                <main class="pb-10">
+                    {{ $slot }}
+                </main>
+            </div>
+            
+            <script>
+                document.addEventListener('submit', function(e) {
+                    if (e.defaultPrevented) return;
+                    const form = e.target;
+                    if (form.target === '_blank') return;
+                    form.querySelectorAll('[type="submit"]').forEach(btn => {
+                        btn.disabled = true;
                     });
                 });
-            });
-        </script>
+                window.addEventListener('pageshow', function(e) {
+                    if (e.persisted) {
+                        document.querySelectorAll('[type="submit"]').forEach(btn => {
+                            btn.disabled = false;
+                        });
+                    }
+                });
+            </script>
+            @stack('scripts')
+        </div>
     </body>
 </html>

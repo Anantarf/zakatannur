@@ -104,11 +104,11 @@
                         @if(request('period_id')) <input type="hidden" name="period_id" value="{{ request('period_id') }}"> @endif
                         @if(request('metode')) <input type="hidden" name="metode" value="{{ request('metode') }}"> @endif
 
-                        <select name="days" onchange="this.form.submit()" class="appearance-none rounded-lg border-slate-200 bg-slate-50 pl-3 pr-8 py-1.5 text-[11px] sm:text-xs font-semibold text-slate-500 uppercase tracking-[0.08em] focus:border-brand-500 focus:ring-brand-500 transition-all cursor-pointer">
-                            <option value="7" @selected($activeDays == 7)>7 Hari</option>
-                            <option value="14" @selected($activeDays == 14)>14 Hari</option>
-                            <option value="30" @selected($activeDays == 30)>30 Hari</option>
-                        </select>
+                        <x-ui-select-custom name="days" :value="$activeDays" :options="[
+                            '7' => '7 Hari',
+                            '14' => '14 Hari',
+                            '30' => '30 Hari',
+                        ]" @change="$el.closest('form').submit()" class="w-28 sm:w-32" />
                     </form>
                 </div>
                 <div class="px-4 pb-4 pt-3 sm:px-6 sm:pb-6 sm:pt-4">
@@ -148,34 +148,35 @@
                     <form method="GET" action="{{ route('dashboard') }}" class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 w-full sm:w-auto mt-2 sm:mt-0">
                         <!-- Filter Tahun -->
                         <div class="relative w-full sm:w-auto sm:min-w-[120px]">
-                            <select name="year" onchange="this.form.submit()" class="w-full appearance-none rounded-lg border-slate-200 bg-slate-50 pl-3 pr-8 py-2 text-sm font-bold text-slate-600 focus:border-brand-500 focus:ring-brand-500 transition-all cursor-pointer">
-                                <option value="">Semua Waktu</option>
-                                @foreach ($years ?? [] as $y)
-                                    <option value="{{ $y }}" @selected((string) $year === (string) $y)>Tahun {{ $y }}</option>
-                                @endforeach
-                            </select>
+                            @php
+                                $yearOptions = ['' => 'Semua Waktu'];
+                                foreach ($years ?? [] as $y) {
+                                    $yearOptions[$y] = 'Tahun ' . $y;
+                                }
+                            @endphp
+                            <x-ui-select-custom name="year" :value="$year" :options="$yearOptions" @change="$el.closest('form').submit()" />
 
                         </div>
 
                         <div class="relative w-full sm:w-auto sm:min-w-[190px]">
-                            <select name="period_id" onchange="this.form.submit()" class="w-full appearance-none rounded-lg border-slate-200 bg-slate-50 pl-3 pr-8 py-2 text-sm font-bold text-slate-600 focus:border-brand-500 focus:ring-brand-500 transition-all cursor-pointer">
-                                <option value="">Semua Periode</option>
-                                @foreach ($periods ?? [] as $period)
-                                    <option value="{{ $period->id }}" @selected((string) ($periodId ?? '') === (string) $period->id)>
-                                        {{ $period->display_label }}{{ $period->sequence > 1 ? ' #' . $period->sequence : '' }}
-                                    </option>
-                                @endforeach
-                            </select>
+                            @php
+                                $periodOptions = ['' => 'Semua Periode'];
+                                foreach ($periods ?? [] as $period) {
+                                    $periodOptions[$period->id] = $period->display_label . ($period->sequence > 1 ? ' #' . $period->sequence : '');
+                                }
+                            @endphp
+                            <x-ui-select-custom name="period_id" :value="$periodId" :options="$periodOptions" @change="$el.closest('form').submit()" />
                         </div>
 
                         <!-- Filter Bentuk Zakat -->
                         <div class="relative w-full sm:w-auto sm:min-w-[140px]">
-                            <select name="metode" onchange="this.form.submit()" class="w-full appearance-none rounded-lg border-slate-200 bg-slate-50 pl-3 pr-8 py-2 text-sm font-bold text-slate-600 focus:border-brand-500 focus:ring-brand-500 transition-all cursor-pointer">
-                                <option value="">Semua Bentuk</option>
-                                @foreach ($methods ?? [] as $m)
-                                    <option value="{{ $m }}" @selected((string) $metode === (string) $m)>{{ \App\Models\ZakatTransaction::METHOD_LABELS[$m] ?? strtoupper($m) }}</option>
-                                @endforeach
-                            </select>
+                            @php
+                                $methodOptions = ['' => 'Semua Bentuk'];
+                                foreach ($methods ?? [] as $m) {
+                                    $methodOptions[$m] = \App\Models\ZakatTransaction::METHOD_LABELS[$m] ?? strtoupper($m);
+                                }
+                            @endphp
+                            <x-ui-select-custom name="metode" :value="$metode" :options="$methodOptions" @change="$el.closest('form').submit()" />
 
                         </div>
 

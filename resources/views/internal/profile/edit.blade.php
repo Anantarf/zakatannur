@@ -34,7 +34,7 @@
                 </div>
 
                 <div class="p-4 sm:p-5">
-                    <form method="POST" action="{{ route('internal.profile.update') }}" class="space-y-4">
+                    <form method="POST" action="{{ route('internal.profile.update') }}" class="space-y-4" x-data="{ isSubmitting: false }" @submit="isSubmitting = true">
                         @csrf
                         @method('PATCH')
 
@@ -97,8 +97,16 @@
                         </div>
 
                         <div class="mt-4 flex justify-end">
-                            <button type="submit" class="ui-btn ui-btn-primary w-full sm:w-auto px-6 py-2.5">
-                                {{ __('Simpan Perubahan') }}
+                            <button type="submit" 
+                                    :disabled="isSubmitting"
+                                    :class="{'opacity-50 cursor-not-allowed': isSubmitting}"
+                                    class="ui-btn ui-btn-primary w-full sm:w-auto px-6 py-2.5">
+                                <template x-if="isSubmitting">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                                    </svg>
+                                </template>
+                                <span x-text="isSubmitting ? 'Menyimpan...' : '{{ __('Simpan Perubahan') }}'"></span>
                             </button>
                         </div>
                     </form>

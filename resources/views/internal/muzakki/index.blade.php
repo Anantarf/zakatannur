@@ -41,7 +41,7 @@
                             <svg xmlns="http://www.w3.org/2000/svg" class="ui-alert-icon" viewBox="0 0 20 20" fill="currentColor">
                             <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
                             </svg>
-                            Mohon Perbaiki Kesalahan Berikut:
+                            Mohon periksa:
                         </div>
                         <ul class="list-disc pl-10 space-y-1 text-sm">
                             @foreach ($errors->all() as $error)
@@ -61,7 +61,7 @@
             <div class="ui-card overflow-hidden">
                 <div class="border-b border-slate-200 bg-slate-50/50 p-4">
                     <form method="GET" action="{{ route('internal.muzakki.index') }}" class="flex w-full flex-col gap-2 sm:flex-row sm:items-center" x-data="{ submitTimeout: null }" @submit.prevent>
-                        <input type="text" name="q" value="{{ $q }}" placeholder="Cari nama/alamat..." class="ui-input w-full sm:flex-1" @input="clearTimeout(submitTimeout); submitTimeout = setTimeout(() => $el.closest('form').submit(), 400)" @keydown.enter="$el.closest('form').submit()" />
+                        <input type="text" name="q" value="{{ $q }}" placeholder="Cari nama atau alamat..." class="ui-input w-full sm:flex-1" @input="clearTimeout(submitTimeout); submitTimeout = setTimeout(() => $el.closest('form').submit(), 400)" @keydown.enter="$el.closest('form').submit()" />
                         <div class="flex w-full flex-none items-center gap-2 sm:w-auto">
                             <button type="submit" class="ui-btn ui-btn-secondary flex-1 sm:flex-none px-4 py-2.5">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -127,7 +127,7 @@
                 <div class="hidden overflow-x-auto w-full md:block">
                     <table class="min-w-full text-sm">
                         <thead>
-                            <tr class="border-b border-slate-200 bg-slate-50 text-left text-[11px] font-bold uppercase tracking-[0.14em] text-slate-600 sm:text-xs">
+                            <tr class="ui-table-header">
                                 <th class="px-3 sm:px-5 py-3">Nama</th>
                                 <th class="px-3 sm:px-5 py-3">No HP</th>
                                 <th class="px-3 sm:px-5 py-3">Alamat</th>
@@ -202,7 +202,7 @@
         <form method="POST" x-data="{ id: '', name: '' }" x-on:open-delete-modal.window="id = $event.detail.id; name = $event.detail.name; $el.action = '{{ url('/internal/muzakki') }}/' + id;" class="p-6">
             @csrf
             @method('DELETE')
-            <h2 class="text-lg font-medium text-slate-900">
+            <h2 class="text-lg font-bold text-slate-900">
                 Pindahkan Muzakki <span x-text="name" class="font-bold text-brand-700"></span> ke Tempat Sampah?
             </h2>
             <p class="mt-1 text-sm text-slate-600">

@@ -28,6 +28,7 @@ class ZakkyAdminInsightService
 
         return cache()->remember($cacheKey, 3600, function () use ($today) {
             $logs = AuditLog::query()
+                ->with('actorUser')
                 ->where('created_at', '>=', $today)
                 ->get(['id', 'action', 'created_at', 'metadata', 'actor_user_id']);
 

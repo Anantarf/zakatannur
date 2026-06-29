@@ -122,6 +122,7 @@ class ZakatTransactionController extends Controller
 
         $groupItems = ZakatTransaction::transactionGroupItems($tx->no_transaksi, false, [
             'muzakki' => fn($q) => $q->withTrashed(),
+            'zakatPeriod',
         ]);
 
         return view('internal.transactions.create', $this->transactionFormViewData(
@@ -186,7 +187,7 @@ class ZakatTransactionController extends Controller
 
     private function resolveGroupItems(string $groupNumber): \Illuminate\Support\Collection
     {
-        $relations = ['muzakki' => fn($q) => $q->withTrashed()];
+        $relations = ['muzakki' => fn($q) => $q->withTrashed(), 'zakatPeriod'];
         $items = ZakatTransaction::transactionGroupItems($groupNumber, false, $relations);
 
         return $items->isEmpty()
@@ -197,7 +198,7 @@ class ZakatTransactionController extends Controller
     private function resolveGroupItemsForReceipt(string $groupNumber): \Illuminate\Support\Collection
     {
         $query = fn(bool $withTrashed) => ($withTrashed ? ZakatTransaction::withTrashed() : ZakatTransaction::query())
-            ->with(['muzakki' => fn($q) => $q->withTrashed()])
+            ->with(['muzakki' => fn($q) => $q->withTrashed(), 'zakatPeriod'])
             ->forTransactionGroup($groupNumber)
             ->valid()
             ->orderBy('id', 'asc')

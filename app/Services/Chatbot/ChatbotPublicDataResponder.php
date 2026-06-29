@@ -29,7 +29,12 @@ class ChatbotPublicDataResponder
             'ask_latest_update' => $this->latestUpdate($summary),
             'ask_payment_info' => ChatbotResponse::success(
                 'Untuk pembayaran zakat, silakan serahkan langsung ke amil di Masjid An-Nur. Untuk transfer, Anda bisa menghubungi panitia untuk informasi rekening resmi.',
-                'public_data'
+                'knowledge',
+                [
+                    ['type' => 'suggested_reply', 'label' => 'Berapa total zakat?', 'message' => 'Berapa total zakat terkumpul?'],
+                    ['type' => 'open_tab', 'target' => 'laporan', 'label' => 'Buka Laporan']
+                ],
+                [['id' => 'payment-info', 'label' => 'Panduan Zakat Masjid An-Nur']]
             ),
             default => null,
         };

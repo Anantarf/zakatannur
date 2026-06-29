@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\AppSetting;
 use App\Models\ZakatTransaction;
 use App\Support\SqlDialect;
+use Illuminate\Support\Facades\Cache;
 
 class GuestLatestController extends Controller
 {
@@ -16,20 +17,22 @@ class GuestLatestController extends Controller
         // Fetch 5 latest validated transactions within the current active year
         $effectiveTimestamp = SqlDialect::effectiveTimestamp();
 
-        $latest = ZakatTransaction::valid()
-            ->where('tahun_zakat', $activeYear)
-            ->orderByRaw("{$effectiveTimestamp} DESC")
-            ->limit(5)
-            ->get()
-            ->map(function ($tx) {
-                return [
-                    'id' => $tx->id,
-                    'category' => $tx->category,
-                    'uang' => (int) $tx->nominal_uang,
-                    'beras' => (float) $tx->jumlah_beras_kg,
-                    'timestamp' => $tx->waktu_terima ? $tx->waktu_terima->timestamp : $tx->created_at->timestamp,
-                ];
-            });
+        $latest = Cache::remember("guest:latest:5:{$activeYear}", 30, function () use ($activeYear, $effectiveTimestamp) {
+            return ZakatTransaction::valid()
+                ->where('tahun_zakat', $activeYear)
+                ->orderByRaw("{$effectiveTimestamp} DESC")
+                ->limit(5)
+                ->get()
+                ->map(function ($tx) {
+                    return [
+                        'id' => $tx->id,
+                        'category' => $tx->category,
+                        'uang' => (int) $tx->nominal_uang,
+                        'beras' => (float) $tx->jumlah_beras_kg,
+                        'timestamp' => $tx->waktu_terima ? $tx->waktu_terima->timestamp : $tx->created_at->timestamp,
+                    ];
+                });
+        });
 
         return response()->json([
             'data' => $latest

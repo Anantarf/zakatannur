@@ -22,6 +22,19 @@ class AuditLog extends Model
         'actor_user_id' => 'integer',
     ];
 
+    protected static function booted()
+    {
+        static::created(function ($log) {
+            // Batasi log maksimal 5000 data. Cari id log ke-5000 (dari terbaru)
+            $thresholdRecord = static::orderBy('id', 'desc')->skip(4999)->first(['id']);
+            
+            if ($thresholdRecord) {
+                // Hapus semua log yang lebih tua dari log ke-5000 tersebut
+                static::where('id', '<', $thresholdRecord->id)->delete();
+            }
+        });
+    }
+
     public function actorUser()
     {
         return $this->belongsTo(User::class, 'actor_user_id');

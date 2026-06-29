@@ -46,7 +46,7 @@
     @foreach($rows as $row)
         <div class="flex gap-1 justify-center">
             @foreach($row as $cat)
-                <span class="ui-badge ui-badge-token ui-badge-token-emerald text-[10px] font-semibold">
+                <span class="inline-flex items-center rounded-md px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wider bg-emerald-50 text-emerald-700 ring-1 ring-inset ring-emerald-600/20">
                     {{ \App\Models\ZakatTransaction::CATEGORY_LABELS[$cat] ?? strtoupper($cat) }}
                 </span>
             @endforeach

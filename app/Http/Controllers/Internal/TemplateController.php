@@ -52,7 +52,15 @@ class TemplateController extends Controller
                 DB::transaction(function () use ($file, $user, &$createdTemplate) {
                     $dbMax = (int) (Template::query()
                         ->where('template_type', Template::TYPE_LETTERHEAD)
+                        ->lockForUpdate()
                         ->max('version') ?? 0);
+
+                    // Cleanup old templates (DB + Storage)
+                    $oldTemplates = Template::where('template_type', Template::TYPE_LETTERHEAD)->get();
+                    foreach ($oldTemplates as $old) {
+                        Storage::disk('local')->delete($old->storage_path);
+                        $old->delete();
+                    }
 
                     // Also check storage to prevent orphan version collision
                     $storageMax = 0;
@@ -72,7 +80,7 @@ class TemplateController extends Controller
                     $createdTemplate = Template::query()->create([
                         'template_type' => Template::TYPE_LETTERHEAD,
                         'version' => $version,
-                        'is_active' => false,
+                        'is_active' => true,
                         'storage_path' => $storagePath,
                         'original_filename' => $file->getClientOriginalName(),
                         'mime_type' => $file->getMimeType() ?: 'application/pdf',

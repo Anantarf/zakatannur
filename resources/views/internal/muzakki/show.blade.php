@@ -13,7 +13,7 @@
             </div>
             <div class="flex flex-col gap-2 sm:flex-row">
                 <a href="{{ route('internal.muzakki.edit', ['muzakki' => $muzakki->id]) }}" class="ui-btn ui-btn-primary">Ubah Data</a>
-                <a href="{{ route('internal.muzakki.index') }}" class="ui-btn ui-btn-secondary">Kembali</a>
+                <a href="{{ route('internal.muzakki.index') }}" class="ui-btn ui-btn-secondary">Kembali ke Daftar Muzakki</a>
             </div>
         </div>
     </x-slot>
@@ -118,8 +118,8 @@
                 </div>
                 <div class="hidden overflow-x-auto md:block">
                     <table class="min-w-full text-sm">
-                        <thead class="bg-slate-50 text-left text-xs font-bold uppercase tracking-[0.14em] text-slate-600">
-                            <tr>
+                        <thead>
+                            <tr class="ui-table-header">
                                 <th class="px-6 py-4">Periode</th>
                                 <th class="px-6 py-4">Transaksi</th>
                                 <th class="px-6 py-4">Uang</th>

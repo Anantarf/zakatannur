@@ -8,12 +8,25 @@ class ChatbotActionDetector
     {
         $message = $this->normalize($message);
 
+        // Check for public data totals first
+        if ($this->containsAny($message, ['jiwa', 'orang', 'muzakki fitrah']) && $this->containsAny($message, ['total', 'jumlah'])) {
+            return 'ask_total_people';
+        }
+
+        if ($this->containsAny($message, ['uang', 'rupiah', 'rp', 'terkumpul', 'penerimaan uang', 'nominal']) && $this->containsAny($message, ['total', 'jumlah', 'semua'])) {
+            return 'ask_total_money';
+        }
+
+        if ($this->containsAny($message, ['berapa', 'total', 'jumlah', 'ringkasan penerimaan', 'rekap penerimaan']) && $this->containsAny($message, ['zakat', 'semua', 'terkumpul', 'penerimaan'])) {
+            return 'ask_total_summary';
+        }
+
         // Fitrah/Fidyah case scenarios (user asking for calculation)
-        if ($this->containsAny($message, ['fitrah', 'orang', 'jiwa']) && $this->containsAny($message, ['berapa', 'hitung', 'brp'])) {
+        if ($this->containsAny($message, ['fitrah', 'orang', 'jiwa']) && $this->containsAny($message, ['berapa', 'hitung', 'brp']) && preg_match('/\d+/', $message)) {
             return 'calculate_fitrah_case';
         }
 
-        if ($this->containsAny($message, ['fidyah', 'hari', 'puasa']) && $this->containsAny($message, ['berapa', 'hitung', 'brp'])) {
+        if ($this->containsAny($message, ['fidyah', 'hari', 'puasa']) && $this->containsAny($message, ['berapa', 'hitung', 'brp']) && preg_match('/\d+/', $message)) {
             return 'calculate_fidyah_case';
         }
 

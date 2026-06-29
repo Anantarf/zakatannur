@@ -1,5 +1,4 @@
-<div x-data="{ open: false }">
-    <div x-show="open" x-cloak x-transition class="p-4 bg-slate-50 rounded-lg overflow-x-auto border border-slate-200 space-y-3">
+<div class="space-y-3">
         @if(in_array($log->action, ['Updated.Transaction', 'Created.Transaction']))
             <div class="bg-white p-3 rounded-lg border border-slate-200">
                 <div class="text-sm font-bold text-slate-800 mb-3">Perubahan pada Transaksi #{{ $log->metadata['no_transaksi'] ?? '-' }}</div>
@@ -108,7 +107,7 @@
         @elseif(in_array($log->action, ['user.created', 'user.updated']))
             <div class="bg-white p-3 rounded-lg border border-slate-200">
                 <div class="text-sm font-bold text-slate-800 mb-2">
-                    {{ $log->action === 'user.created' ? 'User Baru Dibuat' : 'User Diperbarui' }}
+                    {{ $log->action === 'user.created' ? 'Petugas Baru Ditambahkan' : 'Data Petugas Diperbarui' }}
                 </div>
                 <div class="space-y-1 text-sm">
                     <div class="flex justify-between">
@@ -116,7 +115,7 @@
                         <span class="text-slate-900 font-bold">{{ $log->metadata['name'] ?? '-' }}</span>
                     </div>
                     <div class="flex justify-between">
-                        <span class="text-slate-700">Role</span>
+                        <span class="text-slate-700">Jabatan</span>
                         <span class="text-slate-900 font-bold uppercase">{{ $log->metadata['role'] ?? '-' }}</span>
                     </div>
                 </div>
@@ -149,5 +148,4 @@
             </div>
         @endif
 
-    </div>
 </div>

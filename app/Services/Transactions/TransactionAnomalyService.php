@@ -13,6 +13,7 @@ use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
@@ -108,7 +109,7 @@ class TransactionAnomalyService
     public function detailViewData(string $noTransaksi): array
     {
         $transactions = ZakatTransaction::query()
-            ->with(['muzakki' => fn ($query) => $query->withTrashed(), 'petugas'])
+            ->with(['muzakki' => fn ($query) => $query->withTrashed(), 'petugas', 'zakatPeriod'])
             ->where('no_transaksi', $noTransaksi)
             ->orderBy('id')
             ->get();
@@ -188,22 +189,26 @@ class TransactionAnomalyService
 
     private function overview(array $filters): array
     {
-        $summary = DB::query()
-            ->fromSub($this->baseQuery($filters), 'anomaly_rows')
-            ->selectRaw('COUNT(*) as total_groups')
-            ->selectRaw('SUM(CASE WHEN risk_severity = 2 THEN 1 ELSE 0 END) as warning_groups')
-            ->selectRaw('SUM(CASE WHEN review_severity = 1 THEN 1 ELSE 0 END) as pending_review_groups')
-            ->selectRaw('SUM(CASE WHEN review_severity = 2 THEN 1 ELSE 0 END) as safe_review_groups')
-            ->selectRaw('SUM(CASE WHEN review_severity = 3 THEN 1 ELSE 0 END) as follow_up_groups')
-            ->first();
+        $cacheKey = 'anomaly:overview:' . md5(json_encode($filters));
 
-        return [
-            'totalGroups' => (int) ($summary->total_groups ?? 0),
-            'warningGroups' => (int) ($summary->warning_groups ?? 0),
-            'pendingReviewGroups' => (int) ($summary->pending_review_groups ?? 0),
-            'safeReviewGroups' => (int) ($summary->safe_review_groups ?? 0),
-            'followUpGroups' => (int) ($summary->follow_up_groups ?? 0),
-        ];
+        return Cache::remember($cacheKey, 300, function () use ($filters) {
+            $summary = DB::query()
+                ->fromSub($this->baseQuery($filters), 'anomaly_rows')
+                ->selectRaw('COUNT(*) as total_groups')
+                ->selectRaw('SUM(CASE WHEN risk_severity = 2 THEN 1 ELSE 0 END) as warning_groups')
+                ->selectRaw('SUM(CASE WHEN review_severity = 1 THEN 1 ELSE 0 END) as pending_review_groups')
+                ->selectRaw('SUM(CASE WHEN review_severity = 2 THEN 1 ELSE 0 END) as safe_review_groups')
+                ->selectRaw('SUM(CASE WHEN review_severity = 3 THEN 1 ELSE 0 END) as follow_up_groups')
+                ->first();
+
+            return [
+                'totalGroups' => (int) ($summary->total_groups ?? 0),
+                'warningGroups' => (int) ($summary->warning_groups ?? 0),
+                'pendingReviewGroups' => (int) ($summary->pending_review_groups ?? 0),
+                'safeReviewGroups' => (int) ($summary->safe_review_groups ?? 0),
+                'followUpGroups' => (int) ($summary->follow_up_groups ?? 0),
+            ];
+        });
     }
 
     private function baseQuery(array $filters): Builder

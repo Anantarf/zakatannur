@@ -69,14 +69,13 @@
 
         <div>
             <label class="ui-form-label">Shift Petugas <span class="text-red-500">*</span></label>
-            <select name="shift" x-model="shift" class="ui-select w-full" required>
-                <option value="">-- Pilih Shift --</option>
-                @foreach($shifts as $shift)
-                    <option value="{{ $shift }}" {{ (old('shift', $mainTx->shift ?? (\Carbon\Carbon::now('Asia/Jakarta')->hour < 14 ? 'pagi' : (\Carbon\Carbon::now('Asia/Jakarta')->hour < 18 ? 'siang' : 'malam'))) == $shift) ? 'selected' : '' }}>
-                        {{ $shiftLabels[$shift] }}
-                    </option>
-                @endforeach
-            </select>
+            @php
+                $shiftOptionsArray = [];
+                foreach($shifts as $s) {
+                    $shiftOptionsArray[$s] = $shiftLabels[$s];
+                }
+            @endphp
+            <x-ui-select-custom name="shift" x-model="shift" :options="$shiftOptionsArray" placeholder="-- Pilih Shift --" required />
         </div>
 
         @if(isset($isEdit))

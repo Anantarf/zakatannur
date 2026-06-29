@@ -30,7 +30,7 @@
                             <svg xmlns="http://www.w3.org/2000/svg" class="ui-alert-icon" viewBox="0 0 20 20" fill="currentColor">
                                 <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
                             </svg>
-                            Periksa input:
+                            Mohon periksa:
                         </div>
                         <ul class="list-disc pl-10 space-y-1 text-sm">
                             @foreach ($errors->all() as $error)
@@ -41,22 +41,30 @@
                 </div>
             @endif
 
+            @php
+                $errorToSection = [
+                    'public_refresh_interval_seconds' => 1,
+                    'period_label' => 2, 'period_starts_at' => 2, 'period_ends_at' => 2, 'hijri_year' => 2,
+                    'default_fitrah_cash_per_jiwa' => 3, 'default_fitrah_beras_per_jiwa' => 3,
+                    'default_fidyah_per_hari' => 3, 'default_fidyah_beras_per_hari' => 3,
+                    'chart_starts_at' => 4, 'chart_ends_at' => 4, 'chart_fallback_buffer_days' => 4,
+                    'dashboard_chart_mode' => 4, 'dashboard_chart_period_id' => 4,
+                    'dashboard_chart_starts_at' => 4, 'dashboard_chart_ends_at' => 4,
+                ];
+                $firstErrorSection = null;
+                foreach ($errorToSection as $field => $section) {
+                    if ($errors->has($field)) { $firstErrorSection = $section; break; }
+                }
+            @endphp
             <div class="ui-card overflow-hidden"
                 x-data="{
-                    tab: 'config',
-                    expandedSection: null,
-                    isDirty: false,
+                    tab: '{{ ($errors->hasAny(["new_year", "new_year_confirmation", "backup_confirmed"])) ? "new_period" : "config" }}',
+                    expandedSection: {{ $firstErrorSection ?? 'null' }},
+                    isDirty: {{ $errors->any() ? 'true' : 'false' }},
                     isSubmitting: false,
                     dashboardMode: @js(old('dashboard_chart_mode', $dashboardChartMode)),
                     dashboardArchive: @js((bool) old('dashboard_chart_show_offseason_archive', $dashboardChartShowOffseasonArchive)),
                     dashboardAutoSwitch: @js((bool) old('dashboard_chart_auto_switch_on_new_active_period', $dashboardChartAutoSwitchOnNewActivePeriod)),
-                    periodStartsAt: @js(old('period_starts_at', optional($activePeriod?->starts_at)->toDateString())),
-                    formatGregorianMonth(value) {
-                        if (!value) return 'Bulan Masehi akan terbaca otomatis setelah tanggal mulai diisi.';
-                        const date = new Date(value + 'T00:00:00');
-                        if (Number.isNaN(date.getTime())) return 'Tanggal mulai belum valid.';
-                        return new Intl.DateTimeFormat('id-ID', { month: 'long', year: 'numeric' }).format(date);
-                    },
                     toggleSection(sectionNum) {
                         this.expandedSection = this.expandedSection === sectionNum ? null : sectionNum;
                     },
@@ -78,12 +86,12 @@
                     <div class="flex w-full rounded-lg border border-slate-200 bg-slate-100/60 p-0.5 sm:w-fit">
                         <button type="button" @click="tab = 'config'"
                             :class="tab === 'config' ? 'bg-white shadow-sm text-slate-900' : 'text-slate-500 hover:text-slate-700'"
-                            class="flex-1 rounded-md px-3 py-1.5 text-sm font-semibold transition sm:flex-none">
+                            class="flex-1 rounded-button px-3 py-1.5 text-sm font-semibold transition sm:flex-none">
                             Edit Periode Aktif
                         </button>
                         <button type="button" @click="tab = 'new_period'"
                             :class="tab === 'new_period' ? 'bg-amber-600 text-white shadow-sm' : 'text-slate-500 hover:text-amber-700'"
-                            class="flex-1 rounded-md px-3 py-1.5 text-sm font-semibold transition sm:flex-none">
+                            class="flex-1 rounded-button px-3 py-1.5 text-sm font-semibold transition sm:flex-none">
                             Buka Tahun Baru
                         </button>
                     </div>
@@ -91,92 +99,41 @@
 
                 {{-- Tab: Konfigurasi --}}
                 <div x-show="tab === 'config'" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 translate-y-2" x-transition:enter-end="opacity-100 translate-y-0" class="p-4 sm:p-5">
-                    <div class="mb-6">
-                        <div class="ui-settings-kicker text-brand-700 mb-3">Status Saat Ini</div>
-                        <div class="grid grid-cols-1 gap-3 text-sm md:grid-cols-3">
-                            <button type="button" @click="toggleSection(2)" class="ui-settings-summary-card ui-settings-summary-card-emerald text-left hover:ring-2 hover:ring-brand-300 transition-all cursor-pointer">
-                                <div class="text-[11px] font-bold text-brand-700 flex items-center justify-between">
-                                    <span>Periode Aktif</span>
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" :class="expandedSection === 2 ? 'rotate-180' : ''" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-                                    </svg>
-                                </div>
-                                <div class="mt-1 text-base font-bold text-brand-950">{{ $activePeriod?->display_label ?? $activeYear }}</div>
-                                <div class="mt-1 text-xs leading-5 text-brand-800">
-                                    Klik untuk edit identitas & tanggal
-                                </div>
-                            </button>
-                            <button type="button" @click="toggleSection(4)" class="ui-settings-summary-card ui-settings-summary-card-emerald text-left hover:ring-2 hover:ring-brand-300 transition-all cursor-pointer">
-                                <div class="text-[11px] font-bold text-brand-700 flex items-center justify-between">
-                                    <span>Grafik Periode</span>
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" :class="expandedSection === 4 ? 'rotate-180' : ''" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-                                    </svg>
-                                </div>
-                                <div class="mt-1 text-base font-bold text-brand-950">{{ $chartRange['label'] ?? '-' }}</div>
-                                <div class="mt-1 text-xs leading-5 text-brand-800">
-                                    Klik untuk sesuaikan rentang grafik
-                                </div>
-                            </button>
-                            <button type="button" @click="toggleSection(5)" class="ui-settings-summary-card ui-settings-summary-card-emerald text-left hover:ring-2 hover:ring-brand-300 transition-all cursor-pointer">
-                                <div class="text-[11px] font-bold text-brand-700 flex items-center justify-between">
-                                    <span>Sumber Dashboard</span>
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" :class="expandedSection === 5 ? 'rotate-180' : ''" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-                                    </svg>
-                                </div>
-                                <div class="mt-1 text-base font-bold text-brand-950">{{ $dashboardChartRange['period_label'] ?? 'Belum dipilih' }}</div>
-                                <div class="mt-0.5 text-[11px] text-brand-700">
-                                    Klik untuk ubah mode & periode
-                                </div>
-                            </button>
-                            <button type="button" @click="toggleSection(6)" class="ui-settings-summary-card ui-settings-summary-card-emerald text-left hover:ring-2 hover:ring-brand-300 transition-all cursor-pointer">
-                                <div class="text-[11px] font-bold text-brand-700 flex items-center justify-between">
-                                    <span>Notifikasi Realtime</span>
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" :class="expandedSection === 6 ? 'rotate-180' : ''" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-                                    </svg>
-                                </div>
-                                <div class="mt-1 text-base font-bold text-brand-950">Test Broadcast</div>
-                                <div class="mt-0.5 text-[11px] text-brand-700">
-                                    Klik untuk test koneksi
-                                </div>
-                            </button>
-                        </div>
-                    </div>
-
-                    <form method="POST" action="{{ route('internal.settings.period.update') }}" class="space-y-3" @submit="isDirty = false" @input="isDirty = true" @change="isDirty = true">
+                    <form method="POST" action="{{ route('internal.settings.period.update') }}" class="space-y-3" @submit="isDirty = false; isSubmitting = true" @input="isDirty = true" @change="isDirty = true">
                         @csrf
 
-                        {{-- Section 1: Dasar Sistem (Always Visible) --}}
+                        {{-- Section 1: Dasar Sistem (Accordion) --}}
                         <section class="ui-settings-panel ui-settings-panel-muted">
-                            <div class="ui-settings-section-head">
+                            <button type="button" @click="toggleSection(1)" class="ui-settings-section-head group w-full text-left hover:bg-slate-50/50 transition-colors">
                                 <span class="ui-section-accent"></span>
-                                <div>
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 shrink-0 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.066 2.573c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.573 1.066c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.066-2.573c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                </svg>
+                                <div class="flex-1">
                                     <h4 class="ui-settings-section-title">Dasar Sistem</h4>
-                                    <p class="ui-settings-section-copy">Info sistem dan interval refresh. Tahun aktif hanya bisa diubah via "Buka Tahun Baru".</p>
+                                    <p class="ui-settings-section-copy" x-show="expandedSection === 1" x-cloak>Tahun aktif sistem dan interval refresh halaman publik.</p>
+                                    <p class="text-sm text-slate-500 mt-0.5" x-show="expandedSection !== 1" x-cloak>Tahun {{ old('active_year', $activeYear) }} &middot; Refresh {{ old('public_refresh_interval_seconds', $publicRefreshIntervalSeconds ?? 15) }}s</p>
                                 </div>
-                            </div>
-                            <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                                <div>
-                                    <label class="ui-form-label flex items-center gap-2" for="active_year">
-                                        Tahun Aktif Sistem
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" title="Gunakan tab 'Buka Tahun Baru' untuk mengubah ini">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                        </svg>
-                                    </label>
-                                    <input id="active_year" name="active_year" type="number" min="2000" max="2100" value="{{ old('active_year', $activeYear) }}" class="ui-input w-full bg-slate-50" readonly required />
-                                </div>
-                                <div>
-                                    <label class="ui-form-label flex items-center gap-2" for="public_refresh_interval_seconds">
-                                        Refresh Halaman Publik (detik)
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" title="0 = tidak ada refresh otomatis, 15 = refresh tiap 15 detik">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                        </svg>
-                                    </label>
-                                    <input id="public_refresh_interval_seconds" name="public_refresh_interval_seconds" type="number" min="0" max="60" value="{{ old('public_refresh_interval_seconds', $publicRefreshIntervalSeconds ?? 15) }}" class="ui-input w-full" @change="isDirty = true" required />
-                                    <p class="mt-1 text-xs leading-5 text-slate-500">0 = tidak refresh, 15 = refresh tiap 15 detik</p>
-                                    <x-input-error class="mt-2" :messages="$errors->get('public_refresh_interval_seconds')" />
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-slate-400 transition-transform" :class="expandedSection === 1 ? 'rotate-180' : ''" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                                </svg>
+                            </button>
+                            <div x-show="expandedSection === 1" x-collapse class="pt-4">
+                                <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                                    <div>
+                                        <p class="ui-form-label">Tahun Aktif Sistem</p>
+                                        <div class="ui-input flex items-center justify-between gap-2 bg-slate-50 text-slate-700 cursor-default select-none">
+                                            <span class="font-semibold">{{ old('active_year', $activeYear) }}</span>
+                                            <button type="button" @click="tab = 'new_period'" class="text-xs text-brand-600 hover:text-brand-800 font-medium shrink-0">Buka Tahun Baru →</button>
+                                        </div>
+                                        <input name="active_year" type="hidden" value="{{ old('active_year', $activeYear) }}" />
+                                    </div>
+                                    <div>
+                                        <label class="ui-form-label" for="public_refresh_interval_seconds">Refresh Halaman Publik (detik)</label>
+                                        <input id="public_refresh_interval_seconds" name="public_refresh_interval_seconds" type="number" min="0" max="{{ (int) config('zakat.public_refresh.form_max_seconds', 600) }}" value="{{ old('public_refresh_interval_seconds', $publicRefreshIntervalSeconds ?? 15) }}" class="ui-input w-full" @change="isDirty = true" required />
+                                        <p class="mt-1 text-xs leading-5 text-slate-500">0 = tidak refresh, 15 = refresh tiap 15 detik</p>
+                                        <x-input-error class="mt-2" :messages="$errors->get('public_refresh_interval_seconds')" />
+                                    </div>
                                 </div>
                             </div>
                         </section>
@@ -185,9 +142,13 @@
                         <section class="ui-settings-panel ui-settings-panel-muted">
                             <button type="button" @click="toggleSection(2)" class="ui-settings-section-head group w-full text-left hover:bg-slate-50/50 transition-colors">
                                 <span class="ui-section-accent"></span>
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 shrink-0 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                </svg>
                                 <div class="flex-1">
                                     <h4 class="ui-settings-section-title">Identitas Periode Aktif</h4>
-                                    <p class="ui-settings-section-copy">Nama, tahun Hijriah, dan rentang penerimaan.</p>
+                                    <p class="ui-settings-section-copy" x-show="expandedSection === 2" x-cloak>Nama, tahun Hijriah, dan rentang penerimaan.</p>
+                                    <p class="text-sm text-slate-500 mt-0.5" x-show="expandedSection !== 2" x-cloak>{{ $activePeriod?->display_label ?? $activeYear }}@if($activePeriod?->starts_at) &middot; {{ $activePeriod->starts_at->translatedFormat('d M') }} – {{ optional($activePeriod->ends_at)->translatedFormat('d M Y') ?? '?' }}@endif</p>
                                 </div>
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-slate-400 transition-transform" :class="expandedSection === 2 ? 'rotate-180' : ''" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
@@ -207,7 +168,7 @@
                                     </div>
                                     <div>
                                         <label class="ui-form-label" for="period_starts_at">Tanggal Mulai Penerimaan</label>
-                                        <input id="period_starts_at" name="period_starts_at" type="date" x-model="periodStartsAt" value="{{ old('period_starts_at', optional($activePeriod?->starts_at)->toDateString()) }}" class="ui-input w-full" />
+                                        <input id="period_starts_at" name="period_starts_at" type="date" value="{{ old('period_starts_at', optional($activePeriod?->starts_at)->toDateString()) }}" class="ui-input w-full" />
                                         <x-input-error class="mt-2" :messages="$errors->get('period_starts_at')" />
                                     </div>
                                     <div>
@@ -223,9 +184,13 @@
                         <section class="ui-settings-panel ui-settings-panel-muted">
                             <button type="button" @click="toggleSection(3)" class="ui-settings-section-head group w-full text-left hover:bg-slate-50/50 transition-colors">
                                 <span class="ui-section-accent"></span>
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 shrink-0 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
                                 <div class="flex-1">
                                     <h4 class="ui-settings-section-title">Nominal Default Transaksi</h4>
-                                    <p class="ui-settings-section-copy">Isian awal saat panitia input transaksi baru. Transaksi lama tidak otomatis dihitung ulang.</p>
+                                    <p class="ui-settings-section-copy" x-show="expandedSection === 3" x-cloak>Isian awal saat panitia input transaksi baru. Transaksi lama tidak dihitung ulang.</p>
+                                    <p class="text-sm text-slate-500 mt-0.5" x-show="expandedSection !== 3" x-cloak>Fitrah Rp {{ number_format($defaultFitrahCashPerJiwa, 0, ',', '.') }} &middot; {{ number_format($defaultFitrahBerasPerJiwa, 2, ',', '.') }} Kg &middot; Fidyah Rp {{ number_format($defaultFidyahPerHari, 0, ',', '.') }}/hari</p>
                                 </div>
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-slate-400 transition-transform" :class="expandedSection === 3 ? 'rotate-180' : ''" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
@@ -256,70 +221,66 @@
                                 </div>
                             </div>
                         </section>
-                        {{-- Section 4: Rentang Grafik (Accordion) --}}
-                        <section class="ui-settings-panel ui-settings-panel-emerald">
-                            <button type="button" @click="toggleSection(4)" class="ui-settings-section-head group w-full text-left hover:bg-emerald-50/50 transition-colors">
-                                <span class="ui-section-accent"></span>
-                                <div class="flex-1">
-                                    <h4 class="ui-settings-section-title">Rentang Grafik Periode Aktif</h4>
-                                    <p class="ui-settings-section-copy">Tanggal yang dipakai untuk baca grafik periode. Kosongkan untuk ikuti rentang periode.</p>
-                                </div>
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-emerald-400 transition-transform" :class="expandedSection === 4 ? 'rotate-180' : ''" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-                                </svg>
-                            </button>
-                            <div x-show="expandedSection === 4" x-collapse class="pt-4">
-                                <div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
-                                    <div>
-                                        <label class="ui-form-label" for="chart_starts_at">Tanggal Awal Grafik</label>
-                                        <input id="chart_starts_at" name="chart_starts_at" type="date" value="{{ old('chart_starts_at', $chartStartsAt) }}" class="ui-input w-full" />
-                                        <x-input-error class="mt-2" :messages="$errors->get('chart_starts_at')" />
-                                    </div>
-                                    <div>
-                                        <label class="ui-form-label" for="chart_ends_at">Tanggal Akhir Grafik</label>
-                                        <input id="chart_ends_at" name="chart_ends_at" type="date" value="{{ old('chart_ends_at', $chartEndsAt) }}" class="ui-input w-full" />
-                                        <x-input-error class="mt-2" :messages="$errors->get('chart_ends_at')" />
-                                    </div>
-                                    <div>
-                                        <label class="ui-form-label" for="chart_fallback_buffer_days">Jarak Ekstra (Hari Setelah Selesai)</label>
-                                        <input id="chart_fallback_buffer_days" name="chart_fallback_buffer_days" type="number" min="0" max="14" value="{{ old('chart_fallback_buffer_days', $chartFallbackBufferDays) }}" class="ui-input w-full" required />
-                                        <p class="mt-1 text-xs leading-5 text-emerald-700">Agar grafik tidak langsung terhenti tepat pada hari penutupan.</p>
-                                        <x-input-error class="mt-2" :messages="$errors->get('chart_fallback_buffer_days')" />
-                                    </div>
-                                </div>
-                            </div>
-                        </section>
 
-                        {{-- Section 5: Sumber Grafik Dashboard (Accordion) --}}
-                        <section class="ui-settings-panel ui-settings-panel-emerald">
-                            <button type="button" @click="toggleSection(5)" class="ui-settings-section-head group w-full text-left hover:bg-emerald-50/50 transition-colors">
+                        {{-- Section 4: Pengaturan Grafik (Accordion — gabungan rentang periode + sumber dashboard) --}}
+                        <section class="ui-settings-panel ui-settings-panel-muted">
+                            <button type="button" @click="toggleSection(4)" class="ui-settings-section-head group w-full text-left hover:bg-slate-50/50 transition-colors">
                                 <span class="ui-section-accent"></span>
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 shrink-0 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                                </svg>
                                 <div class="flex-1">
-                                    <h4 class="ui-settings-section-title">Sumber Grafik Dashboard</h4>
-                                    <p class="ui-settings-section-copy">Pilih apakah dashboard ikut periode aktif, periode manual, atau periode terakhir selesai.</p>
+                                    <h4 class="ui-settings-section-title">Pengaturan Grafik</h4>
+                                    <p class="ui-settings-section-copy" x-show="expandedSection === 4" x-cloak>Rentang baca grafik periode aktif dan sumber data grafik dashboard.</p>
+                                    <p class="text-sm text-slate-500 mt-0.5" x-show="expandedSection !== 4" x-cloak>{{ $chartRange['label'] ?? '-' }} &middot; Dashboard: {{ $dashboardChartRange['period_label'] ?? 'belum dipilih' }}</p>
                                 </div>
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-emerald-400 transition-transform" :class="expandedSection === 5 ? 'rotate-180' : ''" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-slate-400 transition-transform" :class="expandedSection === 4 ? 'rotate-180' : ''" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
                                 </svg>
                             </button>
-                            <div x-show="expandedSection === 5" x-collapse class="pt-4">
-                                <div class="mb-4 rounded-xl bg-emerald-50 border border-emerald-100 p-3">
-                                    <div class="text-xs font-bold text-emerald-700 mb-1">📍 Status Grafik Saat Ini</div>
-                                    <div class="text-sm font-bold text-slate-900">{{ $dashboardChartRange['period_label'] ?? 'Belum ada periode' }}</div>
-                                    <div class="text-xs text-slate-600 mt-1">{{ $dashboardChartRange['label'] ?? 'Akan mengikuti pengaturan yang disimpan' }}</div>
+                            <div x-show="expandedSection === 4" x-collapse class="pt-4 space-y-5">
+
+                                {{-- Sub: Rentang Grafik Periode --}}
+                                <div>
+                                    <p class="ui-settings-kicker text-brand-700 mb-3">Rentang Grafik Periode Aktif</p>
+                                    <div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
+                                        <div>
+                                            <label class="ui-form-label" for="chart_starts_at">Tanggal Awal</label>
+                                            <input id="chart_starts_at" name="chart_starts_at" type="date" value="{{ old('chart_starts_at', $chartStartsAt) }}" class="ui-input w-full" />
+                                            <x-input-error class="mt-2" :messages="$errors->get('chart_starts_at')" />
+                                        </div>
+                                        <div>
+                                            <label class="ui-form-label" for="chart_ends_at">Tanggal Akhir</label>
+                                            <input id="chart_ends_at" name="chart_ends_at" type="date" value="{{ old('chart_ends_at', $chartEndsAt) }}" class="ui-input w-full" />
+                                            <p class="mt-1 text-xs leading-5 text-emerald-700">Kosongkan agar ikut rentang periode.</p>
+                                            <x-input-error class="mt-2" :messages="$errors->get('chart_ends_at')" />
+                                        </div>
+                                        <div>
+                                            <label class="ui-form-label" for="chart_fallback_buffer_days">Jarak Ekstra (hari)</label>
+                                            <input id="chart_fallback_buffer_days" name="chart_fallback_buffer_days" type="number" min="0" max="14" value="{{ old('chart_fallback_buffer_days', $chartFallbackBufferDays) }}" class="ui-input w-full" required />
+                                            <p class="mt-1 text-xs leading-5 text-slate-500">Tambahan hari setelah akhir periode agar grafik tidak terpotong. 0 = tanpa jarak.</p>
+                                            <x-input-error class="mt-2" :messages="$errors->get('chart_fallback_buffer_days')" />
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <hr class="border-emerald-100" />
+
+                                {{-- Sub: Sumber Grafik Dashboard --}}
+                                <div>
+                                    <p class="ui-settings-kicker text-brand-700 mb-3">Sumber Grafik Dashboard</p>
+
                                     @if (!empty($dashboardChartRange['fallback_note']))
-                                        <div class="mt-2 text-xs text-amber-700 bg-amber-50 border border-amber-100 rounded px-2 py-1">
-                                            ⚠️ {{ $dashboardChartRange['fallback_note'] }}
+                                        <div class="ui-alert ui-alert-warning mb-3">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="ui-alert-icon shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
+                                            <span class="text-xs font-medium">{{ $dashboardChartRange['fallback_note'] }}</span>
                                         </div>
                                     @endif
-                                </div>
 
-                                <div class="mb-4">
-                                    <div class="ui-form-label mb-3 font-bold">Pilih Mode</div>
-                                    <div class="grid grid-cols-1 gap-2 sm:grid-cols-3">
+                                    <div class="grid grid-cols-1 gap-2 sm:grid-cols-3 mb-4">
                                         @php
                                             $dashboardChartModeDescriptions = [
-                                                \App\Services\Charts\ChartRangeResolver::DASHBOARD_MODE_ACTIVE_PERIOD => 'Dashboard ikut periode aktif (paling aman untuk harian)',
+                                                \App\Services\Charts\ChartRangeResolver::DASHBOARD_MODE_ACTIVE_PERIOD => 'Ikut periode aktif (paling aman untuk harian)',
                                                 \App\Services\Charts\ChartRangeResolver::DASHBOARD_MODE_MANUAL_PERIOD => 'Kunci ke periode tertentu (review/arsip)',
                                                 \App\Services\Charts\ChartRangeResolver::DASHBOARD_MODE_LAST_COMPLETED_PERIOD => 'Periode terakhir selesai (di luar musim)',
                                             ];
@@ -327,8 +288,8 @@
                                         @foreach ($dashboardChartModes as $modeValue => $modeLabel)
                                             <label class="ui-settings-choice text-sm"
                                                 :class="dashboardMode === '{{ $modeValue }}'
-                                                    ? 'border-emerald-300 ring-2 ring-emerald-200'
-                                                    : 'border-slate-200 hover:border-emerald-200'">
+                                                    ? 'border-brand-300 ring-2 ring-brand-200'
+                                                    : 'border-slate-200 hover:border-brand-200'">
                                                 <input type="radio" name="dashboard_chart_mode" value="{{ $modeValue }}" x-model="dashboardMode" class="sr-only" />
                                                 <span class="block font-bold text-slate-900">{{ $modeLabel }}</span>
                                                 <span class="ui-settings-choice-copy text-xs">{{ $dashboardChartModeDescriptions[$modeValue] ?? '' }}</span>
@@ -336,117 +297,67 @@
                                         @endforeach
                                     </div>
                                     <x-input-error class="mt-2" :messages="$errors->get('dashboard_chart_mode')" />
-                                </div>
 
-                                <div x-show="dashboardMode === '{{ \App\Services\Charts\ChartRangeResolver::DASHBOARD_MODE_MANUAL_PERIOD }}'" x-transition class="mb-4">
-                                    <label class="ui-form-label" for="dashboard_chart_period_id">Periode yang Dikunci</label>
-                                    <select id="dashboard_chart_period_id" name="dashboard_chart_period_id" class="ui-select w-full">
-                                        <option value="">Pilih periode</option>
-                                        @foreach ($dashboardChartPeriods as $periodOption)
-                                            <option value="{{ $periodOption->id }}" @selected((string) old('dashboard_chart_period_id', $dashboardChartPeriodId) === (string) $periodOption->id)>
-                                                {{ $periodOption->display_label }}{{ $periodOption->sequence > 1 ? ' #' . $periodOption->sequence : '' }}
-                                            </option>
-                                        @endforeach
-                                    </select>
-                                    <x-input-error class="mt-2" :messages="$errors->get('dashboard_chart_period_id')" />
-                                </div>
+                                    <div x-show="dashboardMode === '{{ \App\Services\Charts\ChartRangeResolver::DASHBOARD_MODE_MANUAL_PERIOD }}'" x-transition class="mb-4">
+                                        @php
+                                            $dashPeriodOptions = [];
+                                            foreach ($dashboardChartPeriods as $periodOption) {
+                                                $dashPeriodOptions[$periodOption->id] = $periodOption->display_label . ($periodOption->sequence > 1 ? ' #' . $periodOption->sequence : '');
+                                            }
+                                        @endphp
+                                        <label class="ui-form-label" for="dashboard_chart_period_id">Periode yang Dikunci</label>
+                                        <x-ui-select-custom name="dashboard_chart_period_id" :options="$dashPeriodOptions" :value="old('dashboard_chart_period_id', $dashboardChartPeriodId)" placeholder="Pilih periode" />
+                                        <x-input-error class="mt-2" :messages="$errors->get('dashboard_chart_period_id')" />
+                                    </div>
 
-                                <div class="mb-4 p-3 rounded-lg bg-slate-50 border border-slate-200 text-sm">
-                                    <span x-show="dashboardMode === '{{ \App\Services\Charts\ChartRangeResolver::DASHBOARD_MODE_ACTIVE_PERIOD }}'">
-                                        ✓ Dashboard otomatis ikut periode aktif.
-                                    </span>
-                                    <span x-show="dashboardMode === '{{ \App\Services\Charts\ChartRangeResolver::DASHBOARD_MODE_MANUAL_PERIOD }}'" x-cloak>
-                                        ✓ Dashboard memakai periode pilihan sampai diubah.
-                                    </span>
-                                    <span x-show="dashboardMode === '{{ \App\Services\Charts\ChartRangeResolver::DASHBOARD_MODE_LAST_COMPLETED_PERIOD }}'" x-cloak>
-                                        ✓ Dashboard memakai periode terakhir selesai.
-                                    </span>
-                                </div>
+                                    <div x-show="dashboardMode === '{{ \App\Services\Charts\ChartRangeResolver::DASHBOARD_MODE_MANUAL_PERIOD }}'" x-transition class="mb-4 grid grid-cols-1 gap-3 sm:grid-cols-2">
+                                        <div>
+                                            <label class="ui-form-label" for="dashboard_chart_starts_at">Timpa Tanggal Awal (opsional)</label>
+                                            <input id="dashboard_chart_starts_at" name="dashboard_chart_starts_at" type="date" value="{{ old('dashboard_chart_starts_at', $dashboardChartStartsAt) }}" class="ui-input w-full" />
+                                            <x-input-error class="mt-2" :messages="$errors->get('dashboard_chart_starts_at')" />
+                                        </div>
+                                        <div>
+                                            <label class="ui-form-label" for="dashboard_chart_ends_at">Timpa Tanggal Akhir (opsional)</label>
+                                            <input id="dashboard_chart_ends_at" name="dashboard_chart_ends_at" type="date" value="{{ old('dashboard_chart_ends_at', $dashboardChartEndsAt) }}" class="ui-input w-full" />
+                                            <x-input-error class="mt-2" :messages="$errors->get('dashboard_chart_ends_at')" />
+                                        </div>
+                                    </div>
 
-                                <div class="mb-4">
-                                    <label class="ui-form-label block mb-2 font-bold">Opsi Tambahan</label>
                                     <div class="space-y-2">
                                         <label class="ui-settings-check border-emerald-100 text-emerald-900">
-                                            <input type="checkbox" name="dashboard_chart_show_offseason_archive" value="1" x-model="dashboardArchive" @checked(old('dashboard_chart_show_offseason_archive', $dashboardChartShowOffseasonArchive)) class="mt-0.5 rounded border-slate-300 text-emerald-600 shadow-sm focus:ring-emerald-500" />
+                                            <input type="checkbox" name="dashboard_chart_show_offseason_archive" value="1" x-model="dashboardArchive" class="mt-0.5 rounded border-slate-300 text-emerald-600 shadow-sm focus:ring-emerald-500" />
                                             <span class="text-sm font-medium">Tetap tampilkan grafik arsip di luar musim zakat</span>
                                         </label>
                                         <label class="ui-settings-check border-emerald-100 text-emerald-900">
-                                            <input type="checkbox" name="dashboard_chart_auto_switch_on_new_active_period" value="1" x-model="dashboardAutoSwitch" @checked(old('dashboard_chart_auto_switch_on_new_active_period', $dashboardChartAutoSwitchOnNewActivePeriod)) class="mt-0.5 rounded border-slate-300 text-emerald-600 shadow-sm focus:ring-emerald-500" />
+                                            <input type="checkbox" name="dashboard_chart_auto_switch_on_new_active_period" value="1" x-model="dashboardAutoSwitch" class="mt-0.5 rounded border-slate-300 text-emerald-600 shadow-sm focus:ring-emerald-500" />
                                             <span class="text-sm font-medium">Otomatis ganti ke periode aktif baru</span>
                                         </label>
                                     </div>
-                                </div>
-
-                                <div x-show="dashboardMode === '{{ \App\Services\Charts\ChartRangeResolver::DASHBOARD_MODE_MANUAL_PERIOD }}'" x-transition class="mb-4 grid grid-cols-1 gap-3 sm:grid-cols-2">
-                                    <div>
-                                        <label class="ui-form-label" for="dashboard_chart_starts_at">Timpa Tanggal Awal (opsional)</label>
-                                        <input id="dashboard_chart_starts_at" name="dashboard_chart_starts_at" type="date" value="{{ old('dashboard_chart_starts_at', $dashboardChartStartsAt) }}" class="ui-input w-full" />
-                                        <x-input-error class="mt-2" :messages="$errors->get('dashboard_chart_starts_at')" />
-                                    </div>
-                                    <div>
-                                        <label class="ui-form-label" for="dashboard_chart_ends_at">Timpa Tanggal Akhir (opsional)</label>
-                                        <input id="dashboard_chart_ends_at" name="dashboard_chart_ends_at" type="date" value="{{ old('dashboard_chart_ends_at', $dashboardChartEndsAt) }}" class="ui-input w-full" />
-                                        <x-input-error class="mt-2" :messages="$errors->get('dashboard_chart_ends_at')" />
-                                    </div>
-                                </div>
-                            </div>
-                        </section>
-
-                        {{-- Section 6: Test Pusher (Accordion) --}}
-                        <section class="ui-settings-panel ui-settings-panel-emerald">
-                            <button type="button" @click="toggleSection(6)" class="ui-settings-section-head group w-full text-left hover:bg-emerald-50/50 transition-colors">
-                                <span class="ui-section-accent"></span>
-                                <div class="flex-1">
-                                    <h4 class="ui-settings-section-title">Test Notifikasi Realtime</h4>
-                                    <p class="ui-settings-section-copy">Gunakan tombol ini untuk menembakkan event transaksi palsu untuk mengetes kemunculan notifikasi popup realtime di halaman depan.</p>
-                                </div>
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-emerald-400 transition-transform" :class="expandedSection === 6 ? 'rotate-180' : ''" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-                                </svg>
-                            </button>
-                            <div x-show="expandedSection === 6" x-collapse class="pt-4">
-                                <div class="mb-4 rounded-xl bg-emerald-50 border border-emerald-100 p-4">
-                                    <p class="text-sm text-emerald-900 mb-3"><strong>Langkah Pengetesan:</strong> Buka halaman beranda publik di tab/jendela baru. Lalu tekan tombol di bawah ini. Jika sistem notifikasi aktif, Anda akan mendengar suara 'Pop', muncul popup notifikasi, dan angka total di beranda akan berkedip hijau seketika tanpa perlu memuat ulang halaman.</p>
-                                    <button type="button" onclick="document.getElementById('form-test-pusher').submit();" class="ui-btn ui-btn-primary bg-indigo-600 hover:bg-indigo-700 text-white">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
-                                        </svg>
-                                        Uji Notifikasi Sekarang
-                                    </button>
                                 </div>
                             </div>
                         </section>
 
                         <div class="mt-6 border-t border-slate-100 pt-5">
-                            <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-                                <div>
-                                    <p class="text-sm font-bold text-slate-900">Siap menyimpan perubahan?</p>
-                                    <p class="mt-1 text-xs leading-5 text-slate-500">Semua perubahan di atas akan disimpan. Pengaturan tahun baru dikelola di tab terpisah.</p>
-                                </div>
-                                <div class="flex flex-col items-stretch gap-2 sm:flex-row sm:items-center">
-                                    <a href="{{ route('dashboard') }}" class="ui-btn ui-btn-secondary w-full sm:w-auto">Kembali</a>
-                                    <button type="submit"
-                                            @click="isSubmitting = true"
-                                            :disabled="isSubmitting || !isDirty"
-                                            :class="{'opacity-50 cursor-not-allowed': !isDirty}"
-                                            class="ui-btn ui-btn-primary w-full px-6 py-3 sm:w-auto">
-                                        <template x-if="isSubmitting">
-                                            <svg xmlns="http://www.w3.org/2000/svg" class="animate-spin h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
-                                            </svg>
-                                        </template>
-                                        <template x-if="!isSubmitting">
-                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-                                            </svg>
-                                        </template>
-                                        <span x-text="isSubmitting ? 'Menyimpan...' : 'Simpan Pengaturan'"></span>
-                                    </button>
-                                </div>
+                            <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-end">
+                                <p class="text-xs text-slate-400 sm:mr-auto" x-show="!isDirty && !isSubmitting" x-cloak>Belum ada perubahan.</p>
+                                <a href="{{ route('dashboard') }}" class="ui-btn ui-btn-secondary w-full sm:w-auto">Kembali ke Dashboard</a>
+                                <button type="submit"
+                                        :disabled="isSubmitting || !isDirty"
+                                        :class="{'opacity-50 cursor-not-allowed': !isDirty}"
+                                        class="ui-btn ui-btn-primary w-full px-6 py-3 sm:w-auto">
+                                    <template x-if="isSubmitting">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="animate-spin h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                                        </svg>
+                                    </template>
+                                    <template x-if="!isSubmitting">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                                        </svg>
+                                    </template>
+                                    <span x-text="isSubmitting ? 'Menyimpan...' : 'Simpan Pengaturan'"></span>
+                                </button>
                             </div>
-                            <p class="mt-4 text-center text-xs text-slate-400 sm:text-left">
-                                Tahun tersedia: {{ implode(', ', $years) }}
-                            </p>
                         </div>
                     </form>
                 </div>
@@ -458,7 +369,7 @@
                         <p class="mt-1 text-xs leading-5 text-amber-700">Aksi ini membuat periode aktif baru dan mengubah default sistem. Backup database sebelum lanjut.</p>
                     </div>
 
-                    <form method="POST" action="{{ route('internal.settings.period.start_new') }}" class="mt-4 space-y-4">
+                    <form method="POST" action="{{ route('internal.settings.period.start_new') }}" class="mt-4 space-y-4" @submit="isDirty = false">
                         @csrf
 
                         <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
@@ -482,7 +393,7 @@
                         <x-input-error class="mt-2" :messages="$errors->get('backup_confirmed')" />
 
                         <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-end">
-                            <button type="submit" :disabled="String(year) !== String(confirmYear) || !backup" class="ui-btn w-full bg-amber-600 px-5 py-3 text-white shadow-sm hover:bg-amber-700 focus:ring-amber-500 sm:w-auto">
+                            <button type="submit" :disabled="String(year) !== String(confirmYear) || !backup" class="ui-btn ui-btn-warning w-full sm:w-auto">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
                                 </svg>
@@ -495,7 +406,5 @@
         </div>
     </div>
 
-    <form id="form-test-pusher" action="{{ route('internal.test_pusher') }}" method="POST" class="hidden">
-        @csrf
-    </form>
+
 </x-app-layout>

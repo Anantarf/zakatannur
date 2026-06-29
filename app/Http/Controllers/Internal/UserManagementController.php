@@ -129,7 +129,7 @@ class UserManagementController extends Controller
             'password' => ['nullable', 'string', 'min:' . self::PASSWORD_MIN_LENGTH, 'max:' . self::PASSWORD_MAX_LENGTH],
         ]);
 
-        $user->fill($request->only(['name', 'username', 'role']));
+        $user->fill(['name' => $data['name'], 'username' => $data['username'], 'role' => $data['role']]);
         
         if ($request->filled('password')) {
             $user->password = Hash::make($request->password);

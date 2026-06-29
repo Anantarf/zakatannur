@@ -181,19 +181,23 @@
  }
 
  .ui-btn-primary {
-  @apply bg-brand-600 text-white shadow-md shadow-brand-600/30 hover:bg-brand-500 hover:-translate-y-[2px] hover:shadow-glow-brand hover:scale-105 focus:ring-brand-500;
+  @apply bg-brand-600 text-white shadow-md shadow-brand-600/30 hover:bg-brand-500 hover:-translate-y-[2px] hover:shadow-lg hover:scale-105 focus:ring-2 focus:ring-brand-500 focus:ring-offset-2;
  }
 
  .ui-btn-secondary {
-  @apply border border-slate-200 bg-white text-slate-700 shadow-sm hover:bg-slate-50 hover:-translate-y-[2px] hover:shadow-md hover:scale-105 focus:ring-brand-500;
+  @apply border border-slate-200 bg-white text-slate-700 shadow-sm hover:bg-slate-50 hover:-translate-y-[2px] hover:shadow-md hover:scale-105 focus:ring-2 focus:ring-brand-500 focus:ring-offset-2;
  }
 
  .ui-btn-accent {
-  @apply bg-blue-600 text-white shadow-md shadow-blue-600/30 hover:bg-blue-500 hover:-translate-y-[2px] hover:shadow-lg hover:scale-105 focus:ring-blue-500;
+  @apply bg-blue-600 text-white shadow-md shadow-blue-600/30 hover:bg-blue-500 hover:-translate-y-[2px] hover:shadow-lg hover:scale-105 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2;
  }
 
  .ui-btn-danger {
-  @apply bg-red-600 text-white shadow-sm hover:bg-red-700 hover:-translate-y-[2px] hover:shadow-md hover:scale-105 focus:ring-red-500;
+  @apply bg-red-600 text-white shadow-sm hover:bg-red-700 hover:-translate-y-[2px] hover:shadow-md hover:scale-105 focus:ring-2 focus:ring-red-500 focus:ring-offset-2;
+ }
+
+ .ui-btn-warning {
+  @apply bg-amber-600 text-white shadow-sm hover:bg-amber-700 hover:-translate-y-[2px] hover:shadow-md hover:scale-105 focus:ring-2 focus:ring-amber-500 focus:ring-offset-2;
  }
 
  .ui-btn-loading {
@@ -205,11 +209,11 @@
  }
 
  .ui-btn-pill {
-  @apply rounded-full border border-brand-100 bg-brand-50 px-4 py-2 text-sm leading-4 text-brand-700 hover:bg-brand-100 focus:ring-brand-500;
+  @apply rounded-full border border-brand-100 bg-brand-50 px-4 py-2 text-sm leading-4 text-brand-700 hover:bg-brand-100 focus:ring-2 focus:ring-brand-500 focus:ring-offset-2;
  }
 
  .ui-icon-button {
-  @apply inline-flex items-center justify-center rounded-lg p-2 transition-all duration-200 hover:scale-110 active:scale-95;
+  @apply inline-flex items-center justify-center rounded-button p-2 transition-all duration-200 hover:scale-110 active:scale-95;
  }
 
  .ui-icon-button-slate {
@@ -235,7 +239,7 @@
  /* Form Inputs */
 
  .ui-input {
-  @apply rounded-button border border-slate-200 bg-white text-slate-700 shadow-sm transition-all duration-200 focus:border-brand-500 focus:ring-2 focus:ring-brand-400/50 focus:ring-offset-2 focus:shadow-lg;
+  @apply rounded-button border border-slate-200 bg-white text-slate-700 shadow-sm transition-all duration-200 focus:border-brand-500 focus:ring-2 focus:ring-brand-500 focus:ring-offset-2 focus:shadow-lg;
   padding: var(--pad-form) 1rem;
   font-size: var(--text-input);
  }
@@ -245,7 +249,7 @@
  }
 
  .ui-select {
-  @apply rounded-button border border-slate-200 bg-white text-slate-700 transition-all duration-200 focus:border-brand-500 focus:ring-2 focus:ring-brand-400/50 focus:ring-offset-2 focus:shadow-lg hover:border-slate-300 hover:bg-slate-50/50 cursor-pointer font-medium shadow-sm;
+  @apply rounded-button border border-slate-200 bg-white text-slate-700 transition-all duration-200 focus:border-brand-500 focus:ring-2 focus:ring-brand-500 focus:ring-offset-2 focus:shadow-lg hover:border-slate-300 hover:bg-slate-50/50 cursor-pointer font-medium shadow-sm;
   padding: var(--pad-form) 1rem;
   font-size: var(--text-input);
  }
@@ -255,7 +259,7 @@
  }
 
  .ui-textarea {
-  @apply rounded-button border border-slate-200 bg-white text-slate-700 shadow-sm transition-all duration-200 focus:border-brand-500 focus:ring-2 focus:ring-brand-400/50 focus:ring-offset-2 focus:shadow-lg;
+  @apply rounded-button border border-slate-200 bg-white text-slate-700 shadow-sm transition-all duration-200 focus:border-brand-500 focus:ring-2 focus:ring-brand-500 focus:ring-offset-2 focus:shadow-lg;
   padding: var(--pad-form) 1rem;
   font-size: var(--text-input);
  }
@@ -265,7 +269,7 @@
  }
 
  .ui-file-input {
-  @apply block w-full rounded-button border border-slate-200 bg-white p-3 text-sm text-slate-700 shadow-sm transition focus:border-brand-500 focus:ring-brand-500 file:mr-4 file:rounded-lg file:border-0 file:bg-brand-600 file:px-4 file:py-2 file:text-sm file:font-bold file:text-white hover:file:bg-brand-700;
+  @apply block w-full rounded-button border border-slate-200 bg-white p-3 text-sm text-slate-700 shadow-sm transition focus:border-brand-500 focus:ring-2 focus:ring-brand-500 focus:ring-offset-2 file:mr-4 file:rounded-lg file:border-0 file:bg-brand-600 file:px-4 file:py-2 file:text-sm file:font-bold file:text-white hover:file:bg-brand-700;
  }
 
  .ui-inline-note {
@@ -547,10 +551,6 @@
   @apply border-brand-100 bg-brand-50/60;
  }
 
- .ui-settings-panel-sky {
-  @apply border-sky-100 bg-sky-50/60;
- }
-
  .ui-settings-panel-amber {
   @apply border-amber-100 bg-amber-50/70;
  }
@@ -578,11 +578,11 @@
  }
 
  .ui-settings-section-title {
-  @apply text-sm font-bold text-slate-900;
+  @apply text-base font-bold text-slate-900;
  }
 
  .ui-settings-section-copy {
-  @apply text-xs leading-5 text-slate-500;
+  @apply text-sm leading-5 text-slate-500;
  }
 
  .ui-settings-note {
@@ -608,7 +608,7 @@
  }
 
  .ui-nav-link-active {
-  @apply bg-brand-700 text-white shadow-md shadow-brand-700/30;
+  @apply bg-brand-600 text-white shadow-md shadow-brand-600/30;
  }
 
  .ui-nav-link-inactive {
@@ -620,7 +620,7 @@
  }
 
  .ui-nav-link-mobile-active {
-  @apply bg-brand-700 text-white shadow-md shadow-brand-700/30;
+  @apply bg-brand-600 text-white shadow-md shadow-brand-600/30;
  }
 
  .ui-nav-link-mobile-inactive {
@@ -669,6 +669,12 @@
   @apply transition-all duration-200 hover:shadow-md;
  }
 
+ /* Tables */
+
+ .ui-table-header {
+  @apply border-b border-slate-200 bg-slate-50 text-left text-[11px] font-bold uppercase tracking-[0.1em] text-slate-500;
+ }
+
  /* Modals & Dialogs */
 
  .ui-modal-panel {
@@ -681,6 +687,10 @@
 
  .ui-modal-close-btn {
   @apply rounded-full bg-white p-2 text-slate-400 hover:text-slate-500 hover:bg-slate-100 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:ring-offset-2 transition-all;
+ }
+
+ .ui-modal-actions {
+  @apply mt-6 flex flex-col gap-3 sm:flex-row sm:justify-end;
  }
 
  /* Toast */

@@ -3,7 +3,7 @@
         <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <div class="space-y-1 text-center sm:text-left">
                 <h2 class="ui-page-title">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7 shrink-0 text-amber-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="ui-page-title-icon text-amber-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01M5.07 19h13.86c1.54 0 2.5-1.67 1.73-3L13.73 4c-.77-1.33-2.69-1.33-3.46 0L3.34 16c-.77 1.33.19 3 1.73 3z" />
                     </svg>
                     Deteksi Anomali
@@ -92,67 +92,45 @@
                         <input type="hidden" name="scope" value="{{ $scope ?? 'active' }}" />
                         <input type="text" name="q" value="{{ $q ?? '' }}" placeholder="Cari nomor transaksi atau nama..." class="ui-input w-full sm:min-w-[240px] sm:flex-[1_1_260px] xl:max-w-[300px]" />
 
-                        <div class="relative w-full sm:min-w-[140px] sm:flex-[0.8_1_140px] xl:max-w-[150px]">
-                            <select name="year" class="ui-select w-full appearance-none pr-10">
-                                <option value="">Semua Tahun</option>
-                                @foreach ($years ?? [] as $y)
-                                    <option value="{{ $y }}" @selected((string) ($year ?? '') === (string) $y)>{{ $y }}</option>
-                                @endforeach
-                            </select>
-                            <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-slate-400">
-                                <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
-                            </div>
-                        </div>
+                        @php
+                            $yearOptions = ['' => 'Semua Tahun'];
+                            foreach ($years ?? [] as $y) {
+                                $yearOptions[$y] = $y;
+                            }
+                        @endphp
+                        <x-ui-select-custom name="year" :value="$year ?? ''" :options="$yearOptions" class="sm:min-w-[140px] sm:flex-[0.8_1_140px] xl:max-w-[150px]" />
 
-                        <div class="relative w-full sm:min-w-[210px] sm:flex-[1_1_210px] xl:max-w-[240px]">
-                            <select name="period_id" class="ui-select w-full appearance-none pr-10">
-                                <option value="">Semua Periode</option>
-                                @foreach ($periods ?? [] as $period)
-                                    <option value="{{ $period->id }}" @selected((string) ($periodId ?? '') === (string) $period->id)>
-                                        {{ $period->display_label }}{{ $period->sequence > 1 ? ' #' . $period->sequence : '' }}
-                                    </option>
-                                @endforeach
-                            </select>
-                            <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-slate-400">
-                                <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
-                            </div>
-                        </div>
+                        @php
+                            $periodOptions = ['' => 'Semua Periode'];
+                            foreach ($periods ?? [] as $period) {
+                                $periodOptions[$period->id] = $period->display_label . ($period->sequence > 1 ? ' #' . $period->sequence : '');
+                            }
+                        @endphp
+                        <x-ui-select-custom name="period_id" :value="$periodId ?? ''" :options="$periodOptions" class="sm:min-w-[210px] sm:flex-[1_1_210px] xl:max-w-[240px]" />
 
-                        <div class="relative w-full sm:min-w-[160px] sm:flex-[1_1_160px] xl:max-w-[180px]">
-                            <select name="flag_type" class="ui-select w-full appearance-none pr-10">
-                                <option value="">Semua Flag</option>
-                                @foreach ($flagOptions ?? [] as $flagValue => $flagLabel)
-                                    <option value="{{ $flagValue }}" @selected(($flag_type ?? '') === $flagValue)>{{ $flagLabel }}</option>
-                                @endforeach
-                            </select>
-                            <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-slate-400">
-                                <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
-                            </div>
-                        </div>
+                        @php
+                            $flagOptionsData = ['' => 'Semua Flag'];
+                            foreach ($flagOptions ?? [] as $flagValue => $flagLabel) {
+                                $flagOptionsData[$flagValue] = $flagLabel;
+                            }
+                        @endphp
+                        <x-ui-select-custom name="flag_type" :value="$flag_type ?? ''" :options="$flagOptionsData" class="sm:min-w-[160px] sm:flex-[1_1_160px] xl:max-w-[180px]" />
 
-                        <div class="relative w-full sm:min-w-[150px] sm:flex-[1_1_150px] xl:max-w-[170px]">
-                            <select name="risk_level" class="ui-select w-full appearance-none pr-10">
-                                <option value="">Semua Level</option>
-                                @foreach ($riskLevels ?? [] as $level)
-                                    <option value="{{ $level }}" @selected(($risk_level ?? '') === $level)>{{ \App\Models\TransactionRiskReview::levelLabel($level) }}</option>
-                                @endforeach
-                            </select>
-                            <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-slate-400">
-                                <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
-                            </div>
-                        </div>
+                        @php
+                            $riskLevelOptions = ['' => 'Semua Level'];
+                            foreach ($riskLevels ?? [] as $level) {
+                                $riskLevelOptions[$level] = \App\Models\TransactionRiskReview::levelLabel($level);
+                            }
+                        @endphp
+                        <x-ui-select-custom name="risk_level" :value="$risk_level ?? ''" :options="$riskLevelOptions" class="sm:min-w-[150px] sm:flex-[1_1_150px] xl:max-w-[170px]" />
 
-                        <div class="relative w-full sm:min-w-[170px] sm:flex-[1_1_170px] xl:max-w-[190px]">
-                            <select name="review_status" class="ui-select w-full appearance-none pr-10">
-                                <option value="">Semua Review</option>
-                                @foreach ($reviewStatuses ?? [] as $statusValue)
-                                    <option value="{{ $statusValue }}" @selected(($review_status ?? '') === $statusValue)>{{ \App\Models\TransactionRiskReview::reviewStatusLabel($statusValue) }}</option>
-                                @endforeach
-                            </select>
-                            <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-slate-400">
-                                <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
-                            </div>
-                        </div>
+                        @php
+                            $reviewStatusOptions = ['' => 'Semua Review'];
+                            foreach ($reviewStatuses ?? [] as $statusValue) {
+                                $reviewStatusOptions[$statusValue] = \App\Models\TransactionRiskReview::reviewStatusLabel($statusValue);
+                            }
+                        @endphp
+                        <x-ui-select-custom name="review_status" :value="$review_status ?? ''" :options="$reviewStatusOptions" class="sm:min-w-[170px] sm:flex-[1_1_170px] xl:max-w-[190px]" />
 
                         <button type="submit" class="ui-btn ui-btn-secondary w-full sm:w-auto sm:flex-none">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -184,7 +162,7 @@
                 <div class="hidden overflow-x-auto md:block">
                     <table class="min-w-full text-sm">
                         <thead>
-                            <tr class="border-b border-slate-200 bg-slate-50 text-left text-[11px] font-bold uppercase tracking-[0.14em] text-slate-600 sm:text-xs">
+                            <tr class="ui-table-header">
                                 <th class="px-3 py-3 sm:px-5">No. Transaksi</th>
                                 <th class="px-3 py-3 sm:px-5">Waktu</th>
                                 <th class="px-3 py-3 sm:px-5">Pembayar</th>

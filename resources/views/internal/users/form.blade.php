@@ -75,11 +75,13 @@
                             <div class="mt-3 grid grid-cols-1 sm:grid-cols-2">
                                 <div>
                                     <label class="ui-form-label" for="role">Role</label>
-                                    <select id="role" name="role" class="ui-select w-full block" required>
-                                        @foreach ($allowedRoles as $r)
-                                            <option value="{{ $r }}" @selected(old('role', data_get($user, 'role', '')) === $r)>{{ $roleLabels[$r] ?? ucfirst($r) }}</option>
-                                        @endforeach
-                                    </select>
+                                    @php
+                                        $roleOpts = [];
+                                        foreach ($allowedRoles as $r) {
+                                            $roleOpts[$r] = $roleLabels[$r] ?? ucfirst($r);
+                                        }
+                                    @endphp
+                                    <x-ui-select-custom name="role" :options="$roleOpts" :value="old('role', data_get($user, 'role', ''))" required />
                                     <x-input-error class="mt-1" :messages="$errors->get('role')" />
                                 </div>
                             </div>
@@ -101,7 +103,7 @@
 
                         <div class="mt-4 flex flex-col-reverse sm:flex-row items-center justify-between gap-3 pt-2">
                             <div class="w-full sm:w-auto">
-                                @if ($user && auth()->id() !== $user->id)
+                                @if ($user && auth()->id() !== $user->id && auth()->user()->canManageUser($user))
                                     <button type="button" class="ui-btn bg-white text-red-600 border-red-200 hover:bg-red-50 hover:border-red-300 w-full sm:w-auto" onclick="if(confirm('Apakah Anda yakin ingin menghapus pengguna ini?')) document.getElementById('delete-form').submit();">
                                         Hapus Pengguna
                                     </button>

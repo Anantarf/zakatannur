@@ -34,9 +34,7 @@
         <div class="ui-mobile-meta-item">
             <p class="ui-mobile-meta-label">Petugas</p>
             <div class="ui-mobile-meta-value">{{ $t->petugas?->name ?? '-' }}</div>
-            <span class="mt-1 inline-flex items-center justify-center rounded px-2 py-0.5 text-[11px] font-bold uppercase bg-brand-50 text-brand-700 border border-brand-100 whitespace-nowrap leading-tight text-center">
-                {{ $t->shift_label }}
-            </span>
+            <span class="ui-badge ui-badge-token ui-badge-token-emerald mt-1 px-2 py-0.5 text-[11px]">{{ $t->shift_label }}</span>
         </div>
         <div class="ui-mobile-meta-item col-span-2">
             <p class="ui-mobile-meta-label">Nominal</p>
@@ -78,9 +76,7 @@
         @if (!empty($t->risk_flags))
         <div class="flex flex-wrap gap-2">
             @foreach ($t->risk_flags as $flag)
-                <span class="rounded-full border border-amber-200 bg-amber-50 px-3 py-1 text-xs font-semibold text-amber-700">
-                    {{ \App\Models\TransactionRiskReview::flagLabel($flag) }}
-                </span>
+                <span class="ui-badge ui-badge-risk ui-badge-risk-warning rounded-full px-3 py-1">{{ \App\Models\TransactionRiskReview::flagLabel($flag) }}</span>
             @endforeach
         </div>
         @endif
@@ -95,13 +91,13 @@
 
         <form method="POST" action="{{ route('internal.anomalies.review_status', $t->no_transaksi) }}" class="pt-2 flex flex-wrap items-center gap-2">
             @csrf @method('PATCH')
-            <select name="review_status" class="ui-select text-xs py-1.5 flex-1">
-                @foreach (\App\Models\TransactionRiskReview::REVIEW_STATUSES as $s)
-                    <option value="{{ $s }}" @selected($t->review_status === $s)>
-                        {{ \App\Models\TransactionRiskReview::reviewStatusLabel($s) }}
-                    </option>
-                @endforeach
-            </select>
+            @php
+                $revOptions = [];
+                foreach (\App\Models\TransactionRiskReview::REVIEW_STATUSES as $s) {
+                    $revOptions[$s] = \App\Models\TransactionRiskReview::reviewStatusLabel($s);
+                }
+            @endphp
+            <x-ui-select-custom name="review_status" :options="$revOptions" :value="$t->review_status" class="flex-[2] text-xs" />
             <button type="submit" class="ui-btn ui-btn-primary py-1.5 text-xs flex-1">Simpan</button>
             <button type="button" @click="open = false" class="ui-btn ui-btn-secondary py-1.5 text-xs flex-1">Tutup</button>
         </form>

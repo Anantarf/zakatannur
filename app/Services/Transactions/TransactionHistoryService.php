@@ -139,7 +139,7 @@ class TransactionHistoryService
                 : null;
 
             $groupSummary->days_left = $deletedAt
-                ? max(0, $purgeDays - (int) $deletedAt->startOfDay()->diffInDays(now(config('zakat.timezone'))->startOfDay()))
+                ? $purgeDays - (int) $deletedAt->startOfDay()->diffInDays(now(config('zakat.timezone'))->startOfDay())
                 : null;
             $groupSummary->deleted_at_formatted = $deletedAt ? $deletedAt->format('d/m/Y H:i') : '-';
 
@@ -175,6 +175,7 @@ class TransactionHistoryService
             'availableYears' => ZakatTransaction::valid()
                 ->distinct()
                 ->orderByDesc('tahun_zakat')
+                ->limit(50)
                 ->pluck('tahun_zakat'),
         ]);
     }

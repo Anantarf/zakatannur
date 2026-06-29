@@ -221,7 +221,11 @@ const buildChart = (canvas, type, config, palette) => {
                                         diffStr = '↓ ' + (type === 'uang' ? new Intl.NumberFormat('id-ID').format(Math.abs(diff)) : Math.abs(diff).toFixed(2) + ' Kg');
                                     }
                                     if (diff === 0) {
-                                        res.push('', ' Stabil dibanding kemarin');
+                                        if (current === 0) {
+                                            res.push('', ' Tidak ada transaksi');
+                                        } else {
+                                            res.push('', ' Stabil dibanding kemarin');
+                                        }
                                     } else {
                                         res.push('', ' ' + diffStr + ' dari kemarin');
                                     }

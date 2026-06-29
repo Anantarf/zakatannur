@@ -36,7 +36,7 @@ class ChatbotApiTest extends TestCase
     {
         $this->app->bind(ChatbotServiceInterface::class, fn () => new class implements ChatbotServiceInterface
         {
-            public function sendMessage(string $message, array $context = []): string
+            public function sendMessage(string $message, array $context = [], string $language = 'id', array $history = []): string
             {
                 throw new \RuntimeException('secret failure details');
             }
@@ -64,14 +64,14 @@ class ChatbotApiTest extends TestCase
     {
         Http::fake([
             'generativelanguage.googleapis.com/*' => Http::response([
-                'candidates' => [[ 'content' => [ 'parts' => [[ 'text' => 'Halo, saya Zakky dari Gemini 2.5 Flash' ]] ]]],
+                'choices' => [[ 'message' => [ 'content' => 'Halo, saya Zakky dari Gemini 2.5 Flash' ] ]],
             ], 200),
         ]);
 
         $this->app->bind(ChatbotServiceInterface::class, fn () => new OpenAiChatbotProvider(
             'test-key',
             'gemini-2.5-flash',
-            'https://generativelanguage.googleapis.com/v1beta/models'
+            'https://generativelanguage.googleapis.com/v1beta/openai'
         ));
 
         $response = $this->postJson('/api/chatbot/message', ['message' => 'halo']);
@@ -93,7 +93,7 @@ class ChatbotApiTest extends TestCase
         $this->app->bind(ChatbotServiceInterface::class, fn () => new OpenAiChatbotProvider(
             'test-key',
             'gemini-2.5-flash',
-            'https://generativelanguage.googleapis.com/v1beta/models'
+            'https://generativelanguage.googleapis.com/v1beta/openai'
         ));
 
         $response = $this->postJson('/api/chatbot/message', ['message' => 'halo']);
@@ -112,24 +112,20 @@ class ChatbotApiTest extends TestCase
     {
         Http::fake([
             'generativelanguage.googleapis.com/*' => Http::response([
-                'error' => [
-                    'code' => 429,
-                    'message' => 'Quota exceeded',
-                    'status' => 'RESOURCE_EXHAUSTED',
-                ],
+                'error' => ['message' => 'Resource has been exhausted (e.g. check quota).'],
             ], 429),
         ]);
 
         $this->app->bind(ChatbotServiceInterface::class, fn () => new OpenAiChatbotProvider(
             'test-key',
             'gemini-2.5-flash',
-            'https://generativelanguage.googleapis.com/v1beta/models'
+            'https://generativelanguage.googleapis.com/v1beta/openai'
         ));
 
         $response = $this->postJson('/api/chatbot/message', ['message' => 'halo']);
 
         $response->assertStatus(503)
-            ->assertJsonPath('message', 'Kuota penggunaan AI harian sudah tercapai. Silakan coba lagi besok.');
+            ->assertJsonPath('message', 'Terlalu banyak pertanyaan. Tunggu 1 menit, lalu coba lagi.');
     }
 
     public function test_chatbot_returns_503_when_gemini_returns_500(): void

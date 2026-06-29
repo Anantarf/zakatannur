@@ -5,9 +5,9 @@
                 <svg xmlns="http://www.w3.org/2000/svg" class="ui-page-title-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414A1 1 0 0119 9.414V19a2 2 0 01-2 2z" />
                 </svg>
-                Log Audit
+                Riwayat Aktivitas
             </h2>
-            <p class="ui-page-title-copy">Riwayat aktivitas penting untuk membantu pelacakan dan akuntabilitas sistem.</p>
+            <p class="ui-page-title-copy">Catatan semua kegiatan penting yang dilakukan oleh petugas di sistem ini.</p>
         </div>
     </x-slot>
 
@@ -21,10 +21,11 @@
                 :generated="$zakkyInsight['generated'] ?? false"
             />
 
-            <div class="ui-card overflow-hidden shadow-md">
-                <div class="border-b border-slate-100 bg-slate-50/50 p-4">
+            <div class="ui-card overflow-hidden">
+                {{-- Toolbar --}}
+                <div class="ui-toolbar-soft">
                     <form method="GET" action="{{ route('internal.audit_logs.index') }}" class="flex w-full flex-col gap-2 sm:flex-row sm:items-center">
-                        <input type="text" name="q" value="{{ $q ?? '' }}" placeholder="Cari aktivitas, petugas, atau IP..." class="ui-input w-full sm:flex-1" />
+                        <input type="text" name="q" value="{{ $q ?? '' }}" placeholder="Cari aktivitas atau nama petugas..." class="ui-input w-full sm:flex-1" />
                         <div class="flex w-full flex-none items-center gap-2 sm:w-auto">
                             <button type="submit" class="ui-btn ui-btn-secondary flex-1 sm:flex-none px-4 py-2.5">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -33,47 +34,35 @@
                                 Cari
                             </button>
                             @if($q ?? null)
-                                <a href="{{ route('internal.audit_logs.index') }}" class="ui-btn ui-btn-secondary flex-1 text-center sm:flex-none px-4 py-2.5" title="Reset Pencarian">
+                                <a href="{{ route('internal.audit_logs.index') }}" class="ui-btn ui-btn-secondary flex-1 text-center sm:flex-none px-4 py-2.5">
                                     Reset
                                 </a>
                             @endif
                         </div>
                     </form>
                 </div>
+
                 <div class="p-4 sm:p-6 text-slate-900">
 
+                    {{-- Mobile --}}
                     <div class="space-y-3 md:hidden">
-                        @if (count($logs) > 0)
-                            @foreach ($logs as $log)
-                                <article class="ui-mobile-card">
-                                    <div class="flex items-start justify-between gap-3">
-                                        <div class="min-w-0">
-                                            <div class="font-sans text-[11px] text-slate-500">{{ $log->created_at->format('d/m/Y H:i:s') }}</div>
-                                            <div class="mt-2 font-bold text-slate-800">{{ $log->actorUser->name ?? 'System' }}</div>
-                                            <div class="mt-1 text-[11px] font-medium tracking-tight text-slate-400">{{ $log->ip }}</div>
+                        @forelse ($logs as $log)
+                            <article class="ui-mobile-card">
+                                <div class="flex items-start justify-between gap-3">
+                                    <div class="min-w-0 flex-1">
+                                        <div class="text-[11px] text-slate-400">
+                                            {{ $log->created_at->timezone('Asia/Jakarta')->format('d/m/Y · H:i') }}
                                         </div>
-                                        <div class="shrink-0 text-right">
-                                            @include('internal.audit_logs.partials.action-badge', ['log' => $log])
+                                        <div class="mt-2 text-sm leading-snug">
+                                            @include('internal.audit_logs.partials._narrative', ['log' => $log])
                                         </div>
                                     </div>
-
-                                    <div class="ui-mobile-meta-grid">
-                                        <div class="ui-mobile-meta-item">
-                                            <p class="ui-mobile-meta-label">Tabel</p>
-                                            <span class="font-semibold text-slate-700">{{ class_basename($log->subject_type) }}</span>
-                                        </div>
-                                        <div class="ui-mobile-meta-item">
-                                            <p class="ui-mobile-meta-label">ID</p>
-                                            <span class="font-sans text-xs text-slate-500">{{ $log->subject_id ? '#' . substr($log->subject_id, 0, 8) . '...' : '-' }}</span>
-                                        </div>
+                                    <div class="shrink-0 pt-0.5">
+                                        @include('internal.audit_logs.partials.action-badge', ['log' => $log])
                                     </div>
-
-                                    <div class="mt-4">
-                                        @include('internal.audit_logs.partials.detail-panel', ['log' => $log])
-                                    </div>
-                                </article>
-                            @endforeach
-                        @else
+                                </div>
+                            </article>
+                        @empty
                             <div class="ui-empty-state">
                                 <div class="flex flex-col items-center">
                                     <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 text-slate-200 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -82,112 +71,73 @@
                                     <span class="ui-empty-state-copy">Belum ada aktivitas yang tercatat.</span>
                                 </div>
                             </div>
-                        @endif
+                        @endforelse
                     </div>
 
+                    {{-- Desktop --}}
                     <div class="hidden overflow-x-auto w-full rounded-2xl border border-slate-200 md:block">
                         <table class="w-full text-left text-sm">
                             <thead>
-                                <tr class="border-b border-slate-200 bg-slate-50 text-slate-600 text-xs font-bold uppercase tracking-[0.14em]">
-                                    <th class="px-4 sm:px-6 py-4 w-40">
+                                <tr class="ui-table-header">
+                                    <th class="px-6 py-4 w-44">
                                         <a href="{{ route('internal.audit_logs.index', ['sort_by' => 'created_at', 'sort_dir' => ($sortBy === 'created_at' && $sortDir === 'desc') ? 'asc' : 'desc', 'page' => 1]) }}" class="flex items-center gap-1 hover:text-slate-700 transition-colors">
                                             Waktu
-                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 transition-colors {{ $sortBy === 'created_at' ? 'text-brand-500' : 'text-slate-300' }} {{ $sortBy === 'created_at' && $sortDir === 'asc' ? 'rotate-180' : '' }}" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 transition-transform {{ $sortBy === 'created_at' ? 'text-brand-500' : 'text-slate-300' }} {{ $sortBy === 'created_at' && $sortDir === 'asc' ? 'rotate-180' : '' }}" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
                                             </svg>
                                         </a>
                                     </th>
-                                    <th class="px-4 sm:px-6 py-4 flex-1">
-                                        <a href="{{ route('internal.audit_logs.index', ['sort_by' => 'petugas', 'sort_dir' => ($sortBy === 'petugas' && $sortDir === 'asc') ? 'desc' : 'asc', 'page' => 1]) }}" class="flex items-center gap-1 hover:text-slate-700 transition-colors">
-                                            Petugas
-                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 transition-colors {{ $sortBy === 'petugas' ? 'text-brand-500' : 'text-slate-300' }} {{ $sortBy === 'petugas' && $sortDir === 'desc' ? 'rotate-180' : '' }}" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-                                            </svg>
-                                        </a>
-                                    </th>
-                                    <th class="px-4 sm:px-6 py-4 w-48">
-                                        <a href="{{ route('internal.audit_logs.index', ['sort_by' => 'action', 'sort_dir' => ($sortBy === 'action' && $sortDir === 'asc') ? 'desc' : 'asc', 'page' => 1]) }}" class="flex items-center gap-1 hover:text-slate-700 transition-colors">
-                                            Aksi
-                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 transition-colors {{ $sortBy === 'action' ? 'text-brand-500' : 'text-slate-300' }} {{ $sortBy === 'action' && $sortDir === 'desc' ? 'rotate-180' : '' }}" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-                                            </svg>
-                                        </a>
-                                    </th>
-                                    <th class="px-4 sm:px-6 py-4 w-20 text-center">Detail</th>
+                                    <th class="px-6 py-4">Ringkasan Kegiatan</th>
+                                    <th class="px-6 py-4 w-20 text-center">Detail</th>
                                 </tr>
                             </thead>
-                            <tbody class="divide-y divide-slate-100">
-                                @if (count($logs) > 0)
-                                    @foreach ($logs as $log)
-                                    <tbody x-data="{ open: false }" class="border-b border-slate-100">
-                                        <tr class="transition-colors hover:bg-slate-50">
+                                @forelse ($logs as $log)
+                                    <tbody x-data="{ open: false }">
+                                        <tr class="border-b border-slate-100 transition-colors hover:bg-slate-50">
                                             <td class="px-6 py-4">
                                                 <div class="flex flex-col gap-0.5">
                                                     <span class="font-bold text-sm text-slate-800">{{ $log->created_at->timezone('Asia/Jakarta')->format('d/m/Y') }}</span>
-                                                    <span class="font-medium text-xs text-slate-600">{{ $log->created_at->timezone('Asia/Jakarta')->format('H:i:s') }}</span>
+                                                    <span class="font-medium text-xs text-slate-500">{{ $log->created_at->timezone('Asia/Jakarta')->format('H:i:s') }}</span>
                                                 </div>
                                             </td>
                                             <td class="px-6 py-4">
-                                                <div class="flex flex-col gap-1">
-                                                    <span class="font-bold text-slate-800">{{ $log->actorUser->name ?? 'System' }}</span>
-                                                    <span class="text-xs text-slate-600 font-medium">{{ $log->ip }}</span>
+                                                <div class="flex flex-col gap-1.5">
+                                                    @include('internal.audit_logs.partials._narrative', ['log' => $log])
+                                                    @include('internal.audit_logs.partials.action-badge', ['log' => $log])
                                                 </div>
-                                            </td>
-                                            <td class="px-6 py-4">
-                                                @include('internal.audit_logs.partials.action-badge', ['log' => $log])
                                             </td>
                                             <td class="px-6 py-4 text-center">
-                                                <button type="button" @click="open = !open" class="flex items-center justify-center gap-1 text-xs font-bold text-brand-600 hover:text-brand-700 transition-colors mx-auto">
-                                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 transform transition-transform" :class="open ? 'rotate-180' : ''" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3" />
+                                                <button type="button" @click="open = !open" class="inline-flex items-center justify-center mx-auto text-brand-600 hover:text-brand-700 transition-colors">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 transition-transform" :class="open ? 'rotate-180' : ''" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
                                                     </svg>
                                                 </button>
                                             </td>
                                         </tr>
-                                        @if ($log)
                                         <tr x-show="open" x-transition x-cloak class="bg-slate-50/50">
-                                            <td colspan="4" class="px-6 py-4">
-                                                <div class="space-y-4">
-                                                    <div class="grid grid-cols-3 gap-4">
-                                                        <div class="bg-white rounded-lg border border-slate-200 p-3">
-                                                            <div class="text-xs font-semibold text-slate-500 uppercase tracking-[0.08em] mb-1">Tabel Terkena</div>
-                                                            <div class="text-sm font-bold text-slate-800">{{ class_basename($log->subject_type) }}</div>
-                                                        </div>
-                                                        <div class="bg-white rounded-lg border border-slate-200 p-3">
-                                                            <div class="text-xs font-semibold text-slate-500 uppercase tracking-[0.08em] mb-1">Record ID</div>
-                                                            <div class="text-sm font-mono text-slate-700">{{ $log->subject_id ?? '-' }}</div>
-                                                        </div>
-                                                        <div class="bg-white rounded-lg border border-slate-200 p-3">
-                                                            <div class="text-xs font-semibold text-slate-500 uppercase tracking-[0.08em] mb-1">Waktu Akurat</div>
-                                                            <div class="text-sm font-mono text-slate-700">{{ $log->created_at->timezone('Asia/Jakarta')->format('H:i:s') }}</div>
-                                                        </div>
-                                                    </div>
-                                                    <div>
-                                                        @include('internal.audit_logs.partials.detail-panel', ['log' => $log])
-                                                    </div>
+                                            <td colspan="3" class="px-6 py-4">
+                                                @include('internal.audit_logs.partials.detail-panel', ['log' => $log])
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                @empty
+                                    <tbody>
+                                        <tr>
+                                            <td colspan="3" class="ui-empty-state">
+                                                <div class="flex flex-col items-center">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 text-slate-200 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414A1 1 0 0119 9.414V19a2 2 0 01-2 2z" />
+                                                    </svg>
+                                                    <span class="ui-empty-state-copy">Belum ada aktivitas yang tercatat.</span>
                                                 </div>
                                             </td>
                                         </tr>
-                                        @endif
                                     </tbody>
-                                    @endforeach
-                                @else
-                                    <tr>
-                                        <td colspan="4" class="px-6 py-12 text-center">
-                                            <div class="flex flex-col items-center">
-                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 text-slate-200 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414A1 1 0 0119 9.414V19a2 2 0 01-2 2z" />
-                                                </svg>
-                                                <span class="ui-empty-state-copy">Belum ada aktivitas yang tercatat.</span>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                @endif
-                            </tbody>
+                                @endforelse
                         </table>
                     </div>
 
-                    <div class="border-t border-slate-100 px-5 py-3">
+                    <div class="border-t border-slate-100 px-6 py-3">
                         {{ $logs->links() }}
                     </div>
                 </div>

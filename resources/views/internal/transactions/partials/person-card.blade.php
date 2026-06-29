@@ -18,10 +18,7 @@
             <div x-show="person.zakat.fitrah.active" class="mt-3 space-y-3" x-collapse x-transition:enter="transition ease-out duration-300" x-transition:leave="transition ease-in duration-200">
                 <div class="space-y-1">
                     <label class="ui-form-label-xs">Bentuk Zakat Fitrah</label>
-                    <select x-model="person.zakat.fitrah.metode" class="ui-select w-full">
-                        <option value="uang">Uang (Rp)</option>
-                        <option value="beras">Beras (Kg)</option>
-                    </select>
+                    <x-ui-select-custom name="" x-model="person.zakat.fitrah.metode" :options="['uang' => 'Uang (Rp)', 'beras' => 'Beras (Kg)']" />
                 </div>
 
                 <div class="space-y-1">
@@ -65,10 +62,7 @@
                 </div>
                 <div class="space-y-1">
                     <label class="ui-form-label-xs">Bentuk Fidyah</label>
-                    <select x-model="person.zakat.fidyah.metode" class="ui-select w-full">
-                        <option value="uang">Uang (Rp)</option>
-                        <option value="beras">Beras (Kg)</option>
-                    </select>
+                    <x-ui-select-custom name="" x-model="person.zakat.fidyah.metode" :options="['uang' => 'Uang (Rp)', 'beras' => 'Beras (Kg)']" />
                 </div>
 
                 <div class="space-y-1">
@@ -108,10 +102,7 @@
             <div x-show="person.zakat.mal.active" class="mt-3 space-y-2" x-collapse>
                 <div class="space-y-1">
                     <label class="ui-form-label-xs">Bentuk Zakat Mal</label>
-                    <select x-model="person.zakat.mal.metode" class="ui-select w-full">
-                        <option value="uang">Uang (Rp)</option>
-                        <option value="beras">Beras (Kg)</option>
-                    </select>
+                    <x-ui-select-custom name="" x-model="person.zakat.mal.metode" :options="['uang' => 'Uang (Rp)', 'beras' => 'Beras (Kg)']" />
                 </div>
                 <div class="mt-1.5 flex w-full items-center overflow-hidden rounded-lg border bg-white transition-all focus-within:ring-1"
                     :class="isBelowStandard(person, 'mal') ? 'border-red-500 focus-within:ring-red-500 focus-within:border-red-500' : 'border-slate-300 focus-within:ring-blue-500 focus-within:border-blue-500'">
@@ -132,10 +123,7 @@
             <div x-show="person.zakat.infaq.active" class="mt-3 space-y-2" x-collapse>
                 <div class="space-y-1">
                     <label class="ui-form-label-xs">Bentuk Infaq Sedekah</label>
-                    <select x-model="person.zakat.infaq.metode" class="ui-select w-full">
-                        <option value="uang">Uang (Rp)</option>
-                        <option value="beras">Beras (Kg)</option>
-                    </select>
+                    <x-ui-select-custom name="" x-model="person.zakat.infaq.metode" :options="['uang' => 'Uang (Rp)', 'beras' => 'Beras (Kg)']" />
                 </div>
                 <div class="mt-1.5 flex w-full items-center overflow-hidden rounded-lg border bg-white transition-all focus-within:ring-1"
                     :class="isBelowStandard(person, 'infaq') ? 'border-red-500 focus-within:ring-red-500 focus-within:border-red-500' : 'border-cyan-300 focus-within:ring-cyan-500 focus-within:border-cyan-500'">

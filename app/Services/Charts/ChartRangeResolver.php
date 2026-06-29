@@ -9,6 +9,7 @@ use App\Models\ZakatTransaction;
 use App\Services\Periods\ZakatPeriodResolver;
 use App\Support\SqlDialect;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Cache;
 
 class ChartRangeResolver
 {
@@ -196,23 +197,27 @@ class ChartRangeResolver
 
     private function transactionBounds(int $year, ?ZakatPeriod $period = null): array
     {
-        $effectiveTimestamp = SqlDialect::effectiveTimestamp();
+        $cacheKey = 'chart:bounds:' . $year . ':' . ($period?->id ?? 'all');
 
-        $row = ZakatTransaction::query()
-            ->valid()
-            ->where('tahun_zakat', $year)
-            ->when($period, fn ($query) => $query->where(function ($scope) use ($period) {
-                $scope->where('zakat_period_id', $period->id)
-                    ->orWhereNull('zakat_period_id');
-            }))
-            ->selectRaw('MIN(' . $effectiveTimestamp . ') as first_date')
-            ->selectRaw('MAX(' . $effectiveTimestamp . ') as last_date')
-            ->first();
+        return Cache::remember($cacheKey, 3600, function () use ($year, $period) {
+            $effectiveTimestamp = SqlDialect::effectiveTimestamp();
 
-        return [
-            'first_date' => $row?->first_date,
-            'last_date' => $row?->last_date,
-        ];
+            $row = ZakatTransaction::query()
+                ->valid()
+                ->where('tahun_zakat', $year)
+                ->when($period, fn ($query) => $query->where(function ($scope) use ($period) {
+                    $scope->where('zakat_period_id', $period->id)
+                        ->orWhereNull('zakat_period_id');
+                }))
+                ->selectRaw('MIN(' . $effectiveTimestamp . ') as first_date')
+                ->selectRaw('MAX(' . $effectiveTimestamp . ') as last_date')
+                ->first();
+
+            return [
+                'first_date' => $row?->first_date,
+                'last_date' => $row?->last_date,
+            ];
+        });
     }
 
     private function payload(int $year, Carbon $start, Carbon $end, string $source, bool $empty, ?ZakatPeriod $period = null): array

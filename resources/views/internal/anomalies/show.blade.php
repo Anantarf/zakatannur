@@ -3,7 +3,7 @@
         <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <div class="space-y-1 text-center sm:text-left">
                 <h2 class="ui-page-title">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7 shrink-0 text-amber-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="ui-page-title-icon text-amber-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01M5.07 19h13.86c1.54 0 2.5-1.67 1.73-3L13.73 4c-.77-1.33-2.69-1.33-3.46 0L3.34 16c-.77 1.33.19 3 1.73 3z" />
                     </svg>
                     Tinjau Anomali
@@ -216,7 +216,7 @@
                                         <col class="w-[20%]">
                                     </colgroup>
                                     <thead>
-                                        <tr class="border-b border-slate-200 bg-slate-50 text-left text-[11px] font-bold uppercase tracking-[0.14em] text-slate-600 sm:text-xs">
+                                        <tr class="ui-table-header">
                                             <th class="px-5 py-4">Nama Muzakki</th>
                                             <th class="px-3 py-4 sm:px-4">Kategori</th>
                                             <th class="px-3 py-4 sm:px-4">Bentuk</th>
@@ -306,7 +306,7 @@
                                 <p class="ui-label text-slate-400">Sinyal Sistem</p>
                                 <div class="mt-2 flex flex-wrap gap-2">
                                     @forelse ($riskMeta['flag_labels'] as $flagLabel)
-                                        <span class="inline-flex items-center rounded-full border border-amber-200 bg-amber-50 px-3 py-1 text-xs font-semibold text-amber-700">{{ $flagLabel }}</span>
+                                        <span class="ui-badge ui-badge-risk ui-badge-risk-warning rounded-full px-3 py-1">{{ $flagLabel }}</span>
                                     @empty
                                         <span class="text-sm text-slate-500">Belum ada flag aktif.</span>
                                     @endforelse
@@ -337,11 +337,13 @@
                         <form method="POST" action="{{ route('internal.anomalies.review_status', ['noTransaksi' => $noTransaksi]) }}" class="mt-5 space-y-3">
                             @csrf
                             @method('PATCH')
-                            <select id="review_status" name="review_status" class="ui-select w-full bg-white">
-                                @foreach ($reviewStatuses as $statusValue)
-                                    <option value="{{ $statusValue }}" @selected(($riskReview['review_status'] ?? null) === $statusValue)>{{ \App\Models\TransactionRiskReview::reviewStatusLabel($statusValue) }}</option>
-                                @endforeach
-                            </select>
+                            @php
+                                $reviewOptionsShow = [];
+                                foreach ($reviewStatuses as $statusValue) {
+                                    $reviewOptionsShow[$statusValue] = \App\Models\TransactionRiskReview::reviewStatusLabel($statusValue);
+                                }
+                            @endphp
+                            <x-ui-select-custom name="review_status" :options="$reviewOptionsShow" :value="$riskReview['review_status'] ?? null" />
                             <div class="space-y-2">
                                 <label for="review_note" class="ui-label text-slate-500">Catatan Review</label>
                                 <textarea id="review_note" name="review_note" rows="4" class="ui-textarea w-full bg-white" placeholder="Tuliskan alasan keputusan review. Wajib diisi jika status tindak lanjut.">{{ old('review_note', $riskReview['review_note'] ?? '') }}</textarea>

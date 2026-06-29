@@ -44,31 +44,31 @@
 <div class="hidden overflow-x-auto md:block">
     <table class="min-w-full text-sm">
         <thead>
-            <tr class="border-b border-slate-200 bg-slate-50 text-left text-xs font-semibold uppercase tracking-wider text-slate-500 sm:text-sm">
-                <th class="px-3 py-4 text-left sm:px-6 sm:py-4">Kategori</th>
-                <th class="px-3 py-4 sm:px-6 sm:py-4 text-center">Total Transaksi</th>
-                <th class="px-3 py-4 sm:px-6 sm:py-4 text-right">Total Uang</th>
-                <th class="px-3 py-4 sm:px-6 sm:py-4 text-right">Total Beras</th>
+            <tr class="border-b border-slate-200 bg-slate-50 text-left text-[11px] font-semibold uppercase tracking-[0.14em] text-slate-400 sm:text-xs">
+                <th class="pl-4 pr-2 py-3 text-left">Kategori</th>
+                <th class="px-2 py-3 text-center">Total Transaksi</th>
+                <th class="px-2 py-3 text-right">Total Uang</th>
+                <th class="pr-4 pl-2 py-3 text-right">Total Beras</th>
             </tr>
         </thead>
         <tbody class="divide-y divide-slate-100 font-medium text-slate-600">
             @foreach ($payload['items'] as $item)
-                <tr class="transition-colors hover:bg-brand-50/30">
-                    <td class="px-3 py-4 font-bold uppercase text-slate-900 sm:px-6">
+                <tr class="group transition-colors hover:bg-brand-50/30 stagger-item">
+                    <td class="pl-4 pr-2 py-2.5 font-bold uppercase text-slate-900 text-[12px]">
                         {{ \App\Models\ZakatTransaction::CATEGORY_LABELS[$item['category']] ?? strtoupper($item['category']) }}
                     </td>
-                    <td class="px-3 py-4 text-center sm:px-6">{{ number_format($item['jumlah_transaksi']) }}</td>
-                    <td class="whitespace-nowrap px-3 py-4 text-right font-semibold text-brand-700 sm:px-6">{{ $item['total_uang_display'] }}</td>
-                    <td class="whitespace-nowrap px-3 py-4 text-right font-semibold text-amber-700 sm:px-6">{{ $item['total_beras_kg_display'] }}</td>
+                    <td class="px-2 py-2.5 text-center text-[13px]">{{ number_format($item['jumlah_transaksi']) }}</td>
+                    <td class="whitespace-nowrap px-2 py-2.5 text-right font-semibold text-brand-700 text-[13px]">{{ $item['total_uang_display'] }}</td>
+                    <td class="whitespace-nowrap pr-4 pl-2 py-2.5 text-right font-semibold text-amber-700 text-[13px]">{{ $item['total_beras_kg_display'] }}</td>
                 </tr>
             @endforeach
         </tbody>
         <tfoot>
-            <tr class="border-t-2 border-brand-100 bg-brand-50/60 text-sm sm:text-base">
-                <td class="px-3 py-4 font-bold text-brand-900 sm:px-6">GRAND TOTAL</td>
-                <td class="px-3 py-4 text-center font-bold text-brand-900 sm:px-6">{{ number_format($payload['totals']['jumlah_transaksi']) }}</td>
-                <td class="whitespace-nowrap px-3 py-4 text-right font-bold text-brand-900 sm:px-6">{{ $payload['totals']['total_uang_display'] }}</td>
-                <td class="whitespace-nowrap px-3 py-4 text-right font-bold text-brand-900 sm:px-6">{{ $payload['totals']['total_beras_kg_display'] }}</td>
+            <tr class="border-t border-brand-100 bg-brand-50/60">
+                <td class="pl-4 pr-2 py-3 font-bold text-brand-900 text-[13px]">GRAND TOTAL</td>
+                <td class="px-2 py-3 text-center font-bold text-brand-900 text-[13px]">{{ number_format($payload['totals']['jumlah_transaksi']) }}</td>
+                <td class="whitespace-nowrap px-2 py-3 text-right font-bold text-brand-900 text-[13px]">{{ $payload['totals']['total_uang_display'] }}</td>
+                <td class="whitespace-nowrap pr-4 pl-2 py-3 text-right font-bold text-brand-900 text-[13px]">{{ $payload['totals']['total_beras_kg_display'] }}</td>
             </tr>
         </tfoot>
     </table>
