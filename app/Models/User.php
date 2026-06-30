@@ -29,6 +29,9 @@ class User extends Authenticatable
         'username',
         'role',
         'password',
+        'two_factor_secret',
+        'two_factor_recovery_codes',
+        'two_factor_confirmed_at',
     ];
 
     /**
@@ -64,6 +67,11 @@ class User extends Authenticatable
     public function canInputTransactions(): bool
     {
         return in_array($this->role, [self::ROLE_STAFF, self::ROLE_ADMIN, self::ROLE_SUPER_ADMIN], true);
+    }
+
+    public function hasTwoFactorEnabled(): bool
+    {
+        return !is_null($this->two_factor_secret) && !is_null($this->two_factor_confirmed_at);
     }
 
     public function canManageUser(User $target): bool

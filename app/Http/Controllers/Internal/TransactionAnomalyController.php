@@ -91,6 +91,6 @@ class TransactionAnomalyController extends Controller
 
         return redirect()
             ->route('internal.anomalies.show', ['noTransaksi' => $noTransaksi])
-            ->with('status', 'Status deteksi anomali berhasil diperbarui.');
+            ->with('status', 'Status anomali diperbarui.');
     }
 }

@@ -112,26 +112,36 @@ document.addEventListener('alpine:init', () => {
             // 4. Parse Links [text](url)
             html = html.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank" rel="noopener noreferrer" class="text-brand-600 underline hover:text-brand-800">$1</a>');
             
-            // 5. Parse Unordered Lists (- item or * item)
-            // We split by lines to handle block-level elements better
+            // 5. Parse Lists (Unordered and Ordered)
             const lines = html.split('\n');
             let inList = false;
+            let listType = null; // 'ul' or 'ol'
             let parsedLines = [];
             
             for (let i = 0; i < lines.length; i++) {
                 let line = lines[i];
-                const listMatch = line.match(/^(\s*)(?:-|\*)\s+(.+)$/);
+                const ulMatch = line.match(/^(\s*)(?:-|\*|•)\s+(.+)$/);
+                const olMatch = line.match(/^(\s*)\d+\.\s+(.+)$/);
                 
-                if (listMatch) {
-                    if (!inList) {
-                        parsedLines.push('<ul class="list-disc pl-5 my-1 space-y-1">');
+                if (ulMatch || olMatch) {
+                    const currentType = ulMatch ? 'ul' : 'ol';
+                    const content = ulMatch ? ulMatch[2] : olMatch[2];
+                    
+                    if (!inList || listType !== currentType) {
+                        if (inList) {
+                            parsedLines.push(`</${listType}>`);
+                        }
+                        const listClass = currentType === 'ul' ? 'list-disc' : 'list-decimal';
+                        parsedLines.push(`<${currentType} class="${listClass} pl-5 my-1 space-y-1">`);
                         inList = true;
+                        listType = currentType;
                     }
-                    parsedLines.push(`<li>${listMatch[2]}</li>`);
+                    parsedLines.push(`<li>${content}</li>`);
                 } else {
                     if (inList) {
-                        parsedLines.push('</ul>');
+                        parsedLines.push(`</${listType}>`);
                         inList = false;
+                        listType = null;
                     }
                     if (line.trim() !== '') {
                         parsedLines.push(`<p class="mb-2 last:mb-0">${line}</p>`);
@@ -139,7 +149,7 @@ document.addEventListener('alpine:init', () => {
                 }
             }
             if (inList) {
-                parsedLines.push('</ul>');
+                parsedLines.push(`</${listType}>`);
             }
             
             return parsedLines.join('');
@@ -563,8 +573,7 @@ document.addEventListener('alpine:init', () => {
                     createdAt: nowIso(),
                 };
 
-                this.messages.push(botMessage);
-                const msgIndex = this.messages.length - 1;
+                let msgIndex = -1;
                 let firstChunkPlayed = false;
                 let scrolledToMessage = false;
 
@@ -579,22 +588,32 @@ document.addEventListener('alpine:init', () => {
                         const line = lines[i].trim();
                         if (line.startsWith('data: ')) {
                             const dataString = line.slice(6).trim();
+                            
+                            // Push the bot message on the first valid event
+                            if (!firstChunkPlayed && (dataString === '[DONE]' || dataString !== '')) {
+                                this.messages.push(botMessage);
+                                msgIndex = this.messages.length - 1;
+                                this.playPopSound();
+                                firstChunkPlayed = true;
+                                this.$nextTick(() => this.scrollToBottom(true));
+                            }
+
                             if (dataString === '[DONE]') {
+                                this.messages[msgIndex].content = this.messages[msgIndex].content
+                                    .replace(/\[SUGGEST:\s*.*?\]/gi, '').trim();
                                 continue;
                             }
 
                             const data = JSON.parse(dataString);
                             if (data.chunk) {
-                                if (!firstChunkPlayed) {
-                                    this.playPopSound();
-                                    firstChunkPlayed = true;
-                                }
                                 this.messages[msgIndex].content += data.chunk;
-                                // Scroll to message only on first chunk, not every chunk
+                                // Scroll to bottom continuously as new text comes in
                                 if (!scrolledToMessage) {
-                                    this.scrollToMessage(msgIndex);
                                     scrolledToMessage = true;
                                 }
+                                this.$nextTick(() => {
+                                    this.scrollToBottom(false);
+                                });
                             } else if (data.actions) {
                                 this.messages[msgIndex].actions = data.actions;
                             } else if (data.error) {

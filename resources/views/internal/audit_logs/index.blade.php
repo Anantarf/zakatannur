@@ -7,7 +7,7 @@
                 </svg>
                 Riwayat Aktivitas
             </h2>
-            <p class="ui-page-title-copy">Catatan semua kegiatan penting yang dilakukan oleh petugas di sistem ini.</p>
+            <p class="ui-page-title-copy">Riwayat aktivitas petugas.</p>
         </div>
     </x-slot>
 

@@ -41,32 +41,38 @@ class ChatbotStreamController
 
         return new StreamedResponse(function () use ($message, $context, $sessionId) {
             try {
-                $response = $this->chatbot->handle($message, $context, $sessionId);
+                $generator = $this->chatbot->stream($message, $context, $sessionId);
+                $chunksSent = false;
 
-                if ($response->statusCode === 200) {
-                    $reply = $response->reply;
-                    // ponytail: batch chunks ~50 chars to reduce overhead, no artificial delay
-                    $chunkSize = 50;
-                    for ($i = 0; $i < strlen($reply); $i += $chunkSize) {
-                        $chunk = substr($reply, $i, $chunkSize);
-                        echo "data: " . json_encode(['chunk' => $chunk]) . "\n\n";
+                foreach ($generator as $item) {
+                    if (isset($item['chunk'])) {
+                        // Echo the chunk immediately
+                        echo "data: " . json_encode(['chunk' => $item['chunk']]) . "\n\n";
+                        flush();
+                        $chunksSent = true;
+                    } elseif (isset($item['response'])) {
+                        // The final response object is yielded at the end
+                        $response = $item['response'];
+                        if ($response->statusCode === 200) {
+                            // Quick-response path: reply was never streamed as chunks, send it now
+                            if (!$chunksSent && !empty($response->reply)) {
+                                echo "data: " . json_encode(['chunk' => $response->reply]) . "\n\n";
+                                flush();
+                            }
+                            if (!empty($response->actions)) {
+                                echo "data: " . json_encode(['actions' => $response->actions]) . "\n\n";
+                                flush();
+                            }
+                            echo "data: [DONE]\n\n";
+                        } else {
+                            echo "data: " . json_encode([
+                                'error' => $response->reply,
+                                'retryable' => $response->retryable ?? true,
+                            ]) . "\n\n";
+                        }
                         flush();
                     }
-
-                    if (!empty($response->actions)) {
-                        echo "data: " . json_encode(['actions' => $response->actions]) . "\n\n";
-                        flush();
-                    }
-
-                    echo "data: [DONE]\n\n";
-                } else {
-                    echo "data: " . json_encode([
-                        'error' => $response->reply,
-                        'retryable' => $response->retryable,
-                    ]) . "\n\n";
                 }
-
-                flush();
             } catch (\Throwable $e) {
                 Log::error('Chatbot stream error', [
                     'exception' => $e->getMessage(),

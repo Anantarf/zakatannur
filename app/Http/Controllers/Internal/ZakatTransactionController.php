@@ -46,7 +46,7 @@ class ZakatTransactionController extends Controller
         }
 
         return redirect()->route('internal.transactions.show', ['transaction' => $results[0]->id])
-            ->with('status', 'Transaksi berhasil disimpan!');
+            ->with('status', 'Transaksi berhasil disimpan.');
     }
 
     public function show(Request $request, ZakatTransaction $transaction): View
@@ -156,7 +156,7 @@ class ZakatTransactionController extends Controller
         $targetId = count($results) > 0 ? $results[0]->id : $transaction->id;
 
         return redirect()->route('internal.transactions.show', ['transaction' => $targetId])
-            ->with('status', 'Transaksi berhasil diupdate!');
+            ->with('status', 'Transaksi berhasil diperbarui.');
     }
 
     /**

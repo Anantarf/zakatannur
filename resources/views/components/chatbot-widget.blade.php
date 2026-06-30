@@ -40,9 +40,16 @@
         scrollbar-color: #cbd5e1 transparent;
     }
     
-    /* Markdown Styles overrides */
+    /* Typography & Markdown Styles overrides */
+    [data-chatbot-widget] {
+        font-family: 'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif;
+    }
     [data-chatbot-widget] strong {
         font-weight: 700 !important;
+        color: #0f172a; /* slate-900 for emphasis */
+    }
+    [data-chatbot-widget] .text-white strong {
+        color: #ffffff; /* keep white for user bubble */
     }
     [data-chatbot-widget] em {
         font-style: italic !important;
@@ -186,13 +193,13 @@
 
                     <div class="flex max-w-[85%] flex-col group" :class="message.role === 'user' ? 'items-end' : 'items-start'">
                         <div
-                            class="px-3 py-2 text-[13px] font-medium leading-relaxed break-words"
+                            class="px-3.5 py-2.5 text-[13.5px] font-[450] leading-[1.65] tracking-[0.01em] break-words shadow-sm"
                             style="word-break: break-word;"
                             :class="message.role === 'user'
-                                ? 'whitespace-pre-wrap rounded-lg rounded-tr-none bg-brand-600 text-white'
+                                ? 'whitespace-pre-wrap rounded-2xl rounded-tr-sm bg-brand-600 text-white'
                                 : (message.isError
-                                    ? 'rounded-lg rounded-tl-none border border-amber-200 bg-amber-50 text-amber-900'
-                                    : 'rounded-lg rounded-tl-none border border-slate-200 bg-white text-slate-800')"
+                                    ? 'rounded-2xl rounded-tl-sm border border-amber-200 bg-amber-50 text-amber-900'
+                                    : 'rounded-2xl rounded-tl-sm border border-slate-200 bg-white text-slate-700')"
                             x-html="formatMessage(message.content, message.role)"
                         ></div>
                         <div class="mt-1.5 flex flex-wrap items-center gap-2 px-1 text-[11px]">
@@ -278,7 +285,7 @@
                 </div>
             </template>
 
-            <div x-show="isTyping" class="flex items-start animate-fade-in gap-3">
+            <div x-show="isTyping && (!messages.length || messages[messages.length-1].role === 'user')" class="flex items-start animate-fade-in gap-3">
                 <span class="flex h-8 w-8 shrink-0 items-center justify-center overflow-hidden rounded-full bg-brand-600 text-white flex-shrink-0 transform-gpu">
                     {!! $profileAvatar !!}
                 </span>

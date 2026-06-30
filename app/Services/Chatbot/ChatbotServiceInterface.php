@@ -26,6 +26,12 @@ interface ChatbotServiceInterface
     public function sendMessage(string $message, array $context = [], string $language = 'id', array $history = []): string;
 
     /**
+     * Mengirim pesan ke AI provider secara streaming.
+     * Mengembalikan Generator yang yield kepingan teks string.
+     */
+    public function streamMessage(string $message, array $context = [], string $language = 'id', array $history = []): \Generator;
+
+    /**
      * Apakah balasan terakhir merupakan fallback (layanan AI tidak tersedia).
      * Frontend/Controller bisa pakai ini untuk membedakan status code.
      */

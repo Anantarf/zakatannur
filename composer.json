@@ -12,7 +12,9 @@
         "laravel/tinker": "^2.7",
         "maennchen/zipstream-php": "^2.1",
         "phpoffice/phpspreadsheet": "1.29",
+        "pragmarx/google2fa-laravel": "^3.0",
         "pusher/pusher-php-server": "^7.2",
+        "sentry/sentry-laravel": "^4.0",
         "setasign/fpdi": "^2.6",
         "tecnickcom/tcpdf": "^6.11"
     },
@@ -67,7 +69,8 @@
     "config": {
         "optimize-autoloader": true,
         "preferred-install": "dist",
-        "sort-packages": true
+        "sort-packages": true,
+        "platform-check": false
     },
     "minimum-stability": "stable",
     "prefer-stable": true

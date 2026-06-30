@@ -33,6 +33,16 @@ class MockChatbotProvider implements ChatbotServiceInterface
         return 'Saya belum punya jawaban pasti untuk pertanyaan itu. Coba tanyakan total uang, total beras, total jiwa, kategori penerimaan, update terakhir, atau cara bayar zakat.';
     }
 
+    public function streamMessage(string $message, array $context = [], string $language = 'id', array $history = []): \Generator
+    {
+        $reply = $this->sendMessage($message, $context, $language, $history);
+        $words = explode(' ', $reply);
+        foreach ($words as $word) {
+            yield $word . ' ';
+            usleep(10000); // simulate 10ms delay
+        }
+    }
+
     public function wasLastReplyFallback(): bool
     {
         return false;

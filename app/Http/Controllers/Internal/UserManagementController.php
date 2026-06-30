@@ -85,11 +85,11 @@ class UserManagementController extends Controller
 
         if (!$actor->canManageUser($user)) {
              return redirect()->route('internal.users.index')
-                ->with('status', 'User berhasil dibuat.');
+                ->with('status', 'Akun petugas berhasil dibuat.');
         }
 
         return redirect()->route('internal.users.edit', ['user' => $user->id])
-            ->with('status', 'User berhasil dibuat.');
+            ->with('status', 'Akun petugas berhasil dibuat.');
     }
 
     public function edit(Request $request, User $user)
@@ -145,7 +145,7 @@ class UserManagementController extends Controller
         ]);
 
         return redirect()->route('internal.users.edit', ['user' => $user->id])
-            ->with('status', 'Perubahan tersimpan.');
+            ->with('status', 'Data pengguna berhasil diperbarui.');
     }
 
     public function destroy(Request $request, User $user)
@@ -169,7 +169,7 @@ class UserManagementController extends Controller
         ]);
 
         return redirect()->route('internal.users.index')
-            ->with('status', 'Pengguna berhasil dihapus.');
+            ->with('status', 'Akun petugas berhasil dihapus.');
     }
 
     /** @return array<int,string> */

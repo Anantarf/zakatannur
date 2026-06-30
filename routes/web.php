@@ -12,18 +12,26 @@ use App\Http\Controllers\Internal\MuzakkiController;
 use App\Http\Controllers\Internal\ZakatTransactionController;
 use App\Http\Controllers\Internal\ExportController;
 use App\Http\Controllers\Internal\ProfileController;
+use App\Http\Controllers\Internal\ProfileTwoFactorController;
 use App\Http\Controllers\Guest\GuestPagesController;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
+
+Route::get('/health', function () {
+    try { DB::connection()->getPdo(); $db = 'ok'; } catch (\Exception $e) { $db = 'error'; }
+    return response()->json(['status' => $db === 'ok' ? 'ok' : 'degraded', 'db' => $db,
+        'timestamp' => now()->toIso8601String()], $db === 'ok' ? 200 : 503);
+})->name('health');
 
 Route::get('/', [GuestPagesController::class, 'home'])
     ->middleware(['throttle:public-summary'])
     ->name('home');
 
 Route::get('/dashboard', [DashboardController::class, 'show'])
-    ->middleware(['auth', 'role:staff,admin,super_admin'])
+    ->middleware(['auth', 'role:staff,admin,super_admin', '2fa'])
     ->name('dashboard');
 
-Route::middleware(['auth', 'role:staff,admin,super_admin'])
+Route::middleware(['auth', 'role:staff,admin,super_admin', '2fa'])
     ->name('internal.')
     ->prefix('internal')
     ->group(function () {
@@ -88,6 +96,10 @@ Route::middleware(['auth', 'role:staff,admin,super_admin'])
 
         Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
         Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
+        Route::get('/profile/two-factor', [ProfileTwoFactorController::class, 'show'])->name('profile.two-factor.show');
+        Route::post('/profile/two-factor/enable', [ProfileTwoFactorController::class, 'enable'])->name('profile.two-factor.enable');
+        Route::post('/profile/two-factor/confirm', [ProfileTwoFactorController::class, 'confirm'])->name('profile.two-factor.confirm');
+        Route::post('/profile/two-factor/disable', [ProfileTwoFactorController::class, 'disable'])->name('profile.two-factor.disable');
 
         Route::middleware(['role:super_admin'])->group(function () {
             Route::get('/settings/period', [PeriodSettingsController::class, 'edit'])->name('settings.period.edit');

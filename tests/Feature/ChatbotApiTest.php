@@ -29,7 +29,7 @@ class ChatbotApiTest extends TestCase
             ->assertJson([
                 'status' => 'success',
             ])
-            ->assertJsonPath('data.reply', 'Halo! Saya Zakky, asisten virtual Zakat An-Nur. Saya bisa bantu membaca ringkasan penerimaan, grafik, dan panduan umum zakat.');
+            ->assertJsonPath('data.reply', 'Halo! Assalamualaikum. Saya Zakky, asisten virtual Zakat An-Nur. Ada yang bisa saya bantu terkait zakat, fidyah, atau operasional masjid hari ini?');
     }
 
     public function test_chatbot_does_not_expose_internal_exception_messages(): void
@@ -41,6 +41,12 @@ class ChatbotApiTest extends TestCase
                 throw new \RuntimeException('secret failure details');
             }
 
+            public function streamMessage(string $message, array $context = [], string $language = 'id', array $history = []): \Generator
+            {
+                throw new \RuntimeException('secret failure details');
+                yield; // make it a Generator
+            }
+
             public function wasLastReplyFallback(): bool
             {
                 return false;
@@ -48,7 +54,7 @@ class ChatbotApiTest extends TestCase
         });
 
         $response = $this->postJson('/api/chatbot/message', [
-            'message' => 'Halo',
+            'message' => 'Apa itu reksa dana syariah di pasar modal global?',
         ]);
 
         $response->assertStatus(500)

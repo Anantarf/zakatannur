@@ -31,6 +31,10 @@ class AuthenticatedSessionController extends Controller
 
         Audit::log($request, 'login');
 
+        if (Auth::user()->hasTwoFactorEnabled()) {
+            return redirect()->route('two-factor.challenge');
+        }
+
         return redirect()->intended(RouteServiceProvider::HOME);
     }
 
