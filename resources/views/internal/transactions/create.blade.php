@@ -58,7 +58,7 @@
                             <input type="hidden" :name="`items[${i}][is_custom]`" value="1">
                         </template>
                         <template x-if="tx.is_bank_transfer">
-                            <input type="hidden" :name="`items[${i}][is_bank_transfer]`" value="1">
+                            <input type="hidden" :name="`items[${i}][is_transfer]`" value="1">
                         </template>
                     </div>
                 </template>

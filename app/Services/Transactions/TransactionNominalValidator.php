@@ -22,12 +22,13 @@ class TransactionNominalValidator
         int $defaultFitrah,
         int $defaultFidyah,
         float $defaultFitrahBeras,
-        float $defaultFidyahBeras
+        float $defaultFidyahBeras,
+        bool $requireActiveYear = false
     ): void {
         $errors = [];
         $activeYear = AppSetting::getInt(AppSetting::KEY_ACTIVE_YEAR, (int) now()->year);
 
-        if ($tahun !== $activeYear) {
+        if ($requireActiveYear && $tahun !== $activeYear) {
             $errors['tahun_zakat'][] = 'Tahun zakat harus mengikuti periode aktif sistem saat ini.';
         }
 

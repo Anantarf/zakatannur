@@ -21,7 +21,7 @@ class AuditLogController extends Controller
             $query->where(function($builder) use ($q) {
                 $builder->where('action', 'like', "%{$q}%")
                         ->orWhere('ip', 'like', "%{$q}%")
-                        ->orWhere('details', 'like', "%{$q}%")
+                        ->orWhere('metadata', 'like', "%{$q}%")
                         ->orWhereHas('actorUser', function($userBuilder) use ($q) {
                             $userBuilder->where('name', 'like', "%{$q}%");
                         });

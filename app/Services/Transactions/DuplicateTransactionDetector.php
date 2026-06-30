@@ -46,6 +46,9 @@ class DuplicateTransactionDetector
             } elseif ($this->samePayerAndAmount($transaction, $candidate) && $this->isTransferPair($transaction, $candidate)) {
                 $candidateScore = 50;
                 $matchType = TransactionRiskReview::FLAG_TRANSFER_DUPLICATE_CANDIDATE;
+            } elseif ($this->samePayerByNameOnly($transaction, $candidate) && $this->sameAmount($transaction, $candidate) && (int) $candidate->muzakki_id !== (int) $transaction->muzakki_id) {
+                $candidateScore = 35;
+                $matchType = TransactionRiskReview::FLAG_PAYER_MATCH_DIFFERENT_BENEFICIARY;
             }
 
             if ($candidateScore <= 0 || $matchType === null) {
@@ -61,6 +64,8 @@ class DuplicateTransactionDetector
                 $reasons[] = 'Kandidat duplikasi transfer ditemukan dengan nominal dan pembayar yang sama dalam rentang waktu dekat.';
             } elseif ($matchType === TransactionRiskReview::FLAG_PAYER_MATCH_SAME_BENEFICIARY) {
                 $reasons[] = 'Transaksi dengan nama pembayar yang sama dan muzakki yang sama ditemukan dalam rentang waktu dekat.';
+            } elseif ($matchType === TransactionRiskReview::FLAG_PAYER_MATCH_DIFFERENT_BENEFICIARY) {
+                $reasons[] = 'Transaksi dengan nama pembayar dan nominal yang sama ditemukan untuk muzakki berbeda dalam rentang waktu dekat.';
             }
 
             $candidates[] = [

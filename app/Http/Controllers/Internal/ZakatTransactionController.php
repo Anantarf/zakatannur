@@ -37,7 +37,7 @@ class ZakatTransactionController extends Controller
     public function store(StoreZakatTransactionRequest $request, ZakatService $service): RedirectResponse
     {
         $data = $request->validated();
-        $service->validateNominalDefaults($data);
+        $service->validateNominalDefaults($data, true);
 
         $results = $service->storeTransaction($data, $request->user()->id);
 
@@ -84,13 +84,16 @@ class ZakatTransactionController extends Controller
         $tx = $transaction;
         $groupNumber = $tx->no_transaksi;
 
-        $groupItems = $this->resolveGroupItemsForReceipt($groupNumber);
-
-        if ($tx->trashed() && !in_array($user->role, [User::ROLE_ADMIN, User::ROLE_SUPER_ADMIN], true)) {
+        if ($tx->trashed()) {
             abort(Response::HTTP_FORBIDDEN);
         }
 
         $this->authorize('printReceipt', $tx);
+
+        $groupItems = $this->resolveGroupItemsForReceipt($groupNumber);
+        if ($groupItems->isEmpty()) {
+            abort(Response::HTTP_NOT_FOUND);
+        }
 
         $template = ReceiptPdf::getActiveLetterheadTemplate();
         if (!$template) {
@@ -206,6 +209,6 @@ class ZakatTransactionController extends Controller
 
         $items = $query(false);
 
-        return $items->isEmpty() ? $query(true) : $items;
+        return $items;
     }
 }

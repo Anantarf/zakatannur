@@ -84,6 +84,29 @@ class DuplicateTransactionDetectorTest extends TestCase
         $this->assertSame(50, $result['score']);
     }
 
+    public function test_same_payer_name_and_amount_different_beneficiary_scores_35(): void
+    {
+        $muzakki2 = Muzakki::query()->create(['name' => 'Budi']);
+
+        $this->makeTx([
+            'muzakki_id' => $muzakki2->id,
+            'pembayar_nama' => 'Ahmad Fauzi',
+            'pembayar_phone' => '08111111111',
+        ]);
+
+        $tx = $this->makeTx([
+            'pembayar_nama' => 'Ahmad Fauzi',
+            'pembayar_phone' => '08222222222',
+            'waktu_terima' => now()->addMinutes(5),
+        ]);
+
+        $result = $this->detector->analyze($tx);
+
+        $this->assertContains('payer_match_different_beneficiary', $result['flags']);
+        $this->assertSame(35, $result['score']);
+        $this->assertSame('payer_match_different_beneficiary', $result['candidates'][0]['match_type']);
+    }
+
     public function test_different_tahun_zakat_not_flagged(): void
     {
         $this->makeTx(['tahun_zakat' => 2025]);
@@ -227,4 +250,3 @@ class DuplicateTransactionDetectorTest extends TestCase
         $this->assertGreaterThan(0, $result['score']);
     }
 }
-

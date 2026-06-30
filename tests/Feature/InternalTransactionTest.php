@@ -81,6 +81,47 @@ class InternalTransactionTest extends TestCase
         $this->assertMatchesRegularExpression('/^TRX-\d{8}-\d{4}$/', $trx->no_transaksi);
     }
 
+    public function test_batch_transaction_persists_transfer_flag(): void
+    {
+        AppSetting::query()->create(['key' => AppSetting::KEY_ACTIVE_YEAR, 'value' => '2026']);
+        AnnualSetting::query()->create([
+            'year' => 2026,
+            'default_fitrah_cash_per_jiwa' => 50000,
+            'default_fidyah_per_hari' => 50000,
+        ]);
+
+        $staff = User::factory()->create(['role' => User::ROLE_STAFF]);
+
+        $response = $this->actingAs($staff)->post('/internal/transactions', [
+            'tahun_zakat' => 2026,
+            'pembayar_nama' => 'Hamba Allah',
+            'pembayar_phone' => '0812',
+            'pembayar_alamat' => 'Jakarta',
+            'shift' => 'pagi',
+            'items' => [
+                [
+                    'muzakki_name' => 'Ahmad',
+                    'category' => ZakatTransaction::CATEGORY_INFAK,
+                    'metode' => ZakatTransaction::METHOD_UANG,
+                    'nominal_uang' => 75000,
+                    'is_transfer' => '1',
+                ],
+            ],
+        ]);
+
+        $this->assertStringContainsString('/internal/transactions/', $response->headers->get('Location'));
+
+        $trx = ZakatTransaction::query()->first();
+        $this->assertNotNull($trx);
+        $this->assertTrue($trx->is_transfer);
+
+        $this->actingAs($staff)
+            ->get(route('internal.transactions.show', ['transaction' => $trx->id]))
+            ->assertOk()
+            ->assertSee('TF:')
+            ->assertSee('75.000');
+    }
+
     public function test_fitrah_beras_auto_calculates_beras_from_jiwa(): void
     {
         AppSetting::query()->create(['key' => AppSetting::KEY_ACTIVE_YEAR, 'value' => '2026']);
@@ -430,6 +471,59 @@ class InternalTransactionTest extends TestCase
         $this->assertStringContainsString('/internal/transactions/', $response->headers->get('Location'));
 
         $this->assertSame(2, Muzakki::query()->where('name', 'Ahmad')->count());
+    }
+
+    public function test_admin_can_update_historical_transaction_without_requiring_active_year(): void
+    {
+        AppSetting::query()->create(['key' => AppSetting::KEY_ACTIVE_YEAR, 'value' => '2026']);
+        AnnualSetting::query()->create([
+            'year' => 2025,
+            'default_fitrah_cash_per_jiwa' => 50000,
+            'default_fidyah_per_hari' => 50000,
+        ]);
+
+        $admin = User::factory()->create(['role' => User::ROLE_ADMIN]);
+        $muzakki = Muzakki::query()->create(['name' => 'Ahmad']);
+
+        $trx = ZakatTransaction::query()->create([
+            'no_transaksi' => 'TRX-20250516-0001',
+            'muzakki_id' => $muzakki->id,
+            'pembayar_nama' => 'Pembayar Lama',
+            'pembayar_phone' => '0812',
+            'pembayar_alamat' => 'Jakarta',
+            'shift' => ZakatTransaction::SHIFT_PAGI,
+            'category' => ZakatTransaction::CATEGORY_MAL,
+            'tahun_zakat' => 2025,
+            'metode' => ZakatTransaction::METHOD_UANG,
+            'nominal_uang' => 100000,
+            'petugas_id' => $admin->id,
+            'status' => ZakatTransaction::STATUS_VALID,
+            'waktu_terima' => now(config('zakat.timezone')),
+        ]);
+
+        $response = $this->actingAs($admin)
+            ->patch('/internal/transactions/' . $trx->id, [
+                'pembayar_nama' => 'Pembayar Lama',
+                'pembayar_phone' => '0812',
+                'pembayar_alamat' => 'Jakarta',
+                'tahun_zakat' => 2025,
+                'shift' => ZakatTransaction::SHIFT_PAGI,
+                'items' => [
+                    [
+                        'id' => $trx->id,
+                        'muzakki_name' => 'Ahmad',
+                        'category' => ZakatTransaction::CATEGORY_MAL,
+                        'metode' => ZakatTransaction::METHOD_UANG,
+                        'nominal_uang' => 125000,
+                    ],
+                ],
+            ]);
+
+        $this->assertStringContainsString('/internal/transactions/', $response->headers->get('Location'));
+
+        $trx->refresh();
+        $this->assertSame(2025, $trx->tahun_zakat);
+        $this->assertSame(125000, $trx->nominal_uang);
     }
 
     public function test_update_rejects_item_ids_from_other_transaction_groups(): void

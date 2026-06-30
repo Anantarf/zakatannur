@@ -229,6 +229,15 @@ class PeriodSettingsTest extends TestCase
             ])
             ->assertSessionHasErrors(['new_year']);
 
+        // new_year cannot equal the active year
+        $this->actingAs($admin)
+            ->post('/internal/settings/period/start-new', [
+                'new_year' => 2026,
+                'backup_confirmed' => 1,
+                'new_year_confirmation' => '2026',
+            ])
+            ->assertSessionHasErrors(['new_year']);
+
         $this->actingAs($admin)
             ->post('/internal/settings/period/start-new', [
                 'new_year' => 2027,
@@ -238,7 +247,7 @@ class PeriodSettingsTest extends TestCase
             ->assertSessionHasErrors(['new_year_confirmation']);
     }
 
-    public function test_same_gregorian_year_can_have_two_ramadan_periods(): void
+    public function test_start_new_period_rejects_active_year_and_does_not_create_duplicate_period(): void
     {
         AppSetting::query()->create(['key' => AppSetting::KEY_ACTIVE_YEAR, 'value' => '2030']);
 
@@ -269,15 +278,9 @@ class PeriodSettingsTest extends TestCase
                 'backup_confirmed' => 1,
                 'new_year_confirmation' => '2030',
             ])
-            ->assertRedirect(route('internal.settings.period.edit'));
+            ->assertSessionHasErrors(['new_year']);
 
-        $this->assertDatabaseHas('zakat_periods', [
-            'gregorian_year' => 2030,
-            'sequence' => 2,
-            'is_active' => 1,
-        ]);
-
-        $this->assertSame(2, ZakatPeriod::query()->where('gregorian_year', 2030)->count());
+        $this->assertSame(1, ZakatPeriod::query()->where('gregorian_year', 2030)->count());
         $this->assertSame(1, ZakatPeriod::query()->where('gregorian_year', 2030)->where('is_active', true)->count());
     }
 }

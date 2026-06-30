@@ -44,6 +44,11 @@ class GroupedTransactionQueryService
         return $this->makeGroupSummaries($onlyTrashed);
     }
 
+    public function makeTrashedGroupSummaries(): Builder
+    {
+        return $this->makeGroupSummaries(true);
+    }
+
     public function latestValidGroups(?int $year = null, ?string $metode = null, int $limit = 10, ?int $periodId = null)
     {
         return $this->makeGroupSummaries()

@@ -121,7 +121,7 @@ class ReceiptPrintTest extends TestCase
         $this->assertNotNull($trx->fresh()->receipt_printed_at);
     }
 
-    public function test_printing_trashed_transaction_is_forbidden_for_staff_but_allowed_for_admin(): void
+    public function test_printing_trashed_transaction_is_forbidden(): void
     {
         $this->seedActiveLetterheadTemplate();
 
@@ -156,9 +156,7 @@ class ReceiptPrintTest extends TestCase
         $response = $this->actingAs($admin)
             ->get('/internal/transactions/' . $trx->id . '/receipt');
 
-        $response->assertOk();
-        $response->assertHeader('Content-Type', 'application/pdf');
-        $this->assertStringStartsWith('%PDF', $response->getContent());
+        $response->assertForbidden();
     }
 
     public function test_receipt_redirects_with_error_when_no_active_letterhead(): void

@@ -63,7 +63,7 @@ class TransactionAnomalyDetector
             return null;
         }
 
-        $avg = $this->averageNominalUang($transaction->category);
+        $avg = $this->averageNominalUang($transaction->category, $transaction->metode, $transaction->id);
         if ($avg === null || $avg <= 0) {
             return null;
         }
@@ -82,24 +82,36 @@ class TransactionAnomalyDetector
         return null;
     }
 
-    private function averageNominalUang(string $category): ?float
+    private function averageNominalUang(string $category, string $metode, ?int $excludeTransactionId = null): ?float
     {
-        return Cache::remember("anomaly:avg_nominal_uang:{$category}", self::AVG_CACHE_TTL_SECONDS, function () use ($category) {
-            $stats = DB::table('zakat_transactions')
-                ->whereNull('deleted_at')
-                ->where('status', ZakatTransaction::STATUS_VALID)
-                ->where('category', $category)
-                ->where('metode', '!=', ZakatTransaction::METHOD_BERAS)
-                ->where('nominal_uang', '>', 0)
-                ->selectRaw('AVG(nominal_uang) as avg_nominal, COUNT(*) as total')
-                ->first();
+        if ($excludeTransactionId !== null) {
+            return $this->calculateAverageNominalUang($category, $metode, $excludeTransactionId);
+        }
 
-            if (!$stats || (int) $stats->total < self::OUTLIER_MIN_SAMPLE) {
-                return null;
-            }
+        return Cache::remember(
+            "anomaly:avg_nominal_uang:{$category}:{$metode}",
+            self::AVG_CACHE_TTL_SECONDS,
+            fn () => $this->calculateAverageNominalUang($category, $metode)
+        );
+    }
 
-            return (float) $stats->avg_nominal;
-        });
+    private function calculateAverageNominalUang(string $category, string $metode, ?int $excludeTransactionId = null): ?float
+    {
+        $stats = DB::table('zakat_transactions')
+            ->whereNull('deleted_at')
+            ->where('status', ZakatTransaction::STATUS_VALID)
+            ->where('category', $category)
+            ->where('metode', $metode)
+            ->when($excludeTransactionId, fn ($query) => $query->where('id', '!=', $excludeTransactionId))
+            ->where('nominal_uang', '>', 0)
+            ->selectRaw('AVG(nominal_uang) as avg_nominal, COUNT(*) as total')
+            ->first();
+
+        if (!$stats || (int) $stats->total < self::OUTLIER_MIN_SAMPLE) {
+            return null;
+        }
+
+        return (float) $stats->avg_nominal;
     }
 
     private function significantChangeReason(ZakatTransaction $transaction, array $context): string

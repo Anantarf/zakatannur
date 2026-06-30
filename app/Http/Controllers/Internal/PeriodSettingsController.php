@@ -74,8 +74,8 @@ class PeriodSettingsController extends Controller
             $input = $validator->getData();
             $newYear = (int) ($input['new_year'] ?? 0);
 
-            if ($newYear < $activeYear) {
-                $validator->errors()->add('new_year', 'Tahun baru tidak boleh lebih kecil dari tahun aktif saat ini.');
+            if ($newYear <= $activeYear) {
+                $validator->errors()->add('new_year', 'Tahun baru harus lebih besar dari tahun aktif saat ini.');
             }
 
             if ((string) ($input['new_year_confirmation'] ?? '') !== (string) $newYear) {

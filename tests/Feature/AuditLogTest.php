@@ -17,6 +17,23 @@ class AuditLogTest extends TestCase
 {
     use RefreshDatabase;
 
+    public function test_audit_log_search_uses_existing_columns(): void
+    {
+        $admin = User::factory()->create(['role' => User::ROLE_ADMIN, 'name' => 'Admin Audit']);
+
+        \App\Models\AuditLog::query()->create([
+            'actor_user_id' => $admin->id,
+            'action' => 'transaction.delete',
+            'metadata' => ['no_transaksi' => 'TRX-SEARCH-001'],
+            'ip' => '127.0.0.1',
+        ]);
+
+        $this->actingAs($admin)
+            ->get('/internal/audit-logs?q=TRX-SEARCH-001')
+            ->assertOk()
+            ->assertSee('TRX-SEARCH-001');
+    }
+
     public function test_trashing_transaction_writes_audit_log(): void
     {
         $admin   = User::factory()->create(['role' => User::ROLE_ADMIN]);

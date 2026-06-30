@@ -116,7 +116,7 @@ class TransactionHistoryService
 
     public function paginatedTrash(string $query, array $queryParams): LengthAwarePaginator
     {
-        $groupSummaries = $this->groupedQueryService->makeGroupSummaries(true)
+        $groupSummaries = $this->groupedQueryService->makeTrashedGroupSummaries()
             ->with(['petugas'])
             ->when($query !== '', function (Builder $builder) use ($query) {
                 $like = '%' . str_replace('%', '\\%', $query) . '%';

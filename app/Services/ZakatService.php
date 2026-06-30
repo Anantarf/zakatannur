@@ -68,8 +68,11 @@ class ZakatService
 
         $this->assertItemsBelongToEditableGroup($items, $noTransaksiOverride);
 
+        $lockName = 'sync_tx_' . $waktuTerima->format('Ymd');
+
         $syncResult = $this->executeWithRetry(
-            fn() => $this->performSync($data, $items, $petugasId, $waktuTerima, $noTransaksiOverride)
+            fn() => $this->performSync($data, $items, $petugasId, $waktuTerima, $noTransaksiOverride),
+            $lockName
         );
 
         $syncResults = $syncResult['results'];
@@ -153,49 +156,42 @@ class ZakatService
      */
     private function performSync(array $data, array $items, int $petugasId, Carbon $waktuTerima, ?string $noTransaksiOverride): array
     {
-        $lockName = 'sync_tx_' . $waktuTerima->format('Ymd');
-        $lockToken = $this->acquireTransactionLock($lockName);
+        $noTransaksi = $noTransaksiOverride ?? $this->numberGenerator->generate($waktuTerima);
+        $wasReceiptPrinted = ZakatTransaction::withTrashed()
+            ->where('no_transaksi', $noTransaksi)
+            ->whereNotNull('receipt_printed_at')
+            ->exists();
 
-        try {
-            $noTransaksi = $noTransaksiOverride ?? $this->numberGenerator->generate($waktuTerima);
-            $wasReceiptPrinted = ZakatTransaction::withTrashed()
-                ->where('no_transaksi', $noTransaksi)
-                ->whereNotNull('receipt_printed_at')
-                ->exists();
-
-            if (!$noTransaksiOverride && ZakatTransaction::where('no_transaksi', $noTransaksi)->exists()) {
-                throw new DuplicateTransactionNumberException("Nomor Transaksi {$noTransaksi} sudah terpakai. Sila klik simpan sekali lagi untuk mendapatkan nomor baru.");
-            }
-
-            $oldTotals = $this->getExistingTransactionTotals($noTransaksi);
-            $pembayarData = $this->muzakkiResolver->payerData($data);
-
-            $existingIds = ZakatTransaction::where('no_transaksi', $noTransaksi)->pluck('id')->toArray();
-            [$results, $newIds] = $this->processItems($items, $data, $pembayarData, $petugasId, $waktuTerima, $noTransaksi);
-
-            $idsToDelete = $this->deleteRemovedTransactions($existingIds, $newIds);
-            $summary = $this->buildSyncSummary($existingIds, $newIds, $idsToDelete);
-
-            $this->auditLogger->logSync(
-                request(),
-                $noTransaksi,
-                $pembayarData['muzakki_name'],
-                $summary,
-                $oldTotals,
-                $results,
-                $noTransaksiOverride !== null,
-                $wasReceiptPrinted
-            );
-
-            return [
-                'results' => $results,
-                'oldUang' => (int) $oldTotals['uang'],
-                'oldBeras' => (float) $oldTotals['beras'],
-                'wasReceiptPrinted' => $wasReceiptPrinted,
-            ];
-        } finally {
-            $this->releaseTransactionLock($lockToken);
+        if (!$noTransaksiOverride && ZakatTransaction::withTrashed()->where('no_transaksi', $noTransaksi)->exists()) {
+            throw new DuplicateTransactionNumberException("Nomor Transaksi {$noTransaksi} sudah terpakai. Sila klik simpan sekali lagi untuk mendapatkan nomor baru.");
         }
+
+        $oldTotals = $this->getExistingTransactionTotals($noTransaksi);
+        $pembayarData = $this->muzakkiResolver->payerData($data);
+
+        $existingIds = ZakatTransaction::where('no_transaksi', $noTransaksi)->pluck('id')->toArray();
+        [$results, $newIds] = $this->processItems($items, $data, $pembayarData, $petugasId, $waktuTerima, $noTransaksi);
+
+        $idsToDelete = $this->deleteRemovedTransactions($existingIds, $newIds);
+        $summary = $this->buildSyncSummary($existingIds, $newIds, $idsToDelete);
+
+        $this->auditLogger->logSync(
+            request(),
+            $noTransaksi,
+            $pembayarData['muzakki_name'],
+            $summary,
+            $oldTotals,
+            $results,
+            $noTransaksiOverride !== null,
+            $wasReceiptPrinted
+        );
+
+        return [
+            'results' => $results,
+            'oldUang' => (int) $oldTotals['uang'],
+            'oldBeras' => (float) $oldTotals['beras'],
+            'wasReceiptPrinted' => $wasReceiptPrinted,
+        ];
     }
 
     /**
@@ -394,7 +390,7 @@ class ZakatService
      *
      * @throws ValidationException
      */
-    public function validateNominalDefaults(array $data): void
+    public function validateNominalDefaults(array $data, bool $requireActiveYear = false): void
     {
         $tahun = (int) ($data['tahun_zakat'] ?? now()->year);
         $items = $this->extractItems($data);
@@ -410,16 +406,19 @@ class ZakatService
             $defaultFitrah,
             $defaultFidyah,
             $defaultFitrahBeras,
-            $defaultFidyahBeras
+            $defaultFidyahBeras,
+            $requireActiveYear
         );
     }
 
-    private function executeWithRetry(\Closure $callback)
+    private function executeWithRetry(\Closure $callback, ?string $lockName = null)
     {
         $maxAttempts = (int) config('zakat.transaction.retry_attempts', 5);
         $attempts = 0;
         while ($attempts < $maxAttempts) {
             $attempts++;
+            $lockToken = $lockName ? $this->acquireTransactionLock($lockName) : null;
+
             try {
                 return DB::transaction($callback);
             } catch (QueryException $e) {
@@ -431,6 +430,8 @@ class ZakatService
                 continue;
             } catch (\RuntimeException $e) {
                 throw $e;
+            } finally {
+                $this->releaseTransactionLock($lockToken);
             }
         }
         throw new \RuntimeException("Gagal memproses transaksi setelah beberapa kali percobaan karena kepadatan trafik. Silakan klik simpan sekali lagi.");

@@ -162,7 +162,10 @@ class TransactionAnomalyDetectorTest extends TestCase
 
         Cache::flush(); // force fresh average calculation
 
-        $tx = $this->makeTx(['nominal_uang' => 600_000]); // 6x average → outlier
+        $tx = $this->makeTx([
+            'category' => ZakatTransaction::CATEGORY_MAL,
+            'nominal_uang' => 600_000,
+        ]);
 
         $result = $this->detector->analyze($tx);
 
@@ -195,7 +198,10 @@ class TransactionAnomalyDetectorTest extends TestCase
 
         Cache::flush();
 
-        $tx = $this->makeTx(['nominal_uang' => 499_000]); // just below 5x
+        $tx = $this->makeTx([
+            'category' => ZakatTransaction::CATEGORY_MAL,
+            'nominal_uang' => 499_000,
+        ]);
 
         $result = $this->detector->analyze($tx);
 

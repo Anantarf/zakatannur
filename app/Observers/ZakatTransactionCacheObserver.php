@@ -17,7 +17,14 @@ class ZakatTransactionCacheObserver
 
     private function clearAnomalyAvgCache(ZakatTransaction $model): void
     {
-        Cache::forget("anomaly:avg_nominal_uang:{$model->category}");
+        Cache::forget("anomaly:avg_nominal_uang:{$model->category}:{$model->metode}");
+
+        $originalCategory = $model->getOriginal('category');
+        $originalMetode = $model->getOriginal('metode');
+
+        if ($originalCategory && $originalMetode) {
+            Cache::forget("anomaly:avg_nominal_uang:{$originalCategory}:{$originalMetode}");
+        }
     }
 
     public function created(ZakatTransaction $zakatTransaction): void

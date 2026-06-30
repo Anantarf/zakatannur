@@ -37,10 +37,10 @@ class TransactionTransformer
                     'muzakki_id' => $muzakkiId,
                     'name' => $name,
                     'zakat' => [
-                        'fitrah' => ['active' => false, 'metode' => 'uang', 'is_custom' => false, 'is_transfer' => false, 'nominal' => ''],
-                        'fidyah' => ['active' => false, 'metode' => 'uang', 'is_custom' => false, 'is_transfer' => false, 'hari' => '', 'nominal' => ''],
-                        'mal'   => ['active' => false, 'metode' => 'uang', 'is_transfer' => false, 'nominal' => ''],
-                        'infaq' => ['active' => false, 'metode' => 'uang', 'is_transfer' => false, 'nominal' => ''],
+                        'fitrah' => ['active' => false, 'metode' => 'uang', 'is_custom' => false, 'is_bank_transfer' => false, 'nominal' => ''],
+                        'fidyah' => ['active' => false, 'metode' => 'uang', 'is_custom' => false, 'is_bank_transfer' => false, 'hari' => '', 'nominal' => ''],
+                        'mal'   => ['active' => false, 'metode' => 'uang', 'is_bank_transfer' => false, 'nominal' => ''],
+                        'infaq' => ['active' => false, 'metode' => 'uang', 'is_bank_transfer' => false, 'nominal' => ''],
                     ]
                 ];
                 $foundIndex = count($persons) - 1;
@@ -52,7 +52,7 @@ class TransactionTransformer
                     'active'    => true,
                     'metode'    => $item->metode,
                     'is_custom' => (bool) $item->is_khusus,
-                    'is_transfer' => (bool) $item->is_transfer,
+                    'is_bank_transfer' => (bool) $item->is_transfer,
                     'hari'      => $category === 'fidyah' ? $item->hari : '',
                     'nominal'   => $item->metode === ZakatTransaction::METHOD_BERAS
                                    ? $item->jumlah_beras_kg_display
