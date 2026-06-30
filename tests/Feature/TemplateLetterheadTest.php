@@ -49,7 +49,7 @@ class TemplateLetterheadTest extends TestCase
         $this->assertNotNull($tpl);
         $this->assertSame('letterhead', $tpl->template_type);
         $this->assertSame(1, (int) $tpl->version);
-        $this->assertFalse((bool) $tpl->is_active);
+        $this->assertTrue((bool) $tpl->is_active);
         $this->assertSame('kop.pdf', $tpl->original_filename);
 
         Storage::disk('local')->assertExists($tpl->storage_path);
@@ -59,7 +59,7 @@ class TemplateLetterheadTest extends TestCase
             ->assertSee('Template Kop Surat');
     }
 
-    public function test_super_admin_can_activate_only_one_template(): void
+    public function test_uploading_new_template_replaces_old_and_is_active(): void
     {
         Storage::fake('local');
 
@@ -68,33 +68,77 @@ class TemplateLetterheadTest extends TestCase
         $file1 = UploadedFile::fake()->create('kop1.pdf', 100, 'application/pdf');
         $file2 = UploadedFile::fake()->create('kop2.pdf', 100, 'application/pdf');
 
-        $this->actingAs($super)->post('/internal/templates/letterhead', ['file' => $file1]);
-        $this->actingAs($super)->post('/internal/templates/letterhead', ['file' => $file2]);
-
-        $this->assertDatabaseCount('templates', 2);
-
-        $tplV1 = Template::query()->where('version', 1)->first();
-        $tplV2 = Template::query()->where('version', 2)->first();
-        $this->assertNotNull($tplV1);
-        $this->assertNotNull($tplV2);
-
-        $this->actingAs($super)->post('/internal/templates/' . $tplV1->id . '/activate')
+        $this->actingAs($super)->post('/internal/templates/letterhead', ['file' => $file1])
             ->assertRedirect(route('internal.templates.letterhead'));
 
-        $tplV1->refresh();
-        $tplV2->refresh();
-        $this->assertTrue((bool) $tplV1->is_active);
-        $this->assertFalse((bool) $tplV2->is_active);
+        $this->assertDatabaseCount('templates', 1);
+        $this->assertSame(1, (int) Template::query()->first()->version);
+
+        $this->actingAs($super)->post('/internal/templates/letterhead', ['file' => $file2])
+            ->assertRedirect(route('internal.templates.letterhead'));
+
+        // Old template deleted, only new one remains
+        $this->assertDatabaseCount('templates', 1);
+        $tpl = Template::query()->first();
+        $this->assertSame(2, (int) $tpl->version);
+        $this->assertTrue((bool) $tpl->is_active);
+    }
+
+    public function test_activate_switches_active_template(): void
+    {
+        Storage::fake('local');
+
+        $super = User::factory()->create(['role' => User::ROLE_SUPER_ADMIN]);
+
+        // Seed two templates directly to test activate endpoint
+        $tplV1 = Template::query()->create([
+            'template_type' => Template::TYPE_LETTERHEAD,
+            'version' => 1,
+            'is_active' => true,
+            'storage_path' => 'templates/letterhead/v1.pdf',
+            'original_filename' => 'kop1.pdf',
+            'mime_type' => 'application/pdf',
+            'file_size_bytes' => 100,
+            'uploaded_by' => $super->id,
+        ]);
+        $tplV2 = Template::query()->create([
+            'template_type' => Template::TYPE_LETTERHEAD,
+            'version' => 2,
+            'is_active' => false,
+            'storage_path' => 'templates/letterhead/v2.pdf',
+            'original_filename' => 'kop2.pdf',
+            'mime_type' => 'application/pdf',
+            'file_size_bytes' => 100,
+            'uploaded_by' => $super->id,
+        ]);
 
         $this->actingAs($super)->post('/internal/templates/' . $tplV2->id . '/activate')
             ->assertRedirect(route('internal.templates.letterhead'));
 
-        $tplV1->refresh();
-        $tplV2->refresh();
-        $this->assertFalse((bool) $tplV1->is_active);
-        $this->assertTrue((bool) $tplV2->is_active);
+        $this->assertFalse((bool) $tplV1->fresh()->is_active);
+        $this->assertTrue((bool) $tplV2->fresh()->is_active);
+        $this->assertSame(1, Template::query()->where('is_active', true)->count());
+    }
 
-        $this->assertSame(1, Template::query()->where('template_type', 'letterhead')->where('is_active', true)->count());
+    public function test_old_storage_file_deleted_only_after_successful_upload(): void
+    {
+        Storage::fake('local');
+
+        $super = User::factory()->create(['role' => User::ROLE_SUPER_ADMIN]);
+
+        // Upload first template
+        $file1 = UploadedFile::fake()->create('kop1.pdf', 100, 'application/pdf');
+        $this->actingAs($super)->post('/internal/templates/letterhead', ['file' => $file1]);
+
+        $oldPath = Template::query()->first()->storage_path;
+        Storage::disk('local')->assertExists($oldPath);
+
+        // Upload second template — old file should be deleted after commit
+        $file2 = UploadedFile::fake()->create('kop2.pdf', 100, 'application/pdf');
+        $this->actingAs($super)->post('/internal/templates/letterhead', ['file' => $file2]);
+
+        Storage::disk('local')->assertMissing($oldPath);
+        Storage::disk('local')->assertExists(Template::query()->first()->storage_path);
     }
 
     public function test_super_admin_can_preview_pdf(): void

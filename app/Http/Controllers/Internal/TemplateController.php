@@ -49,16 +49,18 @@ class TemplateController extends Controller
             $attempts++;
 
             try {
-                DB::transaction(function () use ($file, $user, &$createdTemplate) {
+                $oldPaths = [];
+
+                DB::transaction(function () use ($file, $user, &$createdTemplate, &$oldPaths) {
                     $dbMax = (int) (Template::query()
                         ->where('template_type', Template::TYPE_LETTERHEAD)
                         ->lockForUpdate()
                         ->max('version') ?? 0);
 
-                    // Cleanup old templates (DB + Storage)
+                    // Collect old storage paths and delete DB records only
                     $oldTemplates = Template::where('template_type', Template::TYPE_LETTERHEAD)->get();
                     foreach ($oldTemplates as $old) {
-                        Storage::disk('local')->delete($old->storage_path);
+                        $oldPaths[] = $old->storage_path;
                         $old->delete();
                     }
 
@@ -88,6 +90,11 @@ class TemplateController extends Controller
                         'uploaded_by' => $user->id,
                     ]);
                 });
+
+                // Delete old files only after DB transaction committed successfully
+                foreach ($oldPaths as $path) {
+                    Storage::disk('local')->delete($path);
+                }
 
                 if ($createdTemplate instanceof Template) {
                     Audit::log($request, 'template.uploaded', $createdTemplate, [
@@ -167,13 +174,13 @@ class TemplateController extends Controller
                 ->withErrors(['delete' => 'Template yang sedang aktif tidak boleh dihapus.']);
         }
 
+        $storagePath = $template->storage_path;
+
         DB::transaction(function () use ($template) {
-            // Delete file
-            Storage::disk('local')->delete($template->storage_path);
-            
-            // Delete record
             $template->delete();
         });
+
+        Storage::disk('local')->delete($storagePath);
 
         Audit::log($request, 'template.deleted', null, [
             'template_type' => $template->template_type,
