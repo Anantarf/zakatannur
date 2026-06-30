@@ -90,7 +90,7 @@ class ZakatTransactionController extends Controller
 
         $this->authorize('printReceipt', $tx);
 
-        $groupItems = $this->resolveGroupItemsForReceipt($groupNumber);
+        $groupItems = $this->resolveGroupItems($groupNumber, onlyValid: true);
         if ($groupItems->isEmpty()) {
             abort(Response::HTTP_NOT_FOUND);
         }
@@ -188,27 +188,23 @@ class ZakatTransactionController extends Controller
         );
     }
 
-    private function resolveGroupItems(string $groupNumber): \Illuminate\Support\Collection
+    private function resolveGroupItems(string $groupNumber, bool $onlyValid = false): \Illuminate\Support\Collection
     {
         $relations = ['muzakki' => fn($q) => $q->withTrashed(), 'zakatPeriod'];
+
+        if ($onlyValid) {
+            return ZakatTransaction::query()
+                ->with($relations)
+                ->forTransactionGroup($groupNumber)
+                ->valid()
+                ->orderBy('id', 'asc')
+                ->get();
+        }
+
         $items = ZakatTransaction::transactionGroupItems($groupNumber, false, $relations);
 
         return $items->isEmpty()
             ? ZakatTransaction::transactionGroupItems($groupNumber, true, $relations)
             : $items;
-    }
-
-    private function resolveGroupItemsForReceipt(string $groupNumber): \Illuminate\Support\Collection
-    {
-        $query = fn(bool $withTrashed) => ($withTrashed ? ZakatTransaction::withTrashed() : ZakatTransaction::query())
-            ->with(['muzakki' => fn($q) => $q->withTrashed(), 'zakatPeriod'])
-            ->forTransactionGroup($groupNumber)
-            ->valid()
-            ->orderBy('id', 'asc')
-            ->get();
-
-        $items = $query(false);
-
-        return $items;
     }
 }

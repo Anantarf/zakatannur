@@ -72,7 +72,7 @@
                     <x-slot name="trigger">
                         <button class="inline-flex h-10 w-10 items-center justify-center rounded-full border border-slate-200 bg-slate-50 text-left text-brand-700 shadow-sm transition hover:bg-white hover:text-brand-800 sm:h-auto sm:w-auto sm:gap-3 sm:px-3 sm:py-2">
                             <div class="flex h-8 w-8 items-center justify-center rounded-full bg-brand-100 text-brand-700 shadow-sm ring-1 ring-slate-200 sm:h-10 sm:w-10">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                                 </svg>
                             </div>
@@ -80,7 +80,7 @@
                                 <div class="truncate text-sm font-bold text-slate-900">{{ auth()->user()->name }}</div>
                                 <div class="truncate text-[11px] font-semibold text-brand-700">{{ $userMeta }}</div>
                             </div>
-                            <svg xmlns="http://www.w3.org/2000/svg" class="hidden h-4 w-4 text-slate-400 sm:block" viewBox="0 0 20 20" fill="currentColor">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="hidden h-4 w-4 text-slate-400 sm:block" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
                                 <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
                             </svg>
                         </button>

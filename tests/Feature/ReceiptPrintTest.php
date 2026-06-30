@@ -159,6 +159,32 @@ class ReceiptPrintTest extends TestCase
         $response->assertForbidden();
     }
 
+    public function test_staff_cannot_print_other_staff_receipt(): void
+    {
+        $staffA  = User::factory()->create(['role' => User::ROLE_STAFF]);
+        $staffB  = User::factory()->create(['role' => User::ROLE_STAFF]);
+        $muzakki = Muzakki::query()->create(['name' => 'Ahmad']);
+
+        $trx = ZakatTransaction::query()->create([
+            'no_transaksi'   => 'TRX-20260308-0001',
+            'muzakki_id'     => $muzakki->id,
+            'pembayar_nama'  => 'Hamba Allah',
+            'pembayar_phone' => '0812',
+            'pembayar_alamat'=> 'Jakarta',
+            'shift'          => ZakatTransaction::SHIFTS[0],
+            'category'       => ZakatTransaction::CATEGORY_FITRAH,
+            'tahun_zakat'    => 2026,
+            'metode'         => ZakatTransaction::METHOD_UANG,
+            'nominal_uang'   => 100000,
+            'petugas_id'     => $staffA->id,
+            'status'         => ZakatTransaction::STATUS_VALID,
+        ]);
+
+        $this->actingAs($staffB)
+            ->get('/internal/transactions/' . $trx->id . '/receipt')
+            ->assertForbidden();
+    }
+
     public function test_receipt_redirects_with_error_when_no_active_letterhead(): void
     {
         $staff   = User::factory()->create(['role' => User::ROLE_STAFF]);

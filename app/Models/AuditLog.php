@@ -87,7 +87,7 @@ class AuditLog extends Model
         if (in_array($this->action, ['Updated.Transaction']) && isset($this->metadata['totals'])) {
             $old = (int) ($this->metadata['totals']['old']['uang'] ?? 0);
             $new = (int) ($this->metadata['totals']['new']['uang'] ?? 0);
-            if ($old > 0 && abs($new - $old) / $old > 0.5) {
+            if ($old > 0 && abs($new - $old) / $old > (float) config('zakat.thresholds.significant_change_percent', 0.5)) {
                 $flags[] = 'perubahan_nominal_besar';
             }
         }

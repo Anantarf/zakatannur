@@ -10,6 +10,7 @@ use App\Services\Transactions\TransactionAuditLogger;
 use App\Services\Transactions\TransactionNominalValidator;
 use App\Services\Transactions\TransactionNumberGenerator;
 use App\Services\Transactions\TransactionPayloadBuilder;
+use App\Services\Transactions\TransactionLockManager;
 use App\Services\Transactions\TransactionReviewAssistantService;
 use App\Services\Transactions\TransactionRowPersister;
 use Carbon\Carbon;
@@ -32,6 +33,7 @@ class ZakatService
     private TransactionPayloadBuilder $payloadBuilder;
     private TransactionAuditLogger $auditLogger;
     private ZakatPeriodResolver $periodResolver;
+    private TransactionLockManager $lockManager;
 
     public function __construct(
         TransactionNumberGenerator $numberGenerator,
@@ -43,6 +45,7 @@ class ZakatService
         TransactionPayloadBuilder $payloadBuilder,
         TransactionAuditLogger $auditLogger,
         ZakatPeriodResolver $periodResolver,
+        TransactionLockManager $lockManager,
     ) {
         $this->numberGenerator = $numberGenerator;
         $this->nominalValidator = $nominalValidator;
@@ -53,6 +56,7 @@ class ZakatService
         $this->payloadBuilder = $payloadBuilder;
         $this->auditLogger = $auditLogger;
         $this->periodResolver = $periodResolver;
+        $this->lockManager = $lockManager;
     }
 
     public function storeTransaction(array $data, int $petugasId, ?string $noTransaksiOverride = null): array
@@ -192,50 +196,6 @@ class ZakatService
             'oldBeras' => (float) $oldTotals['beras'],
             'wasReceiptPrinted' => $wasReceiptPrinted,
         ];
-    }
-
-    /**
-     * Serializes transaction number generation on the database connection.
-     *
-     * Cache locks are unsafe here with the file driver because the sequence is
-     * persisted in the database. The lock must live beside the row reads/writes.
-     *
-     * @return array{driver:string,name:string}|null
-     */
-    private function acquireTransactionLock(string $lockName): ?array
-    {
-        $driver = DB::connection()->getDriverName();
-        $timeout = (int) config('zakat.cache.lock_timeout_seconds', 30);
-
-        if (in_array($driver, ['mysql', 'mariadb'], true)) {
-            $result = DB::selectOne('SELECT GET_LOCK(?, ?) AS acquired', [$lockName, $timeout]);
-
-            if ((int) ($result->acquired ?? 0) !== 1) {
-                throw new \RuntimeException("Gagal mendapatkan kunci transaksi setelah menunggu (Lock: {$lockName}). Silakan coba lagi.");
-            }
-
-            return ['driver' => $driver, 'name' => $lockName];
-        }
-
-        if ($driver === 'pgsql') {
-            DB::select('SELECT pg_advisory_xact_lock(hashtext(?))', [$lockName]);
-        }
-
-        return null;
-    }
-
-    /**
-     * @param array{driver:string,name:string}|null $lockToken
-     */
-    private function releaseTransactionLock(?array $lockToken): void
-    {
-        if ($lockToken === null) {
-            return;
-        }
-
-        if (in_array($lockToken['driver'], ['mysql', 'mariadb'], true)) {
-            DB::select('SELECT RELEASE_LOCK(?)', [$lockToken['name']]);
-        }
     }
 
     /**
@@ -417,7 +377,7 @@ class ZakatService
         $attempts = 0;
         while ($attempts < $maxAttempts) {
             $attempts++;
-            $lockToken = $lockName ? $this->acquireTransactionLock($lockName) : null;
+            $lockToken = $lockName ? $this->lockManager->acquire($lockName) : null;
 
             try {
                 return DB::transaction($callback);
@@ -431,7 +391,7 @@ class ZakatService
             } catch (\RuntimeException $e) {
                 throw $e;
             } finally {
-                $this->releaseTransactionLock($lockToken);
+                $this->lockManager->release($lockToken);
             }
         }
         throw new \RuntimeException("Gagal memproses transaksi setelah beberapa kali percobaan karena kepadatan trafik. Silakan klik simpan sekali lagi.");
@@ -442,8 +402,10 @@ class ZakatService
         $uangDelta = abs($newUang - $oldUang);
         $berasDelta = abs($newBeras - $oldBeras);
 
-        $uangThreshold = max(50000, (int) round(max($oldUang, $newUang) * 0.5));
-        $berasThreshold = max(2.5, max($oldBeras, $newBeras) * 0.5);
+        $pct = (float) config('zakat.thresholds.significant_change_percent', 0.5);
+        $berasPct = (float) config('zakat.thresholds.significant_change_beras_percent', 0.5);
+        $uangThreshold = max(50000, (int) round(max($oldUang, $newUang) * $pct));
+        $berasThreshold = max(2.5, max($oldBeras, $newBeras) * $berasPct);
 
         return $uangDelta >= $uangThreshold || $berasDelta >= $berasThreshold;
     }

@@ -198,6 +198,17 @@ return [
     ],
 
     /**
+     * Risk / Anomaly Thresholds
+     */
+    'thresholds' => [
+        // Persentase perubahan nominal yang dianggap signifikan (0.5 = 50%)
+        'significant_change_percent' => 0.5,
+
+        // Persentase perubahan beras yang dianggap signifikan (0.5 = 50%)
+        'significant_change_beras_percent' => 0.5,
+    ],
+
+    /**
      * Validation String Length Limits
      */
     'validation' => [

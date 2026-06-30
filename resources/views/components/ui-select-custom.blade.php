@@ -30,7 +30,7 @@
             :class="{ 'border-brand-500 ring-2 ring-brand-500 ring-offset-2': open }"
     >
         <span x-text="selectedLabel" class="truncate pointer-events-none" :class="{ 'text-slate-400': !value, 'text-slate-800 font-bold': value }"></span>
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 shrink-0 transition-transform duration-200 pointer-events-none" :class="open ? 'rotate-180 text-brand-600' : 'text-slate-400'" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 shrink-0 transition-transform duration-200 pointer-events-none" :class="open ? 'rotate-180 text-brand-600' : 'text-slate-400'" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7" />
         </svg>
     </button>
@@ -65,7 +65,7 @@
                     :class="String(value) === String(key) ? 'bg-brand-50 font-bold text-brand-700' : 'font-semibold text-slate-700 hover:bg-slate-50 hover:text-brand-600'"
             >
                 <span x-text="label" class="truncate"></span>
-                <svg x-show="String(value) === String(key)" xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 shrink-0 text-brand-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <svg x-show="String(value) === String(key)" xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 shrink-0 text-brand-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" />
                 </svg>
             </button>
