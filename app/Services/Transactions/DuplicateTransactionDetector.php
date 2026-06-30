@@ -47,7 +47,7 @@ class DuplicateTransactionDetector
                 $candidateScore = 50;
                 $matchType = TransactionRiskReview::FLAG_TRANSFER_DUPLICATE_CANDIDATE;
             } elseif ($this->samePayerByNameOnly($transaction, $candidate) && $this->sameAmount($transaction, $candidate) && (int) $candidate->muzakki_id !== (int) $transaction->muzakki_id) {
-                $candidateScore = 35;
+                $candidateScore = 15; // ponytail: below warning threshold — paying for multiple family members is not suspicious
                 $matchType = TransactionRiskReview::FLAG_PAYER_MATCH_DIFFERENT_BENEFICIARY;
             }
 

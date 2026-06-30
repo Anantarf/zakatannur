@@ -156,6 +156,7 @@ class ZakatTransaction extends Model
         'is_khusus' => 'boolean',
         'default_fitrah_cash_per_jiwa_used' => 'integer',
         'default_fidyah_per_hari_used' => 'integer',
+        'anomaly_context' => 'array',
         'voided_at' => 'datetime',
         'waktu_terima' => 'datetime',
         'deleted_at' => 'datetime',

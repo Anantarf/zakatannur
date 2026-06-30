@@ -44,6 +44,11 @@ class User extends Authenticatable
         'remember_token',
     ];
 
+    public function hasTwoFactorEnabled(): bool
+    {
+        return !is_null($this->two_factor_secret) && !is_null($this->two_factor_confirmed_at);
+    }
+
     public function isSuperAdmin(): bool
     {
         return $this->role === self::ROLE_SUPER_ADMIN;
@@ -69,10 +74,6 @@ class User extends Authenticatable
         return in_array($this->role, [self::ROLE_STAFF, self::ROLE_ADMIN, self::ROLE_SUPER_ADMIN], true);
     }
 
-    public function hasTwoFactorEnabled(): bool
-    {
-        return !is_null($this->two_factor_secret) && !is_null($this->two_factor_confirmed_at);
-    }
 
     public function canManageUser(User $target): bool
     {

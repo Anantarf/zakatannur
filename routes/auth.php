@@ -14,10 +14,8 @@ Route::middleware('guest')->group(function () {
 });
 
 Route::middleware('auth')->group(function () {
-    Route::get('two-factor-challenge', [TwoFactorController::class, 'showChallenge'])
-        ->name('two-factor.challenge');
-    Route::post('two-factor-challenge', [TwoFactorController::class, 'verify'])
-        ->name('two-factor.verify');
+    Route::get('two-factor-challenge', [TwoFactorController::class, 'showChallenge'])->name('two-factor.challenge');
+    Route::post('two-factor-challenge', [TwoFactorController::class, 'verify'])->name('two-factor.verify');
 
     Route::get('confirm-password', [ConfirmablePasswordController::class, 'show'])
                 ->name('password.confirm');

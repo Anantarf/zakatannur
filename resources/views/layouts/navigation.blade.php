@@ -31,7 +31,7 @@
                 </a>
             </div>
 
-            <div class="hidden flex-1 justify-center xl:flex">
+            <div class="hidden flex-1 justify-center lg:flex">
                 <div class="flex items-center gap-2 rounded-full border border-slate-200 bg-slate-100 p-1.5">
                     @include('layouts.partials.internal-nav-links', ['mobile' => false, 'user' => $user, 'canInputTransaksi' => $canInputTransaksi, 'isAdmin' => $isAdmin, 'pendingAnomalyCount' => $pendingAnomalyCount])
                     @if ($isAdmin)
@@ -104,7 +104,7 @@
             </div>
         </div>
 
-        <div class="ui-admin-mobile-tabs xl:hidden">
+        <div class="ui-admin-mobile-tabs lg:hidden">
             @include('layouts.partials.internal-nav-links', ['mobile' => true, 'segmented' => true, 'user' => $user, 'canInputTransaksi' => $canInputTransaksi, 'isAdmin' => $isAdmin, 'pendingAnomalyCount' => $pendingAnomalyCount])
         </div>
     </div>

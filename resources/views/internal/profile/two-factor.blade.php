@@ -50,12 +50,11 @@
                         </form>
 
                     @elseif ($user->two_factor_secret && !$user->two_factor_confirmed_at)
-                        {{-- Secret generated, awaiting confirmation --}}
                         <p class="text-sm text-slate-600">Scan QR code ini dengan Google Authenticator, lalu masukkan kode 6 digit untuk mengaktifkan.</p>
 
                         @if ($qrCodeUrl)
                             <div class="flex justify-center py-4">
-                                <img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data={{ urlencode($qrCodeUrl) }}" alt="QR Code 2FA" class="rounded-lg border border-slate-200 shadow-sm" width="200" height="200">
+                                <img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data={{ urlencode($qrCodeUrl) }}" alt="QR Code 2FA" class="w-40 h-40 sm:w-48 sm:h-48 rounded-lg border border-slate-200 shadow-sm">
                             </div>
                         @endif
 

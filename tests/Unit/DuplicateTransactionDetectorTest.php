@@ -103,7 +103,7 @@ class DuplicateTransactionDetectorTest extends TestCase
         $result = $this->detector->analyze($tx);
 
         $this->assertContains('payer_match_different_beneficiary', $result['flags']);
-        $this->assertSame(35, $result['score']);
+        $this->assertSame(15, $result['score']);
         $this->assertSame('payer_match_different_beneficiary', $result['candidates'][0]['match_type']);
     }
 

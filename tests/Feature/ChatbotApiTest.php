@@ -80,7 +80,7 @@ class ChatbotApiTest extends TestCase
             'https://generativelanguage.googleapis.com/v1beta/openai'
         ));
 
-        $response = $this->postJson('/api/chatbot/message', ['message' => 'halo']);
+        $response = $this->postJson('/api/chatbot/message', ['message' => 'Apa hukum zakat emas?']);
 
         $response->assertOk()
             ->assertJsonPath('data.reply', 'Halo, saya Zakky dari Gemini 2.5 Flash');
@@ -102,7 +102,7 @@ class ChatbotApiTest extends TestCase
             'https://generativelanguage.googleapis.com/v1beta/openai'
         ));
 
-        $response = $this->postJson('/api/chatbot/message', ['message' => 'halo']);
+        $response = $this->postJson('/api/chatbot/message', ['message' => 'Apa hukum zakat emas?']);
 
         $response->assertStatus(503)
             ->assertJson([
@@ -128,7 +128,7 @@ class ChatbotApiTest extends TestCase
             'https://generativelanguage.googleapis.com/v1beta/openai'
         ));
 
-        $response = $this->postJson('/api/chatbot/message', ['message' => 'halo']);
+        $response = $this->postJson('/api/chatbot/message', ['message' => 'Apa hukum zakat emas?']);
 
         $response->assertStatus(503)
             ->assertJsonPath('message', 'Terlalu banyak pertanyaan. Tunggu 1 menit, lalu coba lagi.');
@@ -148,7 +148,7 @@ class ChatbotApiTest extends TestCase
             'https://generativelanguage.googleapis.com/v1beta/models'
         ));
 
-        $response = $this->postJson('/api/chatbot/message', ['message' => 'halo']);
+        $response = $this->postJson('/api/chatbot/message', ['message' => 'Apa hukum zakat emas?']);
 
         $response->assertStatus(503)
             ->assertJsonPath('retryable', true);
@@ -160,10 +160,10 @@ class ChatbotApiTest extends TestCase
 
         $this->app->forgetInstance(ChatbotServiceInterface::class);
 
-        $response = $this->postJson('/api/chatbot/message', ['message' => 'halo']);
+        $response = $this->postJson('/api/chatbot/message', ['message' => 'Apa rekomendasi investasi emas?']);
 
         $response->assertOk()
-            ->assertJsonPath('data.reply', 'Halo! Saya Zakky, asisten virtual Zakat An-Nur. Saya bisa bantu membaca ringkasan penerimaan, grafik, dan panduan umum zakat.');
+            ->assertJsonPath('data.reply', 'Saya belum punya jawaban pasti untuk pertanyaan itu. Coba tanyakan total uang, total beras, total jiwa, kategori penerimaan, update terakhir, atau cara bayar zakat.');
     }
 
     public function test_chatbot_returns_summary_action_without_ai_call(): void

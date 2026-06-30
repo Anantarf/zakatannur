@@ -115,7 +115,7 @@ class TransactionGroupLifecycleService
             ]);
 
             ZakatTransaction::where('no_transaksi', $noTransaksi)
-                ->update(['anomaly_context' => json_encode(['restored_after_delete' => true])]);
+                ->update(['anomaly_context' => ['restored_after_delete' => true]]);
 
             $restoredTransactions = ZakatTransaction::query()
                 ->where('no_transaksi', $noTransaksi)

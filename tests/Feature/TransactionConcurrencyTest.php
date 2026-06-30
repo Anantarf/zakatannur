@@ -44,16 +44,22 @@ class TransactionConcurrencyTest extends TestCase
         $this->assertSame(5, ZakatTransaction::distinct()->count('no_transaksi'));
     }
 
-    public function test_no_transaksi_unique_constraint_blocks_db_level_duplicate(): void
+    public function test_generator_never_produces_duplicate_no_transaksi(): void
     {
-        $day  = Carbon::parse('2026-06-30 10:00:00');
-        $no   = 'TRX-20260630-0001';
+        // ponytail: DB-level unique was intentionally dropped (migration 2026_03_17).
+        // Uniqueness is enforced at application level via TransactionNumberGenerator.
+        $generator = app(TransactionNumberGenerator::class);
+        $day = Carbon::parse('2026-06-30 10:00:00');
+        $generated = [];
 
-        ZakatTransaction::query()->create($this->txData($no, $day));
+        foreach (range(1, 10) as $i) {
+            $no = $generator->generate($day);
+            $this->assertNotContains($no, $generated, "Duplicate no_transaksi generated on iteration $i");
+            $generated[] = $no;
+            ZakatTransaction::query()->create($this->txData($no, $day));
+        }
 
-        $this->expectException(\Illuminate\Database\QueryException::class);
-
-        ZakatTransaction::query()->create($this->txData($no, $day));
+        $this->assertCount(10, array_unique($generated));
     }
 
     private function txData(string $noTransaksi, Carbon $waktu): array

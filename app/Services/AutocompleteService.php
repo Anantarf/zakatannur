@@ -6,8 +6,8 @@ use App\Models\ZakatTransaction;
 
 class AutocompleteService
 {
-    private const AVAILABLE_TYPES = ['pembayar_name', 'penerima_name', 'category', 'no_transaksi'];
-    private const DEFAULT_TYPES = ['pembayar_name', 'penerima_name', 'category', 'no_transaksi'];
+    private const AVAILABLE_TYPES = ['pembayar_nama', 'category', 'no_transaksi'];
+    private const DEFAULT_TYPES = ['pembayar_nama', 'category', 'no_transaksi'];
 
     public static function getAutocompleteData(array $types = [], ?string $category = null): array
     {
@@ -27,33 +27,17 @@ class AutocompleteService
 
     private static function fetchUniqueValues(string $type, ?string $category = null): array
     {
-        if ($type === 'pembayar_name') {
+        if ($type === 'pembayar_nama') {
             $query = ZakatTransaction::query()
-                ->whereNotNull('pembayar_name');
+                ->whereNotNull('pembayar_nama');
 
             if ($category) {
-                $query->where('jenis_zakat', $category);
+                $query->where('category', $category);
             }
 
             return $query
-                ->distinct('pembayar_name')
-                ->pluck('pembayar_name')
-                ->filter()
-                ->values()
-                ->toArray();
-        }
-
-        if ($type === 'penerima_name') {
-            $query = ZakatTransaction::query()
-                ->whereNotNull('penerima_name');
-
-            if ($category) {
-                $query->where('jenis_zakat', $category);
-            }
-
-            return $query
-                ->distinct('penerima_name')
-                ->pluck('penerima_name')
+                ->distinct('pembayar_nama')
+                ->pluck('pembayar_nama')
                 ->filter()
                 ->values()
                 ->toArray();
@@ -69,7 +53,7 @@ class AutocompleteService
                 ->whereNotNull('no_transaksi');
 
             if ($category) {
-                $query->where('jenis_zakat', $category);
+                $query->where('category', $category);
             }
 
             return $query

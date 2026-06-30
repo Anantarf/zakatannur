@@ -25,9 +25,17 @@ class TransactionReviewAssistantService
             }
 
             $analysis = $this->riskAnalyzer->analyze($transaction);
-            $reviewStatus = $analysis['risk_level'] === TransactionRiskReview::LEVEL_SAFE
-                ? TransactionRiskReview::REVIEW_AMAN
-                : TransactionRiskReview::REVIEW_BELUM_DITINJAU;
+
+            $existing = TransactionRiskReview::query()
+                ->where('zakat_transaction_id', $transaction->id)
+                ->first();
+
+            $operatorStatuses = [TransactionRiskReview::REVIEW_AMAN, TransactionRiskReview::REVIEW_PERLU_TINDAK_LANJUT];
+            $reviewStatus = $existing && in_array($existing->review_status, $operatorStatuses, true)
+                ? $existing->review_status
+                : ($analysis['risk_level'] === TransactionRiskReview::LEVEL_SAFE
+                    ? TransactionRiskReview::REVIEW_AMAN
+                    : TransactionRiskReview::REVIEW_BELUM_DITINJAU);
 
             TransactionRiskReview::query()->updateOrCreate(
                 ['zakat_transaction_id' => $transaction->id],
