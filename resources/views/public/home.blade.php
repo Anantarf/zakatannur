@@ -52,8 +52,19 @@
         </div>
     </main>
 
-    @include('public.partials.footer')
+    {{-- CTA Konsultasi --}}
+    <div class="bg-emerald-50 py-12">
+        <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 text-center">
+            <h2 class="text-2xl font-bold tracking-tight text-emerald-900 sm:text-3xl">Bingung cara hitung zakat?</h2>
+            <p class="mx-auto mt-4 max-w-2xl text-lg text-emerald-700">Gunakan asisten cerdas AI kami untuk berkonsultasi mengenai kewajiban zakat, nishab, dan cara perhitungannya.</p>
+            <div class="mt-8 flex justify-center">
+                <a href="{{ route('konsultasi') }}" class="rounded-md bg-emerald-600 px-6 py-3 text-base font-semibold text-white shadow-sm hover:bg-emerald-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-600 transition-all">
+                    Mulai Konsultasi Gratis
+                </a>
+            </div>
+        </div>
+    </div>
 
-    <x-chatbot-widget />
+    @include('public.partials.footer')
 </body>
 </html>

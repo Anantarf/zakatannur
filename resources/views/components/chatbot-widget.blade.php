@@ -1,3 +1,5 @@
+@props(['embedded' => false])
+
 @php
     $quickReplies = [
         ['label' => 'Total uang', 'message' => 'Berapa total uang yang terkumpul?'],
@@ -58,10 +60,15 @@
 
 <div
     data-chatbot-widget
-    x-data="chatbotWidget({ endpoint: '{{ url('/api/chatbot/message') }}', quickReplies: {{ json_encode($quickReplies) }} })"
+    x-data="chatbotWidget({ endpoint: '{{ url('/api/chatbot/message') }}', quickReplies: {{ json_encode($quickReplies) }}, embedded: {{ $embedded ? 'true' : 'false' }} })"
     x-cloak
-    class="fixed bottom-4 right-4 z-50 sm:bottom-6 sm:right-6 flex flex-col items-end"
+    @if($embedded)
+        class="flex h-full w-full flex-col items-end"
+    @else
+        class="fixed bottom-4 right-4 z-50 sm:bottom-6 sm:right-6 flex flex-col items-end"
+    @endif
 >
+    @unless($embedded)
     <!-- Tooltip CTA -->
     <div
         x-show="showTooltip && !isOpen"
@@ -119,6 +126,7 @@
             x-text="unreadBadge"
         ></span>
     </button>
+    @endunless
 
     <div
         x-show="isOpen"
@@ -129,8 +137,12 @@
         x-transition:leave-start="translate-y-0 scale-100 opacity-100"
         x-transition:leave-end="translate-y-6 scale-95 opacity-0"
         @keydown.escape.window="closeChat()"
-        class="absolute bottom-0 right-0 z-50 flex w-[calc(100vw-1.5rem)] max-w-[24rem] origin-bottom-right flex-col overflow-hidden rounded-2xl border border-slate-200/80 bg-white shadow-[0_24px_60px_-20px_rgba(15,23,42,0.25)] ring-1 ring-slate-200/70 sm:w-96"
-        style="height: min(500px, 78vh); max-height: 78vh;"
+        @if($embedded)
+            class="flex h-full w-full flex-col overflow-hidden bg-white"
+        @else
+            class="absolute bottom-0 right-0 z-50 flex w-[calc(100vw-1.5rem)] max-w-[24rem] origin-bottom-right flex-col overflow-hidden rounded-2xl border border-slate-200/80 bg-white shadow-[0_24px_60px_-20px_rgba(15,23,42,0.25)] ring-1 ring-slate-200/70 sm:w-96"
+            style="height: min(500px, 78vh); max-height: 78vh;"
+        @endif
         role="dialog"
         aria-label="Chat dengan Zakky"
     >
@@ -154,6 +166,7 @@
             <button
                 type="button"
                 @click="closeChat()"
+                @if($embedded) style="display:none" @endif
                 class="flex h-8 w-8 items-center justify-center rounded text-slate-500 transition-all hover:text-slate-700 hover:bg-slate-100 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:ring-offset-1"
                 aria-label="Tutup chat"
                 title="Tutup"

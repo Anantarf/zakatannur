@@ -17,7 +17,7 @@ class KnowledgeRetriever
 
     public function search(string $message, int $limit = 3, float $threshold = 0.45): array
     {
-        $entries = config('zakky_knowledge', []);
+        $entries = \App\Models\KnowledgeBase::active()->get()->map->toKnowledgeArray()->all();
 
         // 1. Semantic Search via Embeddings
         $rankedViaSemantic = $this->searchViaEmbeddings($message, $entries, $threshold);

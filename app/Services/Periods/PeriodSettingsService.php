@@ -29,6 +29,8 @@ class PeriodSettingsService
         $defaultFitrahBeras = (float) $data['default_fitrah_beras_per_jiwa'];
         $defaultFidyah = (int) $data['default_fidyah_per_hari'];
         $defaultFidyahBeras = (float) $data['default_fidyah_beras_per_hari'];
+        $nishabGoldGram = (int) $data['nishab_gold_gram'];
+        $goldPricePerGram = (int) $data['gold_price_per_gram'];
         $chartStartsAt = $data['chart_starts_at'] ?? null;
         $chartEndsAt = $data['chart_ends_at'] ?? null;
         $chartFallbackBufferDays = (int) $data['chart_fallback_buffer_days'];
@@ -44,6 +46,7 @@ class PeriodSettingsService
             $activeYear, $periodLabel, $hijriYear, $hijriMonth,
             $periodStartsAt, $periodEndsAt,
             $defaultFitrah, $defaultFitrahBeras, $defaultFidyah, $defaultFidyahBeras,
+            $nishabGoldGram, $goldPricePerGram,
             $chartStartsAt, $chartEndsAt, $chartFallbackBufferDays,
             $publicRefreshIntervalSeconds,
             $dashboardChartMode, $dashboardChartPeriodId,
@@ -107,6 +110,8 @@ class PeriodSettingsService
                 'default_fitrah_beras_per_jiwa' => $defaultFitrahBeras,
                 'default_fidyah_per_hari' => $defaultFidyah,
                 'default_fidyah_beras_per_hari' => $defaultFidyahBeras,
+                'nishab_gold_gram' => $nishabGoldGram,
+                'gold_price_per_gram' => $goldPricePerGram,
                 'chart_starts_at' => $chartStartsAt,
                 'chart_ends_at' => $chartEndsAt,
                 'chart_fallback_buffer_days' => $chartFallbackBufferDays,

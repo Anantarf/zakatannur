@@ -43,7 +43,7 @@ class KnowledgeEmbeddingsCache
 
     private function generateAllEmbeddings(): array
     {
-        $entries = config('zakky_knowledge', []);
+        $entries = \App\Models\KnowledgeBase::active()->get()->map->toKnowledgeArray()->all();
         $vectorData = [];
 
         foreach ($entries as $index => $entry) {

@@ -13,6 +13,7 @@ use App\Http\Controllers\Internal\ZakatTransactionController;
 use App\Http\Controllers\Internal\ExportController;
 use App\Http\Controllers\Internal\ProfileController;
 use App\Http\Controllers\Internal\ProfileTwoFactorController;
+use App\Http\Controllers\Internal\KnowledgeBaseController;
 use App\Http\Controllers\Guest\GuestPagesController;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
@@ -26,6 +27,8 @@ Route::get('/health', function () {
 Route::get('/', [GuestPagesController::class, 'home'])
     ->middleware(['throttle:public-summary'])
     ->name('home');
+
+Route::get('/konsultasi', [GuestPagesController::class, 'konsultasi'])->name('konsultasi');
 
 Route::get('/dashboard', [DashboardController::class, 'show'])
     ->middleware(['auth', 'role:staff,admin,super_admin', '2fa'])
@@ -80,6 +83,8 @@ Route::middleware(['auth', 'role:staff,admin,super_admin', '2fa'])
 
             Route::get('/audit-logs', [AuditLogController::class, 'index'])->name('audit_logs.index');
             Route::get('/chatbot-analytics', [ChatbotAnalyticsController::class, 'index'])->name('chatbot_analytics.index');
+
+            Route::resource('knowledge-base', KnowledgeBaseController::class)->except(['create', 'show']);
 
             Route::post('/test-pusher', function () {
                 $transaction = \App\Models\ZakatTransaction::first() ?? new \App\Models\ZakatTransaction([

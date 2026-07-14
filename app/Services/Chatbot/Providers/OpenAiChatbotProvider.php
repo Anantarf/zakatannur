@@ -214,6 +214,12 @@ class OpenAiChatbotProvider implements ChatbotServiceInterface
                 . "Kalau ditanya soal lokasi atau cara bayar, sampaikan: 'Silakan datang ke Masjid An-Nur pada 10 hari terakhir Ramadhan. "
                 . "Lokasi: https://maps.app.goo.gl/o4SULwNTn9QYkQba9' — tapi hanya kalau ditanya. "
                 . "Kalau pertanyaan di luar zakat/Islam/masjid, tolak dengan singkat dan kembalikan ke topik zakat. "
+                . "Untuk konsultasi perhitungan zakat mal, kumpulkan informasi aset (gaji bulanan, tabungan, emas, hutang, pengeluaran rutin). "
+                . "Jika informasi kurang, JANGAN menebak angka, BERTANYALAH untuk melengkapi data.\n"
+                . "JANGAN PERNAH menghitung nominal zakat mal sendiri. "
+                . "Jika variabel cukup, WAJIB hasilkan string JSON persis seperti ini (selipkan di pesanmu): "
+                . "[HITUNG:{\"income_monthly\":10000000,\"expenses_monthly\":2000000,\"savings\":50000000,\"gold_gram\":0,\"debt\":0}] "
+                . "Semua kunci opsional, nilai dalam integer rupiah atau gram emas. "
                 . "Balas dalam bahasa yang sama dengan pertanyaan. "
                 . "Di akhir balasan, tambahkan 2-3 pertanyaan lanjutan: [SUGGEST: ...]";
         }
@@ -234,8 +240,8 @@ class OpenAiChatbotProvider implements ChatbotServiceInterface
             ['role' => 'system', 'content' => $systemInstruction],
         ];
 
-        // Sliding Window Memory: limit to the last 3 interactions (6 messages) to save tokens and keep LLM focused
-        $recentHistory = array_slice($history, -3);
+        // Sliding Window Memory: limit to the last 6 interactions (12 messages) to save tokens and keep LLM focused
+        $recentHistory = array_slice($history, -6);
 
         foreach ($recentHistory as $hist) {
             if (!empty($hist['question'])) {

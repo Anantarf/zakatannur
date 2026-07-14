@@ -13,10 +13,11 @@ const timeFormatter = new Intl.DateTimeFormat('id-ID', {
 const nowIso = () => new Date().toISOString();
 
 document.addEventListener('alpine:init', () => {
-    window.Alpine.data('chatbotWidget', ({ endpoint, quickReplies = [] }) => ({
+    window.Alpine.data('chatbotWidget', ({ endpoint, quickReplies = [], embedded = false }) => ({
         endpoint,
         quickReplies,
-        isOpen: false,
+        embedded,
+        isOpen: embedded,
         showTooltip: false,
         input: '',
         messages: [],
@@ -184,11 +185,13 @@ document.addEventListener('alpine:init', () => {
                 this.resetToWelcome();
             }
 
-            setTimeout(() => {
-                if (!this.isOpen) {
-                    this.showTooltip = true;
-                }
-            }, 3000);
+            if (!this.embedded) {
+                setTimeout(() => {
+                    if (!this.isOpen) {
+                        this.showTooltip = true;
+                    }
+                }, 3000);
+            }
 
             this.$watch('isOpen', (open) => {
                 if (open) {

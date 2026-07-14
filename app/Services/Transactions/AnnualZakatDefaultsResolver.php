@@ -27,6 +27,8 @@ class AnnualZakatDefaultsResolver
                 (int) $period->default_fidyah_per_hari,
                 (float) $period->default_fitrah_beras_per_jiwa,
                 (float) $period->default_fidyah_beras_per_hari,
+                (int) ($period->nishab_gold_gram ?? 85),
+                (int) ($period->gold_price_per_gram ?? 900000),
             );
         }
 

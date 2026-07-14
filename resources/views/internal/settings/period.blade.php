@@ -47,6 +47,7 @@
                     'period_label' => 2, 'period_starts_at' => 2, 'period_ends_at' => 2, 'hijri_year' => 2,
                     'default_fitrah_cash_per_jiwa' => 3, 'default_fitrah_beras_per_jiwa' => 3,
                     'default_fidyah_per_hari' => 3, 'default_fidyah_beras_per_hari' => 3,
+                    'nishab_gold_gram' => 3, 'gold_price_per_gram' => 3,
                     'chart_starts_at' => 4, 'chart_ends_at' => 4, 'chart_fallback_buffer_days' => 4,
                     'dashboard_chart_mode' => 4, 'dashboard_chart_period_id' => 4,
                     'dashboard_chart_starts_at' => 4, 'dashboard_chart_ends_at' => 4,
@@ -188,9 +189,9 @@
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                                 </svg>
                                 <div class="flex-1">
-                                    <h4 class="ui-settings-section-title">Nominal Default Transaksi</h4>
-                                    <p class="ui-settings-section-copy" x-show="expandedSection === 3" x-cloak>Isian awal saat panitia input transaksi baru. Transaksi lama tidak dihitung ulang.</p>
-                                    <p class="text-sm text-slate-500 mt-0.5" x-show="expandedSection !== 3" x-cloak>Fitrah Rp {{ number_format($defaultFitrahCashPerJiwa, 0, ',', '.') }} &middot; {{ number_format($defaultFitrahBerasPerJiwa, 2, ',', '.') }} Kg &middot; Fidyah Rp {{ number_format($defaultFidyahPerHari, 0, ',', '.') }}/hari</p>
+                                    <h4 class="ui-settings-section-title">Nominal Default Transaksi & Zakat Mal</h4>
+                                    <p class="ui-settings-section-copy" x-show="expandedSection === 3" x-cloak>Isian awal saat panitia input transaksi baru dan acuan nishab AI.</p>
+                                    <p class="text-sm text-slate-500 mt-0.5" x-show="expandedSection !== 3" x-cloak>Fitrah Rp {{ number_format($defaultFitrahCashPerJiwa, 0, ',', '.') }} &middot; Nishab {{ $nishabGoldGram ?? 85 }}g (Rp {{ number_format($goldPricePerGram ?? 900000, 0, ',', '.') }}/g)</p>
                                 </div>
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-slate-400 transition-transform" :class="expandedSection === 3 ? 'rotate-180' : ''" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
@@ -217,6 +218,16 @@
                                         <label class="ui-form-label" for="default_fidyah_beras_per_hari">Takaran Fidyah Beras / Hari (Kg)</label>
                                         <input id="default_fidyah_beras_per_hari" name="default_fidyah_beras_per_hari" type="number" step="0.01" min="0" value="{{ old('default_fidyah_beras_per_hari', $defaultFidyahBerasPerHari) }}" class="ui-input w-full" required />
                                         <x-input-error class="mt-2" :messages="$errors->get('default_fidyah_beras_per_hari')" />
+                                    </div>
+                                    <div>
+                                        <label class="ui-form-label" for="nishab_gold_gram">Batas Nishab Emas (Gram)</label>
+                                        <input id="nishab_gold_gram" name="nishab_gold_gram" type="number" min="1" value="{{ old('nishab_gold_gram', $nishabGoldGram ?? 85) }}" class="ui-input w-full" required />
+                                        <x-input-error class="mt-2" :messages="$errors->get('nishab_gold_gram')" />
+                                    </div>
+                                    <div>
+                                        <label class="ui-form-label" for="gold_price_per_gram">Harga Emas per Gram (Rp)</label>
+                                        <input id="gold_price_per_gram" name="gold_price_per_gram" type="number" min="1" value="{{ old('gold_price_per_gram', $goldPricePerGram ?? 900000) }}" class="ui-input w-full" required />
+                                        <x-input-error class="mt-2" :messages="$errors->get('gold_price_per_gram')" />
                                     </div>
                                 </div>
                             </div>

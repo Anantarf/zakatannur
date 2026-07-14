@@ -57,6 +57,8 @@ class PeriodSettingsTest extends TestCase
             'default_fitrah_beras_per_jiwa' => 2.5,
             'default_fidyah_per_hari' => 60000,
             'default_fidyah_beras_per_hari' => 0.75,
+            'nishab_gold_gram' => 85,
+            'gold_price_per_gram' => 900000,
             'chart_starts_at' => '2026-03-10',
             'chart_ends_at' => '2026-03-25',
             'chart_fallback_buffer_days' => 3,
@@ -137,6 +139,8 @@ class PeriodSettingsTest extends TestCase
             'default_fitrah_beras_per_jiwa' => 2.5,
             'default_fidyah_per_hari' => 50000,
             'default_fidyah_beras_per_hari' => 0.75,
+            'nishab_gold_gram' => 85,
+            'gold_price_per_gram' => 900000,
             'chart_fallback_buffer_days' => 2,
             'public_refresh_interval_seconds' => 5,
         ];

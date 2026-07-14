@@ -27,6 +27,11 @@ class GuestPagesController extends Controller
         ));
     }
 
+    public function konsultasi()
+    {
+        return view('public.konsultasi');
+    }
+
     private function resolveSelectedYear(Request $request, int $activeYear, array $years): int
     {
         $selectedYear = (int) ($request->integer('year') ?: $activeYear);
