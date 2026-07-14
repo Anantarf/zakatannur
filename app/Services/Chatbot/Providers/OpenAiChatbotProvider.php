@@ -225,10 +225,25 @@ class OpenAiChatbotProvider implements ChatbotServiceInterface
         }
 
         if (!empty($context)) {
-            $contextText = collect($context)
-                ->map(fn ($item) => '- ' . ($item['title'] ?? 'Konteks') . ': ' . ($item['answer'] ?? ''))
-                ->implode("\n");
-            $systemInstruction .= "\n\nKonteks resmi:\n" . $contextText;
+            // Hint-only entries (no title/answer) carry sentiment/correction hints when no
+            // knowledge context matched — they shouldn't render as an empty "- Konteks: " bullet.
+            $knowledgeItems = collect($context)->filter(fn ($item) => isset($item['title']));
+            if ($knowledgeItems->isNotEmpty()) {
+                $contextText = $knowledgeItems
+                    ->map(fn ($item) => '- ' . ($item['title'] ?? 'Konteks') . ': ' . ($item['answer'] ?? ''))
+                    ->implode("\n");
+                $systemInstruction .= "\n\nKonteks resmi:\n" . $contextText;
+            }
+
+            $sentimentHint = $context[0]['_sentiment_hint'] ?? null;
+            if ($sentimentHint) {
+                $systemInstruction .= "\n\n" . $sentimentHint;
+            }
+
+            $correctionHint = $context[0]['_correction_hint'] ?? null;
+            if ($correctionHint) {
+                $systemInstruction .= "\n\n" . $correctionHint;
+            }
         }
 
         return $systemInstruction;

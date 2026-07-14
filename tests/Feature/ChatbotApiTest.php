@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Services\Chatbot\ChatbotOrchestrator;
 use App\Services\Chatbot\ChatbotServiceInterface;
 use App\Services\Chatbot\Providers\OpenAiChatbotProvider;
 use App\Services\Chatbot\Providers\MockChatbotProvider;
@@ -413,5 +414,154 @@ class ChatbotApiTest extends TestCase
         $empty->assertOk()
             ->assertJsonPath('data.source', 'public_data');
         $this->assertStringContainsString('Belum ada data penerimaan', $empty->json('data.reply'));
+    }
+
+    public function test_chatbot_computes_zakat_mal_from_hitung_sentinel_and_shows_inputs_used(): void
+    {
+        Http::fake([
+            'generativelanguage.googleapis.com/*' => Http::response([
+                'choices' => [[ 'message' => [ 'content' => 'Oke, datanya lengkap. '
+                    . '[HITUNG:{"income_monthly":10000000,"expenses_monthly":2000000,"savings":50000000,"gold_gram":0,"debt":0}]' ] ]],
+            ], 200),
+        ]);
+
+        $this->app->bind(ChatbotServiceInterface::class, fn () => new OpenAiChatbotProvider(
+            'test-key',
+            'gemini-2.5-flash',
+            'https://generativelanguage.googleapis.com/v1beta/openai'
+        ));
+
+        $response = $this->postJson('/api/chatbot/message', [
+            'message' => 'Cicilan rumah 2 juta sebulan, itungin dong',
+        ]);
+
+        $reply = $response->assertOk()->json('data.reply');
+
+        // Inputs are echoed back so a misread number is visible to the user, not hidden inside the total.
+        $this->assertStringContainsString('Penghasilan bulanan: Rp 10.000.000', $reply);
+        $this->assertStringContainsString('Tabungan: Rp 50.000.000', $reply);
+        $this->assertStringContainsString('Total aset kotor: Rp 170.000.000', $reply);
+        $this->assertStringContainsString('Aset neto: Rp 146.000.000', $reply);
+        $this->assertStringContainsString('Wajib zakat mal', $reply);
+    }
+
+    public function test_chatbot_rejects_implausible_hitung_amount_instead_of_computing(): void
+    {
+        Http::fake([
+            'generativelanguage.googleapis.com/*' => Http::response([
+                'choices' => [[ 'message' => [ 'content' =>
+                    '[HITUNG:{"income_monthly":999999999999,"savings":0}]' ] ]],
+            ], 200),
+        ]);
+
+        $this->app->bind(ChatbotServiceInterface::class, fn () => new OpenAiChatbotProvider(
+            'test-key',
+            'gemini-2.5-flash',
+            'https://generativelanguage.googleapis.com/v1beta/openai'
+        ));
+
+        $response = $this->postJson('/api/chatbot/message', ['message' => 'Cicilan motor 2 juta sebulan, itungin dong ya']);
+
+        $reply = $response->assertOk()->json('data.reply');
+
+        $this->assertStringContainsString('kurang masuk akal', $reply);
+        $this->assertStringNotContainsString('Wajib zakat mal', $reply);
+    }
+
+    public function test_chatbot_stream_blocks_off_topic_reply_before_yielding_the_violating_sentence(): void
+    {
+        // Chunks split the forbidden phrase ("resep masakan") across chunk boundaries, and the
+        // violating sentence is the very first one — proving the guardrail check runs on the
+        // accumulated reply (not per raw chunk) and blocks before that sentence is ever yielded.
+        $chunks = ['Ini ', 'res', 'ep ', 'masakan ', 'rendang ', 'yang enak sekali.', ' Cara membuatnya mudah.'];
+
+        $this->app->bind(ChatbotServiceInterface::class, fn () => new class ($chunks) implements ChatbotServiceInterface {
+            public function __construct(private array $chunks)
+            {
+            }
+
+            public function sendMessage(string $message, array $context = [], string $language = 'id', array $history = []): string
+            {
+                return implode('', $this->chunks);
+            }
+
+            public function streamMessage(string $message, array $context = [], string $language = 'id', array $history = []): \Generator
+            {
+                foreach ($this->chunks as $chunk) {
+                    yield $chunk;
+                }
+            }
+
+            public function wasLastReplyFallback(): bool
+            {
+                return false;
+            }
+        });
+
+        $orchestrator = app(ChatbotOrchestrator::class);
+
+        $yieldedChunks = [];
+        $finalResponse = null;
+        foreach ($orchestrator->stream('Kasih resep masakan dong', [], 'test-session') as $item) {
+            if (isset($item['response'])) {
+                $finalResponse = $item['response'];
+            } elseif (isset($item['chunk'])) {
+                $yieldedChunks[] = $item['chunk'];
+            }
+        }
+
+        $this->assertSame([], $yieldedChunks, 'No chunk should reach the consumer once the guardrail trips.');
+        $this->assertNotNull($finalResponse);
+        $this->assertSame(403, $finalResponse->statusCode);
+        $this->assertStringContainsString('asisten khusus Zakat An-Nur', $finalResponse->reply);
+    }
+
+    public function test_chatbot_sends_correction_hint_even_when_no_knowledge_context_matches(): void
+    {
+        // A short correction like this rarely matches any knowledge_bases entry semantically,
+        // so the hint must not depend on the retrieved context being non-empty.
+        Http::fake([
+            'generativelanguage.googleapis.com/*' => Http::response([
+                'choices' => [[ 'message' => [ 'content' => 'Oke, saya catat perubahannya.' ] ]],
+            ], 200),
+        ]);
+
+        $this->app->bind(ChatbotServiceInterface::class, fn () => new OpenAiChatbotProvider(
+            'test-key',
+            'gemini-2.5-flash',
+            'https://generativelanguage.googleapis.com/v1beta/openai'
+        ));
+
+        $response = $this->postJson('/api/chatbot/message', [
+            'message' => 'eh salah, harusnya 12 juta bukan 10 juta',
+        ]);
+
+        $response->assertOk();
+
+        Http::assertSent(function ($request) {
+            $systemMessage = collect($request->data()['messages'])->firstWhere('role', 'system')['content'] ?? '';
+            return str_contains($systemMessage, 'GANTI nilai lama itu dengan nilai baru');
+        });
+    }
+
+    public function test_chatbot_guardrail_blocks_off_topic_reply(): void
+    {
+        Http::fake([
+            'generativelanguage.googleapis.com/*' => Http::response([
+                'choices' => [[ 'message' => [ 'content' =>
+                    'Ini bukan soal zakat, tapi kalau kamu mau resep masakan rendang, saya bisa bantu jelaskan bumbunya secara lengkap dari awal sampai akhir.' ] ]],
+            ], 200),
+        ]);
+
+        $this->app->bind(ChatbotServiceInterface::class, fn () => new OpenAiChatbotProvider(
+            'test-key',
+            'gemini-2.5-flash',
+            'https://generativelanguage.googleapis.com/v1beta/openai'
+        ));
+
+        $response = $this->postJson('/api/chatbot/message', ['message' => 'Kasih resep masakan dong']);
+
+        $response->assertStatus(403);
+        $this->assertStringContainsString('asisten khusus Zakat An-Nur', $response->json('message'));
     }
 }

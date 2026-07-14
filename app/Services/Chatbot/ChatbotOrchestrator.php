@@ -202,9 +202,51 @@ class ChatbotOrchestrator
 
     private function applySentimentHint(array $contexts, string $sentiment): array
     {
-        if ($sentiment === 'frustrated' && !empty($contexts)) {
-            $contexts[0] = array_merge($contexts[0], [
+        if ($sentiment === 'frustrated') {
+            $contexts = $this->mergeHintIntoContexts($contexts, [
                 '_sentiment_hint' => 'User appears frustrated. Be empathetic, concise, and offer clear next steps.',
+            ]);
+        }
+
+        return $contexts;
+    }
+
+    /**
+     * Hints must reach the LLM even when there's no matching knowledge context to piggyback
+     * on (e.g. a short correction like "eh salah, 12 juta" rarely matches any KB entry) —
+     * so this creates a hint-only context entry instead of silently dropping the hint.
+     */
+    private function mergeHintIntoContexts(array $contexts, array $hint): array
+    {
+        if (empty($contexts)) {
+            $contexts[] = $hint;
+        } else {
+            $contexts[0] = array_merge($contexts[0], $hint);
+        }
+
+        return $contexts;
+    }
+
+    private function isCorrectingPreviousNumber(string $message): bool
+    {
+        $lower = strtolower($message);
+        $correctionWords = ['bukan', 'salah', 'harusnya', 'koreksi', 'maksudnya', 'eh', 'ralat', 'seharusnya'];
+
+        foreach ($correctionWords as $word) {
+            if (str_contains($lower, $word)) {
+                return (bool) preg_match('/\d/', $message);
+            }
+        }
+
+        return false;
+    }
+
+    private function applyCorrectionHint(array $contexts, string $message): array
+    {
+        if ($this->isCorrectingPreviousNumber($message)) {
+            $contexts = $this->mergeHintIntoContexts($contexts, [
+                '_correction_hint' => 'User tampaknya sedang mengoreksi angka yang sudah disebut sebelumnya. '
+                    . 'GANTI nilai lama itu dengan nilai baru, jangan menjumlahkan keduanya.',
             ]);
         }
 
@@ -267,34 +309,59 @@ class ChatbotOrchestrator
                 // Rusak
                 $replacement = "\n\n(Mohon maaf, saya kurang mengerti datanya. Bisa sebutkan nominal penghasilan bulanan, tabungan, dan emas yang dimiliki?)";
             } else {
-                // Cek negatif
+                $year = (int) \App\Models\AppSetting::getInt(\App\Models\AppSetting::KEY_ACTIVE_YEAR, (int) now()->year);
+                $defaultsResolver = app(\App\Services\Transactions\AnnualZakatDefaultsResolver::class);
+                $defaults = $defaultsResolver->resolve($year);
+
+                // Sanity bound: an LLM extraction slip (e.g. reading "10 juta" as 10 miliar)
+                // still passes JSON validation. Tie the ceiling to nishab (the domain's own
+                // "this is a lot of money" reference point) instead of a flat guessed number,
+                // so it stays meaningful if the admin updates the gold price next year.
+                $maxPlausibleValue = ($defaults->nishabGoldGram * $defaults->goldPricePerGram) * 1000;
+
                 $hasNegative = false;
+                $hasImplausible = false;
                 $allEmpty = true;
                 foreach (['income_monthly', 'expenses_monthly', 'savings', 'gold_gram', 'debt'] as $key) {
                     if (isset($data[$key])) {
                         $allEmpty = false;
-                        if ((int)$data[$key] < 0) {
+                        $value = (int) $data[$key];
+                        if ($value < 0) {
                             $hasNegative = true;
+                        } elseif ($value > $maxPlausibleValue) {
+                            $hasImplausible = true;
                         }
                     }
                 }
 
                 if ($hasNegative) {
                     $replacement = "\n\n(Pastikan nominal yang Anda masukkan tidak kurang dari nol. Mari coba hitung ulang.)";
+                } elseif ($hasImplausible) {
+                    $replacement = "\n\n(Sepertinya ada nominal yang kurang masuk akal. Mohon sebutkan ulang angkanya, misalnya \"10 juta\" bukan \"10 miliar\".)";
                 } elseif ($allEmpty) {
                     $replacement = "\n\n(Bisa sebutkan nominal penghasilan atau tabungannya agar bisa saya hitung?)";
                 } else {
-                    // Semua valid, panggil calculate()
-                    $year = (int) \App\Models\AppSetting::getInt(\App\Models\AppSetting::KEY_ACTIVE_YEAR, (int) now()->year);
-                    $defaultsResolver = app(\App\Services\Transactions\AnnualZakatDefaultsResolver::class);
-                    $defaults = $defaultsResolver->resolve($year);
-                    
                     $guide = app(ChatbotZakatMalGuide::class);
                     $result = $guide->calculate($data, $defaults);
 
+                    $inputSummary = sprintf(
+                        "Data yang saya pakai:\n"
+                        . "• Penghasilan bulanan: Rp %s\n"
+                        . "• Pengeluaran rutin bulanan: Rp %s\n"
+                        . "• Tabungan: Rp %s\n"
+                        . "• Emas: %d gram\n"
+                        . "• Hutang: Rp %s\n"
+                        . "(Kalau ada yang salah saya tangkap, koreksi saja nominalnya.)\n\n",
+                        number_format((int) ($data['income_monthly'] ?? 0), 0, ',', '.'),
+                        number_format((int) ($data['expenses_monthly'] ?? 0), 0, ',', '.'),
+                        number_format((int) ($data['savings'] ?? 0), 0, ',', '.'),
+                        (int) ($data['gold_gram'] ?? 0),
+                        number_format((int) ($data['debt'] ?? 0), 0, ',', '.')
+                    );
+
                     if (!$result['is_above_nishab']) {
-                        $replacement = sprintf(
-                            "\n\n*Estimasi Zakat Mal:*\n"
+                        $replacement = "\n\n" . $inputSummary . sprintf(
+                            "*Estimasi Zakat Mal:*\n"
                             . "• Aset neto: Rp %s\n"
                             . "• Nishab (batas wajib): Rp %s\n\n"
                             . "Kesimpulan: Saat ini belum wajib zakat mal.",
@@ -302,8 +369,8 @@ class ChatbotOrchestrator
                             number_format($result['nishab'], 0, ',', '.')
                         );
                     } else {
-                        $replacement = sprintf(
-                            "\n\n*Estimasi Zakat Mal:*\n"
+                        $replacement = "\n\n" . $inputSummary . sprintf(
+                            "*Estimasi Zakat Mal:*\n"
                             . "• Total aset kotor: Rp %s\n"
                             . "• Hutang & pengeluaran tahunan: Rp %s\n"
                             . "• Aset neto: Rp %s\n"
@@ -332,6 +399,7 @@ class ChatbotOrchestrator
         $language = $this->detectLanguage($message);
         $sentiment = $this->detectSentiment($message);
         $contexts = $this->applySentimentHint($this->knowledgeRetriever->search($message, 2), $sentiment);
+        $contexts = $this->applyCorrectionHint($contexts, $message);
         $history = $this->buildHistory($sessionId);
 
         $reply = $this->aiProvider->sendMessage($message, $contexts, $language, $history);
@@ -344,14 +412,17 @@ class ChatbotOrchestrator
     {
         $language = $this->detectLanguage($message);
         $contexts = $this->applySentimentHint($this->knowledgeRetriever->search($message, 2), $sentiment);
+        $contexts = $this->applyCorrectionHint($contexts, $message);
         $history = $this->buildHistory($sessionId);
 
         $stream = $this->aiProvider->streamMessage($message, $contexts, $language, $history);
 
         $fullReply = '';
         $buffer = '';
+        $sentenceBuffer = '';
         $isSwallowing = false;
         $swallowingType = null;
+        $guardrailTripped = false;
 
         foreach ($stream as $chunk) {
             $fullReply .= $chunk;
@@ -369,8 +440,11 @@ class ChatbotOrchestrator
                         if ($swallowingType === 'hitung') {
                             $computed = trim($this->parseAndCalculateSentinel($sentinel));
                             if ($computed !== '') {
-                                yield $computed;
+                                $sentenceBuffer .= $computed;
                             }
+                            // Replace it in $fullReply too, so finalizeAiReply's later pass finds
+                            // no sentinel left and doesn't redo the same DB lookup + calculation.
+                            $fullReply = str_replace($sentinel, $computed, $fullReply);
                         }
                         $swallowingType = null;
                     } else {
@@ -381,7 +455,7 @@ class ChatbotOrchestrator
                     if ($pos !== false) {
                         $yieldStr = substr($buffer, 0, $pos);
                         if ($yieldStr !== '') {
-                            yield $yieldStr;
+                            $sentenceBuffer .= $yieldStr;
                             $buffer = substr($buffer, $pos);
                         }
 
@@ -390,7 +464,7 @@ class ChatbotOrchestrator
 
                         if (strlen($buffer) < 9) {
                             if (!str_starts_with("[SUGGEST:", strtoupper($prefix9)) && !str_starts_with("[HITUNG:", strtoupper($prefix8))) {
-                                yield '[';
+                                $sentenceBuffer .= '[';
                                 $buffer = substr($buffer, 1);
                             } else {
                                 break; // Wait for more chars
@@ -403,25 +477,76 @@ class ChatbotOrchestrator
                                 $isSwallowing = true;
                                 $swallowingType = 'hitung';
                             } else {
-                                yield '[';
+                                $sentenceBuffer .= '[';
                                 $buffer = substr($buffer, 1);
                             }
                         }
                     } else {
-                        yield $buffer;
+                        $sentenceBuffer .= $buffer;
                         $buffer = '';
                     }
                 }
             }
+
+            // Flush complete sentences only, so a guardrail violation is caught at a
+            // sentence boundary instead of after an arbitrary run of raw provider chunks —
+            // shrinks the window of unsafe content a user could see before it's blocked.
+            foreach ($this->extractCompleteSentences($sentenceBuffer) as $sentence) {
+                if ($this->guardrailVerifier->verify($fullReply) !== null) {
+                    $guardrailTripped = true;
+                    break;
+                }
+                yield $sentence;
+            }
+
+            if ($guardrailTripped) {
+                break;
+            }
         }
-        if ($buffer !== '' && !$isSwallowing) {
-            yield $buffer;
+
+        if (!$guardrailTripped) {
+            if ($buffer !== '' && !$isSwallowing) {
+                $sentenceBuffer .= $buffer;
+            }
+            if ($sentenceBuffer !== '' && $this->guardrailVerifier->verify($fullReply) === null) {
+                yield $sentenceBuffer;
+            }
         }
 
         $wasFallback = $this->aiProvider->wasLastReplyFallback();
         $response = $this->finalizeAiReply($fullReply, $wasFallback, $contexts);
 
         yield ['response' => $response];
+    }
+
+    /**
+     * Splits complete sentences off the front of $sentenceBuffer (cut at ".", "!", "?", or a
+     * newline), leaving any trailing incomplete text buffered for the next call. Falls back to
+     * flushing the whole thing once it gets long, so a run-on line without punctuation doesn't
+     * sit unseen indefinitely. Splitting on "." is not grammar-aware (it'll cut inside "Rp
+     * 10.000.000" too) — harmless here since it only changes flush/check granularity, not the
+     * text delivered.
+     */
+    private function extractCompleteSentences(string &$sentenceBuffer): array
+    {
+        $sentences = [];
+
+        while (true) {
+            if (preg_match('/^.*?[.!?\n]/s', $sentenceBuffer, $matches)) {
+                $sentences[] = $matches[0];
+                $sentenceBuffer = substr($sentenceBuffer, strlen($matches[0]));
+                continue;
+            }
+
+            if (strlen($sentenceBuffer) > 200) {
+                $sentences[] = $sentenceBuffer;
+                $sentenceBuffer = '';
+            }
+
+            break;
+        }
+
+        return $sentences;
     }
 
     private function extractNumberFromText(string $text, array $keywords): ?int
@@ -485,7 +610,10 @@ class ChatbotOrchestrator
             $count, $berasPerJiwa, $totalBeras
         );
 
-        return ChatbotResponse::success($reply, 'calculation');
+        return ChatbotResponse::success($reply, 'calculation', [
+            ['type' => 'suggested_reply', 'label' => 'Cara bayar zakat', 'message' => 'Bagaimana cara membayar zakat?'],
+            ['type' => 'suggested_reply', 'label' => 'Hitung zakat mal', 'message' => 'Bantu saya hitung zakat mal'],
+        ]);
     }
 
     private function calculateFidyah(string $message): ChatbotResponse
@@ -515,10 +643,11 @@ class ChatbotOrchestrator
             $days, $berasPerHari, $totalBeras
         );
 
-        return ChatbotResponse::success($reply, 'calculation');
+        return ChatbotResponse::success($reply, 'calculation', [
+            ['type' => 'suggested_reply', 'label' => 'Hitung zakat fitrah', 'message' => 'Zakat fitrah 4 orang berapa?'],
+            ['type' => 'suggested_reply', 'label' => 'Cara bayar zakat', 'message' => 'Bagaimana cara membayar zakat?'],
+        ]);
     }
-
-
 
     private function buildContext(array $rawContext): array
     {

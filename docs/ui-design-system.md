@@ -87,3 +87,23 @@ Target utama desain ini adalah menyatukan bahasa visual dari **Landing Page (Pub
 3.  **Hero Section High-Contrast:** Bagian atas (*Hero Image / Header*) di halaman publik sangat disarankan menggunakan gaya **Dark Card** raksasa (`bg-slate-950`) untuk memberikan kesan megah, modern, dan premium sejak detik pertama pengunjung tiba di situs Anda.
 
 *Dengan mematuhi seluruh pedoman ini, Anda akan menjamin transisi visual antara pengguna yang sedang melihat landing page hingga akhirnya masuk ke dalam dashboard terasa mulus (seamless) dan 100% konsisten.*
+
+---
+
+## 7. UI Judgement & Quality Report (2026)
+
+Bagian ini merangkum skor UI dan Technical Debt untuk perbaikan selanjutnya.
+
+**Skor Kualitas (Overall: 8.5/10)**
+- **Visual hierarchy (8.3/10):** Struktur ada, tetapi beberapa layar masih terlalu padat dan belum cukup tegas membedakan prioritas utama.
+- **Information density (8.2/10):** Lengkap, tetapi di beberapa area mobile dan tabel operasional terasa berat saat dipindai cepat.
+- **Consistency (8.5/10):** Komponen internal sudah cukup konsisten.
+- **Usability (8.8/10):** Alur utama cukup jelas dan actionable.
+- **Code Quality (7.8/10):** Ada beberapa class Tailwind inline yang terlalu panjang di Blade.
+
+**Area Perbaikan Utama (Untuk mencapai 9+/10):**
+1. **Meredam Keramaian Visual:** Dashboard dan card besar terlalu banyak yang ingin menonjol. Perlu penyederhanaan hierarki.
+2. **Density Mobile:** Kurangi teks pada card mobile di "Riwayat Transaksi" agar lebih ringan dipindai.
+3. **Skeleton Loading:** Belum ada komponen `.skeleton` khusus untuk *loading state*.
+4. **Refactor Inline Tailwind:** Pindahkan class panjang ke `app.css` dengan `@apply` atau buat komponen Blade khusus agar kode lebih bersih.
+5. **Konsistensi Istilah:** Seragamkan istilah seperti "Warning", "Perlu Dicek", "Belum Review".

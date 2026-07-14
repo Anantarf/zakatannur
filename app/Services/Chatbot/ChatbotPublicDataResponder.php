@@ -50,7 +50,7 @@ class ChatbotPublicDataResponder
         return ChatbotResponse::success(
             "Total penerimaan uang tahun {$year} saat ini adalah " . Format::rupiah($total) . '.',
             'public_data',
-            $this->openSummaryAction()
+            $this->followUpActions('ask_total_money')
         );
     }
 
@@ -64,7 +64,7 @@ class ChatbotPublicDataResponder
         return ChatbotResponse::success(
             "Total penerimaan beras tahun {$year} saat ini adalah " . Format::kg($total) . '.',
             'public_data',
-            $this->openSummaryAction()
+            $this->followUpActions('ask_total_rice')
         );
     }
 
@@ -78,7 +78,7 @@ class ChatbotPublicDataResponder
         return ChatbotResponse::success(
             "Total jiwa zakat fitrah tahun {$year} saat ini adalah " . number_format($total, 0, ',', '.') . ' jiwa.',
             'public_data',
-            $this->openSummaryAction()
+            $this->followUpActions('ask_total_people')
         );
     }
 
@@ -95,7 +95,7 @@ class ChatbotPublicDataResponder
         return ChatbotResponse::success(
             "Ringkasan penerimaan tahun {$year}: " . Format::rupiah($totalUang) . ', ' . Format::kg($totalBeras) . ', dan ' . number_format($totalJiwa, 0, ',', '.') . ' jiwa.',
             'public_data',
-            $this->openSummaryAction()
+            $this->followUpActions('ask_total_summary')
         );
     }
 
@@ -110,7 +110,7 @@ class ChatbotPublicDataResponder
             ->map(fn ($category) => $this->categoryLabel((string) $category))
             ->implode(', ');
 
-        return ChatbotResponse::success("Kategori yang tercatat saat ini: {$categories}.", 'public_data', $this->openSummaryAction());
+        return ChatbotResponse::success("Kategori yang tercatat saat ini: {$categories}.", 'public_data', $this->followUpActions('ask_categories'));
     }
 
     private function topCategory(array $items): ChatbotResponse
@@ -127,7 +127,7 @@ class ChatbotPublicDataResponder
         return ChatbotResponse::success(
             'Kategori dengan penerimaan uang terbesar saat ini adalah ' . $this->categoryLabel((string) ($top['category'] ?? '-')) . ' sebesar ' . Format::rupiah((int) ($top['total_uang'] ?? 0)) . '.',
             'public_data',
-            $this->openSummaryAction()
+            $this->followUpActions('ask_top_category')
         );
     }
 
@@ -143,17 +143,56 @@ class ChatbotPublicDataResponder
         return ChatbotResponse::success(
             'Data publik terakhir diperbarui ' . $time->locale('id')->diffForHumans() . ' (' . $computedAt . ' WIB).',
             'public_data',
-            $this->openSummaryAction()
+            $this->followUpActions('ask_latest_update')
         );
     }
 
-    private function openSummaryAction(): array
+    /**
+     * Suggested replies tailored to what was just answered, so the conversation
+     * moves forward instead of repeating the same three suggestions everywhere.
+     */
+    private function followUpActions(string $justAnswered): array
     {
-        return [
-            ['type' => 'open_tab', 'target' => 'laporan', 'label' => 'Buka Ringkasan'],
-            ['type' => 'suggested_reply', 'label' => 'Kategori terbesar', 'message' => 'Kategori terbesar apa?'],
-            ['type' => 'suggested_reply', 'label' => 'Update terakhir', 'message' => 'Kapan data terakhir diperbarui?'],
-        ];
+        $suggestions = match ($justAnswered) {
+            'ask_total_money' => [
+                ['label' => 'Total beras berapa?', 'message' => 'Total beras berapa?'],
+                ['label' => 'Kategori terbesar', 'message' => 'Kategori terbesar apa?'],
+            ],
+            'ask_total_rice' => [
+                ['label' => 'Total uang berapa?', 'message' => 'Total uang berapa?'],
+                ['label' => 'Total jiwa berapa?', 'message' => 'Total jiwa berapa?'],
+            ],
+            'ask_total_people' => [
+                ['label' => 'Total uang berapa?', 'message' => 'Total uang berapa?'],
+                ['label' => 'Cara bayar zakat', 'message' => 'Bagaimana cara membayar zakat?'],
+            ],
+            'ask_total_summary' => [
+                ['label' => 'Kategori terbesar', 'message' => 'Kategori terbesar apa?'],
+                ['label' => 'Update terakhir', 'message' => 'Kapan data terakhir diperbarui?'],
+            ],
+            'ask_categories' => [
+                ['label' => 'Kategori terbesar', 'message' => 'Kategori terbesar apa?'],
+                ['label' => 'Ringkasan penerimaan', 'message' => 'Berapa total keseluruhan?'],
+            ],
+            'ask_top_category' => [
+                ['label' => 'Semua kategori', 'message' => 'Kategori apa saja yang tercatat?'],
+                ['label' => 'Update terakhir', 'message' => 'Kapan data terakhir diperbarui?'],
+            ],
+            'ask_latest_update' => [
+                ['label' => 'Ringkasan penerimaan', 'message' => 'Berapa total keseluruhan?'],
+                ['label' => 'Kategori terbesar', 'message' => 'Kategori terbesar apa?'],
+            ],
+            default => [
+                ['label' => 'Kategori terbesar', 'message' => 'Kategori terbesar apa?'],
+            ],
+        };
+
+        $actions = [['type' => 'open_tab', 'target' => 'laporan', 'label' => 'Buka Ringkasan']];
+        foreach ($suggestions as $suggestion) {
+            $actions[] = ['type' => 'suggested_reply', 'label' => $suggestion['label'], 'message' => $suggestion['message']];
+        }
+
+        return $actions;
     }
 
     private function categoryLabel(string $category): string

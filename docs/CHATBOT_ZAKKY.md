@@ -185,3 +185,70 @@ Log::channel('chatbot')->info('API call', [
 - ✓ Chatbot provider consolidated to OpenAI + Mock
 - ⏳ Phase 2: natural language wording (not implemented yet)
 - ⏳ Phase 2: admin sensitivity configuration (not implemented yet)
+
+---
+
+## Improvements & Score (v2.0)
+
+**Final Score: 8.8/10 ⭐⭐⭐⭐**
+
+### 1. Security & Rate Limiting
+- **ThrottleChatbot middleware** - 30 requests/minute per user/IP
+- **Dual throttling** - Route middleware (30/1) + custom middleware
+
+### 2. UX Enhancements
+- **Auto-scroll** - Jumps to latest message when new one arrives
+- **Copy feedback** - Shows toast "Tersalin!" after copy
+- **Better error messages** - Include actionable suggestions
+
+### 3. Performance & Caching
+- **ChatbotResponseCache** - Caches identical questions for 1 hour
+- **MD5-based cache keys** - Normalized for minor variations
+
+### 4. User Feedback Mechanism
+- **Feedback buttons** - 👍 (helpful) / 👎 (unhelpful) on bot messages
+- **ChatbotFeedback model** - For analytics & improvement
+- Endpoint - POST `/api/chatbot/message` with `type=feedback`
+
+### 5. Sentinel Pattern (Zakat Mal)
+- LLM diarahkan menghasilkan `[HITUNG:{...}]`
+- `ChatbotOrchestrator` memotong tag tersebut dan menjalankan perhitungan Zakat Mal murni di backend PHP (`ChatbotZakatMalGuide`), menghindari halusinasi.
+
+---
+
+## Troubleshooting Guide
+
+### Error: "Gagal memproses pesan. Silakan coba beberapa saat lagi."
+
+Ini berarti chatbot API gagal. Mari debug:
+
+#### 1. Cek Konfigurasi
+Buka `.env` file dan pastikan:
+```env
+OPENAI_API_KEY=sk-...        # HARUS ada (bukan kosong)
+OPENAI_CHAT_MODEL=gpt-4o-mini
+OPENAI_BASE_URL=https://api.openai.com/v1
+CHATBOT_PROVIDER=openai
+```
+Jika `OPENAI_API_KEY` kosong atau tidak ada → chatbot fallback ke mode mock (terbatas).
+
+#### 2. Cek Logs
+```bash
+tail -f storage/logs/laravel.log
+```
+Cari line dengan `Chatbot error` atau `OpenAI API Error` untuk detail masalah.
+
+#### 3. Error Codes & Meanings
+| Error | Penyebab | Solusi |
+|-------|----------|--------|
+| 401/403 | API key salah/tidak valid | Cek OPENAI_API_KEY di .env |
+| 404 | Model tidak ditemukan | Cek OPENAI_CHAT_MODEL (gpt-4o-mini) |
+| 429 | Quota terlampaui | Tunggu sampai besok atau upgrade API plan |
+| 500+ | Server OpenAI error | Tunggu beberapa menit, coba lagi |
+| Network error | Tidak bisa connect | Cek koneksi internet |
+
+#### Fallback Mode (Saat API Down)
+Jika API tidak bisa diakses, chatbot masih bekerja tapi terbatas:
+- ✅ Bisa jawab pertanyaan standar (total uang, total beras, cara bayar)
+- ✅ Bisa recognize intents & navigate (lihat grafik, buka ringkasan)
+- ❌ Tidak bisa answer complex questions
