@@ -30,17 +30,6 @@ class ChatbotActionDetector
             return 'calculate_fidyah_case';
         }
 
-        // Zakat mal complex case (edge cases → refer to panitia only)
-        if ($this->containsAny($message, ['properti', 'rumah', 'tanah', 'mobil', 'kendaraan', 'saham', 'crypto', 'bitcoin', 'partnership', 'usaha bersama', 'cv', 'pt']) ||
-            ($this->containsAny($message, ['hutang', 'utang']) && $this->containsAny($message, ['besar', 'banyak']))) {
-            return 'refer_zakat_mal_complex';
-        }
-
-        // Zakat mal calculation scenario (has financial data + zakat question)
-        if ($this->containsAny($message, ['gaji', 'penghasilan', 'tabungan', 'emas', 'harta']) &&
-            $this->containsAny($message, ['zakat berapa', 'berapa zakat', 'hitung zakat'])) {
-            return 'calculate_zakat_mal_case';
-        }
 
         // Zakat mal specific queries (check specific before general)
         if ($this->containsAny($message, ['contoh', 'skenario']) && $this->containsAny($message, ['zakat', 'hitung', 'berapa'])) {

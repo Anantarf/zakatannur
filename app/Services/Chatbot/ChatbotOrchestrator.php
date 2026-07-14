@@ -14,7 +14,8 @@ class ChatbotOrchestrator
         private ChatbotServiceInterface $aiProvider,
         private ChatbotActionDetector $actionDetector,
         private KnowledgeRetriever $knowledgeRetriever,
-        private ChatbotPublicDataResponder $publicDataResponder
+        private ChatbotPublicDataResponder $publicDataResponder,
+        private ChatbotGuardrailVerifier $guardrailVerifier
     ) {
     }
 
@@ -242,6 +243,14 @@ class ChatbotOrchestrator
         }
 
         $cleanReply = $this->parseAndCalculateSentinel($cleanReply);
+
+        // --- Guardrail Verification ---
+        // Verifikasi output untuk memastikan tidak ada prompt injection atau halusinasi di luar topik zakat
+        $guardrailViolation = $this->guardrailVerifier->verify($cleanReply);
+        if ($guardrailViolation !== null) {
+            $cleanReply = $guardrailViolation;
+            return ChatbotResponse::error($cleanReply, false, 403);
+        }
 
         return $wasFallback
             ? ChatbotResponse::error($cleanReply, true)
