@@ -15,7 +15,11 @@ class ChatbotOrchestrator
         private ChatbotActionDetector $actionDetector,
         private KnowledgeRetriever $knowledgeRetriever,
         private ChatbotPublicDataResponder $publicDataResponder,
-        private ChatbotGuardrailVerifier $guardrailVerifier
+        private ChatbotGuardrailVerifier $guardrailVerifier,
+        private ChatbotLanguageDetector $languageDetector,
+        private ChatbotSentimentDetector $sentimentDetector,
+        private ChatbotCalculatorService $calculatorService,
+        private ChatbotSentinelParser $sentinelParser
     ) {
     }
 
@@ -27,8 +31,8 @@ class ChatbotOrchestrator
         }
 
         try {
-            $sentiment = $this->detectSentiment($message);
-            $response = $this->answerFromAi($message, $sessionId);
+            $sentiment = $this->sentimentDetector->detect($message);
+            $response = $this->answerFromAi($message, $rawContext, $sessionId);
             $confidenceSource = $this->aiProvider->wasLastReplyFallback() ? 'fallback' : 'ai';
             $this->saveChatLog($message, null, $response->source, $response->reply, $sessionId, $sentiment, $confidenceSource);
 
@@ -52,8 +56,8 @@ class ChatbotOrchestrator
         }
 
         try {
-            $sentiment = $this->detectSentiment($message);
-            $generator = $this->streamFromAi($message, $sessionId, $sentiment);
+            $sentiment = $this->sentimentDetector->detect($message);
+            $generator = $this->streamFromAi($message, $rawContext, $sessionId, $sentiment);
 
             $fullReply = '';
             $responseObj = null;
@@ -90,23 +94,30 @@ class ChatbotOrchestrator
 
         $context = $this->buildContext($rawContext);
 
+        // Once the AI has taken over a conversation (e.g. mid zakat-mal consultation), stay in
+        // AI mode for continuity. Otherwise a reply like "kambingnya 40 ekor, sudah berapa lama"
+        // can contain "berapa"/"total"-style words the fast-path keyword matcher looks for,
+        // then get hijacked into an unrelated public-data answer instead of continuing the chat.
+        if (($context['last_source'] ?? null) === 'ai') {
+            return null;
+        }
+
         try {
             $intent = $this->actionDetector->intent($message, $context);
 
             // Handle fitrah/fidyah calculation cases
             if ($intent === 'calculate_fitrah_case') {
-                return $this->finalizeQuickResponse($this->calculateFitrah($message), $message, $rawContext, $intent, 'calculation', $sessionId);
+                return $this->finalizeQuickResponse($this->calculatorService->calculateFitrah($message), $message, $rawContext, $intent, 'calculation', $sessionId);
             }
 
             if ($intent === 'calculate_fidyah_case') {
-                return $this->finalizeQuickResponse($this->calculateFidyah($message), $message, $rawContext, $intent, 'calculation', $sessionId);
+                return $this->finalizeQuickResponse($this->calculatorService->calculateFidyah($message), $message, $rawContext, $intent, 'calculation', $sessionId);
             }
 
             // Route specific zakat mal intents to their knowledge base entries
             if (in_array($intent, ['ask_zakat_mal_definition', 'ask_zakat_mal_nishab', 'ask_zakat_mal_example'])) {
                 $entryId = match($intent) {
-                    'ask_zakat_mal_definition', 'ask_zakat_mal_nishab' => 'zakat-mal-definisi',
-                    'ask_zakat_mal_example' => 'zakat-mal-contoh',
+                    'ask_zakat_mal_definition', 'ask_zakat_mal_nishab', 'ask_zakat_mal_example' => 'zakat-mal',
                     default => null,
                 };
 
@@ -117,9 +128,9 @@ class ChatbotOrchestrator
                         $response = ChatbotResponse::success(
                             (string) $knowledge['answer'],
                             'knowledge',
-                            $knowledge['actions'] ?? [],
+                            [],
                             [['id' => $knowledge['id'], 'label' => $knowledge['source_label'] ?? 'Panduan Zakat Masjid An-Nur']]
-                        )->withContext($this->contextForIntent($context, $entryId, 'knowledge'));
+                        )->withContext($this->contextForIntent($entryId, 'knowledge'));
                         return $this->finalizeQuickResponse($response, $message, $rawContext, $intent, 'knowledge', $sessionId, 'knowledge');
                     }
                 }
@@ -127,14 +138,14 @@ class ChatbotOrchestrator
 
             $publicData = $intent ? $this->publicDataResponder->respond($intent) : null;
             if ($publicData) {
-                $response = $publicData->withContext($this->contextForIntent($context, $intent, 'public_data'));
+                $response = $publicData->withContext($this->contextForIntent($intent, 'public_data'));
                 return $this->finalizeQuickResponse($response, $message, $rawContext, $intent, 'public_data', $sessionId, 'knowledge');
             }
 
             $action = $this->actionDetector->detect($message);
             if ($action) {
-                $response = $action->withContext($this->contextForIntent($context, 'navigation', 'action'));
-                return $this->finalizeQuickResponse($response, $message, $rawContext, 'navigation', 'action', $sessionId, null);
+                $response = $action->withContext($this->contextForIntent($intent ?? 'chatbot_info', $action->source));
+                return $this->finalizeQuickResponse($response, $message, $rawContext, $intent ?? 'chatbot_info', $action->source, $sessionId, null);
             }
 
             return null;
@@ -160,13 +171,15 @@ class ChatbotOrchestrator
             AiChatLog::updateOrCreate(
                 [
                     'session_id' => $sessionId,
+                    // Keyed on the raw question so two different questions that happen to
+                    // redact to the same text (e.g. two different nominals) never collide.
                     'question_md5' => md5($question),
                 ],
                 [
-                    'question' => $question,
+                    'question' => $this->redactNominals($question),
                     'intent' => $intent,
                     'source_type' => $sourceType,
-                    'answer' => $answer,
+                    'answer' => $this->redactNominals($answer),
                     'sentiment' => $sentiment,
                     'confidence_source' => $confidenceSource,
                 ]
@@ -174,6 +187,14 @@ class ChatbotOrchestrator
         } catch (Throwable $e) {
             Log::warning('Failed to save AI chat log.', ['message' => $e->getMessage()]);
         }
+    }
+
+    // Zakat mal consultation routinely surfaces income/debt/savings figures — mask anything that
+    // looks like a money amount before it lands in ai_chat_logs, so a jamaah's financial details
+    // don't sit in plain text indefinitely. Intent/topic/sentiment stay analyzable either way.
+    private function redactNominals(string $text): string
+    {
+        return preg_replace('/\d[\d.,]{5,}\d|\b\d{6,}\b/', '[nominal]', $text) ?? $text;
     }
 
     private function buildHistory(?string $sessionId): array
@@ -185,7 +206,7 @@ class ChatbotOrchestrator
         $recentLogs = AiChatLog::where('session_id', $sessionId)
             ->whereNotNull('answer')
             ->orderBy('created_at', 'desc')
-            ->limit(4)
+            ->limit(8)
             ->get()
             ->reverse();
 
@@ -211,11 +232,6 @@ class ChatbotOrchestrator
         return $contexts;
     }
 
-    /**
-     * Hints must reach the LLM even when there's no matching knowledge context to piggyback
-     * on (e.g. a short correction like "eh salah, 12 juta" rarely matches any KB entry) —
-     * so this creates a hint-only context entry instead of silently dropping the hint.
-     */
     private function mergeHintIntoContexts(array $contexts, array $hint): array
     {
         if (empty($contexts)) {
@@ -227,23 +243,9 @@ class ChatbotOrchestrator
         return $contexts;
     }
 
-    private function isCorrectingPreviousNumber(string $message): bool
-    {
-        $lower = strtolower($message);
-        $correctionWords = ['bukan', 'salah', 'harusnya', 'koreksi', 'maksudnya', 'eh', 'ralat', 'seharusnya'];
-
-        foreach ($correctionWords as $word) {
-            if (str_contains($lower, $word)) {
-                return (bool) preg_match('/\d/', $message);
-            }
-        }
-
-        return false;
-    }
-
     private function applyCorrectionHint(array $contexts, string $message): array
     {
-        if ($this->isCorrectingPreviousNumber($message)) {
+        if ($this->sentimentDetector->isCorrectingPreviousNumber($message)) {
             $contexts = $this->mergeHintIntoContexts($contexts, [
                 '_correction_hint' => 'User tampaknya sedang mengoreksi angka yang sudah disebut sebelumnya. '
                     . 'GANTI nilai lama itu dengan nilai baru, jangan menjumlahkan keduanya.',
@@ -253,38 +255,85 @@ class ChatbotOrchestrator
         return $contexts;
     }
 
-    private function finalizeAiReply(string $rawReply, bool $wasFallback, array $contexts): ChatbotResponse
+    private function applyConversationHint(array $contexts, string $mode): array
+    {
+        if ($mode !== 'zakat_mal_consultation') {
+            return $contexts;
+        }
+
+        return $this->mergeHintIntoContexts($contexts, [
+            '_conversation_hint' => 'Mode percakapan: konsultasi zakat mal. '
+                . 'Rangkum singkat data yang sudah diberikan user, tanyakan hanya data penting yang belum ada, '
+                . 'dan jangan mengulang penjelasan umum kecuali diminta. Jika data belum cukup, beri opsi bernomor seperti '
+                . '1) tidak ada hutang, 2) ada hutang jatuh tempo, 3) ada cicilan, 4) lainnya. '
+                . 'Jika data sudah cukup, gunakan [HITUNG:{...}].',
+        ]);
+    }
+
+    private function detectConversationMode(string $message, array $rawContext): string
+    {
+        $context = $this->buildContext($rawContext);
+        $normalized = mb_strtolower($message);
+
+        $hasZakatMal = str_contains($normalized, 'zakat mal')
+            || str_contains($normalized, 'zakat maal')
+            || str_contains($normalized, 'hitung zakat')
+            || str_contains($normalized, 'nisab')
+            || str_contains($normalized, 'nishab');
+
+        $hasFinancialSignal = preg_match('/\d/', $normalized)
+            || str_contains($normalized, 'gaji')
+            || str_contains($normalized, 'tabungan')
+            || str_contains($normalized, 'emas')
+            || str_contains($normalized, 'hutang')
+            || str_contains($normalized, 'pengeluaran')
+            || str_contains($normalized, 'aset');
+
+        if (($context['mode'] ?? null) === 'zakat_mal_consultation') {
+            // Stay for short/ambiguous follow-ups (bare numbers, "tidak ada hutang", "iya") since
+            // those carry no topic keyword of their own. But let an explicit switch to another
+            // zakat topic actually leave the mode - otherwise a user asking about zakat fitrah or
+            // the payment schedule mid-consultation gets stuck being asked for more zakat mal data
+            // instead of an answer to what they just asked.
+            $switchesTopic = str_contains($normalized, 'zakat fitrah')
+                || str_contains($normalized, 'fidyah')
+                || str_contains($normalized, 'jadwal')
+                || str_contains($normalized, 'dashboard')
+                || str_contains($normalized, 'grafik')
+                || str_contains($normalized, 'infaq')
+                || str_contains($normalized, 'shodaqoh')
+                || str_contains($normalized, 'cara bayar')
+                || str_contains($normalized, 'konfirmasi');
+
+            if (!$switchesTopic || $hasZakatMal || $hasFinancialSignal) {
+                return 'zakat_mal_consultation';
+            }
+        }
+
+        return $hasZakatMal || $hasFinancialSignal ? 'zakat_mal_consultation' : 'general';
+    }
+
+    private function aiConversationContext(string $mode): array
+    {
+        return array_filter([
+            'last_source' => 'ai',
+            'topic' => $mode === 'zakat_mal_consultation' ? 'zakat_mal' : 'ai_conversation',
+            'mode' => $mode,
+        ], fn ($value) => $value !== null && $value !== '');
+    }
+
+    private function finalizeAiReply(string $rawReply, bool $wasFallback, array $contexts, string $mode): ChatbotResponse
     {
         $cleanReply = $wasFallback && str_starts_with($rawReply, ChatbotServiceInterface::FALLBACK_PREFIX)
             ? substr($rawReply, strlen(ChatbotServiceInterface::FALLBACK_PREFIX))
             : $rawReply;
 
-        $actions = [];
-
-        // Include hardcoded actions from the highest ranked context if available
-        if (!empty($contexts[0]['actions'])) {
-            $actions = array_merge($actions, $contexts[0]['actions']);
-        }
-
         if (!$wasFallback) {
-            preg_match_all('/\[SUGGEST:\s*(.*?)\]/i', $cleanReply, $matches);
-            if (!empty($matches[1])) {
-                foreach ($matches[1] as $suggestText) {
-                    // Prevent duplicate labels if AI hallucinates the exact same suggestion as hardcoded
-                    $isDuplicate = collect($actions)->contains('label', trim($suggestText));
-                    if (!$isDuplicate) {
-                        $actions[] = [
-                            'type' => 'suggested_reply',
-                            'label' => trim($suggestText),
-                            'message' => trim($suggestText),
-                        ];
-                    }
-                }
-                $cleanReply = trim(preg_replace('/\[SUGGEST:\s*.*?\]/i', '', $cleanReply));
-            }
+            $cleanReply = $this->polishReply($cleanReply);
         }
 
-        $cleanReply = $this->parseAndCalculateSentinel($cleanReply);
+        $cleanReply = $this->sentinelParser->parseAndCalculateSentinel($cleanReply);
+        $cleanReply = $this->polishReply($cleanReply);
 
         // --- Guardrail Verification ---
         // Verifikasi output untuk memastikan tidak ada prompt injection atau halusinasi di luar topik zakat
@@ -296,123 +345,53 @@ class ChatbotOrchestrator
 
         return $wasFallback
             ? ChatbotResponse::error($cleanReply, true)
-            : ChatbotResponse::success($cleanReply, 'ai', $actions, $contexts);
+            // last_source:'ai' round-trips through the frontend's context and back on the next
+            // request, so getQuickResponse() can tell "we're mid AI-conversation" and defer to
+            // the AI instead of the fast-path keyword matcher hijacking the user's next reply.
+            : ChatbotResponse::success($cleanReply, 'ai', [], $contexts)
+                ->withContext($this->aiConversationContext($mode));
     }
 
-    private function parseAndCalculateSentinel(string $reply): string
+    private function polishReply(string $reply): string
     {
-        if (preg_match('/\[HITUNG:\s*(\{.*?\})\s*\]/is', $reply, $matches)) {
-            $jsonStr = $matches[1];
-            $data = json_decode($jsonStr, true);
+        $reply = trim(preg_replace('/\[SUGGEST:\s*.*?\]/i', '', $reply) ?? $reply);
+        $reply = trim(preg_replace('/\[(OPEN_TAB|ACTION|BUTTON):.*?\]/i', '', $reply) ?? $reply);
+        $reply = preg_replace('/\n{3,}/', "\n\n", $reply) ?? $reply;
 
-            if (json_last_error() !== JSON_ERROR_NONE || !is_array($data)) {
-                // Rusak
-                $replacement = "\n\n(Mohon maaf, saya kurang mengerti datanya. Bisa sebutkan nominal penghasilan bulanan, tabungan, dan emas yang dimiliki?)";
-            } else {
-                $year = (int) \App\Models\AppSetting::getInt(\App\Models\AppSetting::KEY_ACTIVE_YEAR, (int) now()->year);
-                $defaultsResolver = app(\App\Services\Transactions\AnnualZakatDefaultsResolver::class);
-                $defaults = $defaultsResolver->resolve($year);
-
-                // Sanity bound: an LLM extraction slip (e.g. reading "10 juta" as 10 miliar)
-                // still passes JSON validation. Tie the ceiling to nishab (the domain's own
-                // "this is a lot of money" reference point) instead of a flat guessed number,
-                // so it stays meaningful if the admin updates the gold price next year.
-                $maxPlausibleValue = ($defaults->nishabGoldGram * $defaults->goldPricePerGram) * 1000;
-
-                $hasNegative = false;
-                $hasImplausible = false;
-                $allEmpty = true;
-                foreach (['income_monthly', 'expenses_monthly', 'savings', 'gold_gram', 'debt'] as $key) {
-                    if (isset($data[$key])) {
-                        $allEmpty = false;
-                        $value = (int) $data[$key];
-                        if ($value < 0) {
-                            $hasNegative = true;
-                        } elseif ($value > $maxPlausibleValue) {
-                            $hasImplausible = true;
-                        }
-                    }
-                }
-
-                if ($hasNegative) {
-                    $replacement = "\n\n(Pastikan nominal yang Anda masukkan tidak kurang dari nol. Mari coba hitung ulang.)";
-                } elseif ($hasImplausible) {
-                    $replacement = "\n\n(Sepertinya ada nominal yang kurang masuk akal. Mohon sebutkan ulang angkanya, misalnya \"10 juta\" bukan \"10 miliar\".)";
-                } elseif ($allEmpty) {
-                    $replacement = "\n\n(Bisa sebutkan nominal penghasilan atau tabungannya agar bisa saya hitung?)";
-                } else {
-                    $guide = app(ChatbotZakatMalGuide::class);
-                    $result = $guide->calculate($data, $defaults);
-
-                    $inputSummary = sprintf(
-                        "Data yang saya pakai:\n"
-                        . "• Penghasilan bulanan: Rp %s\n"
-                        . "• Pengeluaran rutin bulanan: Rp %s\n"
-                        . "• Tabungan: Rp %s\n"
-                        . "• Emas: %d gram\n"
-                        . "• Hutang: Rp %s\n"
-                        . "(Kalau ada yang salah saya tangkap, koreksi saja nominalnya.)\n\n",
-                        number_format((int) ($data['income_monthly'] ?? 0), 0, ',', '.'),
-                        number_format((int) ($data['expenses_monthly'] ?? 0), 0, ',', '.'),
-                        number_format((int) ($data['savings'] ?? 0), 0, ',', '.'),
-                        (int) ($data['gold_gram'] ?? 0),
-                        number_format((int) ($data['debt'] ?? 0), 0, ',', '.')
-                    );
-
-                    if (!$result['is_above_nishab']) {
-                        $replacement = "\n\n" . $inputSummary . sprintf(
-                            "*Estimasi Zakat Mal:*\n"
-                            . "• Aset neto: Rp %s\n"
-                            . "• Nishab (batas wajib): Rp %s\n\n"
-                            . "Kesimpulan: Saat ini belum wajib zakat mal.",
-                            number_format($result['nett_assets'], 0, ',', '.'),
-                            number_format($result['nishab'], 0, ',', '.')
-                        );
-                    } else {
-                        $replacement = "\n\n" . $inputSummary . sprintf(
-                            "*Estimasi Zakat Mal:*\n"
-                            . "• Total aset kotor: Rp %s\n"
-                            . "• Hutang & pengeluaran tahunan: Rp %s\n"
-                            . "• Aset neto: Rp %s\n"
-                            . "• Nishab: Rp %s\n\n"
-                            . "Kesimpulan: Wajib zakat mal.\n"
-                            . "Total zakat (2.5%%): Rp %s per tahun (~Rp %s/bulan)",
-                            number_format($result['total_assets'], 0, ',', '.'),
-                            number_format($result['annual_expenses'] + $result['debt'], 0, ',', '.'),
-                            number_format($result['nett_assets'], 0, ',', '.'),
-                            number_format($result['nishab'], 0, ',', '.'),
-                            number_format($result['zakat_amount'], 0, ',', '.'),
-                            number_format((int)($result['zakat_amount'] / 12), 0, ',', '.')
-                        );
-                    }
-                }
-            }
-
-            $reply = trim(str_replace($matches[0], $replacement, $reply));
-        }
-
-        return $reply;
+        return trim($reply);
     }
 
-    private function answerFromAi(string $message, ?string $sessionId): ChatbotResponse
+    private function answerFromAi(string $message, array $rawContext, ?string $sessionId): ChatbotResponse
     {
-        $language = $this->detectLanguage($message);
-        $sentiment = $this->detectSentiment($message);
-        $contexts = $this->applySentimentHint($this->knowledgeRetriever->search($message, 2), $sentiment);
+        $language = $this->languageDetector->detect($message);
+        $sentiment = $this->sentimentDetector->detect($message);
+        $mode = $this->detectConversationMode($message, $rawContext);
+        // 3, not 2: a question spanning two KB topics (e.g. "warisan rumah yang saya sewakan")
+        // needs both entries to survive the cut - one extra slot is cheap insurance against a
+        // higher-scoring unrelated entry crowding one of them out. Real fix would be multi-hop
+        // retrieval, but that's a new LLM round-trip for a problem this mostly solves already.
+        $contexts = $this->applySentimentHint($this->knowledgeRetriever->search($message, 3), $sentiment);
         $contexts = $this->applyCorrectionHint($contexts, $message);
+        $contexts = $this->applyConversationHint($contexts, $mode);
         $history = $this->buildHistory($sessionId);
 
         $reply = $this->aiProvider->sendMessage($message, $contexts, $language, $history);
         $wasFallback = $this->aiProvider->wasLastReplyFallback();
 
-        return $this->finalizeAiReply($reply, $wasFallback, $contexts);
+        return $this->finalizeAiReply($reply, $wasFallback, $contexts, $mode);
     }
 
-    private function streamFromAi(string $message, ?string $sessionId, string $sentiment): \Generator
+    private function streamFromAi(string $message, array $rawContext, ?string $sessionId, string $sentiment): \Generator
     {
-        $language = $this->detectLanguage($message);
-        $contexts = $this->applySentimentHint($this->knowledgeRetriever->search($message, 2), $sentiment);
+        $language = $this->languageDetector->detect($message);
+        $mode = $this->detectConversationMode($message, $rawContext);
+        // 3, not 2: a question spanning two KB topics (e.g. "warisan rumah yang saya sewakan")
+        // needs both entries to survive the cut - one extra slot is cheap insurance against a
+        // higher-scoring unrelated entry crowding one of them out. Real fix would be multi-hop
+        // retrieval, but that's a new LLM round-trip for a problem this mostly solves already.
+        $contexts = $this->applySentimentHint($this->knowledgeRetriever->search($message, 3), $sentiment);
         $contexts = $this->applyCorrectionHint($contexts, $message);
+        $contexts = $this->applyConversationHint($contexts, $mode);
         $history = $this->buildHistory($sessionId);
 
         $stream = $this->aiProvider->streamMessage($message, $contexts, $language, $history);
@@ -436,9 +415,9 @@ class ChatbotOrchestrator
                         $sentinel = substr($buffer, 0, $pos + 1);
                         $buffer = substr($buffer, $pos + 1);
 
-                        // [HITUNG:...] must surface its computed result live; [SUGGEST:...] stays hidden (becomes actions later)
+                        // [HITUNG:...] must surface its computed result live; [SUGGEST:...] stays hidden.
                         if ($swallowingType === 'hitung') {
-                            $computed = trim($this->parseAndCalculateSentinel($sentinel));
+                            $computed = trim($this->sentinelParser->parseAndCalculateSentinel($sentinel));
                             if ($computed !== '') {
                                 $sentenceBuffer .= $computed;
                             }
@@ -514,19 +493,11 @@ class ChatbotOrchestrator
         }
 
         $wasFallback = $this->aiProvider->wasLastReplyFallback();
-        $response = $this->finalizeAiReply($fullReply, $wasFallback, $contexts);
+        $response = $this->finalizeAiReply($fullReply, $wasFallback, $contexts, $mode);
 
         yield ['response' => $response];
     }
 
-    /**
-     * Splits complete sentences off the front of $sentenceBuffer (cut at ".", "!", "?", or a
-     * newline), leaving any trailing incomplete text buffered for the next call. Falls back to
-     * flushing the whole thing once it gets long, so a run-on line without punctuation doesn't
-     * sit unseen indefinitely. Splitting on "." is not grammar-aware (it'll cut inside "Rp
-     * 10.000.000" too) — harmless here since it only changes flush/check granularity, not the
-     * text delivered.
-     */
     private function extractCompleteSentences(string &$sentenceBuffer): array
     {
         $sentences = [];
@@ -549,116 +520,17 @@ class ChatbotOrchestrator
         return $sentences;
     }
 
-    private function extractNumberFromText(string $text, array $keywords): ?int
-    {
-        $normalized = strtolower($text);
-        
-        // 1. Try to find a digit near the keyword
-        foreach ($keywords as $keyword) {
-            if (preg_match('/(\d+)[\s]*' . preg_quote($keyword) . '/i', $normalized, $matches)) {
-                return (int) $matches[1];
-            }
-        }
-        
-        // 2. Try to map words to numbers near keyword
-        $map = [
-            'satu' => 1, 'dua' => 2, 'tiga' => 3, 'empat' => 4, 'lima' => 5,
-            'enam' => 6, 'tujuh' => 7, 'delapan' => 8, 'sembilan' => 9, 'sepuluh' => 10,
-            'sebelas' => 11, 'dua belas' => 12
-        ];
-        
-        foreach ($keywords as $keyword) {
-            foreach ($map as $word => $num) {
-                if (preg_match('/' . preg_quote($word) . '[\s]*' . preg_quote($keyword) . '/i', $normalized)) {
-                    return $num;
-                }
-            }
-        }
-        
-        // 3. Fallback: just try to find any number in the message
-        if (preg_match('/(\d+)/', $normalized, $matches)) {
-            return (int) $matches[1];
-        }
-
-        return null;
-    }
-
-    private function calculateFitrah(string $message): ChatbotResponse
-    {
-        $count = $this->extractNumberFromText($message, ['orang', 'jiwa', 'person']);
-        
-        if (!$count) {
-            return ChatbotResponse::success(
-                'Berapa orang yang mau dihitung fitrahnya? Coba ketik: "Fitrah 4 orang berapa?"',
-                'knowledge',
-                [['type' => 'suggested_reply', 'label' => 'Contoh', 'message' => 'Fitrah keluarga 4 orang berapa?']]
-            );
-        }
-        $cashPerJiwa = config('zakat.annual_defaults.fitrah_cash_per_jiwa', 50000);
-        $berasPerJiwa = config('zakat.annual_defaults.fitrah_beras_per_jiwa', 2.5);
-
-        $totalCash = $count * $cashPerJiwa;
-        $totalBeras = $count * $berasPerJiwa;
-
-        $reply = sprintf(
-            "Fitrah untuk %d orang:\n\n"
-            . "Uang  : %d × Rp %s = Rp %s\n"
-            . "Beras : %d × %.1f kg = %.1f kg\n\n"
-            . "Angka ini mengacu tarif An-Nur tahun ini. Konfirmasi ke panitia sebelum bayar ya.",
-            $count,
-            $count, number_format($cashPerJiwa, 0, ',', '.'), number_format($totalCash, 0, ',', '.'),
-            $count, $berasPerJiwa, $totalBeras
-        );
-
-        return ChatbotResponse::success($reply, 'calculation', [
-            ['type' => 'suggested_reply', 'label' => 'Cara bayar zakat', 'message' => 'Bagaimana cara membayar zakat?'],
-            ['type' => 'suggested_reply', 'label' => 'Hitung zakat mal', 'message' => 'Bantu saya hitung zakat mal'],
-        ]);
-    }
-
-    private function calculateFidyah(string $message): ChatbotResponse
-    {
-        $days = $this->extractNumberFromText($message, ['hari', 'day']);
-        
-        if (!$days) {
-            return ChatbotResponse::success(
-                'Berapa hari fidyahnya? Coba ketik: "Fidyah 7 hari berapa?"',
-                'knowledge',
-                [['type' => 'suggested_reply', 'label' => 'Contoh', 'message' => 'Fidyah 5 hari berapa?']]
-            );
-        }
-        $cashPerHari = config('zakat.annual_defaults.fidyah_per_hari', 30000);
-        $berasPerHari = config('zakat.annual_defaults.fidyah_beras_per_hari', 0.75);
-
-        $totalCash = $days * $cashPerHari;
-        $totalBeras = $days * $berasPerHari;
-
-        $reply = sprintf(
-            "Fidyah untuk %d hari:\n\n"
-            . "Uang  : %d × Rp %s = Rp %s\n"
-            . "Beras : %d × %.2f kg = %.2f kg\n\n"
-            . "Angka ini mengacu tarif An-Nur tahun ini. Konfirmasi ke panitia sebelum bayar ya.",
-            $days,
-            $days, number_format($cashPerHari, 0, ',', '.'), number_format($totalCash, 0, ',', '.'),
-            $days, $berasPerHari, $totalBeras
-        );
-
-        return ChatbotResponse::success($reply, 'calculation', [
-            ['type' => 'suggested_reply', 'label' => 'Hitung zakat fitrah', 'message' => 'Zakat fitrah 4 orang berapa?'],
-            ['type' => 'suggested_reply', 'label' => 'Cara bayar zakat', 'message' => 'Bagaimana cara membayar zakat?'],
-        ]);
-    }
-
     private function buildContext(array $rawContext): array
     {
         return [
             'last_intent' => is_string($rawContext['last_intent'] ?? null) ? trim($rawContext['last_intent']) : null,
             'last_source' => is_string($rawContext['last_source'] ?? null) ? trim($rawContext['last_source']) : null,
             'topic' => is_string($rawContext['topic'] ?? null) ? trim($rawContext['topic']) : null,
+            'mode' => is_string($rawContext['mode'] ?? null) ? trim($rawContext['mode']) : null,
         ];
     }
 
-    private function contextForIntent(array $context, string $intent, string $source): array
+    private function contextForIntent(string $intent, string $source): array
     {
         $topic = 'general';
         if ($source === 'public_data' || str_starts_with($intent, 'ask_')) {
@@ -684,66 +556,9 @@ class ChatbotOrchestrator
             $context['last_intent'] ?? '',
             $context['last_source'] ?? '',
             $context['topic'] ?? '',
+            $context['mode'] ?? '',
         ]);
         $hash = md5($normalized . '|' . $contextPart . '|' . ($sessionId ?? ''));
         return "chatbot:response:{$hash}";
-    }
-
-    private function detectLanguage(string $message): string
-    {
-        $lower = strtolower($message);
-        $englishWords = [
-            'how', 'what', 'when', 'where', 'why', 'who', 'is', 'are', 'do', 'does',
-            'can', 'should', 'would', 'could', 'will', 'have', 'has', 'been', 'total',
-            'collected', 'much', 'many', 'money', 'rice', 'pay', 'help', 'information',
-            'please', 'thank', 'hello', 'hi', 'yes', 'no', 'tell', 'show', 'give',
-            'chart', 'graph', 'data', 'report', 'summary', 'account', 'transaction',
-            'history', 'status', 'update', 'latest', 'current', 'recent', 'check',
-        ];
-
-        $englishCount = 0;
-        foreach ($englishWords as $word) {
-            if (preg_match('/\b' . preg_quote($word) . '\b/', $lower)) {
-                $englishCount++;
-            }
-        }
-
-        $wordCount = count(array_filter(str_word_count($lower, 1)));
-        $englishRatio = $wordCount > 0 ? $englishCount / $wordCount : 0;
-
-        return $englishRatio > 0.3 ? 'en' : 'id';
-    }
-
-    private function detectSentiment(string $message): string
-    {
-        $lower = strtolower($message);
-
-        $frustratedWords = [
-            'tidak bisa', 'error', 'gagal', 'kenapa', 'kenape', 'gak bisa',
-            'masa', 'ndak bisa', 'kok', 'mana', 'mbok', 'bodo', 'bingung sekali',
-            'ngasal', 'salah', 'broken', 'not working', 'failed',
-            'why', 'why not', 'useless', 'stupid', 'sucks',
-        ];
-
-        $confusedWords = [
-            'bagaimana', 'gimana', 'apa itu', 'maksudnya', 'bingung',
-            'gimana cara', 'caranya', 'bagaimana cara', 'apa bedanya',
-            'how to', 'how do', 'what is', 'what does', 'confused',
-            'don\'t understand', 'unclear', 'tidak paham', 'tidak mengerti',
-        ];
-
-        foreach ($frustratedWords as $keyword) {
-            if (str_contains($lower, $keyword)) {
-                return 'frustrated';
-            }
-        }
-
-        foreach ($confusedWords as $keyword) {
-            if (str_contains($lower, $keyword)) {
-                return 'confused';
-            }
-        }
-
-        return 'neutral';
     }
 }

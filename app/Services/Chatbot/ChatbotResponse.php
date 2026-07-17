@@ -23,7 +23,7 @@ class ChatbotResponse
     ) {
         $this->reply = $reply;
         $this->source = $source;
-        $this->actions = $actions;
+        $this->actions = [];
         $this->citations = $citations;
         $this->context = $context;
         $this->retryable = $retryable;

@@ -1,15 +1,6 @@
 @props(['embedded' => false])
 
 @php
-    $quickReplies = [
-        ['label' => 'Total uang', 'message' => 'Berapa total uang yang terkumpul?'],
-        ['label' => 'Total beras', 'message' => 'Berapa total beras yang terkumpul?'],
-        ['label' => 'Total jiwa', 'message' => 'Berapa total jiwa zakat fitrah?'],
-        ['label' => 'Update terakhir', 'message' => 'Kapan data terakhir diperbarui?'],
-        ['label' => 'Lihat grafik', 'action' => 'tab', 'target' => 'grafik'],
-        ['label' => 'Cara bayar', 'message' => 'Bagaimana cara membayar zakat?'],
-    ];
-
     $messageIcon = <<<'SVG'
         <svg xmlns="http://www.w3.org/2000/svg" class="h-[54%] w-[54%]" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true" stroke-width="2.25">
             <path stroke-linecap="round" stroke-linejoin="round" d="M8 10h8M8 14h5" />
@@ -60,7 +51,7 @@
 
 <div
     data-chatbot-widget
-    x-data="chatbotWidget({ endpoint: '{{ url('/api/chatbot/message') }}', quickReplies: {{ json_encode($quickReplies) }}, embedded: {{ $embedded ? 'true' : 'false' }} })"
+    x-data="chatbotWidget({ endpoint: '{{ url('/api/chatbot/message') }}', embedded: {{ $embedded ? 'true' : 'false' }} })"
     x-cloak
     @if($embedded)
         class="flex h-full w-full flex-col items-end"
@@ -90,7 +81,7 @@
                 aria-label="Tutup pesan"
                 title="Tutup"
             >
-                <svg class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+                <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
             </button>
             
             <div class="flex items-start gap-3 pr-6">
@@ -112,7 +103,7 @@
     <button
         type="button"
         @click="toggleChat()"
-        class="zakky-fab relative flex h-16 w-16 items-center justify-center rounded-full bg-brand-600 text-white shadow-lg transition-all duration-300 hover:bg-brand-700 hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-brand-500 focus:ring-offset-2 active:scale-95"
+        class="zakky-fab relative flex h-16 w-16 items-center justify-center rounded-full bg-brand-600 text-white shadow-lg transition-all duration-300 hover:bg-brand-700 hover:shadow-2xl hover:scale-110 hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:ring-offset-2 active:scale-95 transform-gpu"
         :class="isOpen ? 'scale-0 opacity-0 pointer-events-none' : 'scale-100 opacity-100'"
         aria-label="Buka chat"
     >
@@ -140,19 +131,19 @@
         @if($embedded)
             class="flex h-full w-full flex-col overflow-hidden bg-white"
         @else
-            class="absolute bottom-0 right-0 z-50 flex w-[calc(100vw-1.5rem)] max-w-[24rem] origin-bottom-right flex-col overflow-hidden rounded-2xl border border-slate-200/80 bg-white shadow-[0_24px_60px_-20px_rgba(15,23,42,0.25)] ring-1 ring-slate-200/70 sm:w-96"
-            style="height: min(500px, 78vh); max-height: 78vh;"
+            class="absolute bottom-0 right-0 z-50 flex w-[calc(100vw-1.5rem)] max-w-[400px] origin-bottom-right flex-col overflow-hidden rounded-2xl border border-slate-200/80 bg-white shadow-[0_24px_60px_-20px_rgba(15,23,42,0.25)] ring-1 ring-slate-200/70 sm:w-[400px]"
+            style="height: min(600px, 85vh); max-height: 85vh;"
         @endif
         role="dialog"
         aria-label="Chat dengan Zakky"
     >
         <div class="z-10 flex items-center justify-between border-b border-slate-200 bg-white px-4 py-3">
             <div class="flex items-center space-x-3 min-w-0 flex-1">
-                <span class="flex h-8 w-8 shrink-0 items-center justify-center overflow-hidden rounded-full bg-brand-600 text-white transform-gpu">
+                <span class="flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-full bg-brand-600 text-white transform-gpu">
                     {!! $profileAvatar !!}
                 </span>
                 <div class="min-w-0 flex-1">
-                    <h3 class="text-sm font-extrabold text-slate-900">Zakky</h3>
+                    <h3 class="text-lg font-extrabold tracking-tight text-slate-900">Zakky</h3>
                     <p class="flex items-center text-xs text-slate-500">
                         <span
                             class="mr-1.5 h-2 w-2 shrink-0 rounded-full"
@@ -178,24 +169,6 @@
         </div>
 
         <div x-ref="chatContainer" class="chat-scroll flex flex-1 flex-col space-y-3 overflow-y-auto overflow-x-hidden bg-white p-4">
-
-
-            <!-- Quick Replies -->
-            <div x-show="quickReplies.length > 0 &amp;&amp; messages.length === 0" class="animate-fade-in" style="animation-delay: 100ms;">
-                <div class="grid grid-cols-2 gap-1.5">
-                    <template x-for="(chip, i) in quickReplies" :key="`chip-${i}`">
-                        <button
-                            type="button"
-                            @click="useQuickReply(chip)"
-                            class="rounded-lg border border-slate-200 bg-white px-2.5 py-1.5 text-xs text-slate-700 font-medium transition-all hover:border-brand-300 hover:bg-brand-50 active:scale-95 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:ring-offset-1"
-                            :title="chip.label"
-                        >
-                            <span class="block truncate" x-text="chip.label"></span>
-                        </button>
-                    </template>
-                </div>
-            </div>
-
             <template x-for="(message, index) in messages" :key="`${message.role}-${index}`">
                 <div class="flex w-full animate-fade-in" data-message :data-index="index" :class="message.role === 'user' ? 'justify-end' : 'justify-start items-start'" style="animation-duration: 300ms;">
                     <template x-if="message.role === 'bot'">
@@ -206,16 +179,16 @@
 
                     <div class="flex max-w-[85%] flex-col group" :class="message.role === 'user' ? 'items-end' : 'items-start'">
                         <div
-                            class="px-3.5 py-2.5 text-[13.5px] font-[450] leading-[1.65] tracking-[0.01em] break-words shadow-sm"
+                            class="px-3.5 py-2.5 text-[15px] leading-relaxed break-words shadow-sm"
                             style="word-break: break-word;"
                             :class="message.role === 'user'
                                 ? 'whitespace-pre-wrap rounded-2xl rounded-tr-sm bg-brand-600 text-white'
                                 : (message.isError
                                     ? 'rounded-2xl rounded-tl-sm border border-amber-200 bg-amber-50 text-amber-900'
-                                    : 'rounded-2xl rounded-tl-sm border border-slate-200 bg-white text-slate-700')"
+                                    : 'rounded-2xl rounded-tl-sm border border-slate-200 bg-slate-50 text-slate-700')"
                             x-html="formatMessage(message.content, message.role)"
                         ></div>
-                        <div class="mt-1.5 flex flex-wrap items-center gap-2 px-1 text-[11px]">
+                        <div class="mt-1.5 flex flex-wrap items-center gap-2 px-1 text-xs">
                             <span x-text="formatTime(message.createdAt)" class="text-slate-400 flex-shrink-0"></span>
                             <template x-if="message.citations && message.citations.length > 0">
                                 <span class="truncate text-slate-400" x-text="'Sumber: ' + message.citations[0].label"></span>
@@ -239,7 +212,7 @@
                                         title="Membantu"
                                         aria-label="Membantu"
                                     >
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true">
                                             <path stroke-linecap="round" stroke-linejoin="round" d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 1.95-1.56l1.38-6A2 2 0 0 0 19.66 12H14V9Z" />
                                             <path stroke-linecap="round" stroke-linejoin="round" d="M7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3" />
                                         </svg>
@@ -252,13 +225,13 @@
                                         title="Tidak membantu"
                                         aria-label="Tidak membantu"
                                     >
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true">
                                             <path stroke-linecap="round" stroke-linejoin="round" d="M10 15v4a3 3 0 0 0 3 3l4-9V2H5.72a2 2 0 0 0-1.95 1.56l-1.38 6A2 2 0 0 0 4.34 12H10v3Z" />
                                             <path stroke-linecap="round" stroke-linejoin="round" d="M17 2h3a2 2 0 0 1 2 2v7a2 2 0 0 1-2 2h-3" />
                                         </svg>
                                     </button>
                                     <span x-show="message.feedback" class="inline-flex items-center gap-1 px-2 py-0.5 text-slate-400">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.25" aria-hidden="true">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.25" aria-hidden="true">
                                             <path stroke-linecap="round" stroke-linejoin="round" d="m5 13 4 4L19 7" />
                                         </svg>
                                         <span>Terima kasih</span>
@@ -276,24 +249,6 @@
                                 </button>
                             </template>
                         </div>
-                        <template x-if="message.actions && message.actions.length > 0">
-                            <div class="mt-2 flex flex-wrap gap-1.5">
-                                <template x-for="(action, actionIndex) in message.actions" :key="`action-${index}-${actionIndex}`">
-                                    <button
-                                        type="button"
-                                        x-show="action.type === 'open_tab' || action.type === 'suggested_reply' || action.type === 'open_url'"
-                                        @click="executeAction(action)"
-                                        class="rounded-lg border border-slate-200 bg-white px-2.5 py-1.5 text-xs font-medium text-slate-700 transition-all hover:border-brand-300 hover:bg-brand-50 active:scale-95 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:ring-offset-1 inline-flex items-center gap-1"
-                                        :title="action.label || (action.target === 'grafik' ? 'Lihat Grafik' : 'Buka Ringkasan')"
-                                    >
-                                        <span x-text="action.label || (action.target === 'grafik' ? 'Lihat Grafik' : 'Buka Ringkasan')"></span>
-                                        <template x-if="action.type === 'open_url'">
-                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 text-brand-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" /></svg>
-                                        </template>
-                                    </button>
-                                </template>
-                            </div>
-                        </template>
                     </div>
                 </div>
             </template>
@@ -319,7 +274,7 @@
                     @keydown="handleKeydown($event)"
                     maxlength="500"
                     rows="1"
-                    class="chat-scroll flex-1 resize-none rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-[13px] text-slate-800 transition-all placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent disabled:opacity-60 disabled:cursor-not-allowed max-h-[120px] overflow-hidden"
+                    class="chat-scroll flex-1 resize-none rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-[16px] text-slate-800 transition-all placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent disabled:opacity-60 disabled:cursor-not-allowed max-h-[120px] overflow-hidden"
                     style="min-height: 40px;"
                     placeholder="Tanya Zakky..."
                     :disabled="isTyping"
@@ -330,7 +285,7 @@
                     :disabled="isTyping || isInputEmpty"
                     aria-label="Kirim pesan"
                 >
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
                         <path d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5.951-1.488 5.951 1.488a1 1 0 001.169-1.409l-7-14z" />
                     </svg>
                 </button>

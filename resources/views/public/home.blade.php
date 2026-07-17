@@ -66,5 +66,7 @@
     </div>
 
     @include('public.partials.footer')
+
+    <x-chatbot-widget />
 </body>
 </html>

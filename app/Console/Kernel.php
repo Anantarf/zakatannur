@@ -21,6 +21,7 @@ class Kernel extends ConsoleKernel
         $schedule->command('transactions:purge-trash', ['--days' => $purgeDays])->daily();
         $schedule->command('muzakki:purge-trash', ['--days' => $purgeDays])->daily();
         $schedule->command('audit-logs:purge')->daily();
+        $schedule->command('chatbot-logs:purge')->daily();
     }
 
     /**

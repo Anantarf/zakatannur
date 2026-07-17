@@ -11,17 +11,23 @@ class ChatbotGuardrailVerifier
      */
     public function verify(string $llmReply): ?string
     {
-        // Jika respons mengandung perhitungan sentinel, abaikan karena itu digenerate oleh sistem internal kita (aman)
-        if (str_contains($llmReply, '[HITUNG:')) {
-            return null;
-        }
+        // Strip [HITUNG:{...}] sentinels (complete, or still mid-stream/incomplete) before
+        // checking — they're internal calculation markers the LLM shouldn't be judged on, but
+        // they must not blank out checking of the rest of the reply too (previously a bare
+        // str_contains($llmReply, '[HITUNG:') short-circuited the ENTIRE check, so real
+        // off-topic content sitting alongside a sentinel slipped through unchecked).
+        $llmReply = preg_replace('/\[HITUNG:.*/is', '', $llmReply) ?? $llmReply;
 
         $lowerReply = strtolower($llmReply);
 
         // 1. Daftar kata kunci terlarang (out-of-scope / prompt injection indicators)
+        // Catatan: 'saham'/'trading'/'crypto'/'bitcoin' sengaja TIDAK dimasukkan di sini —
+        // itu topik zakat mal kontemporer yang sah (lihat entri KB zakat-saham-investasi-reksadana),
+        // bukan cuma obrolan pasar modal. Heuristik #2 di bawah (>150 karakter tanpa kata kunci
+        // domain) tetap menangkap kalau AI benar-benar melantur ke topik itu tanpa konteks zakat.
         $forbiddenTopics = [
             'resep masakan', 'cara memasak', 'bumbu', 'politik', 'pemilu', 'presiden',
-            'cuaca hari ini', 'ramalan cuaca', 'saham', 'trading', 'crypto', 'bitcoin',
+            'cuaca hari ini', 'ramalan cuaca',
             'lirik lagu', 'chord gitar', 'film', 'movie', 'bioskop',
             // Prompt injection indicators
             'sebagai asisten ai umum', 'sebagai model bahasa', 'as an ai language model',

@@ -6,6 +6,7 @@ use App\Services\Chatbot\ChatbotOrchestrator;
 use App\Services\Chatbot\ChatbotServiceInterface;
 use App\Services\Chatbot\Providers\OpenAiChatbotProvider;
 use App\Services\Chatbot\Providers\MockChatbotProvider;
+use App\Models\AiChatLog;
 use App\Models\Muzakki;
 use App\Models\User;
 use App\Models\ZakatTransaction;
@@ -30,7 +31,7 @@ class ChatbotApiTest extends TestCase
             ->assertJson([
                 'status' => 'success',
             ])
-            ->assertJsonPath('data.reply', 'Halo! Assalamualaikum. Saya Zakky, asisten virtual Zakat An-Nur. Ada yang bisa saya bantu terkait zakat, fidyah, atau operasional masjid hari ini?');
+            ->assertJsonPath('data.reply', 'Halo! Assalamualaikum. Saya Zakky. Ceritakan kebutuhan Anda, misalnya ingin hitung zakat fitrah, tanya zakat mal, cek fidyah, atau memahami cara pembayaran.');
     }
 
     public function test_chatbot_does_not_expose_internal_exception_messages(): void
@@ -167,28 +168,26 @@ class ChatbotApiTest extends TestCase
             ->assertJsonPath('data.reply', 'Saya belum punya jawaban pasti untuk pertanyaan itu. Coba tanyakan total uang, total beras, total jiwa, kategori penerimaan, update terakhir, atau cara bayar zakat.');
     }
 
-    public function test_chatbot_returns_summary_action_without_ai_call(): void
+    public function test_chatbot_answers_summary_request_without_opening_tab(): void
     {
         $response = $this->postJson('/api/chatbot/message', [
             'message' => 'Buka ringkasan',
         ]);
 
         $response->assertOk()
-            ->assertJsonPath('data.source', 'action')
-            ->assertJsonPath('data.actions.0.type', 'open_tab')
-            ->assertJsonPath('data.actions.0.target', 'laporan');
+            ->assertJsonPath('data.source', 'public_data')
+            ->assertJsonPath('data.actions', []);
     }
 
-    public function test_chatbot_returns_chart_action_without_ai_call(): void
+    public function test_chatbot_answers_chart_request_without_opening_tab(): void
     {
         $response = $this->postJson('/api/chatbot/message', [
             'message' => 'Lihat grafik harian',
         ]);
 
         $response->assertOk()
-            ->assertJsonPath('data.source', 'action')
-            ->assertJsonPath('data.actions.0.type', 'open_tab')
-            ->assertJsonPath('data.actions.0.target', 'grafik');
+            ->assertJsonPath('data.source', 'public_data')
+            ->assertJsonPath('data.actions', []);
     }
 
     public function test_chatbot_answers_payment_from_knowledge(): void
@@ -200,8 +199,7 @@ class ChatbotApiTest extends TestCase
         $response->assertOk()
             ->assertJsonPath('data.source', 'knowledge')
             ->assertJsonPath('data.citations.0.label', 'Panduan Zakat Masjid An-Nur')
-            ->assertJsonPath('data.actions.0.type', 'suggested_reply')
-            ->assertJsonPath('data.actions.1.type', 'open_tab');
+            ->assertJsonPath('data.actions', []);
     }
 
     public function test_chatbot_answers_total_from_public_data(): void
@@ -236,8 +234,7 @@ class ChatbotApiTest extends TestCase
 
         $response->assertOk()
             ->assertJsonPath('data.source', 'public_data')
-            ->assertJsonPath('data.actions.0.target', 'laporan')
-            ->assertJsonPath('data.actions.1.type', 'suggested_reply')
+            ->assertJsonPath('data.actions', [])
             ->assertJsonPath('data.context.topic', 'public_data');
 
         $this->assertStringContainsString('Rp 25.000', $response->json('data.reply'));
@@ -440,9 +437,14 @@ class ChatbotApiTest extends TestCase
         // Inputs are echoed back so a misread number is visible to the user, not hidden inside the total.
         $this->assertStringContainsString('Penghasilan bulanan: Rp 10.000.000', $reply);
         $this->assertStringContainsString('Tabungan: Rp 50.000.000', $reply);
-        $this->assertStringContainsString('Total aset kotor: Rp 170.000.000', $reply);
-        $this->assertStringContainsString('Aset neto: Rp 146.000.000', $reply);
-        $this->assertStringContainsString('Wajib zakat mal', $reply);
+        // Income and savings are assessed against nisab separately (not pooled into one asset
+        // base) - see ChatbotZakatMalGuide. Net income 96jt/year clears nisab (76,5jt); the 50jt
+        // savings alone does not.
+        $this->assertStringContainsString('Penghasilan bersih tahunan: Rp 96.000.000', $reply);
+        $this->assertStringContainsString('wajib zakat penghasilan, sekitar Rp 2.400.000 per tahun', $reply);
+        $this->assertStringContainsString('Aset simpanan (tabungan + emas - hutang): Rp 50.000.000', $reply);
+        $this->assertStringContainsString('belum wajib zakat tabungan/emas', $reply);
+        $this->assertStringContainsString('Total estimasi zakat: Rp 2.400.000 per tahun', $reply);
     }
 
     public function test_chatbot_rejects_implausible_hitung_amount_instead_of_computing(): void
@@ -465,7 +467,8 @@ class ChatbotApiTest extends TestCase
         $reply = $response->assertOk()->json('data.reply');
 
         $this->assertStringContainsString('kurang masuk akal', $reply);
-        $this->assertStringNotContainsString('Wajib zakat mal', $reply);
+        $this->assertStringNotContainsString('wajib zakat penghasilan', $reply);
+        $this->assertStringNotContainsString('wajib zakat tabungan', $reply);
     }
 
     public function test_chatbot_stream_blocks_off_topic_reply_before_yielding_the_violating_sentence(): void
@@ -516,6 +519,57 @@ class ChatbotApiTest extends TestCase
         $this->assertStringContainsString('asisten khusus Zakat An-Nur', $finalResponse->reply);
     }
 
+    public function test_chatbot_guardrail_does_not_block_legitimate_zakat_saham_reply(): void
+    {
+        // 'saham' used to sit in the guardrail's forbidden-topics list, which would have
+        // wrongly blocked the AI answering from the (legitimate) zakat-saham-investasi-reksadana
+        // knowledge base entry.
+        Http::fake([
+            'generativelanguage.googleapis.com/*' => Http::response([
+                'choices' => [[ 'message' => [ 'content' =>
+                    'Zakat saham dan investasi termasuk pembahasan zakat mal kontemporer. '
+                    . 'Objek zakatnya dapat berupa nilai kepemilikan, dividen, atau capital gain. '
+                    . 'Kadar zakat yang umum digunakan adalah 2,5 persen.' ] ]],
+            ], 200),
+        ]);
+
+        $this->app->bind(ChatbotServiceInterface::class, fn () => new OpenAiChatbotProvider(
+            'test-key',
+            'gemini-2.5-flash',
+            'https://generativelanguage.googleapis.com/v1beta/openai'
+        ));
+
+        $response = $this->postJson('/api/chatbot/message', ['message' => 'Bagaimana zakat saham dan investasi?']);
+
+        $response->assertOk();
+        $this->assertStringContainsString('Zakat saham', $response->json('data.reply'));
+    }
+
+    public function test_chatbot_guardrail_still_catches_off_topic_content_hidden_alongside_hitung_sentinel(): void
+    {
+        // The guardrail used to bail out of ALL checks the moment "[HITUNG:" appeared anywhere
+        // in the reply, so off-topic content sharing a message with a sentinel slipped through.
+        Http::fake([
+            'generativelanguage.googleapis.com/*' => Http::response([
+                'choices' => [[ 'message' => [ 'content' =>
+                    'Ini bukan soal zakat, tapi kalau kamu mau resep masakan rendang, saya bisa '
+                    . 'bantu jelaskan bumbunya secara lengkap dari awal sampai akhir persiapan. '
+                    . '[HITUNG:{"income_monthly":10000000}]' ] ]],
+            ], 200),
+        ]);
+
+        $this->app->bind(ChatbotServiceInterface::class, fn () => new OpenAiChatbotProvider(
+            'test-key',
+            'gemini-2.5-flash',
+            'https://generativelanguage.googleapis.com/v1beta/openai'
+        ));
+
+        $response = $this->postJson('/api/chatbot/message', ['message' => 'Cicilan motor 2 juta sebulan, itungin dong ya']);
+
+        $response->assertStatus(403);
+        $this->assertStringContainsString('asisten khusus Zakat An-Nur', $response->json('message'));
+    }
+
     public function test_chatbot_sends_correction_hint_even_when_no_knowledge_context_matches(): void
     {
         // A short correction like this rarely matches any knowledge_bases entry semantically,
@@ -544,6 +598,111 @@ class ChatbotApiTest extends TestCase
         });
     }
 
+    public function test_zakat_mal_consultation_mode_is_sent_to_provider_and_returned_as_context(): void
+    {
+        Http::fake([
+            'generativelanguage.googleapis.com/*' => Http::response([
+                'choices' => [[ 'message' => [ 'content' =>
+                    'Saya catat dulu datanya. Tabungan sudah ada, tinggal hutang dan emas kalau ada. '
+                    . '[SUGGEST: Saya tidak punya hutang] [SUGGEST: Saya punya emas]' ] ]],
+            ], 200),
+        ]);
+
+        $this->app->bind(ChatbotServiceInterface::class, fn () => new OpenAiChatbotProvider(
+            'test-key',
+            'gemini-2.5-flash',
+            'https://generativelanguage.googleapis.com/v1beta/openai'
+        ));
+
+        $response = $this->postJson('/api/chatbot/message', [
+            'message' => 'Saya mau hitung zakat mal, tabungan saya 80 juta',
+            'session_id' => 'consultation-session',
+        ]);
+
+        $response->assertOk()
+            ->assertJsonPath('data.context.last_source', 'ai')
+            ->assertJsonPath('data.context.topic', 'zakat_mal')
+            ->assertJsonPath('data.context.mode', 'zakat_mal_consultation');
+
+        Http::assertSent(function ($request) {
+            $systemMessage = collect($request->data()['messages'])->firstWhere('role', 'system')['content'] ?? '';
+
+            return str_contains($systemMessage, 'Mode percakapan: konsultasi zakat mal')
+                && str_contains($systemMessage, 'tanyakan hanya data penting yang belum ada');
+        });
+    }
+
+    public function test_switching_topic_mid_consultation_leaves_zakat_mal_consultation_mode(): void
+    {
+        Http::fake([
+            'generativelanguage.googleapis.com/*' => Http::response([
+                'choices' => [[ 'message' => [ 'content' => 'Zakat fitrah tahun ini diterima selama Ramadan sampai sebelum salat Idulfitri.' ] ]],
+            ], 200),
+        ]);
+
+        $this->app->bind(ChatbotServiceInterface::class, fn () => new OpenAiChatbotProvider(
+            'test-key',
+            'gemini-2.5-flash',
+            'https://generativelanguage.googleapis.com/v1beta/openai'
+        ));
+
+        $response = $this->postJson('/api/chatbot/message', [
+            'message' => 'Btw jadwal buka zakat fitrah kapan ya?',
+            'session_id' => 'consultation-session-2',
+            'context' => ['mode' => 'zakat_mal_consultation', 'last_source' => 'ai', 'topic' => 'zakat_mal'],
+        ]);
+
+        $response->assertOk()
+            ->assertJsonPath('data.context.mode', 'general');
+
+        Http::assertSent(function ($request) {
+            $systemMessage = collect($request->data()['messages'])->firstWhere('role', 'system')['content'] ?? '';
+
+            return !str_contains($systemMessage, 'Mode percakapan: konsultasi zakat mal');
+        });
+    }
+
+    public function test_chatbot_sends_last_eight_conversation_turns_to_provider(): void
+    {
+        for ($i = 1; $i <= 9; $i++) {
+            AiChatLog::query()->create([
+                'session_id' => 'history-session',
+                'question_md5' => md5('Pertanyaan ' . $i),
+                'question' => 'Pertanyaan ' . $i,
+                'answer' => 'Jawaban ' . $i,
+                'source_type' => 'ai',
+            ]);
+        }
+
+        Http::fake([
+            'generativelanguage.googleapis.com/*' => Http::response([
+                'choices' => [[ 'message' => [ 'content' => 'Baik, saya lanjutkan konsultasinya.' ] ]],
+            ], 200),
+        ]);
+
+        $this->app->bind(ChatbotServiceInterface::class, fn () => new OpenAiChatbotProvider(
+            'test-key',
+            'gemini-2.5-flash',
+            'https://generativelanguage.googleapis.com/v1beta/openai'
+        ));
+
+        $this->postJson('/api/chatbot/message', [
+            'message' => 'Lanjutkan hitung zakat mal saya',
+            'session_id' => 'history-session',
+            'context' => ['mode' => 'zakat_mal_consultation', 'last_source' => 'ai'],
+        ])->assertOk();
+
+        Http::assertSent(function ($request) {
+            $messages = collect($request->data()['messages']);
+            $contents = $messages->pluck('content')->all();
+
+            return !in_array('Pertanyaan 1', $contents, true)
+                && in_array('Pertanyaan 2', $contents, true)
+                && in_array('Jawaban 9', $contents, true)
+                && $messages->where('role', 'user')->count() === 9;
+        });
+    }
+
     public function test_chatbot_guardrail_blocks_off_topic_reply(): void
     {
         Http::fake([
@@ -563,5 +722,69 @@ class ChatbotApiTest extends TestCase
 
         $response->assertStatus(403);
         $this->assertStringContainsString('asisten khusus Zakat An-Nur', $response->json('message'));
+    }
+
+    public function test_ai_conversation_reply_is_not_hijacked_by_quick_response_keyword_match(): void
+    {
+        // Reproduces the reported bug: mid zakat-peternakan consultation, the AI asks
+        // "kambingnya berapa ekor?" and the user answers with a message that legitimately
+        // contains "berapa" ("...sudah berapa lama, dipakai untuk ternak atau dijual?").
+        // Previously that reply got hijacked by ChatbotActionDetector's bare-'berapa'
+        // fallback into an unrelated public-data summary instead of reaching the AI.
+        Http::fake([
+            'generativelanguage.googleapis.com/*' => Http::response([
+                'choices' => [[ 'message' => [ 'content' =>
+                    'Baik, sudah saya catat jumlah kambingnya. Zakat peternakan dihitung dari jumlah dan lama pemeliharaan.' ] ]],
+            ], 200),
+        ]);
+
+        $this->app->bind(ChatbotServiceInterface::class, fn () => new OpenAiChatbotProvider(
+            'test-key',
+            'gemini-2.5-flash',
+            'https://generativelanguage.googleapis.com/v1beta/openai'
+        ));
+
+        $orchestrator = app(ChatbotOrchestrator::class);
+
+        // The context an AI-sourced reply carries on its way back to the frontend, and that
+        // the frontend echoes back on the next request (see ChatbotStreamController + the
+        // 'data.context' handler in chatbot-widget.js for the streaming equivalent of this).
+        $aiConversationContext = ['last_source' => 'ai', 'topic' => 'ai_conversation'];
+
+        $response = $orchestrator->handle(
+            'Kambingnya berapa ekor? Sudah dipelihara berapa lama? Dipakai untuk ternak atau dijual?',
+            $aiConversationContext,
+            'test-session'
+        );
+
+        $this->assertStringContainsString('Zakat peternakan dihitung', $response->reply);
+        $this->assertStringNotContainsString('Ringkasan penerimaan', $response->reply);
+        $this->assertSame('ai', $response->source);
+
+        Http::assertSentCount(1);
+    }
+
+    public function test_suggest_tags_are_stripped_instead_of_becoming_quick_replies(): void
+    {
+        Http::fake([
+            'generativelanguage.googleapis.com/*' => Http::response([
+                'choices' => [[ 'message' => [ 'content' =>
+                    'Baik, boleh saya tahu datanya? '
+                    . '[SUGGEST: Berapa gaji bulanan Anda? | Ada tabungan atau simpanan berapa? | Punya emas atau hutang yang perlu dihitung?]'
+                    . '[SUGGEST: Cara bayar zakat]' ] ]],
+            ], 200),
+        ]);
+
+        $this->app->bind(ChatbotServiceInterface::class, fn () => new OpenAiChatbotProvider(
+            'test-key',
+            'gemini-2.5-flash',
+            'https://generativelanguage.googleapis.com/v1beta/openai'
+        ));
+
+        $response = $this->postJson('/api/chatbot/message', ['message' => 'Bantu saya hitung zakat mal ternak']);
+
+        $response->assertOk()
+            ->assertJsonPath('data.actions', []);
+        $this->assertSame('Baik, boleh saya tahu datanya?', $response->json('data.reply'));
     }
 }

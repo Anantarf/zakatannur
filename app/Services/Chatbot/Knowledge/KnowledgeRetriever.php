@@ -32,32 +32,6 @@ class KnowledgeRetriever
         return $this->searchViaKeywords($message, $entries, $limit);
     }
 
-    public function best(string $message, float $threshold = 0.65): ?array
-    {
-        $results = $this->search($message, 1);
-        $top = $results[0] ?? null;
-
-        if (!$top) {
-            return null;
-        }
-
-        // Check if it was ranked by semantic search
-        if (isset($top['_cosine_similarity'])) {
-            if ($top['_cosine_similarity'] < $threshold) {
-                return null;
-            }
-            return $top;
-        }
-
-        // Fallback keyword score threshold check
-        // The old signature used int threshold=3, we translate that here
-        if ((int) ($top['_score'] ?? 0) < 3) {
-            return null;
-        }
-
-        return $top;
-    }
-
     /**
      * Melakukan pencarian semantik (Vector Search) menggunakan Cosine Similarity.
      * 

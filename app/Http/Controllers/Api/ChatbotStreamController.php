@@ -40,6 +40,13 @@ class ChatbotStreamController
         $context = $request->input('context', []);
 
         return new StreamedResponse(function () use ($message, $context, $sessionId) {
+            // PHP/webserver output buffering can swallow flush() and deliver the whole
+            // reply as one browser-side event instead of a real per-sentence stream.
+            while (ob_get_level() > 0) {
+                ob_end_flush();
+            }
+            ob_implicit_flush(true);
+
             try {
                 $generator = $this->chatbot->stream($message, $context, $sessionId);
                 $chunksSent = false;
@@ -59,8 +66,8 @@ class ChatbotStreamController
                                 echo "data: " . json_encode(['chunk' => $response->reply]) . "\n\n";
                                 flush();
                             }
-                            if (!empty($response->actions)) {
-                                echo "data: " . json_encode(['actions' => $response->actions]) . "\n\n";
+                            if (!empty($response->context)) {
+                                echo "data: " . json_encode(['context' => $response->context]) . "\n\n";
                                 flush();
                             }
                             echo "data: [DONE]\n\n";

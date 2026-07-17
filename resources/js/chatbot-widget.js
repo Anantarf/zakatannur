@@ -13,9 +13,8 @@ const timeFormatter = new Intl.DateTimeFormat('id-ID', {
 const nowIso = () => new Date().toISOString();
 
 document.addEventListener('alpine:init', () => {
-    window.Alpine.data('chatbotWidget', ({ endpoint, quickReplies = [], embedded = false }) => ({
+    window.Alpine.data('chatbotWidget', ({ endpoint, embedded = false }) => ({
         endpoint,
-        quickReplies,
         embedded,
         isOpen: embedded,
         showTooltip: false,
@@ -121,13 +120,27 @@ document.addEventListener('alpine:init', () => {
             
             for (let i = 0; i < lines.length; i++) {
                 let line = lines[i];
+
+                // [[HASIL]]...[[/HASIL]] (from a computed zakat mal figure, see
+                // ChatbotSentinelParser) wraps its lines in a distinct result card
+                // instead of the plain paragraph styling below.
+                let closeResultCardAfter = false;
+                if (line.includes('[[HASIL]]')) {
+                    line = line.replace('[[HASIL]]', '');
+                    parsedLines.push('<div class="zakat-result-card">');
+                }
+                if (line.includes('[[/HASIL]]')) {
+                    line = line.replace('[[/HASIL]]', '');
+                    closeResultCardAfter = true;
+                }
+
                 const ulMatch = line.match(/^(\s*)(?:-|\*|•)\s+(.+)$/);
                 const olMatch = line.match(/^(\s*)\d+\.\s+(.+)$/);
-                
+
                 if (ulMatch || olMatch) {
                     const currentType = ulMatch ? 'ul' : 'ol';
                     const content = ulMatch ? ulMatch[2] : olMatch[2];
-                    
+
                     if (!inList || listType !== currentType) {
                         if (inList) {
                             parsedLines.push(`</${listType}>`);
@@ -148,11 +161,20 @@ document.addEventListener('alpine:init', () => {
                         parsedLines.push(`<p class="mb-2 last:mb-0">${line}</p>`);
                     }
                 }
+
+                if (closeResultCardAfter) {
+                    if (inList) {
+                        parsedLines.push(`</${listType}>`);
+                        inList = false;
+                        listType = null;
+                    }
+                    parsedLines.push('</div>');
+                }
             }
             if (inList) {
                 parsedLines.push(`</${listType}>`);
             }
-            
+
             return parsedLines.join('');
         },
 
@@ -236,15 +258,10 @@ document.addEventListener('alpine:init', () => {
         resetToWelcome() {
             this.messages = [{
                 role: 'bot',
-                content: "Assalamu'alaikum. Saya Zakky. Saya bisa bantu cek data zakat atau jawab pertanyaan Anda.",
+                content: "Assalamu'alaikum. Saya Zakky. Ceritakan kasus zakat Anda, nanti saya bantu arahkan langkahnya.",
                 createdAt: nowIso(),
                 isWelcome: true,
             }];
-            this.quickReplies = [
-                { label: 'Hitung zakat fitrah', message: 'Zakat fitrah 4 orang berapa?' },
-                { label: 'Cara bayar zakat', message: 'Bagaimana cara membayar zakat?' },
-                { label: 'Apa itu zakat mal?', message: 'Apa itu zakat mal?' },
-            ];
             this.messageCount = 0;
             localStorage.setItem('zakky_message_count_' + this.sessionId, '0');
             this.updateActivity();
@@ -379,8 +396,6 @@ document.addEventListener('alpine:init', () => {
                 return;
             }
 
-            // Check for local actions first
-            const localAction = this.resolveLocalAction(userMessage);
             this.messages.push({ role: 'user', content: userMessage, createdAt: nowIso() });
             this.input = '';
             this.$nextTick(() => {
@@ -389,12 +404,6 @@ document.addEventListener('alpine:init', () => {
                     this.$refs.chatInput.style.overflowY = 'hidden';
                 }
             });
-
-            if (localAction) {
-                this.openTab(localAction);
-                this.$nextTick(() => this.scrollToBottom());
-                return;
-            }
 
             this.isTyping = true;
             this.lastError = null;
@@ -433,12 +442,10 @@ document.addEventListener('alpine:init', () => {
                         role: 'bot',
                         content: data.reply,
                         source: data.source,
-                        actions: data.actions || [],
                         citations: data.citations || [],
                         createdAt: nowIso(),
                     });
                     this.conversationContext = this.sanitizeContext(data.context || {});
-                    this.executeActions(data.actions || []);
                     this.isOnline = true;
                     this.playPopSound();
                     return;
@@ -471,80 +478,14 @@ document.addEventListener('alpine:init', () => {
             }
         },
 
-        useQuickReply(chip) {
-            if (this.isTyping) {
-                return;
-            }
-
-            if (chip?.action === 'tab' && chip?.target) {
-                this.openTab(chip.target);
-                return;
-            }
-
-            const text = typeof chip === 'string' ? chip : chip?.message;
-            if (!text) {
-                return;
-            }
-
-            this.input = text;
-            this.sendMessage();
-        },
-
-        openTab(tab) {
-            if (!['beranda', 'laporan', 'grafik'].includes(tab)) {
-                return;
-            }
-
-            window.dispatchEvent(new CustomEvent('public-home:set-tab', {
-                detail: { tab },
-            }));
-            this.closeChat();
-        },
-
-        executeActions(actions) {
-            actions.forEach((action) => {
-                if (action?.auto === true) {
-                    this.executeAction(action);
-                }
-            });
-        },
-
-        executeAction(action) {
-            if (action?.type === 'open_url' && action?.url) {
-                window.open(action.url, '_blank', 'noopener,noreferrer');
-                return;
-            }
-
-            if (action?.type === 'open_tab' && action?.target) {
-                this.openTab(action.target);
-                return;
-            }
-
-            if (action?.type === 'suggested_reply' && action?.message) {
-                this.input = action.message;
-                this.sendMessage();
-            }
-        },
-
         sanitizeContext(context) {
-            const allowedKeys = ['last_intent', 'last_source', 'topic'];
+            const allowedKeys = ['last_intent', 'last_source', 'topic', 'mode'];
             return allowedKeys.reduce((next, key) => {
                 if (typeof context[key] === 'string' && context[key].length <= 80) {
                     next[key] = context[key];
                 }
                 return next;
             }, {});
-        },
-
-        resolveLocalAction(message) {
-            const normalized = message.toLowerCase();
-            if (normalized.includes('buka ringkasan') || normalized.includes('lihat ringkasan') || normalized.includes('buka laporan')) {
-                return 'laporan';
-            }
-            if (normalized.includes('buka grafik') || normalized.includes('lihat grafik') || normalized.includes('buka chart')) {
-                return 'grafik';
-            }
-            return null;
         },
 
         async tryStreaming(userMessage, streamEndpoint) {
@@ -578,7 +519,6 @@ document.addEventListener('alpine:init', () => {
 
                 let msgIndex = -1;
                 let firstChunkPlayed = false;
-                let scrolledToMessage = false;
 
                 while (true) {
                     const { done, value } = await reader.read();
@@ -591,7 +531,7 @@ document.addEventListener('alpine:init', () => {
                         const line = lines[i].trim();
                         if (line.startsWith('data: ')) {
                             const dataString = line.slice(6).trim();
-                            
+
                             // Push the bot message on the first valid event
                             if (!firstChunkPlayed && (dataString === '[DONE]' || dataString !== '')) {
                                 this.messages.push(botMessage);
@@ -610,15 +550,14 @@ document.addEventListener('alpine:init', () => {
                             const data = JSON.parse(dataString);
                             if (data.chunk) {
                                 this.messages[msgIndex].content += data.chunk;
-                                // Scroll to bottom continuously as new text comes in
-                                if (!scrolledToMessage) {
-                                    scrolledToMessage = true;
-                                }
                                 this.$nextTick(() => {
                                     this.scrollToBottom(false);
                                 });
-                            } else if (data.actions) {
-                                this.messages[msgIndex].actions = data.actions;
+                            } else if (data.context) {
+                                // Lets the backend know next turn whether we're mid AI-conversation
+                                // (see ChatbotOrchestrator::getQuickResponse) instead of the fast-path
+                                // keyword matcher hijacking a reply like "kambingnya 40 ekor".
+                                this.conversationContext = this.sanitizeContext(data.context);
                             } else if (data.error) {
                                 this.messages[msgIndex].isError = true;
                                 this.messages[msgIndex].isRetryable = data.retryable;

@@ -24,6 +24,7 @@ class ChatbotController extends Controller
             'context.last_intent' => 'sometimes|string|max:80',
             'context.last_source' => 'sometimes|string|max:40',
             'context.topic' => 'sometimes|string|max:40',
+            'context.mode' => 'sometimes|string|max:80',
             'session_id' => 'sometimes|string|max:100',
             'type' => 'sometimes|string|in:message,feedback',
             'feedback' => 'sometimes|required_if:type,feedback|string|in:helpful,unhelpful',

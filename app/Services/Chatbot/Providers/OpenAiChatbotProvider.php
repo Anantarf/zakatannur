@@ -203,12 +203,20 @@ class OpenAiChatbotProvider implements ChatbotServiceInterface
             . "For location or payment questions: 'Visit Masjid An-Nur during the last 10 days of Ramadan.' Only share this when asked. "
             . "Decline off-topic questions politely and redirect to zakat. "
             . "Always reply in the same language as the user. "
-            . "End each reply with 2-3 follow-up suggestions: [SUGGEST: ...]";
+            . "Do not output [SUGGEST] tags, quick replies, buttons, or UI actions. "
+            . "When more detail is needed, ask one focused clarification question in plain text. "
+            . "If helpful, include 2-4 numbered options plus 'Other' so the user can answer freely.";
 
         if ($language === 'id') {
             $systemInstruction = "Kamu adalah Zakky, asisten digital Zakat An-Nur. "
                 . "Bicara seperti panitia masjid yang tahu betul soal zakat — hangat, langsung ke intinya, tidak perlu berlebihan. "
                 . "Gunakan istilah awam. Jika menggunakan istilah fiqih (seperti Haul/Nishab), selalu berikan penjelasan singkat di dalam kurung. "
+                . "Untuk FAQ, jawab 2-4 kalimat. Untuk konsultasi, pandu bertahap dan tanyakan satu data terpenting yang belum ada. "
+                . "Sebelum menghitung, rangkum singkat data yang sudah user berikan agar kesalahan angka mudah dikoreksi. "
+                . "Untuk case khusus, gunakan alur triase: identifikasi jenis harta, klasifikasikan ke kategori zakat, cek syarat utama, beri estimasi awal jika aman, sebutkan faktor yang bisa mengubah hasil, lalu beri langkah berikutnya. "
+                . "Hindari terlalu sering memakai kalimat defensif seperti 'Zakky tidak menetapkan keputusan final'; gunakan redaksi lebih natural bahwa Zakky memberi arah awal dan detail kasus dapat dikonfirmasi ke panitia atau ustadz. "
+                . "JANGAN membuat tag [SUGGEST], quick reply, tombol, atau instruksi UI. "
+                . "Kalau butuh klarifikasi, ajukan pertanyaan dalam teks biasa. Bila cocok, beri 2-4 opsi bernomor dan opsi 'Lainnya' agar user bisa menjawab kondisi yang berbeda. "
                 . "Jawab hanya dari 'Konteks resmi' di bawah. Kalau informasinya tidak ada, bilang langsung: "
                 . "'Info ini belum ada di sistem saya, lebih baik tanya langsung ke panitia.' "
                 . "Kalau ditanya soal lokasi atau cara bayar, sampaikan: 'Silakan datang ke Masjid An-Nur pada 10 hari terakhir Ramadhan. "
@@ -220,8 +228,7 @@ class OpenAiChatbotProvider implements ChatbotServiceInterface
                 . "Jika variabel cukup, WAJIB hasilkan string JSON persis seperti ini (selipkan di pesanmu): "
                 . "[HITUNG:{\"income_monthly\":10000000,\"expenses_monthly\":2000000,\"savings\":50000000,\"gold_gram\":0,\"debt\":0}] "
                 . "Semua kunci opsional, nilai dalam integer rupiah atau gram emas. "
-                . "Balas dalam bahasa yang sama dengan pertanyaan. "
-                . "Di akhir balasan, tambahkan 2-3 pertanyaan lanjutan: [SUGGEST: ...]";
+                . "Balas dalam bahasa yang sama dengan pertanyaan.";
         }
 
         if (!empty($context)) {
@@ -244,6 +251,11 @@ class OpenAiChatbotProvider implements ChatbotServiceInterface
             if ($correctionHint) {
                 $systemInstruction .= "\n\n" . $correctionHint;
             }
+
+            $conversationHint = $context[0]['_conversation_hint'] ?? null;
+            if ($conversationHint) {
+                $systemInstruction .= "\n\n" . $conversationHint;
+            }
         }
 
         return $systemInstruction;
@@ -255,8 +267,8 @@ class OpenAiChatbotProvider implements ChatbotServiceInterface
             ['role' => 'system', 'content' => $systemInstruction],
         ];
 
-        // Sliding Window Memory: limit to the last 6 interactions (12 messages) to save tokens and keep LLM focused
-        $recentHistory = array_slice($history, -6);
+        // Sliding Window Memory: keep the last 8 interactions for multi-turn consultation.
+        $recentHistory = array_slice($history, -8);
 
         foreach ($recentHistory as $hist) {
             if (!empty($hist['question'])) {

@@ -3,7 +3,6 @@
 @import './public.css';
 @import './ui.css';
 @import './utilities.css';
-@import './chatbot.css';
 @import './chatbot-widget.css';
 
 @tailwind base;

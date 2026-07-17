@@ -39,7 +39,7 @@ class KnowledgeBase extends Model
             'keywords' => $this->keywords ?? [],
             'answer' => $this->answer,
             'source_label' => $this->source_label,
-            'actions' => $this->actions ?? [],
+            'actions' => [],
         ];
     }
 
