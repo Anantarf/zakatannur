@@ -47,4 +47,9 @@ class MockChatbotProvider implements ChatbotServiceInterface
     {
         return false;
     }
+
+    public function lastUsageMetadata(): array
+    {
+        return [];
+    }
 }

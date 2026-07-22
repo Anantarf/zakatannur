@@ -8,6 +8,10 @@ class ChatbotActionDetector
     {
         $message = $this->normalize($message);
 
+        if ($this->containsAny($message, ['bisa bantu apa', 'seberapa jago', 'kemampuan', 'zakky bisa apa', 'chatbot bisa apa', 'jago bahas zakat'])) {
+            return 'ask_zakky_capability';
+        }
+
         if ($this->containsAny($message, ['jiwa', 'orang', 'muzakki fitrah']) && $this->containsAny($message, ['total', 'jumlah'])) {
             return 'ask_total_people';
         }
@@ -16,7 +20,9 @@ class ChatbotActionDetector
             return 'ask_total_money';
         }
 
-        if ($this->containsAny($message, ['berapa', 'total', 'jumlah', 'ringkasan penerimaan', 'rekap penerimaan']) && $this->containsAny($message, ['zakat', 'semua', 'terkumpul', 'penerimaan'])) {
+        if (!$this->containsAny($message, ['seberapa'])
+            && $this->containsAny($message, ['berapa', 'total', 'jumlah', 'ringkasan penerimaan', 'rekap penerimaan'])
+            && $this->containsAny($message, ['zakat', 'semua', 'terkumpul', 'penerimaan'])) {
             return 'ask_total_summary';
         }
 
@@ -64,7 +70,8 @@ class ChatbotActionDetector
             return 'ask_total_money';
         }
 
-        if ($this->containsAny($message, ['berapa', 'total', 'jumlah', 'ringkasan penerimaan', 'rekap penerimaan'])) {
+        if (!$this->containsAny($message, ['seberapa'])
+            && $this->containsAny($message, ['berapa', 'total', 'jumlah', 'ringkasan penerimaan', 'rekap penerimaan'])) {
             return 'ask_total_summary';
         }
 
@@ -126,6 +133,13 @@ class ChatbotActionDetector
                 . "4. Bukti pembayaran jika memakai transfer atau QRIS.\n\n"
                 . "Pastikan nomor rekening, QRIS, atau metode pembayaran berasal dari pengumuman resmi panitia.",
                 'action'
+            ),
+            'ask_zakky_capability' => ChatbotResponse::success(
+                "Saya cukup siap untuk pertanyaan zakat yang ada di panduan Masjid An-Nur: zakat fitrah, zakat mal, fidyah, infaq/shodaqoh, cara pembayaran, ringkasan penerimaan, dan konsultasi awal kasus umum.\n\n"
+                . "Untuk angka zakat mal, saya tidak menebak sendiri. Saya kumpulkan data dulu, lalu sistem menghitungnya lewat kalkulator backend agar hasilnya lebih aman. Kalau kasusnya butuh keputusan fikih pribadi, saya tetap akan arahkan ke panitia atau ustadz.",
+                'knowledge',
+                [],
+                [['id' => 'tentang-zakky', 'label' => 'Panduan Publik Masjid An-Nur']]
             ),
             'ask_location' => ChatbotResponse::success(
                 "Masjid An-Nur berlokasi di Jl. Contoh Alamat No. 123, Kelurahan Maju, Kecamatan Bersama, Kota Sejahtera.\n\n"

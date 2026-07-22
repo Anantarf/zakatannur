@@ -36,4 +36,11 @@ interface ChatbotServiceInterface
      * Frontend/Controller bisa pakai ini untuk membedakan status code.
      */
     public function wasLastReplyFallback(): bool;
+
+    /**
+     * Metadata pemakaian token/biaya dari panggilan provider terakhir.
+     *
+     * @return array{model?: string, prompt_tokens?: int, completion_tokens?: int, total_tokens?: int, estimated_cost_usd?: float}
+     */
+    public function lastUsageMetadata(): array;
 }

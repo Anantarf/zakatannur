@@ -53,6 +53,11 @@ class ChatbotApiTest extends TestCase
             {
                 return false;
             }
+
+            public function lastUsageMetadata(): array
+            {
+                return [];
+            }
         });
 
         $response = $this->postJson('/api/chatbot/message', [
@@ -200,6 +205,118 @@ class ChatbotApiTest extends TestCase
             ->assertJsonPath('data.source', 'knowledge')
             ->assertJsonPath('data.citations.0.label', 'Panduan Zakat Masjid An-Nur')
             ->assertJsonPath('data.actions', []);
+    }
+
+    public function test_chatbot_answers_nisab_from_nisab_knowledge_entry(): void
+    {
+        (new \Database\Seeders\KnowledgeBaseSeeder())->run();
+
+        $response = $this->postJson('/api/chatbot/message', [
+            'message' => 'Nisab itu apa sih?',
+        ]);
+
+        $reply = $response->assertOk()
+            ->assertJsonPath('data.source', 'knowledge')
+            ->assertJsonPath('data.citations.0.id', 'nisab-dan-haul')
+            ->json('data.reply');
+
+        $this->assertStringContainsString('85 gram', $reply);
+    }
+
+    public function test_chatbot_capability_question_is_not_hijacked_by_total_summary(): void
+    {
+        $response = $this->postJson('/api/chatbot/message', [
+            'message' => 'kamu seberapa jago emang bahas zakat?',
+        ]);
+
+        $reply = $response->assertOk()
+            ->assertJsonPath('data.source', 'knowledge')
+            ->assertJsonPath('data.citations.0.id', 'tentang-zakky')
+            ->json('data.reply');
+
+        $this->assertStringContainsString('zakat fitrah', $reply);
+        $this->assertStringContainsString('zakat mal', $reply);
+        $this->assertStringNotContainsString('Ringkasan penerimaan', $reply);
+    }
+
+    public function test_openai_provider_routes_fast_default_and_premium_models(): void
+    {
+        Http::fake([
+            'api.openai.com/*' => Http::response([
+                'choices' => [[ 'message' => [ 'content' => 'Jawaban model.' ] ]],
+                'usage' => [
+                    'prompt_tokens' => 100,
+                    'completion_tokens' => 25,
+                    'total_tokens' => 125,
+                ],
+            ], 200),
+        ]);
+
+        $provider = new OpenAiChatbotProvider(
+            'test-key',
+            'gpt-5.6-terra',
+            'https://api.openai.com/v1',
+            models: [
+                'fast' => 'gpt-5.6-luna',
+                'premium' => 'gpt-5.6-sol',
+            ],
+        );
+
+        $provider->sendMessage('Halo');
+        $provider->sendMessage('Jelaskan perbedaan zakat dan infaq untuk jamaah baru', [
+            ['title' => 'Pengertian Zakat', 'answer' => 'Zakat wajib, infaq sukarela.'],
+        ]);
+        $provider->sendMessage('Saya mau hitung zakat mal dari gaji dan tabungan');
+
+        Http::assertSentCount(3);
+        Http::assertSent(fn ($request) => $request->data()['model'] === 'gpt-5.6-luna');
+        Http::assertSent(fn ($request) => $request->data()['model'] === 'gpt-5.6-terra');
+        Http::assertSent(fn ($request) => $request->data()['model'] === 'gpt-5.6-sol');
+
+        $this->assertSame([
+            'model' => 'gpt-5.6-sol',
+            'prompt_tokens' => 100,
+            'completion_tokens' => 25,
+            'total_tokens' => 125,
+            'estimated_cost_usd' => 0.00125,
+        ], $provider->lastUsageMetadata());
+    }
+
+    public function test_chatbot_logs_openai_token_usage_and_estimated_cost(): void
+    {
+        Http::fake([
+            'api.openai.com/*' => Http::response([
+                'choices' => [[ 'message' => [ 'content' => 'Zakat emas termasuk zakat mal dengan nisab 85 gram.' ] ]],
+                'usage' => [
+                    'prompt_tokens' => 1200,
+                    'completion_tokens' => 200,
+                    'total_tokens' => 1400,
+                ],
+            ], 200),
+        ]);
+
+        $this->app->bind(ChatbotServiceInterface::class, fn () => new OpenAiChatbotProvider(
+            'test-key',
+            'gpt-5.6-terra',
+            'https://api.openai.com/v1',
+            models: [
+                'fast' => 'gpt-5.6-luna',
+                'premium' => 'gpt-5.6-sol',
+            ],
+        ));
+
+        $this->postJson('/api/chatbot/message', [
+            'message' => 'Jelaskan zakat emas untuk konsultasi saya',
+            'session_id' => 'cost-session',
+        ])->assertOk();
+
+        $log = AiChatLog::where('session_id', 'cost-session')->firstOrFail();
+
+        $this->assertSame('gpt-5.6-sol', $log->model);
+        $this->assertSame(1200, $log->prompt_tokens);
+        $this->assertSame(200, $log->completion_tokens);
+        $this->assertSame(1400, $log->total_tokens);
+        $this->assertEquals(0.012, (float) $log->estimated_cost_usd);
     }
 
     public function test_chatbot_answers_total_from_public_data(): void
@@ -498,6 +615,11 @@ class ChatbotApiTest extends TestCase
             public function wasLastReplyFallback(): bool
             {
                 return false;
+            }
+
+            public function lastUsageMetadata(): array
+            {
+                return [];
             }
         });
 

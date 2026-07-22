@@ -17,6 +17,7 @@ class OpenAiChatbotProvider implements ChatbotServiceInterface
     private string $baseUrl;
     private int $timeout;
     private bool $lastReplyWasFallback = false;
+    private array $lastUsageMetadata = [];
 
     public function __construct(string $apiKey, string $model, string $baseUrl, int $timeout = 25, array $models = [])
     {
@@ -31,6 +32,7 @@ class OpenAiChatbotProvider implements ChatbotServiceInterface
     public function sendMessage(string $message, array $context = [], string $language = 'id', array $history = []): string
     {
         $this->lastReplyWasFallback = false;
+        $this->lastUsageMetadata = [];
 
         // Validate API key
         if (empty($this->apiKey)) {
@@ -63,6 +65,7 @@ class OpenAiChatbotProvider implements ChatbotServiceInterface
                 ]);
 
             if ($response->successful()) {
+                $this->lastUsageMetadata = $this->usageMetadata($selectedModel, $response->json('usage') ?? []);
                 $reply = $response->json('choices.0.message.content');
                 if (is_string($reply) && trim($reply) !== '') {
                     return $reply;
@@ -115,6 +118,7 @@ class OpenAiChatbotProvider implements ChatbotServiceInterface
     public function streamMessage(string $message, array $context = [], string $language = 'id', array $history = []): \Generator
     {
         $this->lastReplyWasFallback = false;
+        $this->lastUsageMetadata = [];
 
         if (empty($this->apiKey)) {
             Log::error('OpenAI API key not configured', ['model' => $this->model]);
@@ -141,6 +145,7 @@ class OpenAiChatbotProvider implements ChatbotServiceInterface
                     'temperature' => 0.1,
                     'max_completion_tokens' => 500,
                     'stream' => true,
+                    'stream_options' => ['include_usage' => true],
                 ]);
 
             if ($response->successful()) {
@@ -160,6 +165,10 @@ class OpenAiChatbotProvider implements ChatbotServiceInterface
                             }
 
                             $json = json_decode($data, true);
+                            if (isset($json['usage']) && is_array($json['usage'])) {
+                                $this->lastUsageMetadata = $this->usageMetadata($selectedModel, $json['usage']);
+                            }
+
                             if (isset($json['choices'][0]['delta']['content'])) {
                                 yield $json['choices'][0]['delta']['content'];
                             }
@@ -194,10 +203,51 @@ class OpenAiChatbotProvider implements ChatbotServiceInterface
         return $this->lastReplyWasFallback;
     }
 
+    public function lastUsageMetadata(): array
+    {
+        return $this->lastUsageMetadata;
+    }
+
     private function fallback(string $message): string
     {
         $this->lastReplyWasFallback = true;
         return ChatbotServiceInterface::FALLBACK_PREFIX . $message;
+    }
+
+    private function usageMetadata(string $model, array $usage): array
+    {
+        $promptTokens = (int) ($usage['prompt_tokens'] ?? 0);
+        $completionTokens = (int) ($usage['completion_tokens'] ?? 0);
+        $totalTokens = (int) ($usage['total_tokens'] ?? ($promptTokens + $completionTokens));
+
+        return [
+            'model' => $model,
+            'prompt_tokens' => $promptTokens,
+            'completion_tokens' => $completionTokens,
+            'total_tokens' => $totalTokens,
+            'estimated_cost_usd' => $this->estimateCostUsd($model, $promptTokens, $completionTokens),
+        ];
+    }
+
+    private function estimateCostUsd(string $model, int $promptTokens, int $completionTokens): float
+    {
+        $pricingPerMillion = [
+            'gpt-5.6-luna' => ['input' => 1.00, 'output' => 6.00],
+            'gpt-5.6-terra' => ['input' => 2.50, 'output' => 15.00],
+            'gpt-5.6-sol' => ['input' => 5.00, 'output' => 30.00],
+            'gpt-5.6' => ['input' => 5.00, 'output' => 30.00],
+        ];
+
+        $pricing = $pricingPerMillion[$model] ?? null;
+        if ($pricing === null) {
+            return 0.0;
+        }
+
+        return round(
+            ($promptTokens / 1_000_000 * $pricing['input'])
+            + ($completionTokens / 1_000_000 * $pricing['output']),
+            8
+        );
     }
 
     private function selectModel(string $message, array $context): string

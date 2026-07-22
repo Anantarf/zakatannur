@@ -18,6 +18,11 @@ class AiChatLog extends Model
         'source_type',
         'sentiment',
         'confidence_source',
+        'model',
+        'prompt_tokens',
+        'completion_tokens',
+        'total_tokens',
+        'estimated_cost_usd',
     ];
 
     public function user(): BelongsTo

@@ -35,7 +35,7 @@ class ChatbotOrchestrator
             $sentiment = $this->sentimentDetector->detect($message);
             $response = $this->answerFromAi($message, $rawContext, $sessionId);
             $confidenceSource = $this->aiProvider->wasLastReplyFallback() ? 'fallback' : 'ai';
-            $this->chatLogger->save($message, null, $response->source, $response->reply, $sessionId, $sentiment, $confidenceSource);
+            $this->chatLogger->save($message, null, $response->source, $response->reply, $sessionId, $sentiment, $confidenceSource, $this->aiProvider->lastUsageMetadata());
 
             // Cache jalur AI dimatikan sesuai spesifikasi (RAG memory butuh stateful)
             return $response;
@@ -80,7 +80,7 @@ class ChatbotOrchestrator
             }
 
             $confidenceSource = $this->aiProvider->wasLastReplyFallback() ? 'fallback' : 'ai';
-            $this->chatLogger->save($message, null, $responseObj->source, $fullReply, $sessionId, $sentiment, $confidenceSource);
+            $this->chatLogger->save($message, null, $responseObj->source, $fullReply, $sessionId, $sentiment, $confidenceSource, $this->aiProvider->lastUsageMetadata());
 
             // Cache jalur AI dimatikan sesuai spesifikasi (RAG memory butuh stateful)
 
@@ -125,7 +125,8 @@ class ChatbotOrchestrator
             // Route specific zakat mal intents to their knowledge base entries
             if (in_array($intent, ['ask_zakat_mal_definition', 'ask_zakat_mal_nishab', 'ask_zakat_mal_example'])) {
                 $entryId = match($intent) {
-                    'ask_zakat_mal_definition', 'ask_zakat_mal_nishab', 'ask_zakat_mal_example' => 'zakat-mal',
+                    'ask_zakat_mal_definition', 'ask_zakat_mal_example' => 'zakat-mal',
+                    'ask_zakat_mal_nishab' => 'nisab-dan-haul',
                     default => null,
                 };
 

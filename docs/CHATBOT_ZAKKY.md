@@ -23,7 +23,9 @@ Sistem ini memiliki 2 fitur AI terpisah:
 ### Environment Variables
 ```bash
 OPENAI_API_KEY=sk-...           # Required for production
-OPENAI_CHAT_MODEL=gpt-4o-mini   # Model ID
+OPENAI_CHAT_MODEL=gpt-5.6-terra
+OPENAI_FAST_MODEL=gpt-5.6-luna
+OPENAI_PREMIUM_MODEL=gpt-5.6-sol
 OPENAI_BASE_URL=https://api.openai.com/v1
 
 CHATBOT_PROVIDER=openai         # 'openai' or 'mock'
@@ -216,6 +218,12 @@ Log::channel('chatbot')->info('API call', [
 - LLM diarahkan menghasilkan `[HITUNG:{...}]`
 - `ChatbotOrchestrator` memotong tag tersebut dan menjalankan perhitungan Zakat Mal murni di backend PHP (`ChatbotZakatMalGuide`), menghindari halusinasi.
 
+### 6. Evaluasi RAG untuk Skripsi
+- `php artisan test tests/Feature/ChatbotKnowledgeRetrievalEvalTest.php` menguji retrieval tanpa API: 40 kasus positif harus menemukan topik benar di top-3, dan 20 kasus negatif harus kosong.
+- `php artisan chatbot:eval-rag` menguji retrieval + sebagian fact-check jawaban akhir dengan API asli. Metrik retrieval seperti precision, recall, specificity, dan F1 belum cukup jika fact-check jawaban akhir masih gagal.
+- Log token dan estimasi biaya tersimpan di `ai_chat_logs` untuk membuktikan dampak routing model terhadap biaya.
+- Klaim aman untuk skripsi: sistem mengurangi risiko halusinasi melalui RAG, guardrail, dan kalkulasi deterministik; bukan menghilangkan halusinasi sepenuhnya.
+
 ---
 
 ## Keterbatasan yang Diketahui
@@ -238,7 +246,9 @@ Ini berarti chatbot API gagal. Mari debug:
 Buka `.env` file dan pastikan:
 ```env
 OPENAI_API_KEY=sk-...        # HARUS ada (bukan kosong)
-OPENAI_CHAT_MODEL=gpt-4o-mini
+OPENAI_CHAT_MODEL=gpt-5.6-terra
+OPENAI_FAST_MODEL=gpt-5.6-luna
+OPENAI_PREMIUM_MODEL=gpt-5.6-sol
 OPENAI_BASE_URL=https://api.openai.com/v1
 CHATBOT_PROVIDER=openai
 ```
@@ -254,7 +264,7 @@ Cari line dengan `Chatbot error` atau `OpenAI API Error` untuk detail masalah.
 | Error | Penyebab | Solusi |
 |-------|----------|--------|
 | 401/403 | API key salah/tidak valid | Cek OPENAI_API_KEY di .env |
-| 404 | Model tidak ditemukan | Cek OPENAI_CHAT_MODEL (gpt-4o-mini) |
+| 404 | Model tidak ditemukan | Cek OPENAI_CHAT_MODEL / OPENAI_FAST_MODEL / OPENAI_PREMIUM_MODEL |
 | 429 | Quota terlampaui | Tunggu sampai besok atau upgrade API plan |
 | 500+ | Server OpenAI error | Tunggu beberapa menit, coba lagi |
 | Network error | Tidak bisa connect | Cek koneksi internet |

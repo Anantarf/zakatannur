@@ -8,7 +8,7 @@ use Throwable;
 
 class ChatbotChatLogger
 {
-    public function save(string $question, ?string $intent, string $sourceType, string $answer, ?string $sessionId, ?string $sentiment = null, ?string $confidenceSource = null): void
+    public function save(string $question, ?string $intent, string $sourceType, string $answer, ?string $sessionId, ?string $sentiment = null, ?string $confidenceSource = null, array $usage = []): void
     {
         try {
             AiChatLog::updateOrCreate(
@@ -25,6 +25,11 @@ class ChatbotChatLogger
                     'answer' => $this->redactNominals($answer),
                     'sentiment' => $sentiment,
                     'confidence_source' => $confidenceSource,
+                    'model' => $usage['model'] ?? null,
+                    'prompt_tokens' => $usage['prompt_tokens'] ?? null,
+                    'completion_tokens' => $usage['completion_tokens'] ?? null,
+                    'total_tokens' => $usage['total_tokens'] ?? null,
+                    'estimated_cost_usd' => $usage['estimated_cost_usd'] ?? null,
                 ]
             );
         } catch (Throwable $e) {
