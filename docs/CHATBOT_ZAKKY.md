@@ -196,7 +196,7 @@ Log::channel('chatbot')->info('API call', [
 ## Current State
 
 ### 1. Security & Rate Limiting
-- **`throttle.chatbot` middleware** (`App\Http\Middleware\ThrottleChatbot`, registered in `app/Http/Kernel.php`) - 50 requests/minute per user/IP, applied to both `/chatbot/message` and `/chatbot/stream` in `routes/api.php`.
+- **`throttle:50,1`** (Laravel's built-in `ThrottleRequests` middleware) - 50 requests/minute per user/IP, applied directly to `/chatbot/message` and `/chatbot/stream` in `routes/api.php:26-30`. Note: `app/Http/Middleware/ThrottleChatbot.php` exists in the codebase but is not currently wired up to any route or middleware alias — it's unused.
 
 ### 2. UX Enhancements
 - **Auto-scroll** - Jumps to latest message when new one arrives
