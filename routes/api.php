@@ -24,10 +24,10 @@ Route::withoutMiddleware('throttle:api')->group(function () {
         ->middleware(['throttle:public-summary']);
 
     Route::post('/chatbot/message', [\App\Http\Controllers\Api\ChatbotController::class, 'chat'])
-        ->middleware('throttle:50,1');
+        ->middleware('throttle.chatbot');
 
     Route::post('/chatbot/stream', [ChatbotStreamController::class, 'stream'])
-        ->middleware('throttle:50,1');
+        ->middleware('throttle.chatbot');
 
     Route::get('/autocomplete/data', [\App\Http\Controllers\Api\AutocompleteController::class, 'data'])
         ->middleware(['auth', 'throttle:60,1']);

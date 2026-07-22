@@ -43,6 +43,14 @@ class KnowledgeEmbeddingsCache
 
     private function generateAllEmbeddings(): array
     {
+        // No API key configured is an expected state in local/testing environments, not a
+        // failure - warning once here instead of once per KB entry avoids drowning the log with
+        // (KB entry count) identical lines every time the cache rebuilds without one.
+        if (empty(config('services.openai.api_key'))) {
+            Log::info('Skipping knowledge embeddings: no embeddings API key configured.');
+            return [];
+        }
+
         $entries = \App\Models\KnowledgeBase::active()->get()->map->toKnowledgeArray()->all();
         $vectorData = [];
 
@@ -53,7 +61,7 @@ class KnowledgeEmbeddingsCache
             }
 
             $textToEmbed = $this->prepareTextForEmbedding($entry);
-            
+
             $vector = $this->embeddingsProvider->getEmbedding($textToEmbed);
             if ($vector) {
                 $vectorData[$entry['id']] = $vector;

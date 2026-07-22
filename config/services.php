@@ -32,7 +32,9 @@ return [
 
     'openai' => [
         'api_key' => env('OPENAI_API_KEY'),
-        'model' => env('OPENAI_MODEL', 'gpt-4o-mini'),
+        'model' => env('OPENAI_CHAT_MODEL', env('OPENAI_MODEL', 'gpt-4o-mini')),
+        'fast_model' => env('OPENAI_FAST_MODEL', 'gpt-4o-mini'),
+        'premium_model' => env('OPENAI_PREMIUM_MODEL', env('OPENAI_CHAT_MODEL', env('OPENAI_MODEL', 'gpt-4o-mini'))),
         'base_url' => env('OPENAI_BASE_URL', 'https://api.openai.com/v1'),
     ],
 

@@ -19,6 +19,10 @@ class ChatbotServiceProvider extends ServiceProvider
                     $openaiKey,
                     config('services.openai.model'),
                     config('services.openai.base_url'),
+                    models: [
+                        'fast' => config('services.openai.fast_model'),
+                        'premium' => config('services.openai.premium_model'),
+                    ],
                 );
             }
 

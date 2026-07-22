@@ -16,7 +16,7 @@ class ThrottleChatbot
     public function handle(Request $request, Closure $next): Response
     {
         $key = $this->getKey($request);
-        $maxAttempts = 30; // 30 requests per minute
+        $maxAttempts = 50; // matches the limit chatbot routes previously used via throttle:50,1
         $decayMinutes = 1;
 
         if ($this->limiter->tooManyAttempts($key, $maxAttempts, $decayMinutes)) {

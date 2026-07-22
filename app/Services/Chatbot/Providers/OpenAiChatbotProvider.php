@@ -12,14 +12,18 @@ class OpenAiChatbotProvider implements ChatbotServiceInterface
 {
     private string $apiKey;
     private string $model;
+    private string $fastModel;
+    private string $premiumModel;
     private string $baseUrl;
     private int $timeout;
     private bool $lastReplyWasFallback = false;
 
-    public function __construct(string $apiKey, string $model, string $baseUrl, int $timeout = 25)
+    public function __construct(string $apiKey, string $model, string $baseUrl, int $timeout = 25, array $models = [])
     {
         $this->apiKey = $apiKey;
         $this->model = $model;
+        $this->fastModel = $models['fast'] ?? $model;
+        $this->premiumModel = $models['premium'] ?? $model;
         $this->baseUrl = rtrim($baseUrl, '/');
         $this->timeout = $timeout;
     }
@@ -37,6 +41,7 @@ class OpenAiChatbotProvider implements ChatbotServiceInterface
         }
 
         $systemInstruction = $this->getSystemInstruction($language, $context);
+        $selectedModel = $this->selectModel($message, $context);
 
         $url = "{$this->baseUrl}/chat/completions";
 
@@ -51,7 +56,7 @@ class OpenAiChatbotProvider implements ChatbotServiceInterface
                     return $exception instanceof ConnectionException;
                 }, throw: false)
                 ->post($url, [
-                    'model' => $this->model,
+                    'model' => $selectedModel,
                     'messages' => $this->buildMessagesArray($systemInstruction, $history, $message),
                     'temperature' => 0.1,
                     'max_completion_tokens' => 500,
@@ -66,14 +71,14 @@ class OpenAiChatbotProvider implements ChatbotServiceInterface
                 Log::warning('OpenAI API returned empty reply', [
                     'status' => $response->status(),
                     'body' => $response->body(),
-                    'model' => $this->model,
+                    'model' => $selectedModel,
                 ]);
             }
 
             Log::error('OpenAI API Error Response', [
                 'status' => $response->status(),
                 'body' => $response->body(),
-                'model' => $this->model,
+                'model' => $selectedModel,
             ]);
 
             if ($response->status() === 401 || $response->status() === 403) {
@@ -82,7 +87,7 @@ class OpenAiChatbotProvider implements ChatbotServiceInterface
             }
 
             if ($response->status() === 404) {
-                Log::error('OpenAI Model Not Found', ['model' => $this->model]);
+                Log::error('OpenAI Model Not Found', ['model' => $selectedModel]);
                 return $this->fallback('Asisten sedang diperbarui. Coba tanya: Total uang, Total beras, Total jiwa.');
             }
 
@@ -100,7 +105,7 @@ class OpenAiChatbotProvider implements ChatbotServiceInterface
         } catch (Throwable $e) {
             Log::error('OpenAI API Exception', [
                 'message' => $e->getMessage(),
-                'model' => $this->model,
+                'model' => $selectedModel,
             ]);
 
             return $this->fallback('Layanan asisten AI sedang mengalami kendala jaringan. Silakan coba beberapa saat lagi.');
@@ -118,6 +123,7 @@ class OpenAiChatbotProvider implements ChatbotServiceInterface
         }
 
         $systemInstruction = $this->getSystemInstruction($language, $context);
+        $selectedModel = $this->selectModel($message, $context);
         $url = "{$this->baseUrl}/chat/completions";
 
         try {
@@ -130,7 +136,7 @@ class OpenAiChatbotProvider implements ChatbotServiceInterface
                 ->connectTimeout(8)
                 ->withOptions(['stream' => true])
                 ->post($url, [
-                    'model' => $this->model,
+                    'model' => $selectedModel,
                     'messages' => $this->buildMessagesArray($systemInstruction, $history, $message),
                     'temperature' => 0.1,
                     'max_completion_tokens' => 500,
@@ -165,7 +171,7 @@ class OpenAiChatbotProvider implements ChatbotServiceInterface
 
             Log::error('OpenAI API Stream Error Response', [
                 'status' => $response->status(),
-                'model' => $this->model,
+                'model' => $selectedModel,
             ]);
 
             if ($response->status() === 429) {
@@ -176,7 +182,7 @@ class OpenAiChatbotProvider implements ChatbotServiceInterface
         } catch (Throwable $e) {
             Log::error('OpenAI API Stream Exception', [
                 'message' => $e->getMessage(),
-                'model' => $this->model,
+                'model' => $selectedModel,
             ]);
 
             yield $this->fallback('Layanan asisten AI sedang mengalami kendala jaringan. Silakan coba beberapa saat lagi.');
@@ -192,6 +198,59 @@ class OpenAiChatbotProvider implements ChatbotServiceInterface
     {
         $this->lastReplyWasFallback = true;
         return ChatbotServiceInterface::FALLBACK_PREFIX . $message;
+    }
+
+    private function selectModel(string $message, array $context): string
+    {
+        $normalizedMessage = mb_strtolower($message);
+
+        if ($this->needsPremiumModel($normalizedMessage, $context)) {
+            return $this->premiumModel;
+        }
+
+        if ($this->canUseFastModel($normalizedMessage, $context)) {
+            return $this->fastModel;
+        }
+
+        return $this->model;
+    }
+
+    private function needsPremiumModel(string $message, array $context): bool
+    {
+        $premiumKeywords = [
+            'hitung', 'perhitungan', 'zakat mal', 'zakat maal', 'nishab', 'nisab',
+            'haul', 'emas', 'tabungan', 'utang', 'hutang', 'aset', 'penghasilan',
+            'gaji', 'investasi', 'saham', 'usaha', 'warisan', 'konsultasi',
+        ];
+
+        foreach ($premiumKeywords as $keyword) {
+            if (str_contains($message, $keyword)) {
+                return true;
+            }
+        }
+
+        return count($context) >= 3 || mb_strlen($message) > 350;
+    }
+
+    private function canUseFastModel(string $message, array $context): bool
+    {
+        if (!empty($context) || mb_strlen($message) > 120) {
+            return false;
+        }
+
+        $fastPatterns = [
+            'halo', 'hai', 'assalamualaikum', 'terima kasih', 'makasih',
+            'apa itu zakat', 'jadwal', 'lokasi', 'alamat', 'kontak',
+            'cara bayar', 'total uang', 'total beras', 'total jiwa',
+        ];
+
+        foreach ($fastPatterns as $pattern) {
+            if (str_contains($message, $pattern)) {
+                return true;
+            }
+        }
+
+        return str_word_count($message) <= 6;
     }
 
     private function getSystemInstruction(string $language, array $context): string

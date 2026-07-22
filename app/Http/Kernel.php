@@ -65,6 +65,7 @@ class Kernel extends HttpKernel
         'role' => \App\Http\Middleware\EnsureUserRole::class,
         'signed' => \Illuminate\Routing\Middleware\ValidateSignature::class,
         'throttle' => \Illuminate\Routing\Middleware\ThrottleRequests::class,
+        'throttle.chatbot' => \App\Http\Middleware\ThrottleChatbot::class,
         'verified' => \Illuminate\Auth\Middleware\EnsureEmailIsVerified::class,
     ];
 }
