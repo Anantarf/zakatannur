@@ -28,6 +28,7 @@ class EvaluateChatbotRag extends Command
         $rows = [];
         $truePositives = 0;
         $falseNegatives = 0;
+        $factFailures = 0;
         $cases = ChatbotEvalDataset::cases();
 
         foreach ($cases as $case) {
@@ -46,6 +47,9 @@ class EvaluateChatbotRag extends Command
             if ($case['fact'] !== null) {
                 $reply = $orchestrator->handle($case['question'])->reply;
                 $factStatus = str_contains($reply, $case['fact']) ? 'OK' : 'GAGAL';
+                if ($factStatus === 'GAGAL') {
+                    $factFailures++;
+                }
             }
 
             $pass = $retrievalPass && $factStatus !== 'GAGAL';
@@ -110,9 +114,15 @@ class EvaluateChatbotRag extends Command
                 ['Recall', round($recall, 3)],
                 ['Specificity', round($specificity, 3)],
                 ['F1-Score', round($f1, 3)],
+                ['Fact-check gagal', $factFailures],
             ]
         );
 
-        return ($falseNegatives === 0 && $falsePositives === 0) ? Command::SUCCESS : Command::FAILURE;
+        // Exit status covers retrieval (false negatives/positives) AND fact-check failures -
+        // a case that retrieves the right topic but gets the number wrong must still fail the
+        // gate, not just show "GAGAL" in a table nobody's script is parsing.
+        return ($falseNegatives === 0 && $falsePositives === 0 && $factFailures === 0)
+            ? Command::SUCCESS
+            : Command::FAILURE;
     }
 }
