@@ -26,13 +26,15 @@ class EvaluateChatbotRag extends Command
     public function handle(KnowledgeRetriever $retriever, ChatbotOrchestrator $orchestrator): int
     {
         $rows = [];
-        $passCount = 0;
+        $truePositives = 0;
+        $falseNegatives = 0;
         $cases = ChatbotEvalDataset::cases();
 
         foreach ($cases as $case) {
             $results = $retriever->search($case['question'], 3);
             $slugs = collect($results)->pluck('id')->all();
             $retrievalPass = in_array($case['expected_slug'], $slugs, true);
+            $retrievalPass ? $truePositives++ : $falseNegatives++;
 
             $topScore = isset($results[0])
                 ? ($results[0]['_cosine_similarity'] ?? $results[0]['_score'] ?? '-')
@@ -47,7 +49,6 @@ class EvaluateChatbotRag extends Command
             }
 
             $pass = $retrievalPass && $factStatus !== 'GAGAL';
-            $passCount += $pass ? 1 : 0;
 
             $rows[] = [
                 $pass ? 'OK' : 'GAGAL',
@@ -59,9 +60,59 @@ class EvaluateChatbotRag extends Command
             ];
         }
 
+        $this->info('=== Kasus positif (harus menemukan topik yang tepat) ===');
         $this->table(['Status', 'Pertanyaan', 'Slug diharapkan', 'Top-3 hasil', 'Skor teratas', 'Cek fakta'], $rows);
-        $this->info("{$passCount}/" . count($cases) . ' pertanyaan lolos (retrieval' . ' + cek fakta bila ada).');
 
-        return $passCount === count($cases) ? Command::SUCCESS : Command::FAILURE;
+        $negativeRows = [];
+        $trueNegatives = 0;
+        $falsePositives = 0;
+
+        foreach (ChatbotEvalDataset::negativeCases() as $case) {
+            $results = $retriever->search($case['question'], 3);
+            $slugs = collect($results)->pluck('id')->all();
+            $isFalsePositive = !empty($slugs);
+            $isFalsePositive ? $falsePositives++ : $trueNegatives++;
+
+            $negativeRows[] = [
+                $isFalsePositive ? 'FALSE POSITIVE' : 'OK',
+                $case['question'],
+                implode(', ', $slugs) ?: '(kosong, sesuai harapan)',
+            ];
+        }
+
+        $this->newLine();
+        $this->info('=== Kasus negatif / out-of-scope (harus kosong) ===');
+        $this->table(['Status', 'Pertanyaan out-of-scope', 'Hasil (harusnya kosong)'], $negativeRows);
+
+        $precision = ($truePositives + $falsePositives) > 0
+            ? $truePositives / ($truePositives + $falsePositives)
+            : 0.0;
+        $recall = ($truePositives + $falseNegatives) > 0
+            ? $truePositives / ($truePositives + $falseNegatives)
+            : 0.0;
+        $specificity = ($trueNegatives + $falsePositives) > 0
+            ? $trueNegatives / ($trueNegatives + $falsePositives)
+            : 0.0;
+        $f1 = ($precision + $recall) > 0
+            ? 2 * ($precision * $recall) / ($precision + $recall)
+            : 0.0;
+
+        $this->newLine();
+        $this->info('=== Confusion matrix & metrik ===');
+        $this->table(
+            ['Metrik', 'Nilai'],
+            [
+                ['True Positive', $truePositives],
+                ['False Negative', $falseNegatives],
+                ['True Negative', $trueNegatives],
+                ['False Positive', $falsePositives],
+                ['Precision', round($precision, 3)],
+                ['Recall', round($recall, 3)],
+                ['Specificity', round($specificity, 3)],
+                ['F1-Score', round($f1, 3)],
+            ]
+        );
+
+        return ($falseNegatives === 0 && $falsePositives === 0) ? Command::SUCCESS : Command::FAILURE;
     }
 }
