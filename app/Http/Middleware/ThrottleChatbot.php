@@ -29,7 +29,10 @@ class ThrottleChatbot
 
         $this->limiter->hit($key, $decayMinutes * 60);
 
-        return $next($request)->header('X-RateLimit-Remaining', $this->limiter->remaining($key, $maxAttempts));
+        $response = $next($request);
+        $response->headers->set('X-RateLimit-Remaining', (string) $this->limiter->remaining($key, $maxAttempts));
+
+        return $response;
     }
 
     private function getKey(Request $request): string

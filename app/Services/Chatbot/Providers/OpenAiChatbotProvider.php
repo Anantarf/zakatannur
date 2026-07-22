@@ -60,7 +60,6 @@ class OpenAiChatbotProvider implements ChatbotServiceInterface
                 ->post($url, [
                     'model' => $selectedModel,
                     'messages' => $this->buildMessagesArray($systemInstruction, $history, $message),
-                    'temperature' => 0.1,
                     'max_completion_tokens' => 500,
                 ]);
 
@@ -142,7 +141,6 @@ class OpenAiChatbotProvider implements ChatbotServiceInterface
                 ->post($url, [
                     'model' => $selectedModel,
                     'messages' => $this->buildMessagesArray($systemInstruction, $history, $message),
-                    'temperature' => 0.1,
                     'max_completion_tokens' => 500,
                     'stream' => true,
                     'stream_options' => ['include_usage' => true],

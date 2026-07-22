@@ -272,6 +272,7 @@ class ChatbotApiTest extends TestCase
         Http::assertSent(fn ($request) => $request->data()['model'] === 'gpt-5.6-luna');
         Http::assertSent(fn ($request) => $request->data()['model'] === 'gpt-5.6-terra');
         Http::assertSent(fn ($request) => $request->data()['model'] === 'gpt-5.6-sol');
+        Http::assertSent(fn ($request) => !array_key_exists('temperature', $request->data()));
 
         $this->assertSame([
             'model' => 'gpt-5.6-sol',
