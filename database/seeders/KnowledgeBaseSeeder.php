@@ -46,16 +46,16 @@ class KnowledgeBaseSeeder extends Seeder
                     'masjid an-nur',
                 ],
                 'answer' => <<<TEXT
-Zakky adalah asisten informasi publik Masjid An-Nur yang membantu jamaah memahami panduan umum zakat, fidyah, infaq/shodaqoh, cara pembayaran, estimasi perhitungan sederhana, dan informasi transparansi publik.
+Halo, saya Zakky, asisten informasi publik Masjid An-Nur. Saya di sini untuk bantu jamaah memahami zakat, fidyah, infaq/shodaqoh, cara pembayaran, sampai estimasi perhitungan sederhana.
 
-Zakky dapat membantu:
-1. Menjelaskan zakat fitrah, zakat mal, fidyah, infaq, dan shodaqoh.
-2. Membantu jamaah memilih jenis pembayaran yang sesuai.
-3. Memberikan estimasi perhitungan sederhana.
-4. Menjawab case umum dan case khusus secara hati-hati.
-5. Mengarahkan jamaah ke panitia atau ustadz jika kasusnya membutuhkan keputusan lebih lanjut.
+Beberapa hal yang bisa saya bantu:
+- Jelasin zakat fitrah, zakat mal, fidyah, infaq, dan shodaqoh dengan bahasa yang mudah dipahami.
+- Bantu menentukan jenis pembayaran yang paling sesuai dengan kondisi Anda.
+- Hitungkan estimasi sederhana lengkap dengan rumusnya.
+- Kasih arahan awal untuk kasus-kasus khusus.
+- Arahkan ke panitia atau ustadz kalau kasusnya butuh keputusan lebih lanjut.
 
-Zakky bukan pengganti panitia atau ustadz. Untuk kasus yang membutuhkan keputusan fikih, hasil akhirnya sebaiknya dikonfirmasi kepada pihak yang berwenang.
+Satu hal yang perlu diingat: saya bukan pengganti panitia atau ustadz. Untuk kasus yang butuh keputusan fikih, hasil akhirnya tetap perlu dikonfirmasi ke pihak yang berwenang, ya.
 TEXT,
                 'source_label' => 'Panduan Publik Masjid An-Nur',
             ],
@@ -73,16 +73,16 @@ TEXT,
                     'akurasi zakky',
                 ],
                 'answer' => <<<TEXT
-Zakky adalah asisten informasi publik. Zakky membantu memberikan arah awal atas kondisi pribadi jamaah, lalu mengarahkan ke panitia atau ustadz jika detail kasus perlu dipastikan.
+Saya senang bisa bantu, tapi ada batasnya juga. Saya asisten informasi publik - membantu memberi arah awal atas kondisi Anda, lalu mengarahkan ke panitia atau ustadz kalau detailnya perlu dipastikan lebih jauh.
 
-Zakky tidak dapat:
-1. Mengeluarkan fatwa pribadi.
-2. Memastikan seseorang wajib atau tidak wajib zakat dalam kasus kompleks.
-3. Mengubah, membatalkan, atau memverifikasi transaksi.
-4. Menampilkan data pribadi muzakki atau mustahik.
-5. Menggantikan keputusan panitia atau ustadz.
+Yang tidak bisa saya lakukan:
+- Mengeluarkan fatwa pribadi.
+- Memastikan seseorang wajib atau tidak wajib zakat dalam kasus yang kompleks.
+- Mengubah atau memverifikasi transaksi.
+- Menampilkan data pribadi muzakki/mustahik.
+- Menggantikan keputusan panitia dan ustadz.
 
-Jika pertanyaan berkaitan dengan kondisi pribadi, hutang, emas perhiasan, ibu hamil/menyusui, usaha, atau kasus lain yang memerlukan pertimbangan fikih, Zakky akan memberi arahan awal dan menyarankan konsultasi kepada panitia atau ustadz.
+Kalau pertanyaan Anda menyangkut kondisi pribadi, hutang, emas perhiasan, ibu hamil/menyusui, usaha, atau hal lain yang butuh pertimbangan fikih, saya akan kasih arahan awal dulu, lalu sarankan konsultasi ke panitia atau ustadz.
 TEXT,
                 'source_label' => 'Panduan Publik Masjid An-Nur',
             ],
@@ -100,18 +100,11 @@ TEXT,
                     'rekening zakat',
                 ],
                 'answer' => <<<TEXT
-Silakan konsultasi atau konfirmasi ke panitia Masjid An-Nur jika pertanyaan berkaitan dengan layanan lokal dan teknis pembayaran.
+Untuk urusan layanan lokal dan teknis pembayaran, langsung saja hubungi panitia Masjid An-Nur - itu lebih cepat daripada tanya saya.
 
-Contohnya:
-1. Nomor rekening, QRIS, atau metode pembayaran resmi.
-2. Jadwal penerimaan zakat.
-3. Konfirmasi setelah transfer.
-4. Bukti pembayaran atau kuitansi.
-5. Pembayaran belum tercatat.
-6. Salah memilih jenis pembayaran.
-7. Informasi lokasi penerimaan zakat.
+Contohnya untuk hal-hal seperti: nomor rekening/QRIS resmi, jadwal penerimaan zakat, konfirmasi setelah transfer, bukti pembayaran atau kuitansi, pembayaran yang belum tercatat, salah pilih jenis pembayaran, atau info lokasi penerimaan zakat.
 
-Zakky dapat memberi panduan umum, tetapi konfirmasi akhir layanan Masjid An-Nur tetap melalui panitia.
+Saya bisa kasih panduan umum, tapi konfirmasi akhir untuk layanan Masjid An-Nur tetap lewat panitia.
 TEXT,
                 'source_label' => 'Panduan Publik Masjid An-Nur',
             ],
@@ -131,18 +124,11 @@ TEXT,
                     'menyusui',
                 ],
                 'answer' => <<<TEXT
-Silakan konsultasi kepada ustadz jika pertanyaan membutuhkan keputusan fikih yang bersifat pribadi atau kompleks.
+Kalau pertanyaan Anda butuh keputusan fikih yang sifatnya pribadi atau rumit, sebaiknya konsultasi langsung ke ustadz.
 
-Contohnya:
-1. Memiliki hutang besar atau cicilan jangka panjang.
-2. Penghasilan tidak tetap.
-3. Emas perhiasan yang dipakai sehari-hari.
-4. Ibu hamil atau menyusui yang tidak berpuasa.
-5. Utang puasa lama.
-6. Zakat usaha dengan aset, piutang, dan hutang usaha.
-7. Ragu apakah sudah wajib zakat atau belum.
+Contoh kasusnya: punya hutang besar atau cicilan jangka panjang, penghasilan tidak tetap, emas perhiasan yang dipakai sehari-hari, ibu hamil/menyusui yang tidak berpuasa, utang puasa lama, zakat usaha dengan aset-piutang-hutang, atau masih ragu apakah sudah wajib zakat.
 
-Zakky hanya memberi gambaran umum agar jamaah lebih siap saat berkonsultasi.
+Saya bisa kasih gambaran umum dulu supaya Anda lebih siap saat konsultasi nanti.
 TEXT,
                 'source_label' => 'Panduan Publik Masjid An-Nur',
             ],
@@ -157,13 +143,11 @@ TEXT,
                     'makna zakat',
                 ],
                 'answer' => <<<TEXT
-Zakat adalah harta tertentu yang wajib dikeluarkan oleh seorang muslim apabila telah memenuhi syarat tertentu, kemudian diberikan kepada golongan yang berhak menerimanya.
+Zakat adalah harta tertentu yang wajib dikeluarkan seorang muslim ketika sudah memenuhi syarat tertentu, lalu diberikan kepada golongan yang berhak menerimanya.
 
-Secara umum, zakat memiliki dua fungsi utama:
-1. Fungsi ibadah, yaitu bentuk ketaatan seorang muslim kepada Allah SWT.
-2. Fungsi sosial, yaitu membantu pemerataan kesejahteraan dan meringankan beban mustahik.
+Zakat punya dua fungsi sekaligus: sebagai ibadah (bentuk ketaatan kepada Allah SWT) dan sebagai fungsi sosial (membantu pemerataan kesejahteraan dan meringankan beban mustahik).
 
-Zakat berbeda dari infaq dan shodaqoh karena zakat memiliki ketentuan khusus, seperti jenis harta, nisab, kadar, waktu, dan golongan penerima.
+Bedanya dengan infaq dan shodaqoh, zakat punya ketentuan khusus - jenis harta, nisab, kadar, waktu, sampai golongan penerimanya sudah diatur, bukan sekadar sukarela.
 TEXT,
                 'source_label' => 'BAZNAS; UU No. 23 Tahun 2011',
             ],
@@ -180,14 +164,11 @@ TEXT,
                     'aturan zakat',
                 ],
                 'answer' => <<<TEXT
-Zakat memiliki dasar hukum dalam ajaran Islam dan regulasi pengelolaan zakat di Indonesia.
+Zakat punya dasar hukum dari ajaran Islam sekaligus regulasi pengelolaan zakat di Indonesia.
 
-Dasar penting:
-1. Al-Qur'an menjelaskan golongan penerima zakat, salah satunya pada QS. At-Taubah ayat 60.
-2. Pengelolaan zakat di Indonesia diatur dalam Undang-Undang Nomor 23 Tahun 2011 tentang Pengelolaan Zakat.
-3. Syarat dan tata cara penghitungan zakat mal serta zakat fitrah diatur dalam Peraturan Menteri Agama Nomor 52 Tahun 2014 beserta perubahannya.
+Al-Qur'an menjelaskan golongan penerima zakat, salah satunya di QS. At-Taubah ayat 60. Di Indonesia, pengelolaan zakat diatur dalam Undang-Undang Nomor 23 Tahun 2011, sementara syarat dan tata cara penghitungan zakat mal serta zakat fitrah diatur dalam Peraturan Menteri Agama Nomor 52 Tahun 2014 beserta perubahannya.
 
-Dalam konteks Masjid An-Nur, regulasi ini menjadi dasar bahwa pengelolaan zakat perlu dilakukan secara tertib, amanah, transparan, dan dapat dipertanggungjawabkan.
+Bagi Masjid An-Nur, regulasi ini jadi dasar supaya pengelolaan zakat berjalan tertib, amanah, transparan, dan bisa dipertanggungjawabkan.
 TEXT,
                 'source_label' => 'QS At-Taubah: 60; UU No. 23 Tahun 2011; PMA No. 52 Tahun 2014',
             ],
@@ -203,15 +184,11 @@ TEXT,
                     'zakat apa saja',
                 ],
                 'answer' => <<<TEXT
-Secara umum, zakat terbagi menjadi dua jenis utama:
+Zakat itu ada dua jenis utama: zakat fitrah dan zakat mal.
 
-1. Zakat Fitrah
-Zakat yang wajib dibayarkan oleh setiap muslim menjelang Idulfitri. Zakat ini berkaitan dengan jiwa dan biasanya dihitung per orang.
+Zakat fitrah wajib dibayarkan setiap muslim menjelang Idulfitri, berkaitan dengan jiwa, dan dihitung per orang. Zakat mal adalah zakat atas harta - berlaku kalau sudah mencapai nisab dan memenuhi ketentuan sesuai jenis hartanya, misalnya penghasilan, emas, perak, tabungan, atau perdagangan.
 
-2. Zakat Mal
-Zakat atas harta yang dimiliki seseorang apabila telah memenuhi syarat tertentu, seperti mencapai nisab dan memenuhi ketentuan sesuai jenis hartanya. Zakat mal dapat mencakup zakat penghasilan, emas, perak, tabungan, perdagangan, dan jenis harta lainnya.
-
-Jika ingin memberi secara sukarela di luar kewajiban zakat, maka masuk ke kategori infaq atau shodaqoh.
+Kalau Anda ingin memberi secara sukarela di luar kewajiban ini, itu masuk kategori infaq atau shodaqoh, bukan zakat.
 TEXT,
                 'source_label' => 'BAZNAS',
             ],
@@ -233,21 +210,15 @@ TEXT,
                     'kalkulator fitrah',
                 ],
                 'answer' => <<<TEXT
-Zakat fitrah adalah zakat yang wajib ditunaikan oleh setiap muslim menjelang Idulfitri. Zakat ini dibayarkan per jiwa, baik untuk diri sendiri maupun anggota keluarga yang menjadi tanggungan.
+Zakat fitrah wajib ditunaikan setiap muslim menjelang Idulfitri, dibayar per jiwa - baik untuk diri sendiri maupun keluarga yang jadi tanggungan.
 
-Acuan umum BAZNAS menyebutkan zakat fitrah dapat ditunaikan dalam bentuk beras/makanan pokok 2,5 kg atau 3,5 liter per jiwa. Jika dibayarkan dalam bentuk uang, nominalnya dapat menyesuaikan harga beras/makanan pokok dan ketentuan lembaga atau wilayah setempat.
+Untuk layanan Masjid An-Nur saat ini:
+- Uang: **Rp {$zakatFitrahUangFmt} per jiwa**.
+- Beras: **{$zakatFitrahBerasKg} kg per jiwa**.
 
-Untuk layanan zakat Masjid An-Nur saat ini:
-1. Uang: Rp {$zakatFitrahUangFmt} per jiwa.
-2. Beras: {$zakatFitrahBerasKg} kg per jiwa.
+Tinggal kalikan dengan jumlah jiwa. Contoh untuk 4 jiwa: uangnya 4 x Rp {$zakatFitrahUangFmt} = **Rp 200.000**, berasnya 4 x {$zakatFitrahBerasKg} kg = **10 kg**.
 
-Rumus: jumlah jiwa x nominal per jiwa.
-
-Contoh untuk 4 jiwa:
-1. Uang: 4 x Rp {$zakatFitrahUangFmt} = Rp 200.000.
-2. Beras: 4 x {$zakatFitrahBerasKg} kg = 10 kg.
-
-Nominal dapat diperbarui sesuai periode zakat dan informasi resmi panitia.
+Sebagai catatan, acuan umum BAZNAS sendiri menyebut beras/makanan pokok 2,5 kg atau 3,5 liter per jiwa - kalau dibayar uang, nominalnya menyesuaikan harga setempat. Nominal di atas berlaku untuk periode zakat berjalan dan bisa diperbarui sesuai informasi resmi panitia.
 TEXT,
                 'source_label' => 'BAZNAS; Panduan Publik Masjid An-Nur',
             ],
@@ -266,18 +237,11 @@ TEXT,
                     'haul',
                 ],
                 'answer' => <<<TEXT
-Zakat mal adalah zakat atas harta yang wajib dikeluarkan apabila telah memenuhi syarat tertentu, seperti kepemilikan penuh, mencapai nisab, dan memenuhi ketentuan haul sesuai jenis hartanya.
+Zakat mal adalah zakat atas harta - wajib dikeluarkan kalau harta itu dimiliki penuh, sudah mencapai nisab, dan memenuhi ketentuan haul sesuai jenisnya.
 
-Contoh harta yang dapat termasuk zakat mal:
-1. Penghasilan.
-2. Emas dan perak.
-3. Tabungan atau simpanan.
-4. Aset perdagangan atau usaha.
-5. Harta lain yang memenuhi ketentuan zakat.
+Contoh harta yang bisa masuk zakat mal: penghasilan, emas dan perak, tabungan/simpanan, aset perdagangan atau usaha, sampai harta lain yang memenuhi ketentuan. Kadarnya umumnya 2,5%, tapi cara menghitungnya bisa berbeda tergantung jenis harta dan kondisi masing-masing.
 
-Kadar zakat mal umumnya 2,5%, tetapi cara menghitungnya dapat berbeda sesuai jenis harta dan kondisi pribadi.
-
-Untuk pembayaran di Masjid An-Nur, zakat penghasilan, zakat emas, zakat tabungan, dan zakat usaha dapat dicatat dalam kategori Zakat Mal.
+Di layanan Masjid An-Nur, zakat penghasilan, emas, tabungan, dan usaha semuanya dicatat dalam kategori Zakat Mal.
 TEXT,
                 'source_label' => 'BAZNAS; PMA No. 52 Tahun 2014',
             ],
@@ -299,20 +263,16 @@ TEXT,
                     'nishab',
                 ],
                 'answer' => <<<TEXT
-Nisab dan haul adalah dua syarat utama yang menentukan apakah suatu harta sudah wajib dizakati.
+Nisab dan haul adalah dua syarat utama yang menentukan apakah harta sudah wajib dizakati.
 
-1. Nisab
-Nisab adalah batas minimal nilai harta yang membuatnya wajib dizakati. Kalau harta belum mencapai nisab, belum wajib zakat. Setiap jenis harta punya acuan nisab berbeda - misalnya emas 85 gram, pertanian sekitar 653 kg gabah, atau ternak kambing mulai 40 ekor.
+Nisab adalah batas minimal nilai harta - kalau belum mencapai itu, belum wajib zakat. Setiap jenis harta punya acuan berbeda, misalnya emas 85 gram, pertanian sekitar 653 kg gabah, atau ternak kambing mulai 40 ekor. Haul adalah syarat kepemilikan genap 1 tahun (kalender Hijriyah) untuk harta seperti tabungan, emas, atau aset usaha - zakat baru dikeluarkan setelah harta dimiliki genap 1 tahun dan tetap di atas nisab.
 
-2. Haul
-Haul adalah syarat kepemilikan genap 1 tahun (menurut kalender Hijriyah/Qomariyah) untuk harta seperti tabungan, emas, atau aset usaha. Zakat baru dikeluarkan setelah harta itu dimiliki genap 1 tahun dan tetap berada di atas nisab.
+Ada pengecualian yang perlu diingat:
+- Zakat penghasilan dihitung tiap kali menerima penghasilan di atas nisab, tanpa menunggu haul.
+- Zakat pertanian juga tanpa haul - dikeluarkan tiap panen.
+- Zakat fitrah malah tidak pakai nisab maupun haul sama sekali.
 
-Perlu diperhatikan:
-1. Zakat penghasilan/profesi umumnya dihitung tiap kali menerima penghasilan yang sudah di atas nisab, tanpa menunggu haul 1 tahun.
-2. Zakat pertanian juga tidak memakai syarat haul - dikeluarkan setiap kali panen.
-3. Zakat fitrah tidak memakai nisab maupun haul - wajib bagi setiap muslim yang mampu menjelang Idulfitri.
-
-Karena acuan nisab bisa berubah mengikuti harga emas/bahan pokok terkini, sebaiknya nominal pastinya dikonfirmasi ke panitia saat mendekati waktu perhitungan zakat.
+Karena acuan nisab mengikuti harga emas/bahan pokok terkini, sebaiknya nominal pastinya dikonfirmasi ke panitia saat mendekati waktu perhitungan zakat.
 TEXT,
                 'source_label' => 'BAZNAS; PMA No. 52 Tahun 2014',
             ],
@@ -330,16 +290,16 @@ TEXT,
                     'kenapa hasilnya segini',
                 ],
                 'answer' => <<<TEXT
-Zakky menggunakan pendekatan kehati-hatian dalam memberi estimasi zakat.
+Kalau Anda penasaran kenapa hasil hitungan saya begitu, ini prinsip yang saya pakai: kehati-hatian di atas segalanya.
 
-Prinsip yang digunakan:
-1. Zakat penghasilan dihitung dari arus pendapatan yang diterima, terpisah dari tabungan.
-2. Zakat tabungan dan emas dihitung dari harta yang tersimpan dan dimiliki saat ini.
-3. Penghasilan tahunan tidak dijumlahkan mentah dengan saldo tabungan sebagai satu basis - karena saldo tabungan biasanya sudah mencerminkan hasil penghasilan yang diterima dan dibelanjakan sepanjang tahun, menjumlahkan keduanya akan menghitung penghasilan yang sama dua kali.
-4. Harta yang belum dimiliki penuh, dana titipan, atau harta yang bercampur dengan usaha perlu dipisahkan sebelum dihitung.
-5. Untuk kasus yang memiliki perbedaan pendapat ulama, Zakky hanya memberi arah awal, bukan keputusan final.
+Prinsip yang saya pakai:
+- Zakat penghasilan dihitung dari arus pendapatan yang diterima, terpisah dari tabungan.
+- Zakat tabungan dan emas dihitung dari harta yang tersimpan saat ini.
+- Penghasilan tahunan tidak dijumlahkan mentah-mentah dengan saldo tabungan - karena saldo tabungan biasanya sudah mencerminkan hasil penghasilan yang diterima dan dibelanjakan sepanjang tahun, jadi kalau digabung, penghasilan yang sama malah terhitung dua kali.
+- Harta yang belum dimiliki penuh, dana titipan, atau harta campur usaha perlu dipisahkan dulu sebelum dihitung.
+- Untuk kasus yang punya perbedaan pendapat ulama, saya cuma kasih arah awal - bukan keputusan final.
 
-Dalam praktiknya, sebagian lembaga menghitung zakat penghasilan dari penghasilan bruto, sementara sebagian lain mempertimbangkan penghasilan bersih setelah kebutuhan pokok. Untuk memastikan pendekatan yang dipakai layanan Masjid An-Nur, jamaah dapat mengonfirmasi kepada panitia atau ustadz.
+Perlu diketahui juga, sebagian lembaga menghitung zakat penghasilan dari bruto, sebagian lain dari bersih setelah kebutuhan pokok. Untuk pendekatan yang dipakai Masjid An-Nur, silakan konfirmasi ke panitia atau ustadz.
 TEXT,
                 'source_label' => 'BAZNAS; Panduan Publik Masjid An-Nur',
             ],
@@ -364,23 +324,15 @@ TEXT,
                     'pendapatan naik turun',
                 ],
                 'answer' => <<<TEXT
-Zakat penghasilan adalah zakat atas pendapatan halal dari pekerjaan - gaji, honor, upah, jasa, bonus, THR, atau pendapatan profesi lainnya.
+Zakat penghasilan adalah zakat atas pendapatan halal dari pekerjaan - gaji, honor, upah, jasa, bonus, THR, atau pendapatan profesi lainnya. Kadarnya **2,5%** dari penghasilan yang sudah mencapai nisab.
 
-Acuan zakat penghasilan (nisab setara 85 gram emas, mengikuti harga emas yang berlaku saat ini):
-1. Nisab tahunan: Rp {$nishabRupiahFmt}.
-2. Nisab bulanan: sekitar Rp {$nishabBulananFmt}.
-3. Kadar zakat: 2,5%.
-
-Rumus: 2,5% x penghasilan yang telah mencapai nisab.
-
-Contoh: penghasilan bulanan Rp 10.000.000 sudah di atas nisab bulanan:
-2,5% x Rp 10.000.000 = Rp 250.000.
+Nisabnya setara 85 gram emas, mengikuti harga emas saat ini: sekitar **Rp {$nishabRupiahFmt} per tahun**, atau sekitar **Rp {$nishabBulananFmt} per bulan**. Contohnya, kalau penghasilan bulanan Rp 10.000.000 (sudah di atas nisab bulanan), zakatnya 2,5% x Rp 10.000.000 = **Rp 250.000**.
 
 Dua kondisi yang sering ditanyakan:
-1. Penghasilan tidak tetap (freelance): hitung total penghasilan dalam satu periode, bandingkan dengan nisab - bisa dihitung saat mencapai nisab atau secara tahunan.
-2. Bonus/THR: dihitung sebagai bagian dari penghasilan pada bulan diterimanya, ikut kena zakat 2,5% jika total penghasilan bulan itu sudah di atas nisab.
+- Penghasilan tidak tetap (freelance): hitung total penghasilan dalam satu periode lalu bandingkan dengan nisab - bisa dihitung saat mencapai nisab atau secara tahunan.
+- Bonus/THR: dihitung sebagai bagian penghasilan bulan diterimanya, ikut kena zakat kalau total penghasilan bulan itu sudah di atas nisab.
 
-Ini estimasi sederhana. Jika ada hutang, cicilan, atau tanggungan keluarga yang memengaruhi perhitungan, siapkan rincian tersebut agar panitia atau ustadz dapat membantu memastikan hasil akhirnya.
+Ini estimasi sederhana. Kalau ada hutang, cicilan, atau tanggungan keluarga yang memengaruhi perhitungan, siapkan rinciannya supaya panitia atau ustadz bisa bantu memastikan hasil akhirnya.
 TEXT,
                 'source_label' => 'BAZNAS - Zakat Penghasilan',
             ],
@@ -403,18 +355,11 @@ TEXT,
                     'apakah perhiasan wajib zakat',
                 ],
                 'answer' => <<<TEXT
-Zakat emas dan perak termasuk bagian dari zakat mal.
+Zakat emas dan perak termasuk bagian dari zakat mal. Nisab emas **85 gram**, nisab perak **595 gram**, kadarnya **2,5%**.
 
-Acuan umum:
-1. Nisab emas: 85 gram.
-2. Nisab perak: 595 gram.
-3. Kadar zakat: 2,5%.
+Rumusnya: 2,5% x nilai emas/perak yang memenuhi syarat (nilai rupiahnya mengikuti harga saat zakat dihitung). Contoh: emas simpanan 100 gram yang sudah memenuhi syarat, zakatnya 2,5% dari nilai 100 gram emas tersebut.
 
-Rumus: 2,5% x nilai emas/perak yang memenuhi syarat (nilai rupiah mengikuti harga emas/perak saat zakat dihitung).
-
-Contoh: emas simpanan 100 gram yang sudah memenuhi syarat - zakatnya 2,5% dari nilai 100 gram emas tersebut.
-
-Untuk emas perhiasan yang dipakai sehari-hari (bukan simpanan/investasi), terdapat perbedaan pendapat ulama - sebagian mewajibkan, sebagian tidak selama pemakaiannya wajar. Zakky dapat memberi arah awal untuk kasus ini. Jika jumlah emas cukup besar atau ragu apakah wajib dizakati, sebaiknya detailnya dikonfirmasi kepada ustadz atau panitia.
+Untuk emas perhiasan yang dipakai sehari-hari (bukan simpanan/investasi), ada perbedaan pendapat ulama - sebagian mewajibkan, sebagian tidak selama pemakaiannya wajar. Saya bisa kasih arah awal untuk kasus ini, tapi kalau jumlahnya cukup besar atau Anda masih ragu, sebaiknya konfirmasi ke ustadz atau panitia.
 TEXT,
                 'source_label' => 'BAZNAS - Zakat Emas dan Perak',
             ],
@@ -434,14 +379,11 @@ TEXT,
                     'tabungan naik turun',
                 ],
                 'answer' => <<<TEXT
-Zakat tabungan adalah zakat atas uang simpanan yang telah memenuhi ketentuan zakat mal, terutama jika dimiliki penuh, berasal dari sumber halal, mencapai nisab, dan memenuhi ketentuan haul (disimpan genap 1 tahun).
+Zakat tabungan adalah zakat atas uang simpanan yang sudah memenuhi ketentuan zakat mal - dimiliki penuh, dari sumber halal, mencapai nisab, dan sudah disimpan genap 1 tahun (haul).
 
-Panduan umum:
-1. Hitung saldo tabungan/simpanan milik sendiri, bukan dana titipan orang lain.
-2. Bandingkan dengan nisab zakat mal.
-3. Jika memenuhi syarat, zakatnya 2,5% x saldo.
+Caranya: hitung saldo milik sendiri (bukan dana titipan orang lain), bandingkan dengan nisab zakat mal, lalu kalau memenuhi syarat, zakatnya 2,5% x saldo.
 
-Jika saldo naik turun sepanjang tahun, perhatikan apakah simpanan tersebut tetap memenuhi nisab dan haul. Dalam praktik sederhana, saldo yang dihitung adalah saldo pada waktu perhitungan zakat - tetapi kalau saldo sempat turun jauh di bawah nisab di tengah tahun, sebagian pendapat menganggap haulnya perlu dihitung ulang dari saat saldo kembali mencapai nisab. Jika tabungan bercampur dana titipan, dana usaha, atau hutang, atau saldonya sempat turun jauh di bawah nisab, sebaiknya konsultasikan kepada panitia atau ustadz agar tidak salah hitung.
+Kalau saldo naik turun sepanjang tahun, yang jadi patokan biasanya saldo saat perhitungan zakat dilakukan. Tapi kalau saldo sempat turun jauh di bawah nisab di tengah tahun, sebagian pendapat menganggap haulnya perlu dihitung ulang dari saat saldo kembali mencapai nisab. Kalau tabungan Anda bercampur dana titipan, dana usaha, atau hutang, sebaiknya konsultasikan ke panitia atau ustadz supaya tidak salah hitung.
 TEXT,
                 'source_label' => 'Panduan Umum Zakat Mal; BAZNAS',
             ],
@@ -461,13 +403,11 @@ TEXT,
                     'usaha kecil',
                 ],
                 'answer' => <<<TEXT
-Zakat perdagangan atau usaha adalah zakat atas aset usaha yang memenuhi ketentuan zakat mal - berlaku untuk usaha besar maupun kecil seperti warung/toko.
+Zakat perdagangan atau usaha adalah zakat atas aset usaha yang memenuhi ketentuan zakat mal - berlaku untuk usaha besar maupun kecil seperti warung atau toko.
 
-Rumus: (kas usaha + nilai barang dagangan + piutang yang kemungkinan tertagih) − hutang usaha jatuh tempo = aset zakat.
+Rumusnya: (kas usaha + nilai barang dagangan + piutang yang kemungkinan tertagih) - hutang usaha jatuh tempo = aset zakat. Kalau aset zakat mencapai nisab dan memenuhi haul, zakatnya 2,5% x aset zakat.
 
-Jika aset zakat mencapai nisab dan memenuhi ketentuan haul, zakatnya 2,5% x aset zakat.
-
-Karena setiap usaha punya komposisi stok, modal, piutang, dan hutang yang berbeda, Zakky menyarankan konsultasi kepada panitia atau ustadz sebelum menentukan nominal final, agar tidak salah memasukkan komponen aset.
+Karena tiap usaha punya komposisi stok, modal, piutang, dan hutang yang berbeda, sebaiknya konsultasi dulu ke panitia atau ustadz sebelum menentukan nominal final, supaya tidak salah memasukkan komponen aset.
 TEXT,
                 'source_label' => 'Panduan Umum Zakat Mal; BAZNAS',
             ],
@@ -488,26 +428,17 @@ TEXT,
                     'kalkulator fidyah',
                 ],
                 'answer' => <<<TEXT
-Fidyah adalah pembayaran pengganti bagi orang yang tidak mampu menjalankan puasa Ramadan karena alasan tertentu dan tidak memungkinkan menggantinya dengan qadha sesuai ketentuan syariat.
-
-Panduan umum:
-1. Fidyah dihitung per hari puasa yang ditinggalkan.
-2. Dalam salah satu pendapat fikih, takaran fidyah adalah sekitar 0,75 kg beras/makanan pokok per hari.
-3. Jika dibayarkan dalam bentuk uang, nominalnya dapat menyesuaikan ketentuan lembaga atau wilayah setempat.
+Fidyah adalah pembayaran pengganti bagi orang yang tidak mampu berpuasa Ramadan karena alasan tertentu dan tidak memungkinkan diganti dengan qadha.
 
 Untuk layanan Masjid An-Nur saat ini:
-1. Uang: Rp {$fidyahUangFmt} per hari.
-2. Beras: {$fidyahBerasKg} kg per hari.
+- Uang: **Rp {$fidyahUangFmt} per hari**.
+- Beras: **{$fidyahBerasKg} kg per hari**.
 
-Rumus: jumlah hari yang ditinggalkan x nominal per hari.
+Tinggal kalikan dengan jumlah hari yang ditinggalkan. Contoh untuk 5 hari: uangnya 5 x Rp {$fidyahUangFmt} = **Rp 150.000**, berasnya 5 x {$fidyahBerasKg} kg = **3,75 kg**.
 
-Contoh untuk 5 hari:
-1. Uang: 5 x Rp {$fidyahUangFmt} = Rp 150.000.
-2. Beras: 5 x {$fidyahBerasKg} kg = 3,75 kg.
+Sebagai catatan, salah satu pendapat fikih menyebut takaran fidyah sekitar 0,75 kg beras/makanan pokok per hari - kalau dibayar uang, nominalnya menyesuaikan lembaga atau wilayah. Nominal dari lembaga zakat nasional bisa berbeda dari layanan lokal Masjid An-Nur; angka di atas khusus berlaku untuk layanan Masjid An-Nur.
 
-Catatan: nominal fidyah dari lembaga zakat nasional dapat berbeda dari layanan lokal Masjid An-Nur karena mengikuti kebijakan lembaga, harga makanan pokok setempat, dan bentuk penyalurannya. Nominal di atas berlaku untuk layanan Masjid An-Nur.
-
-Untuk ibu hamil, menyusui, sakit, atau utang puasa lama, ketentuannya dapat berbeda sesuai kondisi. Jamaah sebaiknya menyiapkan kronologi singkat agar panitia atau ustadz dapat membantu menentukan arahnya.
+Untuk kasus ibu hamil, menyusui, sakit, atau utang puasa lama, ketentuannya bisa beda-beda - siapkan kronologi singkat supaya panitia atau ustadz bisa bantu menentukan arahnya.
 TEXT,
                 'source_label' => 'BAZNAS; Panduan Publik Masjid An-Nur',
             ],
@@ -531,12 +462,9 @@ TEXT,
                 'answer' => <<<TEXT
 Infaq dan shodaqoh adalah pemberian sukarela di luar kewajiban zakat.
 
-Perbedaan umum:
-1. Zakat bersifat wajib jika memenuhi syarat, memiliki ketentuan nisab, kadar, dan penerima tertentu.
-2. Infaq dan shodaqoh bersifat sukarela, tidak memiliki nisab, dan dapat diberikan kapan saja.
-3. Shodaqoh memiliki makna lebih luas karena dapat berupa materi maupun non-materi.
+Bedanya dengan zakat: zakat bersifat wajib kalau memenuhi syarat, dan punya ketentuan nisab, kadar, serta penerima tertentu. Infaq dan shodaqoh sukarela, tidak ada nisab, dan bisa diberikan kapan saja - shodaqoh malah maknanya lebih luas karena bisa berupa materi maupun non-materi.
 
-Jika ingin memberi bantuan sukarela melalui Masjid An-Nur, jamaah dapat memilih kategori Infaq/Shodaqoh.
+Kalau Anda ingin memberi bantuan sukarela lewat Masjid An-Nur, pilih saja kategori Infaq/Shodaqoh.
 TEXT,
                 'source_label' => 'BAZNAS; Panduan Publik Masjid An-Nur',
             ],
@@ -557,19 +485,17 @@ TEXT,
                     'ibnu sabil',
                 ],
                 'answer' => <<<TEXT
-Mustahik adalah orang atau kelompok yang berhak menerima zakat.
+Mustahik adalah orang atau kelompok yang berhak menerima zakat. Ada delapan golongannya:
+- Fakir
+- Miskin
+- Amil
+- Mualaf
+- Riqab
+- Gharim
+- Fisabilillah
+- Ibnu sabil
 
-Delapan golongan penerima zakat:
-1. Fakir.
-2. Miskin.
-3. Amil.
-4. Mualaf.
-5. Riqab.
-6. Gharim.
-7. Fisabilillah.
-8. Ibnu sabil.
-
-Zakky hanya menjelaskan kategori umum. Penentuan seseorang sebagai mustahik tetap perlu proses verifikasi oleh panitia atau pihak yang berwenang.
+Saya hanya bisa jelaskan kategori umumnya - penentuan seseorang sebagai mustahik tetap perlu proses verifikasi oleh panitia atau pihak yang berwenang.
 TEXT,
                 'source_label' => 'QS At-Taubah: 60; BAZNAS',
             ],
@@ -584,15 +510,15 @@ TEXT,
                     'siapa muzakki',
                 ],
                 'answer' => <<<TEXT
-Muzakki adalah orang atau pihak yang menunaikan zakat karena telah memenuhi syarat wajib zakat.
+Muzakki adalah orang atau pihak yang menunaikan zakat karena sudah memenuhi syarat wajib zakat.
 
-Dalam layanan Masjid An-Nur, muzakki dapat berupa:
-1. Jamaah yang membayar zakat fitrah untuk diri sendiri.
-2. Kepala keluarga yang membayarkan zakat fitrah keluarganya.
-3. Jamaah yang membayar zakat mal.
-4. Jamaah yang menyalurkan fidyah, infaq, atau shodaqoh.
+Di layanan Masjid An-Nur, muzakki bisa berupa:
+- Jamaah yang bayar zakat fitrah untuk diri sendiri.
+- Kepala keluarga yang membayarkan zakat fitrah keluarganya.
+- Jamaah yang bayar zakat mal.
+- Jamaah yang menyalurkan fidyah, infaq, maupun shodaqoh.
 
-Data pribadi muzakki perlu dijaga dan tidak seluruhnya ditampilkan pada halaman publik.
+Data pribadi muzakki tetap dijaga dan tidak seluruhnya ditampilkan di halaman publik.
 TEXT,
                 'source_label' => 'BAZNAS; Panduan Publik Masjid An-Nur',
             ],
@@ -607,16 +533,16 @@ TEXT,
                     'petugas zakat',
                 ],
                 'answer' => <<<TEXT
-Amil zakat adalah pihak yang bertugas membantu pengelolaan zakat, mulai dari penerimaan, pencatatan, pendistribusian, hingga pelaporan.
+Amil zakat adalah pihak yang bertugas membantu pengelolaan zakat - mulai dari penerimaan, pencatatan, pendistribusian, sampai pelaporan.
 
-Dalam konteks layanan Masjid An-Nur, panitia zakat berperan membantu jamaah dalam:
-1. Menerima pembayaran zakat, fidyah, infaq, dan shodaqoh.
-2. Memberikan informasi teknis pembayaran.
-3. Memverifikasi data atau pembayaran jika diperlukan.
-4. Menyalurkan zakat kepada pihak yang berhak sesuai ketentuan.
-5. Menyediakan informasi ringkasan kepada jamaah.
+Di Masjid An-Nur, panitia zakat berperan:
+- Menerima pembayaran zakat/fidyah/infaq/shodaqoh.
+- Memberi informasi teknis pembayaran.
+- Memverifikasi data kalau diperlukan.
+- Menyalurkan zakat ke pihak yang berhak.
+- Menyediakan informasi ringkasan ke jamaah.
 
-Zakky hanya membantu informasi awal. Keputusan layanan tetap berada pada panitia.
+Saya cuma bantu informasi awal - keputusan layanan tetap ada di panitia.
 TEXT,
                 'source_label' => 'QS At-Taubah: 60; UU No. 23 Tahun 2011; Panduan Publik Masjid An-Nur',
             ],
@@ -633,14 +559,13 @@ TEXT,
                     'bayar apa',
                 ],
                 'answer' => <<<TEXT
-Jika masih bingung memilih jenis pembayaran, gunakan panduan berikut:
+Masih bingung mau bayar apa? Coba cek ini:
+- **Zakat Fitrah** - kalau mau bayar kewajiban menjelang Idulfitri untuk diri sendiri atau keluarga.
+- **Fidyah** - kalau mau mengganti puasa Ramadan yang tidak bisa diqadha.
+- **Zakat Mal** - kalau mau bayar zakat atas harta/penghasilan/emas/tabungan/usaha yang sudah memenuhi syarat.
+- **Infaq/Shodaqoh** - kalau mau memberi bantuan sukarela di luar kewajiban zakat.
 
-1. Pilih Zakat Fitrah jika ingin membayar kewajiban zakat menjelang Idulfitri untuk diri sendiri atau anggota keluarga.
-2. Pilih Fidyah jika ingin mengganti puasa Ramadan yang tidak dapat diganti dengan qadha karena alasan tertentu.
-3. Pilih Zakat Mal jika ingin membayar zakat atas harta, penghasilan, emas, tabungan, usaha, atau aset lain yang sudah memenuhi syarat.
-4. Pilih Infaq/Shodaqoh jika ingin memberi bantuan sukarela di luar kewajiban zakat.
-
-Jika kondisi pribadi cukup khusus, seperti memiliki hutang, penghasilan tidak tetap, emas perhiasan, atau ragu sudah wajib zakat atau belum, gunakan jawaban Zakky sebagai arah awal lalu konfirmasi detailnya kepada panitia atau ustadz.
+Kalau kondisi Anda cukup khusus - punya hutang, penghasilan tidak tetap, emas perhiasan, atau masih ragu apakah sudah wajib zakat - anggap jawaban saya sebagai arah awal, lalu konfirmasi detailnya ke panitia atau ustadz.
 TEXT,
                 'source_label' => 'BAZNAS; Panduan Publik Masjid An-Nur',
             ],
@@ -656,15 +581,9 @@ TEXT,
                     'tanggungan zakat',
                 ],
                 'answer' => <<<TEXT
-Zakat fitrah wajib ditunaikan oleh setiap muslim yang memenuhi ketentuan. Dalam praktik keluarga, zakat fitrah biasanya dibayarkan oleh kepala keluarga untuk dirinya dan anggota keluarga yang menjadi tanggungannya.
+Zakat fitrah wajib bagi setiap muslim yang memenuhi ketentuan. Biasanya, kepala keluarga yang membayarkannya untuk dirinya dan anggota keluarga yang jadi tanggungannya - yaitu diri sendiri, istri/suami, anak, dan anggota keluarga lain dalam tanggungan.
 
-Yang biasanya dibayarkan:
-1. Diri sendiri.
-2. Istri atau suami yang menjadi tanggungan.
-3. Anak.
-4. Anggota keluarga lain yang berada dalam tanggungan.
-
-Jika ada kondisi khusus, seperti bayi baru lahir, anggota keluarga yang sudah mandiri, atau keluarga berbeda tempat tinggal, siapkan daftar anggota keluarga agar panitia atau ustadz dapat membantu memastikan siapa saja yang perlu dihitung.
+Kalau ada kondisi khusus seperti bayi baru lahir, anggota keluarga yang sudah mandiri, atau keluarga beda tempat tinggal, siapkan daftar anggota keluarga supaya panitia atau ustadz bisa bantu memastikan siapa saja yang perlu dihitung.
 TEXT,
                 'source_label' => 'BAZNAS; Panduan Publik Masjid An-Nur',
             ],
@@ -679,14 +598,9 @@ TEXT,
                     'telat zakat fitrah',
                 ],
                 'answer' => <<<TEXT
-Zakat fitrah ditunaikan pada bulan Ramadan hingga sebelum pelaksanaan salat Idulfitri.
+Zakat fitrah ditunaikan di bulan Ramadan sampai sebelum salat Idulfitri dilaksanakan - jadi sebaiknya jangan mepet.
 
-Panduan umum:
-1. Sebaiknya dibayarkan sebelum salat Idulfitri.
-2. Panitia biasanya membuka penerimaan zakat pada periode tertentu menjelang Idulfitri.
-3. Jika khawatir terlambat, segera konfirmasi jadwal penerimaan kepada panitia.
-
-Untuk jadwal layanan Masjid An-Nur, ikuti informasi resmi yang diumumkan oleh panitia.
+Panitia biasanya membuka penerimaan pada periode tertentu menjelang Idulfitri. Kalau khawatir kelewatan, segera konfirmasi jadwal penerimaan ke panitia dan ikuti informasi resmi yang diumumkan Masjid An-Nur.
 TEXT,
                 'source_label' => 'BAZNAS; Panduan Publik Masjid An-Nur',
             ],
@@ -703,14 +617,11 @@ TEXT,
                     'menyusui fidyah',
                 ],
                 'answer' => <<<TEXT
-Fidyah berkaitan dengan kondisi seseorang yang tidak mampu menjalankan puasa Ramadan dan tidak memungkinkan menggantinya dengan qadha sesuai ketentuan syariat.
+Fidyah berlaku untuk orang yang tidak mampu berpuasa Ramadan dan tidak memungkinkan mengganti dengan qadha.
 
-Contoh kondisi yang sering ditanyakan:
-1. Lansia yang tidak kuat berpuasa.
-2. Orang sakit menahun yang tidak memungkinkan qadha.
-3. Kondisi tertentu seperti ibu hamil atau menyusui, yang memerlukan penjelasan lebih hati-hati karena terdapat perbedaan pendapat ulama.
+Kasus yang sering ditanyakan: lansia yang tidak kuat berpuasa, orang sakit menahun yang tidak memungkinkan qadha, atau kondisi seperti ibu hamil/menyusui yang perlu penjelasan lebih hati-hati karena ada perbedaan pendapat ulama.
 
-Untuk kasus sederhana seperti lansia atau sakit menahun, fidyah dapat menjadi pilihan. Untuk ibu hamil, menyusui, atau utang puasa lama, bawalah ringkasan kondisinya saat bertanya kepada ustadz atau panitia.
+Untuk kasus sederhana seperti lansia atau sakit menahun, fidyah bisa jadi pilihan langsung. Untuk ibu hamil, menyusui, atau utang puasa lama, bawa ringkasan kondisinya saat bertanya ke ustadz atau panitia.
 TEXT,
                 'source_label' => 'BAZNAS; Panduan Publik Masjid An-Nur',
             ],
@@ -733,16 +644,15 @@ TEXT,
                     'bilyet giro',
                 ],
                 'answer' => <<<TEXT
-Untuk membayar zakat di Masjid An-Nur, jamaah dapat mengikuti informasi resmi yang disediakan oleh panitia.
+Alurnya simpel:
+- Tentukan dulu jenis pembayarannya (Zakat Fitrah, Fidyah, Zakat Mal, atau Infaq/Shodaqoh).
+- Siapkan nama pembayar dan jumlah jiwa/nominal.
+- Bayar lewat metode yang tersedia - tunai di lokasi, transfer bank, QRIS, atau cek kalau diterima panitia.
+- Simpan bukti pembayarannya.
 
-Panduan umum:
-1. Tentukan jenis pembayaran: Zakat Fitrah, Fidyah, Zakat Mal, atau Infaq/Shodaqoh.
-2. Siapkan nama pembayar, jumlah jiwa atau nominal, dan keterangan jika diperlukan.
-3. Bayar lewat metode yang tersedia: tunai di lokasi, transfer bank, QRIS, atau cek (jika diterima panitia).
-4. Simpan bukti pembayaran.
-5. Jika membayar non-tunai (termasuk cek), lakukan konfirmasi sesuai arahan panitia - untuk cek, status pembayaran dapat menunggu proses pencairan.
+Kalau bayar non-tunai (termasuk cek), lakukan konfirmasi sesuai arahan panitia - khusus cek, statusnya bisa menunggu proses pencairan dulu.
 
-Zakky hanya mengarahkan alur pembayaran. Pastikan nomor rekening, QRIS, atau metode pembayaran yang dipakai berasal dari informasi resmi panitia Masjid An-Nur.
+Saya cuma bisa mengarahkan alurnya. Pastikan nomor rekening, QRIS, atau metode pembayaran yang Anda pakai memang berasal dari informasi resmi panitia Masjid An-Nur.
 TEXT,
                 'source_label' => 'Panduan Publik Masjid An-Nur',
             ],
@@ -767,22 +677,15 @@ TEXT,
                     'transfer belum masuk',
                 ],
                 'answer' => <<<TEXT
-Jika sudah membayar dan ingin memastikan statusnya, atau sudah transfer tapi belum tercatat, berikut langkah dan data yang perlu disiapkan.
+Sudah transfer tapi belum yakin statusnya? Siapkan ini untuk konfirmasi ke panitia:
+- Nama pembayar.
+- Jenis pembayaran.
+- Nominal dan waktu pembayaran.
+- Bukti transfer/QRIS (atau kuitansi kalau bayar tunai).
 
-Siapkan untuk konfirmasi ke panitia:
-1. Nama pembayar.
-2. Jenis pembayaran.
-3. Nominal.
-4. Waktu pembayaran.
-5. Bukti transfer/QRIS (jika non-tunai) atau kuitansi (jika tunai).
+Kalau pembayaran belum muncul di ringkasan publik, ada beberapa kemungkinan: datanya belum diverifikasi/dicocokkan panitia, bukti pembayaran belum diterima, dashboard belum memperbarui data terbaru, atau pembayarannya tercatat di kategori lain.
 
-Jika pembayaran belum muncul di ringkasan publik, beberapa kemungkinan:
-1. Data belum diverifikasi/dicocokkan panitia.
-2. Bukti pembayaran belum diterima.
-3. Dashboard publik belum memperbarui data terbaru.
-4. Pembayaran tercatat di kategori lain.
-
-Zakky tidak dapat memverifikasi atau menerbitkan bukti pembayaran final. Validasi dan bukti resmi tetap mengikuti data dan konfirmasi panitia Masjid An-Nur.
+Saya tidak bisa memverifikasi atau menerbitkan bukti pembayaran final - validasi dan bukti resmi tetap mengikuti data dan konfirmasi panitia Masjid An-Nur.
 TEXT,
                 'source_label' => 'Panduan Publik Masjid An-Nur',
             ],
@@ -798,14 +701,11 @@ TEXT,
                     'batas waktu zakat',
                 ],
                 'answer' => <<<TEXT
-Jadwal penerimaan zakat Masjid An-Nur mengikuti informasi resmi yang diumumkan oleh panitia pada periode berjalan.
+Jadwal penerimaan zakat Masjid An-Nur mengikuti informasi resmi yang diumumkan panitia pada periode berjalan.
 
-Panduan umum:
-1. Zakat fitrah biasanya diterima pada bulan Ramadan hingga sebelum salat Idulfitri.
-2. Zakat mal, infaq, dan shodaqoh dapat mengikuti layanan yang tersedia.
-3. Fidyah dapat dibayarkan sesuai jumlah hari puasa yang ditinggalkan dan arahan panitia.
+Secara umum, zakat fitrah diterima di bulan Ramadan sampai sebelum salat Idulfitri, zakat mal/infaq/shodaqoh mengikuti layanan yang tersedia, dan fidyah dibayarkan sesuai jumlah hari puasa yang ditinggalkan.
 
-Jika jadwal belum terlihat di portal, silakan konfirmasi langsung kepada panitia Masjid An-Nur.
+Kalau jadwalnya belum terlihat di portal, langsung saja konfirmasi ke panitia Masjid An-Nur.
 TEXT,
                 'source_label' => 'Panduan Publik Masjid An-Nur; BAZNAS',
             ],
@@ -834,15 +734,15 @@ TEXT,
                 'answer' => <<<TEXT
 Dashboard publik menampilkan ringkasan pengelolaan zakat secara transparan, tanpa membuka seluruh data pribadi muzakki atau mustahik.
 
-Informasi yang dapat ditampilkan:
-1. Total penerimaan uang dan beras.
-2. Total jiwa untuk zakat fitrah jika tersedia.
-3. Rincian berdasarkan kategori: Zakat Fitrah, Fidyah, Zakat Mal, dan Infaq/Shodaqoh.
-4. Grafik penerimaan harian.
-5. Riwayat transaksi terbaru dalam bentuk terbatas.
-6. Informasi umum terkait periode zakat.
+Yang ditampilkan:
+- Total penerimaan uang dan beras.
+- Total jiwa untuk zakat fitrah.
+- Rincian per kategori (Zakat Fitrah, Fidyah, Zakat Mal, Infaq/Shodaqoh).
+- Grafik penerimaan harian.
+- Riwayat transaksi terbaru dalam bentuk terbatas.
+- Informasi umum periode zakat.
 
-Dashboard publik membantu jamaah melihat perkembangan penerimaan tanpa menunggu rekap manual, sekaligus jadi bentuk pertanggungjawaban pengelolaan zakat kepada jamaah. Transparansi di sini bukan berarti semua data pribadi dibuka - tujuannya keterbukaan informasi tetap berjalan tanpa mengabaikan privasi muzakki dan mustahik.
+Dengan begini, jamaah bisa lihat perkembangan penerimaan tanpa perlu menunggu rekap manual, sekaligus jadi bentuk pertanggungjawaban pengelolaan zakat. Tapi transparansi di sini bukan berarti semua data pribadi dibuka - keterbukaan tetap berjalan tanpa mengabaikan privasi muzakki dan mustahik.
 TEXT,
                 'source_label' => 'Panduan Publik Masjid An-Nur; Prinsip Transparansi dan Privasi Data; UU No. 23 Tahun 2011',
             ],
@@ -858,15 +758,9 @@ TEXT,
                     'laporan grafik',
                 ],
                 'answer' => <<<TEXT
-Grafik penerimaan harian membantu jamaah melihat pola penerimaan zakat dari hari ke hari.
+Grafik penerimaan harian membantu Anda melihat pola penerimaan zakat dari hari ke hari - hari mana yang penerimaannya tinggi, bagaimana perkembangannya selama periode aktif, dan trennya secara visual.
 
-Grafik ini dapat digunakan untuk:
-1. Melihat hari dengan penerimaan tinggi.
-2. Memahami perkembangan penerimaan selama periode aktif.
-3. Membaca tren penerimaan secara visual.
-4. Melengkapi informasi pada ringkasan penerimaan.
-
-Jika angka grafik berbeda dari ekspektasi, kemungkinan data masih dalam proses pembaruan atau hanya menampilkan transaksi yang sudah tercatat.
+Kalau angkanya terlihat beda dari ekspektasi, kemungkinan datanya masih dalam proses pembaruan atau hanya menampilkan transaksi yang sudah tercatat.
 TEXT,
                 'source_label' => 'Panduan Portal Zakat Masjid An-Nur',
             ],
@@ -883,21 +777,17 @@ TEXT,
                     'anonim',
                 ],
                 'answer' => <<<TEXT
-Data pribadi muzakki dan mustahik perlu dijaga. Karena itu, halaman publik sebaiknya menampilkan data ringkasan, bukan seluruh identitas pribadi.
+Data pribadi muzakki dan mustahik perlu dijaga, jadi halaman publik hanya menampilkan data ringkasan - bukan seluruh identitas pribadi.
 
-Yang dapat ditampilkan di publik:
-1. Total penerimaan.
-2. Ringkasan per kategori.
-3. Grafik penerimaan.
-4. Informasi transaksi terbaru secara terbatas jika diperlukan.
+Yang tampil di publik:
+- Total penerimaan.
+- Ringkasan per kategori.
+- Grafik penerimaan.
+- Info transaksi terbaru secara terbatas, kalau diperlukan.
 
-Yang tidak perlu ditampilkan secara terbuka:
-1. Data lengkap muzakki.
-2. Data lengkap mustahik.
-3. Informasi kontak pribadi.
-4. Detail sensitif pembayaran.
+Yang tidak ditampilkan: data lengkap muzakki/mustahik, kontak pribadi, dan detail sensitif pembayaran.
 
-Tujuannya agar transparansi tetap berjalan tanpa mengabaikan privasi jamaah.
+Tujuannya supaya transparansi tetap jalan tanpa mengorbankan privasi jamaah.
 TEXT,
                 'source_label' => 'Panduan Publik Masjid An-Nur; Prinsip Perlindungan Data',
             ],
@@ -915,14 +805,11 @@ TEXT,
                     'wajib zakat kalau punya hutang',
                 ],
                 'answer' => <<<TEXT
-Hutang atau cicilan dapat memengaruhi perhitungan zakat, terutama jika hutang tersebut merupakan kewajiban yang harus segera dibayar dan berkaitan dengan kebutuhan pokok.
+Punya hutang atau cicilan memang bisa memengaruhi perhitungan zakat, terutama kalau itu kewajiban yang harus segera dibayar dan menyangkut kebutuhan pokok.
 
-Panduan umum:
-1. Jika setelah kebutuhan pokok dan kewajiban utama masih ada harta atau penghasilan yang mencapai nisab, zakat tetap perlu diperhatikan.
-2. Jika hutang jatuh tempo membuat harta tidak lagi mencapai nisab, maka kondisi tersebut perlu dihitung lebih hati-hati.
-3. Untuk zakat penghasilan, cara menghitung bisa berbeda tergantung panduan ulama atau lembaga zakat yang diikuti.
+Kalau setelah kebutuhan pokok dan kewajiban utama masih ada harta/penghasilan yang mencapai nisab, zakat tetap perlu diperhatikan. Tapi kalau hutang jatuh tempo membuat harta tidak lagi mencapai nisab, kondisinya perlu dihitung lebih hati-hati - dan untuk zakat penghasilan, caranya bisa beda tergantung panduan ulama atau lembaga yang diikuti.
 
-Karena kondisi hutang setiap orang berbeda, Zakky dapat memberi arah awal dari data yang tersedia. Agar hasilnya lebih tepat, jamaah dapat mengonfirmasi detailnya kepada panitia atau ustadz dengan membawa informasi penghasilan, hutang, kebutuhan pokok, dan jumlah tanggungan.
+Karena kondisi tiap orang beda, saya cuma bisa kasih arah awal. Untuk hasil yang lebih tepat, bawa informasi penghasilan, hutang, kebutuhan pokok, dan jumlah tanggungan saat konsultasi ke panitia atau ustadz.
 TEXT,
                 'source_label' => 'Panduan Umum Zakat Mal; Panduan Publik Masjid An-Nur',
             ],
@@ -937,18 +824,11 @@ TEXT,
                     'orang tua bayar fidyah',
                 ],
                 'answer' => <<<TEXT
-Jika seseorang sudah lanjut usia dan tidak mampu berpuasa serta tidak memungkinkan menggantinya dengan qadha, fidyah dapat menjadi pilihan sesuai ketentuan syariat.
+Kalau seseorang sudah lanjut usia dan tidak mampu berpuasa serta tidak memungkinkan qadha, fidyah bisa jadi pilihan sesuai ketentuan syariat.
 
-Panduan umum:
-1. Hitung jumlah hari puasa yang ditinggalkan.
-2. Kalikan dengan nominal fidyah per hari atau takaran makanan pokok per hari.
-3. Fidyah dapat dibantu pembayarannya oleh keluarga.
+Caranya: hitung jumlah hari puasa yang ditinggalkan, lalu kalikan dengan nominal fidyah per hari. Untuk layanan Masjid An-Nur saat ini, itu **Rp {$fidyahUangFmt} per hari** (uang) atau **{$fidyahBerasKg} kg per hari** (beras) - dan fidyah ini boleh dibantu pembayarannya oleh keluarga.
 
-Untuk layanan Masjid An-Nur saat ini:
-1. Uang: Rp {$fidyahUangFmt} per hari.
-2. Beras: {$fidyahBerasKg} kg per hari.
-
-Jika kondisi lansia masih mungkin berpuasa atau masih mungkin qadha, keputusan fidyah sebaiknya dipastikan kepada ustadz dengan menjelaskan kondisi kesehatannya.
+Kalau kondisi lansianya masih memungkinkan berpuasa atau qadha, sebaiknya keputusan fidyah dipastikan dulu ke ustadz dengan menjelaskan kondisi kesehatannya.
 TEXT,
                 'source_label' => 'BAZNAS; Panduan Publik Masjid An-Nur',
             ],
@@ -964,14 +844,11 @@ TEXT,
                     'sakit permanen',
                 ],
                 'answer' => <<<TEXT
-Jika seseorang sakit menahun sehingga tidak mampu berpuasa dan tidak memungkinkan mengganti puasa di kemudian hari, fidyah dapat menjadi pilihan sesuai ketentuan syariat.
+Kalau seseorang sakit menahun sehingga tidak mampu berpuasa dan tidak memungkinkan mengganti puasa di kemudian hari, fidyah bisa jadi pilihan sesuai ketentuan syariat.
 
-Panduan umum:
-1. Hitung jumlah hari puasa yang ditinggalkan.
-2. Bayarkan fidyah per hari sesuai ketentuan yang berlaku.
-3. Jika kondisi sakit masih berpotensi sembuh, maka qadha mungkin tetap perlu diperhatikan.
+Caranya sama seperti kasus lain: hitung jumlah hari yang ditinggalkan, lalu bayarkan fidyah per hari sesuai ketentuan berlaku. Tapi kalau kondisi sakitnya masih berpotensi sembuh, qadha mungkin tetap perlu dipertimbangkan.
 
-Karena kondisi kesehatan bisa berbeda-beda, Zakky menyarankan konsultasi kepada ustadz atau panitia untuk memastikan apakah cukup fidyah atau tetap perlu qadha.
+Karena kondisi kesehatan tiap orang beda-beda, sebaiknya konsultasi ke ustadz atau panitia untuk memastikan apakah cukup fidyah atau tetap perlu qadha.
 TEXT,
                 'source_label' => 'BAZNAS; Panduan Publik Masjid An-Nur',
             ],
@@ -988,11 +865,11 @@ TEXT,
                     'fidyah menyusui',
                 ],
                 'answer' => <<<TEXT
-Untuk ibu hamil atau menyusui yang tidak berpuasa, kewajiban mengganti puasa dapat berbeda tergantung alasan tidak berpuasa, apakah karena khawatir terhadap diri sendiri, anak, atau keduanya.
+Untuk ibu hamil atau menyusui yang tidak berpuasa, kewajiban penggantinya bisa beda-beda tergantung alasannya - apakah khawatir terhadap diri sendiri, anaknya, atau keduanya.
 
-Dalam beberapa kondisi, kewajiban dapat berupa qadha, fidyah, atau keduanya menurut perbedaan pendapat ulama.
+Dalam beberapa kondisi, kewajibannya bisa berupa qadha, fidyah, atau keduanya, sesuai perbedaan pendapat ulama.
 
-Zakky dapat memberi arah awal untuk kasus ini. Agar kewajibannya sesuai dengan kondisi pribadi, jamaah dapat mengonfirmasi detailnya kepada ustadz atau panitia zakat.
+Saya bisa kasih arah awal untuk kasus ini, tapi supaya kewajibannya sesuai kondisi Anda, sebaiknya konfirmasi detailnya ke ustadz atau panitia zakat.
 TEXT,
                 'source_label' => 'Panduan Fidyah; Panduan Publik Masjid An-Nur',
             ],
@@ -1008,23 +885,15 @@ TEXT,
                     'salah input jenis',
                 ],
                 'answer' => <<<TEXT
-Jika jamaah merasa salah memilih jenis pembayaran, segera konfirmasi kepada panitia Masjid An-Nur.
+Salah pilih jenis pembayaran? Segera konfirmasi ke panitia Masjid An-Nur - misalnya seharusnya Zakat Fitrah tapi terpilih Infaq, seharusnya Zakat Mal tapi terpilih Fidyah, nominal benar tapi kategorinya salah, atau keterangan pembayaran belum sesuai.
 
-Contoh:
-1. Seharusnya Zakat Fitrah tetapi memilih Infaq.
-2. Seharusnya Zakat Mal tetapi memilih Fidyah.
-3. Nominal sudah benar tetapi kategori salah.
-4. Pembayaran sudah dilakukan tetapi keterangan belum sesuai.
+Siapkan info berikut saat konfirmasi:
+- Nama pembayar.
+- Nominal dan waktu pembayaran.
+- Jenis pembayaran yang dipilih dan yang seharusnya.
+- Bukti pembayaran kalau ada.
 
-Siapkan informasi berikut:
-1. Nama pembayar.
-2. Nominal pembayaran.
-3. Waktu pembayaran.
-4. Jenis pembayaran yang dipilih.
-5. Jenis pembayaran yang seharusnya.
-6. Bukti pembayaran jika ada.
-
-Zakky tidak dapat mengubah data transaksi. Perubahan atau koreksi hanya dapat dilakukan oleh panitia sesuai prosedur.
+Saya tidak bisa mengubah data transaksi - perubahan atau koreksi hanya bisa dilakukan panitia sesuai prosedur.
 TEXT,
                 'source_label' => 'Panduan Publik Masjid An-Nur',
             ],
@@ -1051,23 +920,14 @@ TEXT,
                     'contoh hitung pertanian',
                 ],
                 'answer' => <<<TEXT
-Zakat pertanian atau perkebunan adalah zakat atas hasil panen yang memenuhi nisab - dikeluarkan setiap kali panen, tanpa syarat haul (1 tahun) seperti zakat mal lainnya.
+Zakat pertanian atau perkebunan adalah zakat atas hasil panen yang memenuhi nisab - dikeluarkan tiap kali panen, tanpa syarat haul 1 tahun seperti zakat mal lainnya.
 
-Panduan umum:
-1. Nisab: sekitar 653 kg gabah atau hasil panen yang setara.
-2. Pengairan alami (hujan, sungai, tanpa biaya besar): kadar zakat 10%.
-3. Pengairan berbiaya (irigasi, pompa, perawatan berbayar): kadar zakat 5%.
-4. Pengairan campuran: konsultasikan ke panitia/ustadz untuk perhitungan yang tepat.
+Nisabnya sekitar **653 kg gabah** atau hasil panen yang setara. Kadarnya beda tergantung cara pengairan:
+- Pengairan alami (hujan, sungai, tanpa biaya besar): **10%**. Contoh untuk 1.000 kg gabah, zakatnya 10% x 1.000 kg = **100 kg**.
+- Pengairan berbiaya (irigasi, pompa, perawatan berbayar): **5%**. Contoh untuk 1.000 kg gabah, zakatnya 5% x 1.000 kg = **50 kg**.
+- Pengairan campuran: sebaiknya konsultasikan langsung ke panitia/ustadz.
 
-Rumus: kadar (10% atau 5%) x hasil panen.
-
-Contoh untuk 1.000 kg gabah:
-1. Pengairan alami: 10% x 1.000 kg = 100 kg.
-2. Pengairan berbiaya: 5% x 1.000 kg = 50 kg.
-
-Untuk komoditas selain padi/gabah, nisab perlu disetarakan dengan nilai atau ukuran hasil pertanian yang berlaku - bukan otomatis dipukul rata 653 kg. Karena itu, jenis komoditas dan berat bersih hasil panen perlu diketahui sebelum menghitung final.
-
-Zakky dapat membantu memberi contoh rumus, tetapi perhitungan final hasil panen perlu melihat jenis panen, berat bersih, biaya pengairan, dan waktu panen. Siapkan data tersebut saat mengonfirmasi perhitungan kepada panitia.
+Untuk komoditas selain padi/gabah, nisab perlu disetarakan dengan nilai atau ukuran hasil pertanian yang berlaku - bukan otomatis dipukul rata 653 kg. Saya bisa kasih contoh rumusnya, tapi perhitungan final tetap perlu lihat jenis panen, berat bersih, biaya pengairan, dan waktu panen - siapkan data itu saat konfirmasi ke panitia.
 TEXT,
                 'source_label' => 'BAZNAS - Zakat Pertanian; PMA No. 52 Tahun 2014',
             ],
@@ -1091,22 +951,13 @@ TEXT,
                     'contoh hitung ternak',
                 ],
                 'answer' => <<<TEXT
-Zakat peternakan adalah zakat atas hewan ternak tertentu, seperti kambing/domba dan sapi/kerbau, jika memenuhi syarat umum.
+Zakat peternakan berlaku untuk hewan ternak tertentu seperti kambing/domba dan sapi/kerbau, kalau memenuhi syarat umum: jenis dan jumlah ternaknya, apakah digembalakan atau bagian dari usaha intensif, sudah mencapai haul (1 tahun), dan sudah mencapai nisab sesuai jenisnya.
 
-Yang perlu dicek:
-1. Jenis ternaknya, misalnya kambing, domba, sapi, atau kerbau.
-2. Jumlah ternak yang dimiliki.
-3. Apakah ternak digembalakan atau menjadi bagian dari usaha intensif.
-4. Apakah kepemilikan sudah mencapai haul (dimiliki 1 tahun).
-5. Apakah jumlahnya mencapai nisab sesuai jenis ternak.
+Nisab dan kadarnya mengikuti tabel jumlah ternak, bukan persentase uang seperti zakat penghasilan:
+- Kambing/domba, mulai wajib pada **40 ekor**: 40-120 ekor zakatnya 1 ekor, 121-200 ekor zakatnya 2 ekor, 201-300 ekor zakatnya 3 ekor.
+- Sapi/kerbau, mulai wajib pada **30 ekor**: 30-39 ekor zakatnya 1 ekor anak sapi (sekitar 1 tahun), 40-59 ekor zakatnya 1 ekor sapi (sekitar 2 tahun).
 
-Nisab dan contoh kadar zakat peternakan:
-1. Kambing/domba: mulai wajib pada 40 ekor - 40-120 ekor zakatnya 1 ekor, 121-200 ekor zakatnya 2 ekor, 201-300 ekor zakatnya 3 ekor.
-2. Sapi/kerbau: mulai wajib pada 30 ekor - 30-39 ekor zakatnya 1 ekor anak sapi (sekitar 1 tahun), 40-59 ekor zakatnya 1 ekor sapi (sekitar 2 tahun).
-
-Perhitungannya tidak berbentuk persentase uang seperti zakat penghasilan 2,5%, tetapi mengikuti tabel jumlah dan jenis ternak di atas. Jika ternak dipelihara sebagai usaha komersial intensif (misalnya untuk jual-beli, penggemukan, atau produksi bisnis), perhitungannya dapat berbeda dan bisa masuk pembahasan zakat perdagangan - bukan tabel ternak murni. Karena itu, status ternak sebagai gembalaan atau aset usaha perlu dikonfirmasi lebih dulu.
-
-Zakky dapat menjelaskan tabel dasarnya, tetapi belum menghitung otomatis seluruh variasi ternak. Jika ternak bercampur antara kambing, domba, sapi, kerbau, indukan, anak ternak, dan aset usaha, detailnya perlu dirapikan dulu sebelum dihitung oleh panitia atau ustadz.
+Kalau ternak dipelihara sebagai usaha komersial intensif (jual-beli, penggemukan, produksi bisnis), perhitungannya bisa masuk pembahasan zakat perdagangan - bukan tabel ternak murni, jadi status ternaknya perlu dikonfirmasi dulu. Saya bisa jelaskan tabel dasarnya, tapi belum bisa hitung otomatis untuk semua variasi ternak yang bercampur - detailnya perlu dirapikan dulu oleh panitia atau ustadz.
 TEXT,
                 'source_label' => 'BAZNAS - Zakat Ternak Kambing dan Sapi',
             ],
@@ -1131,22 +982,11 @@ TEXT,
                     'contoh hitung properti',
                 ],
                 'answer' => <<<TEXT
-Zakat properti sewa (mustaghallat) adalah zakat atas penghasilan dari aset yang disewakan - rumah kontrakan, kos-kosan, ruko, kios, atau properti lain yang menghasilkan pendapatan sewa.
+Zakat properti sewa (istilah fikihnya "mustaghallat") adalah zakat atas penghasilan dari aset yang disewakan - rumah kontrakan, kos-kosan, ruko, kios, atau properti lain yang menghasilkan pendapatan sewa.
 
-Panduan umum:
-1. Properti yang dipakai pribadi tidak otomatis menjadi objek zakat.
-2. Yang diperhatikan adalah pendapatan bersih sewa (pendapatan sewa dikurangi biaya operasional wajar), bukan nilai propertinya.
-3. Jika pendapatan bersih mencapai nisab, kadar zakatnya 2,5%.
-4. Properti yang dibeli untuk dijual kembali (bukan disewakan) masuk pembahasan zakat perdagangan, bukan zakat sewa.
+Properti yang dipakai pribadi tidak otomatis kena zakat. Yang diperhatikan adalah pendapatan bersih sewa (pendapatan dikurangi biaya operasional wajar), bukan nilai propertinya - kalau pendapatan bersihnya mencapai nisab, zakatnya **2,5%**. Contoh: pendapatan sewa bersih Rp 20.000.000 dalam suatu periode, zakatnya 2,5% x Rp 20.000.000 = **Rp 500.000**. Sebagai catatan, properti yang dibeli untuk dijual kembali (bukan disewakan) masuk zakat perdagangan, bukan zakat sewa.
 
-Rumus: 2,5% x pendapatan bersih sewa yang memenuhi nisab.
-
-Contoh: pendapatan sewa bersih Rp 20.000.000 dalam periode tertentu, sudah memenuhi nisab:
-2,5% x Rp 20.000.000 = Rp 500.000.
-
-Dalam praktik zakat kontemporer, hasil sewa umumnya dianalisis sebagai pendapatan dari aset produktif - pendekatan perhitungannya dapat mengikuti zakat penghasilan atau zakat mal sesuai panduan lembaga/ustadz yang diikuti, bukan satu rumus yang berlaku mutlak untuk semua kasus.
-
-Untuk kasus properti masih cicilan, biaya renovasi besar, atau disewakan tidak rutin, siapkan pendapatan sewa, biaya operasional, cicilan jatuh tempo, dan periode penerimaan. Data ini membantu panitia memastikan apakah yang dihitung pendapatan bersih sewa atau masuk kategori lain.
+Dalam praktik kontemporer, hasil sewa dianalisis sebagai pendapatan dari aset produktif - pendekatannya bisa mengikuti zakat penghasilan atau zakat mal, tergantung panduan lembaga/ustadz yang diikuti, jadi bukan satu rumus mutlak untuk semua kasus. Kalau propertinya masih cicilan, ada biaya renovasi besar, atau disewakan tidak rutin, siapkan pendapatan sewa, biaya operasional, cicilan jatuh tempo, dan periode penerimaan sebelum konfirmasi ke panitia.
 TEXT,
                 'source_label' => 'BAZNAS Daerah - Zakat Properti; Panduan Umum Zakat Mal',
             ],
@@ -1171,19 +1011,11 @@ TEXT,
                     'kalkulator saham',
                 ],
                 'answer' => <<<TEXT
-Zakat saham, investasi, dan reksadana termasuk pembahasan zakat mal kontemporer. Objek zakatnya dapat berupa nilai kepemilikan, dividen, capital gain, atau hasil investasi, tergantung jenis aset dan pendapat yang diikuti.
+Zakat saham, investasi, dan reksadana termasuk pembahasan zakat mal kontemporer. Objek zakatnya bisa berupa nilai kepemilikan, dividen, capital gain, atau hasil investasi - tergantung jenis aset dan pendapat yang diikuti.
 
-Panduan umum:
-1. Jika investasi dimiliki sebagai aset dan telah mencapai nisab serta haul, zakat perlu diperhatikan.
-2. Kadar zakat yang umum digunakan: 2,5% dari objek zakat (nilai portofolio, dividen, atau capital gain, tergantung pendekatan).
-3. Perhitungan dapat berbeda sesuai jenis investasi (saham konvensional vs syariah, reksadana, obligasi/sukuk).
+Kalau investasi dimiliki sebagai aset dan sudah mencapai nisab serta haul, zakat perlu diperhatikan. Kadar yang umum dipakai **2,5%** dari objek zakat (nilai portofolio, dividen, atau capital gain), tapi perhitungannya bisa beda sesuai jenis investasi (saham konvensional vs syariah, reksadana, obligasi/sukuk). Contoh: objek zakat investasi Rp 50.000.000 yang sudah memenuhi syarat, zakatnya 2,5% x Rp 50.000.000 = **Rp 1.250.000**.
 
-Rumus estimasi: 2,5% x objek zakat investasi yang memenuhi nisab dan haul.
-
-Contoh: objek zakat investasi Rp 50.000.000 yang sudah memenuhi syarat:
-2,5% x Rp 50.000.000 = Rp 1.250.000.
-
-Karena topik ini kontemporer dan pendekatannya bisa berbeda antar lembaga - ada yang menghitung dari nilai kepemilikan saham, ada yang fokus ke keuntungan investasi seperti dividen/capital gain - Zakky tidak mengunci satu rumus untuk semua kasus investasi, hanya memberi arah awal. Untuk portofolio yang kompleks, siapkan nilai portofolio, dividen, capital gain, jenis instrumen, dan periode kepemilikan sebelum mengonfirmasi kepada panitia, ustadz, atau lembaga zakat.
+Karena topik ini kontemporer dan pendekatannya beda-beda antar lembaga - ada yang fokus ke nilai kepemilikan, ada yang fokus ke keuntungan seperti dividen/capital gain - saya tidak mengunci satu rumus untuk semua kasus, cuma kasih arah awal. Untuk portofolio yang kompleks, siapkan nilai portofolio, dividen, capital gain, jenis instrumen, dan periode kepemilikan sebelum konfirmasi ke panitia, ustadz, atau lembaga zakat.
 TEXT,
                 'source_label' => 'BAZNAS - Zakat Saham dan Investasi',
             ],
@@ -1203,16 +1035,16 @@ TEXT,
                     'tabungan dari warisan',
                 ],
                 'answer' => <<<TEXT
-Harta warisan tidak otomatis dizakati hanya karena baru diterima. Zakat baru perlu diperhatikan setelah harta itu sah menjadi milik ahli waris dan memenuhi syarat zakat sesuai jenis hartanya.
+Harta warisan tidak otomatis kena zakat hanya karena baru diterima. Zakat baru perlu diperhatikan setelah harta itu sah jadi milik ahli waris dan memenuhi syarat zakat sesuai jenis hartanya.
 
-Panduan umum berdasarkan bentuk warisannya:
-1. Uang, tabungan, atau emas: setelah menjadi milik ahli waris, diperhatikan sebagai zakat mal/tabungan jika mencapai nisab.
-2. Tanah/rumah yang dipakai pribadi: tidak otomatis menjadi objek zakat.
-3. Properti yang disewakan: penghasilan sewanya masuk pembahasan zakat properti sewa.
-4. Aset yang dijual menjadi uang simpanan: uangnya diperhatikan sebagai zakat mal jika memenuhi syarat.
-5. Usaha atau barang dagangan: masuk pembahasan zakat perdagangan.
+Tergantung bentuk warisannya:
+- Uang, tabungan, atau emas yang sudah jadi milik ahli waris: diperhatikan sebagai zakat mal/tabungan kalau mencapai nisab.
+- Tanah/rumah yang dipakai pribadi: tidak otomatis kena zakat.
+- Properti yang disewakan: masuk pembahasan zakat properti sewa.
+- Aset yang dijual jadi uang simpanan: diperhatikan sebagai zakat mal.
+- Usaha atau barang dagangan: masuk zakat perdagangan.
 
-Karena warisan sering bercampur dengan pembagian ahli waris, hutang pewaris, atau aset yang belum terjual, Zakky memberi arahan awal berdasarkan bentuk hartanya. Untuk hasil yang lebih tepat, jamaah dapat mengonfirmasi detailnya kepada ustadz atau panitia dengan membawa rincian bentuk warisan yang diterima.
+Karena warisan sering bercampur dengan pembagian ahli waris, hutang pewaris, atau aset yang belum terjual, saya kasih arahan awal berdasarkan bentuk hartanya dulu. Untuk hasil yang lebih tepat, bawa rincian bentuk warisan yang diterima saat konsultasi ke ustadz atau panitia.
 TEXT,
                 'source_label' => 'Panduan Umum Zakat Mal',
             ],
@@ -1229,17 +1061,17 @@ TEXT,
                     'apakah saya wajib zakat',
                 ],
                 'answer' => <<<TEXT
-Jika jamaah memiliki kasus khusus, Zakky membantu menganalisis secara bertahap, bukan langsung memberi keputusan final.
+Untuk kasus khusus, saya tidak langsung kasih keputusan final - saya bantu menganalisis secara bertahap.
 
-Alur yang digunakan Zakky:
-1. Mengidentifikasi jenis harta atau kewajiban yang ditanyakan.
-2. Mengarahkan kasus ke zakat fitrah, zakat mal, fidyah, atau infaq/shodaqoh.
-3. Memeriksa syarat umum seperti nisab, haul, kepemilikan penuh, dan jenis objek zakat.
-4. Memberikan estimasi awal jika datanya sederhana dan didukung kalkulator Zakky.
-5. Menandai faktor yang bisa mengubah hasil, seperti hutang, cicilan, status harta, penghasilan tidak tetap, dana titipan, atau perbedaan pendapat ulama.
-6. Mengarahkan jamaah ke panitia atau ustadz jika kasusnya membutuhkan keputusan fikih atau verifikasi layanan.
+Alurnya:
+1. Identifikasi jenis harta atau kewajiban yang ditanyakan.
+2. Arahkan ke kategori yang sesuai (zakat fitrah, zakat mal, fidyah, atau infaq/shodaqoh).
+3. Cek syarat umum seperti nisab, haul, dan kepemilikan penuh.
+4. Beri estimasi awal kalau datanya sederhana.
+5. Tandai faktor yang bisa mengubah hasil (hutang, cicilan, status harta, dana titipan, perbedaan pendapat ulama).
+6. Arahkan ke panitia atau ustadz kalau butuh keputusan fikih atau verifikasi layanan.
 
-Dengan cara ini, Zakky membantu jamaah memahami arah masalahnya terlebih dahulu sebelum mengambil langkah berikutnya.
+Dengan cara ini, Anda bisa paham dulu arah masalahnya sebelum mengambil langkah berikutnya.
 TEXT,
                 'source_label' => 'Panduan Publik Masjid An-Nur',
             ],
@@ -1256,18 +1088,11 @@ TEXT,
                     'aset usaha atau pribadi',
                 ],
                 'answer' => <<<TEXT
-Tidak semua aset pribadi otomatis menjadi objek zakat.
+Tidak semua aset pribadi otomatis kena zakat. Aset yang dipakai untuk kebutuhan sehari-hari tidak otomatis jadi objek zakat - baru perlu diperhatikan kalau berubah fungsi jadi aset usaha, barang dagangan, investasi, atau sumber penghasilan.
 
-Panduan umum:
-1. Aset yang dipakai untuk kebutuhan pribadi tidak otomatis menjadi objek zakat.
-2. Aset pribadi perlu diperhatikan jika berubah fungsi menjadi aset usaha, barang dagangan, investasi, atau sumber penghasilan.
-3. Yang dilihat bukan hanya nilai asetnya, tetapi fungsi dan status kepemilikannya.
-4. Jika aset menghasilkan pendapatan, pendapatan tersebut dapat masuk pembahasan zakat mal sesuai jenisnya.
+Yang dilihat bukan cuma nilai asetnya, tapi fungsi dan status kepemilikannya. Kalau aset itu menghasilkan pendapatan, pendapatannya bisa masuk pembahasan zakat mal sesuai jenisnya. Misalnya, rumah yang ditempati sendiri beda dengan rumah yang disewakan; kendaraan yang dipakai pribadi beda dengan kendaraan yang jadi aset usaha atau barang dagangan.
 
-Contoh:
-Rumah yang ditempati sendiri berbeda dengan rumah yang disewakan. Kendaraan yang dipakai pribadi berbeda dengan kendaraan yang menjadi aset usaha atau barang dagangan.
-
-Zakky dapat membantu memberikan arah awal. Agar hasilnya lebih tepat, jamaah dapat mengonfirmasi detail kasus kepada panitia atau ustadz, terutama jika asetnya bercampur antara kebutuhan pribadi, investasi, dan usaha.
+Kalau aset Anda bercampur antara kebutuhan pribadi, investasi, dan usaha, sebaiknya konfirmasi detail kasusnya ke panitia atau ustadz.
 TEXT,
                 'source_label' => 'Panduan Umum Zakat Mal; Panduan Publik Masjid An-Nur',
             ],
@@ -1285,17 +1110,13 @@ TEXT,
                     'mobil dagangan',
                 ],
                 'answer' => <<<TEXT
-Kendaraan perlu dilihat dari fungsi dan penggunaannya.
+Kendaraan perlu dilihat dari fungsi dan penggunaannya, bukan sekadar nilainya:
+- Mobil/motor untuk kebutuhan pribadi: tidak otomatis kena zakat.
+- Kendaraan yang jadi barang dagangan: masuk zakat perdagangan.
+- Kendaraan sebagai aset usaha: diperhatikan dari penghasilan/keuntungan usahanya.
+- Kendaraan yang disewakan: pendapatan sewanya bisa masuk zakat penghasilan atau zakat mal.
 
-Panduan umum:
-1. Mobil atau motor yang dipakai untuk kebutuhan pribadi tidak otomatis menjadi objek zakat.
-2. Kendaraan yang menjadi barang dagangan masuk pembahasan zakat perdagangan.
-3. Kendaraan yang dipakai sebagai aset usaha dapat diperhatikan dari penghasilan atau keuntungan usahanya.
-4. Jika kendaraan disewakan, pendapatan sewanya dapat masuk pembahasan zakat penghasilan atau zakat mal.
-
-Berdasarkan informasi umum, pertanyaan tentang kendaraan biasanya perlu diklasifikasikan dulu: dipakai pribadi, dijual kembali, disewakan, atau menjadi aset operasional usaha.
-
-Untuk keputusan akhir, terutama jika kendaraan terkait usaha, cicilan, atau pendapatan sewa, sebaiknya detailnya dikonfirmasi kepada panitia atau ustadz.
+Jadi pertanyaan tentang kendaraan biasanya perlu diklasifikasikan dulu: dipakai pribadi, dijual kembali, disewakan, atau jadi aset operasional usaha. Untuk keputusan akhir, terutama kalau terkait usaha, cicilan, atau pendapatan sewa, sebaiknya konfirmasi ke panitia atau ustadz.
 TEXT,
                 'source_label' => 'Panduan Umum Zakat Mal; Panduan Publik Masjid An-Nur',
             ],
@@ -1312,17 +1133,13 @@ TEXT,
                     'rumah investasi',
                 ],
                 'answer' => <<<TEXT
-Rumah perlu dilihat dari fungsi dan status penggunaannya.
+Sama seperti aset lain, rumah dilihat dari fungsi dan status penggunaannya:
+- Rumah yang ditempati sendiri untuk kebutuhan keluarga: tidak otomatis kena zakat.
+- Rumah yang disewakan: diperhatikan dari penghasilan sewanya.
+- Rumah yang dibeli untuk dijual kembali: bisa masuk aset dagangan atau investasi.
+- Rumah kosong: perlu dilihat niat dan fungsinya - untuk tempat tinggal, investasi, disewakan, atau dijual.
 
-Panduan umum:
-1. Rumah yang ditempati sendiri untuk kebutuhan keluarga tidak otomatis menjadi objek zakat.
-2. Rumah yang disewakan perlu diperhatikan dari penghasilan sewanya.
-3. Rumah yang dibeli untuk dijual kembali dapat masuk pembahasan aset dagangan atau investasi.
-4. Rumah kosong perlu dilihat niat dan fungsinya: untuk tempat tinggal, investasi, disewakan, atau dijual.
-
-Berdasarkan informasi umum, rumah pribadi yang dipakai sebagai tempat tinggal berbeda dengan properti yang menghasilkan pendapatan.
-
-Agar hasilnya lebih tepat, jamaah dapat mengonfirmasi detail kasus kepada panitia atau ustadz, terutama jika rumah masih cicilan, disewakan tidak rutin, atau bercampur dengan tujuan investasi.
+Jadi rumah pribadi yang dipakai sebagai tempat tinggal beda dengan properti yang menghasilkan pendapatan. Kalau rumah Anda masih cicilan, disewakan tidak rutin, atau bercampur tujuan investasi, sebaiknya konfirmasi detailnya ke panitia atau ustadz.
 TEXT,
                 'source_label' => 'Panduan Umum Zakat Mal; Panduan Publik Masjid An-Nur',
             ],
@@ -1339,15 +1156,13 @@ TEXT,
                     'hibah kena zakat',
                 ],
                 'answer' => <<<TEXT
-Hadiah atau hibah tidak otomatis langsung menjadi zakat saat diterima. Setelah hadiah atau hibah tersebut sah menjadi milik penerima, harta itu diperhatikan sesuai jenisnya.
+Hadiah atau hibah tidak otomatis kena zakat begitu diterima. Setelah sah jadi milik penerima, baru harta itu diperhatikan sesuai jenisnya:
+- Berupa uang dan disimpan: masuk zakat tabungan kalau mencapai nisab.
+- Berupa emas: masuk zakat emas kalau mencapai nisab.
+- Berupa barang yang dipakai pribadi: tidak otomatis kena zakat.
+- Jadi aset yang disewakan atau diperjualbelikan: bisa berubah jadi zakat properti sewa atau zakat perdagangan.
 
-Panduan umum:
-1. Jika hadiah berupa uang dan disimpan, maka dapat masuk pembahasan zakat tabungan jika mencapai nisab dan memenuhi ketentuan.
-2. Jika hadiah berupa emas, maka dapat masuk pembahasan zakat emas jika mencapai nisab.
-3. Jika hadiah berupa barang yang dipakai pribadi, tidak otomatis menjadi objek zakat.
-4. Jika hadiah berupa aset yang kemudian disewakan atau diperjualbelikan, pembahasannya dapat berubah menjadi zakat properti sewa atau zakat perdagangan.
-
-Zakky dapat membantu mengarahkan kategori awal. Untuk hasil yang lebih tepat, perlu dilihat bentuk hadiah, nilai, status kepemilikan, dan penggunaan harta tersebut.
+Saya bisa bantu arahkan kategori awalnya, tapi untuk hasil yang lebih tepat, perlu dilihat bentuk hadiah, nilai, status kepemilikan, dan penggunaan hartanya.
 TEXT,
                 'source_label' => 'Panduan Umum Zakat Mal; Panduan Publik Masjid An-Nur',
             ],
@@ -1364,15 +1179,13 @@ TEXT,
                     'pesangon untuk hutang',
                 ],
                 'answer' => <<<TEXT
-Uang pesangon perlu dilihat sebagai harta yang diterima dan kemudian menjadi milik penerima.
+Uang pesangon dilihat sebagai harta yang diterima dan jadi milik Anda:
+- Diterima sebagai uang dan disimpan: bisa masuk zakat tabungan/mal kalau mencapai nisab.
+- Langsung dipakai untuk kebutuhan pokok, pengobatan, hutang, atau kebutuhan mendesak: perhitungannya perlu lebih hati-hati.
+- Jadi modal usaha: pembahasannya lanjut ke zakat usaha.
+- Bercampur dengan tabungan lama: perlu dipisahkan dulu supaya komponen hartanya jelas.
 
-Panduan umum:
-1. Jika pesangon diterima sebagai uang dan disimpan, maka dapat masuk pembahasan zakat tabungan atau zakat mal jika mencapai nisab.
-2. Jika dana tersebut langsung digunakan untuk kebutuhan pokok, pengobatan, hutang, atau kebutuhan mendesak, perhitungannya perlu lebih hati-hati.
-3. Jika pesangon menjadi modal usaha, pembahasannya dapat berlanjut ke zakat usaha.
-4. Jika pesangon bercampur dengan tabungan lama, perlu dipisahkan agar komponen hartanya jelas.
-
-Zakky dapat memberi arah awal. Untuk keputusan akhir, terutama jika pesangon terkait kebutuhan hidup, hutang, atau kondisi keluarga, sebaiknya jamaah mengonfirmasi detailnya kepada panitia atau ustadz.
+Untuk keputusan akhir, terutama kalau pesangon terkait kebutuhan hidup, hutang, atau kondisi keluarga, sebaiknya konfirmasi detailnya ke panitia atau ustadz.
 TEXT,
                 'source_label' => 'Panduan Umum Zakat Mal; Panduan Publik Masjid An-Nur',
             ],
@@ -1389,15 +1202,13 @@ TEXT,
                     'dana pensiun cair',
                 ],
                 'answer' => <<<TEXT
-Dana pensiun perlu dilihat dari cara penerimaannya: rutin setiap bulan atau cair sekaligus.
+Dana pensiun dilihat dari cara penerimaannya:
+- Diterima rutin tiap bulan: bisa dianalisis seperti penghasilan bulanan.
+- Cair sekaligus dan disimpan: bisa masuk zakat tabungan/mal kalau mencapai nisab.
+- Langsung dipakai untuk kebutuhan pokok, pengobatan, atau pelunasan hutang: perhitungannya perlu lebih hati-hati.
+- Dijadikan modal usaha: pembahasannya lanjut ke zakat usaha.
 
-Panduan umum:
-1. Jika dana pensiun diterima rutin setiap bulan, dapat dianalisis seperti penghasilan bulanan.
-2. Jika dana pensiun cair sekaligus dan disimpan, dapat masuk pembahasan zakat tabungan atau zakat mal jika mencapai nisab.
-3. Jika langsung digunakan untuk kebutuhan pokok, pengobatan, atau pelunasan hutang, perhitungannya perlu lebih hati-hati.
-4. Jika dana pensiun dijadikan modal usaha, pembahasannya dapat berlanjut ke zakat usaha.
-
-Karena kondisi pensiun, kebutuhan hidup, dan hutang setiap orang berbeda, jamaah sebaiknya mengonfirmasi detail kasus kepada panitia atau ustadz agar perhitungannya lebih tepat.
+Karena kondisi pensiun, kebutuhan hidup, dan hutang tiap orang beda, sebaiknya konfirmasi detail kasusnya ke panitia atau ustadz supaya perhitungannya lebih tepat.
 TEXT,
                 'source_label' => 'Panduan Umum Zakat Mal; Panduan Publik Masjid An-Nur',
             ],
@@ -1414,15 +1225,13 @@ TEXT,
                     'piutang usaha',
                 ],
                 'answer' => <<<TEXT
-Piutang adalah harta yang masih berada pada pihak lain karena dipinjam atau belum dibayarkan.
+Piutang adalah harta yang masih ada di pihak lain karena dipinjam atau belum dibayarkan:
+- Piutang kuat, besar kemungkinan tertagih: bisa diperhatikan dalam perhitungan zakat.
+- Piutang lemah, sulit tertagih, atau tidak jelas kapan dibayar: perhitungannya perlu lebih hati-hati.
+- Untuk usaha, piutang yang kemungkinan tertagih: biasanya masuk zakat perdagangan.
+- Piutang yang baru diterima kembali: diperhatikan sebagai bagian dari simpanan.
 
-Panduan umum:
-1. Jika piutang kuat dan besar kemungkinan tertagih, piutang dapat diperhatikan dalam perhitungan zakat.
-2. Jika piutang lemah, sulit tertagih, atau tidak jelas kapan dibayar, perhitungannya perlu lebih hati-hati.
-3. Untuk usaha, piutang yang kemungkinan tertagih biasanya diperhatikan dalam zakat perdagangan.
-4. Jika piutang baru diterima kembali, harta tersebut dapat diperhatikan sebagai bagian dari harta simpanan.
-
-Karena status piutang bisa berbeda-beda, Zakky memberi arah awal berdasarkan kemungkinan tertagihnya. Jika nilainya besar atau status penagihannya tidak jelas, sebaiknya jamaah mengonfirmasi detailnya kepada panitia atau ustadz.
+Karena status piutang beda-beda, saya kasih arah awal berdasarkan kemungkinan tertagihnya. Kalau nilainya besar atau statusnya tidak jelas, sebaiknya konfirmasi ke panitia atau ustadz.
 TEXT,
                 'source_label' => 'Panduan Umum Zakat Mal; Panduan Publik Masjid An-Nur',
             ],
@@ -1440,21 +1249,15 @@ TEXT,
                     'bingung hitung harta',
                 ],
                 'answer' => <<<TEXT
-Harta campuran perlu dipisahkan terlebih dahulu sebelum dihitung zakatnya.
+Kalau harta Anda campur - misalnya rekening pribadi bercampur uang usaha, tabungan bercampur dana titipan, atau uang keluarga bercampur uang pribadi - itu perlu dipisahkan dulu sebelum dihitung zakatnya.
 
-Contoh harta campuran:
-1. Rekening pribadi bercampur dengan uang usaha.
-2. Tabungan bercampur dengan dana titipan.
-3. Uang keluarga bercampur dengan uang pribadi.
-4. Dana operasional usaha bercampur dengan keuntungan pribadi.
-
-Panduan umum:
+Caranya:
 1. Pisahkan dana yang benar-benar milik pribadi.
-2. Pisahkan dana titipan atau dana milik orang lain.
-3. Pisahkan uang usaha dari uang kebutuhan pribadi jika memungkinkan.
-4. Setelah dipisahkan, tentukan apakah harta pribadi atau aset usaha tersebut mencapai nisab.
+2. Pisahkan dana titipan/milik orang lain.
+3. Pisahkan uang usaha dari kebutuhan pribadi kalau memungkinkan.
+4. Tentukan apakah harta pribadi atau aset usahanya mencapai nisab.
 
-Zakky dapat membantu menjelaskan arah perhitungan. Untuk harta campuran, sebaiknya jamaah mengonfirmasi detail kasus kepada panitia atau ustadz agar tidak salah memasukkan komponen harta.
+Untuk harta campuran, sebaiknya konfirmasi detail kasusnya ke panitia atau ustadz supaya tidak salah memasukkan komponen harta.
 TEXT,
                 'source_label' => 'Panduan Umum Zakat Mal; Panduan Publik Masjid An-Nur',
             ],
@@ -1472,15 +1275,15 @@ TEXT,
                     'zakat pakai cek',
                 ],
                 'answer' => <<<TEXT
-Pembayaran zakat menggunakan cek dapat dilakukan jika metode tersebut tersedia dan diterima oleh panitia Masjid An-Nur.
+Bayar zakat pakai cek bisa dilakukan kalau metode ini tersedia dan diterima panitia Masjid An-Nur.
 
-Panduan umum:
-1. Pastikan cek ditujukan kepada pihak yang benar sesuai arahan panitia.
-2. Pastikan nominal, tanggal, dan keterangan pembayaran jelas.
-3. Simpan salinan atau dokumentasi cek jika diperlukan.
-4. Konfirmasi kepada panitia setelah menyerahkan cek - status pembayaran dapat menunggu proses pencairan sesuai prosedur panitia.
+Yang perlu diperhatikan:
+- Pastikan cek ditujukan ke pihak yang benar sesuai arahan panitia.
+- Pastikan nominal, tanggal, dan keterangannya jelas.
+- Simpan salinan/dokumentasi ceknya.
+- Setelah menyerahkan cek, konfirmasi ke panitia - statusnya bisa menunggu proses pencairan sesuai prosedur.
 
-Zakky tidak dapat memverifikasi keabsahan cek atau status pencairannya. Validasi akhir tetap dilakukan oleh panitia.
+Saya tidak bisa memverifikasi keabsahan cek atau status pencairannya; validasi akhir tetap dilakukan panitia.
 TEXT,
                 'source_label' => 'Panduan Publik Masjid An-Nur',
             ],
@@ -1499,19 +1302,17 @@ TEXT,
                     'zakat mal lanjutan',
                 ],
                 'answer' => <<<TEXT
-Zakky dapat membantu menghitung estimasi otomatis untuk beberapa jenis zakat mal yang datanya sederhana, seperti zakat penghasilan, tabungan, dan emas.
+Untuk zakat mal yang datanya sederhana - zakat penghasilan, tabungan, dan emas - saya bisa bantu hitung estimasi otomatis.
 
-Untuk topik lanjutan berikut, Zakky saat ini hanya memberi panduan konsep, rumus umum, dan arahan konsultasi - belum menghitung otomatis:
-1. Zakat pertanian/perkebunan.
-2. Zakat peternakan.
-3. Zakat saham, reksadana, dan investasi.
-4. Zakat properti sewa.
-5. Zakat warisan.
-6. Zakat usaha dengan stok, piutang, dan hutang yang kompleks.
+Tapi untuk topik lanjutan berikut, saat ini saya cuma bisa kasih panduan konsep, rumus umum, dan arahan konsultasi - belum bisa hitung otomatis:
+- Zakat pertanian/perkebunan.
+- Zakat peternakan.
+- Zakat saham, reksadana, dan investasi.
+- Zakat properti sewa.
+- Zakat warisan.
+- Zakat usaha dengan stok, piutang, dan hutang yang kompleks.
 
-Alasannya, perhitungan topik ini butuh data yang lebih spesifik yang belum didukung kalkulator otomatis Zakky. Zakky lebih memilih menjawab jujur dan hati-hati daripada memberi angka yang berisiko keliru.
-
-Untuk kasus lanjutan, siapkan data inti terlebih dahulu: jenis harta, nilai, status kepemilikan, hutang terkait, biaya operasional, dan periode kepemilikan. Data itu membuat konsultasi dengan panitia atau ustadz lebih cepat dan akurat.
+Alasannya sederhana: perhitungan topik-topik ini butuh data yang lebih spesifik daripada yang bisa ditangani kalkulator saya. Saya lebih pilih jujur soal keterbatasan ini daripada kasih angka yang berisiko keliru. Untuk kasus lanjutan, siapkan dulu jenis harta, nilai, status kepemilikan, hutang terkait, biaya operasional, dan periode kepemilikan - itu bikin konsultasi ke panitia atau ustadz jadi lebih cepat dan akurat.
 TEXT,
                 'source_label' => 'Panduan Publik Masjid An-Nur',
             ],
@@ -1536,4 +1337,3 @@ TEXT,
         }
     }
 }
-

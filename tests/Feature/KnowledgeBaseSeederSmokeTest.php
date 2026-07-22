@@ -60,7 +60,8 @@ class KnowledgeBaseSeederSmokeTest extends TestCase
         $zakatFitrah = KnowledgeBase::where('slug', 'zakat-fitrah')->first();
         $this->assertNotNull($zakatFitrah);
         $this->assertStringContainsString('Rp 50.000', $zakatFitrah->answer);
-        $this->assertStringContainsString('4 x Rp 50.000 = Rp 200.000', $zakatFitrah->answer);
+        $this->assertStringContainsString('Rp 200.000', strip_tags(str_replace('**', '', $zakatFitrah->answer)));
+        $this->assertStringContainsString('10 kg', $zakatFitrah->answer);
 
         $analysisAnchor = KnowledgeBase::where('slug', 'cara-zakky-menganalisis-kasus')->first();
         $this->assertNotNull($analysisAnchor);
