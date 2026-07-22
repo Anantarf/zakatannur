@@ -47,6 +47,20 @@
     [data-chatbot-widget] em {
         font-style: italic !important;
     }
+    [data-chatbot-widget] .chat-message-shell {
+        min-width: 0;
+    }
+    [data-chatbot-widget] .chat-message-bubble {
+        max-width: 100%;
+        overflow-wrap: anywhere;
+        text-wrap: pretty;
+    }
+    [data-chatbot-widget] .chat-message-bubble p {
+        margin-bottom: 0.45rem;
+    }
+    [data-chatbot-widget] .chat-message-bubble p:last-child {
+        margin-bottom: 0;
+    }
 </style>
 
 <div
@@ -177,9 +191,9 @@
                         </span>
                     </template>
 
-                    <div class="flex max-w-[85%] flex-col group" :class="message.role === 'user' ? 'items-end' : 'items-start'">
+                    <div class="chat-message-shell flex flex-col group" :class="message.role === 'user' ? 'max-w-[84%] items-end' : 'max-w-[calc(100%-2.75rem)] items-start'">
                         <div
-                            class="px-3.5 py-2.5 text-[15px] leading-relaxed break-words shadow-sm"
+                            class="chat-message-bubble px-4 py-3 text-[15px] leading-[1.62] shadow-sm"
                             style="word-break: break-word;"
                             :class="message.role === 'user'
                                 ? 'whitespace-pre-wrap rounded-2xl rounded-tr-sm bg-brand-600 text-white'
