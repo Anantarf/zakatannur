@@ -19,4 +19,4 @@ yarn-error.log
 /*.sql
 /tmp/
 /storage/framework/views/*.php
-/storage/framework/cache/
+.worktrees/
