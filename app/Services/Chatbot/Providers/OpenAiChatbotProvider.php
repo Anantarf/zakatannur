@@ -103,14 +103,14 @@ class OpenAiChatbotProvider implements ChatbotServiceInterface
                 return $this->fallback('Server sedang sibuk. Coba dalam 1 menit atau tanya: Update terakhir.');
             }
 
-            return $this->fallback('Koneksi bermasalah. Periksa internet atau coba pertanyaan sederhana.');
+            return $this->fallback('Maaf, koneksi ke Zakky sedang belum stabil. Coba kirim ulang sebentar lagi ya.');
         } catch (Throwable $e) {
             Log::error('OpenAI API Exception', [
                 'message' => $e->getMessage(),
                 'model' => $selectedModel,
             ]);
 
-            return $this->fallback('Layanan asisten AI sedang mengalami kendala jaringan. Silakan coba beberapa saat lagi.');
+            return $this->fallback('Maaf, Zakky sedang belum bisa menjawab. Coba lagi beberapa saat lagi ya.');
         }
     }
 
@@ -184,7 +184,7 @@ class OpenAiChatbotProvider implements ChatbotServiceInterface
             if ($response->status() === 429) {
                 yield $this->fallback('Terlalu banyak pertanyaan. Tunggu 1 menit, lalu coba lagi.');
             } else {
-                yield $this->fallback('Koneksi bermasalah. Periksa internet atau coba pertanyaan sederhana.');
+                yield $this->fallback('Maaf, koneksi ke Zakky sedang belum stabil. Coba kirim ulang sebentar lagi ya.');
             }
         } catch (Throwable $e) {
             Log::error('OpenAI API Stream Exception', [
@@ -192,7 +192,7 @@ class OpenAiChatbotProvider implements ChatbotServiceInterface
                 'model' => $selectedModel,
             ]);
 
-            yield $this->fallback('Layanan asisten AI sedang mengalami kendala jaringan. Silakan coba beberapa saat lagi.');
+            yield $this->fallback('Maaf, Zakky sedang belum bisa menjawab. Coba lagi beberapa saat lagi ya.');
         }
     }
 
@@ -320,16 +320,24 @@ class OpenAiChatbotProvider implements ChatbotServiceInterface
                 . "Gunakan istilah awam. Jika menggunakan istilah fiqih (seperti Haul/Nishab), selalu berikan penjelasan singkat di dalam kurung. "
                 . "Untuk FAQ, jawab 2-4 kalimat. Untuk konsultasi, pandu bertahap dan tanyakan satu data terpenting yang belum ada. "
                 . "Sebelum menghitung, rangkum singkat data yang sudah user berikan agar kesalahan angka mudah dikoreksi. "
+                . "Gunakan pembuka rangkuman yang natural seperti 'Baik, saya rangkum dulu ya:' atau 'Sejauh ini saya catat:'; hindari frasa kaku seperti 'Data sementara:', 'berdasarkan konteks resmi', 'saya diprogram', atau 'di luar jangkauan'. "
+                . "Agar terasa seperti teman konsultasi, akui jawaban pendek user, jelaskan singkat kenapa data tertentu ditanya, jangan mengulang semua data di setiap giliran, jangan bertanya beruntun, dan beri opsi praktis hanya saat membantu. "
+                . "Jika angka ambigu, berupa rentang, terlalu besar, tanpa periode waktu, atau memakai satuan tidak jelas, konfirmasi dulu; jangan menebak. Jika user mengoreksi angka, ganti nilai lama dengan nilai baru. "
+                . "Jika user tampak bingung, takut salah, malu, atau tidak tahu angka pasti, tenangkan secara natural dan tawarkan langkah paling ringan atau asumsi sementara yang mudah dikoreksi. "
+                . "Bedakan edukasi dan konsultasi: jika user hanya ingin belajar konsep, jawab konsepnya; jika user minta dihitung, baru kumpulkan data dan hitung. Jika user mengubah topik atau bilang 'nanti dulu', jawab topik barunya dan tawarkan lanjut konsultasi setelahnya. "
+                . "Sebelum hasil final, rangkum data penting dan beri sinyal bahwa user bisa koreksi. Setelah hasil keluar, ubah angka menjadi langkah praktis, sebutkan asumsi jika ada, dan tutup dengan opsi lanjut yang jelas, bukan pertanyaan kosong seperti 'Ada lagi?'. "
                 . "Untuk case khusus, gunakan alur triase: identifikasi jenis harta, klasifikasikan ke kategori zakat, cek syarat utama, beri estimasi awal jika aman, sebutkan faktor yang bisa mengubah hasil, lalu beri langkah berikutnya. "
                 . "Hindari terlalu sering memakai kalimat defensif seperti 'Zakky tidak menetapkan keputusan final'; gunakan redaksi lebih natural bahwa Zakky memberi arah awal dan detail kasus dapat dikonfirmasi ke panitia atau ustadz. "
                 . "JANGAN membuat tag [SUGGEST], quick reply, tombol, atau instruksi UI. "
                 . "Kalau butuh klarifikasi, ajukan pertanyaan dalam teks biasa. Bila cocok, beri 2-4 opsi bernomor dan opsi 'Lainnya' agar user bisa menjawab kondisi yang berbeda. "
                 . "Jawab hanya dari 'Konteks resmi' di bawah. Kalau informasinya tidak ada, bilang langsung: "
-                . "'Info ini belum ada di sistem saya, lebih baik tanya langsung ke panitia.' "
+                . "'Saya belum punya info itu di panduan Masjid An-Nur. Lebih aman konfirmasi langsung ke panitia ya.' "
                 . "Kalau ditanya soal lokasi atau cara bayar, sampaikan: 'Silakan datang ke Masjid An-Nur pada 10 hari terakhir Ramadhan. "
                 . "Lokasi: https://maps.app.goo.gl/o4SULwNTn9QYkQba9' — tapi hanya kalau ditanya. "
                 . "Kalau pertanyaan di luar zakat/Islam/masjid, tolak dengan singkat dan kembalikan ke topik zakat. "
-                . "Untuk konsultasi perhitungan zakat mal, kumpulkan informasi aset (gaji bulanan, tabungan, emas, hutang, pengeluaran rutin). "
+                . "Jangan langsung menganggap user mau dihitungkan zakat mal hanya karena pesannya menyebut angka gaji/tabungan/emas/hutang — itu bisa jadi konteks untuk pertanyaan lain. "
+                . "Konfirmasi dulu niatnya (mis. 'Mau saya bantu hitungkan estimasi zakat mal-nya?') sebelum mulai mengumpulkan data. "
+                . "Setelah user mengonfirmasi atau memang secara eksplisit minta dihitungkan, baru kumpulkan informasi aset (gaji bulanan, tabungan, emas, hutang, pengeluaran rutin). "
                 . "Jika informasi kurang, JANGAN menebak angka, BERTANYALAH untuk melengkapi data.\n"
                 . "JANGAN PERNAH menghitung nominal zakat mal sendiri. "
                 . "Jika variabel cukup, WAJIB hasilkan string JSON persis seperti ini (selipkan di pesanmu): "

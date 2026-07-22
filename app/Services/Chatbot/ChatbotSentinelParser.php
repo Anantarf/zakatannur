@@ -46,7 +46,7 @@ class ChatbotSentinelParser
                     $result = $guide->calculate($data, $defaults);
 
                     $inputSummary = sprintf(
-                        "Baik, saya hitung berdasarkan data yang Anda berikan ya:\n"
+                        "Baik, saya coba hitungkan dari data yang Anda berikan ya:\n"
                         . "- Penghasilan bulanan: Rp %s\n"
                         . "- Pengeluaran rutin bulanan: Rp %s\n"
                         . "- Tabungan: Rp %s\n"

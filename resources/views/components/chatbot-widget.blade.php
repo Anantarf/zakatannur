@@ -84,7 +84,7 @@
         x-transition:leave="transition ease-in duration-300"
         x-transition:leave-start="translate-y-0 opacity-100"
         x-transition:leave-end="translate-y-2 opacity-0"
-        class="relative z-40 mb-4 w-max origin-bottom-right"
+        class="relative z-40 mb-4 w-max max-w-[calc(100vw-2rem)] origin-bottom-right"
     >
         <div class="relative rounded-2xl bg-brand-600 px-4 py-3 text-white shadow-xl ring-1 ring-brand-700/50">
             <!-- Close Button -->
@@ -145,7 +145,7 @@
         @if($embedded)
             class="flex h-full w-full flex-col overflow-hidden bg-white"
         @else
-            class="absolute bottom-0 right-0 z-50 flex w-[calc(100vw-1.5rem)] max-w-[400px] origin-bottom-right flex-col overflow-hidden rounded-2xl border border-slate-200/80 bg-white shadow-[0_24px_60px_-20px_rgba(15,23,42,0.25)] ring-1 ring-slate-200/70 sm:w-[400px]"
+            class="absolute bottom-0 right-0 z-50 flex w-[calc(100vw-2rem)] max-w-[400px] origin-bottom-right flex-col overflow-hidden rounded-2xl border border-slate-200/80 bg-white shadow-[0_24px_60px_-20px_rgba(15,23,42,0.25)] ring-1 ring-slate-200/70 sm:w-[400px]"
             style="height: min(600px, 85vh); max-height: 85vh;"
         @endif
         role="dialog"
@@ -184,7 +184,7 @@
 
         <div x-ref="chatContainer" class="chat-scroll flex flex-1 flex-col space-y-3 overflow-y-auto overflow-x-hidden bg-white p-4">
             <template x-for="(message, index) in messages" :key="`${message.role}-${index}`">
-                <div class="flex w-full animate-fade-in" data-message :data-index="index" :class="message.role === 'user' ? 'justify-end' : 'justify-start items-start'" style="animation-duration: 300ms;">
+                <div class="flex w-full animate-fade-in" data-message :data-index="index" :class="message.role === 'user' ? 'justify-end origin-bottom-right' : 'justify-start items-start origin-bottom-left'">
                     <template x-if="message.role === 'bot'">
                         <span class="mr-3 flex h-8 w-8 shrink-0 items-center justify-center overflow-hidden rounded-full bg-brand-600 text-white flex-shrink-0 transform-gpu">
                             {!! $profileAvatar !!}
@@ -205,7 +205,7 @@
                         <div class="mt-1.5 flex flex-wrap items-center gap-2 px-1 text-xs">
                             <span x-text="formatTime(message.createdAt)" class="text-slate-400 flex-shrink-0"></span>
                             <template x-if="message.citations && message.citations.length > 0">
-                                <span class="truncate text-slate-400" x-text="'Sumber: ' + message.citations[0].label"></span>
+                                <span class="truncate text-slate-400" x-text="'Acuan: ' + message.citations[0].label"></span>
                             </template>
                             <template x-if="message.role === 'bot' &amp;&amp; !message.isError">
                                 <div class="flex gap-1 ml-auto">
@@ -213,7 +213,7 @@
                                         type="button"
                                         @click="copyMessage(message.content)"
                                         x-show="!message.feedback"
-                                        class="opacity-0 group-hover:opacity-100 transition-opacity px-2 py-0.5 font-medium text-slate-500 hover:text-slate-700 hover:bg-slate-100 rounded"
+                                        class="opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity px-2 py-0.5 font-medium text-slate-500 hover:text-slate-700 hover:bg-slate-100 rounded"
                                         title="Salin pesan"
                                     >
                                         Salin
@@ -222,7 +222,7 @@
                                         type="button"
                                         @click="sendFeedback(index, 'helpful')"
                                         x-show="!message.feedback"
-                                        class="opacity-0 group-hover:opacity-100 transition-opacity px-1.5 text-slate-500 hover:text-green-600"
+                                        class="opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity px-1.5 text-slate-500 hover:text-green-600"
                                         title="Membantu"
                                         aria-label="Membantu"
                                     >
@@ -235,7 +235,7 @@
                                         type="button"
                                         @click="sendFeedback(index, 'unhelpful')"
                                         x-show="!message.feedback"
-                                        class="opacity-0 group-hover:opacity-100 transition-opacity px-1.5 text-slate-500 hover:text-red-600"
+                                        class="opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity px-1.5 text-slate-500 hover:text-red-600"
                                         title="Tidak membantu"
                                         aria-label="Tidak membantu"
                                     >
@@ -271,7 +271,7 @@
                 <span class="flex h-8 w-8 shrink-0 items-center justify-center overflow-hidden rounded-full bg-brand-600 text-white flex-shrink-0 transform-gpu">
                     {!! $profileAvatar !!}
                 </span>
-                <div class="flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 py-2">
+                <div class="flex items-center gap-1.5 rounded-2xl rounded-tl-sm border border-slate-200 bg-slate-50 px-3.5 py-2.5 shadow-sm">
                     <span class="zakky-dot zakky-dot-1 h-2 w-2 rounded-full bg-slate-400 animate-bounce" style="animation-delay: 0ms;"></span>
                     <span class="zakky-dot zakky-dot-2 h-2 w-2 rounded-full bg-slate-400 animate-bounce" style="animation-delay: 150ms;"></span>
                     <span class="zakky-dot zakky-dot-3 h-2 w-2 rounded-full bg-slate-400 animate-bounce" style="animation-delay: 300ms;"></span>
@@ -288,14 +288,14 @@
                     @keydown="handleKeydown($event)"
                     maxlength="500"
                     rows="1"
-                    class="chat-scroll flex-1 resize-none rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-[16px] text-slate-800 transition-all placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent disabled:opacity-60 disabled:cursor-not-allowed max-h-[120px] overflow-hidden"
+                    class="chat-scroll flex-1 resize-none rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-[16px] text-slate-800 transition-all placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent disabled:opacity-60 disabled:cursor-not-allowed max-h-[120px] overflow-hidden"
                     style="min-height: 40px;"
                     placeholder="Tanya Zakky..."
                     :disabled="isTyping"
                 ></textarea>
                 <button
                     type="submit"
-                    class="mb-0.5 flex h-10 w-10 items-center justify-center rounded-lg bg-brand-600 text-white transition-all hover:bg-brand-700 active:scale-95 disabled:cursor-not-allowed disabled:opacity-50 flex-shrink-0 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:ring-offset-1"
+                    class="mb-0.5 flex h-10 w-10 items-center justify-center rounded-xl bg-brand-600 text-white transition-all hover:bg-brand-700 active:scale-95 disabled:cursor-not-allowed disabled:opacity-50 flex-shrink-0 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:ring-offset-1"
                     :disabled="isTyping || isInputEmpty"
                     aria-label="Kirim pesan"
                 >
@@ -307,7 +307,7 @@
                     type="button"
                     @click="input = ''; clearHistory(); resetToWelcome();"
                     x-show="messages.filter(m => !m.isWelcome).length > 0"
-                    class="flex h-10 items-center justify-center rounded-lg px-3 text-xs font-medium text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-all active:scale-95 flex-shrink-0 focus:outline-none focus:ring-2 focus:ring-slate-400 focus:ring-offset-1"
+                    class="flex h-10 items-center justify-center rounded-xl px-3 text-xs font-medium text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-all active:scale-95 flex-shrink-0 focus:outline-none focus:ring-2 focus:ring-slate-400 focus:ring-offset-1"
                     aria-label="Reset chat"
                     title="Reset percakapan"
                 >

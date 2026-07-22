@@ -36,7 +36,7 @@ class ChatbotGuardrailVerifier
 
         foreach ($forbiddenTopics as $topic) {
             if (str_contains($lowerReply, $topic)) {
-                return "Mohon maaf, saya adalah Zakky, asisten khusus Zakat An-Nur. Saya hanya dapat menjawab pertanyaan seputar Zakat, Fidyah, Infaq, Shodaqoh, dan operasional Masjid An-Nur. Silakan ajukan pertanyaan terkait topik tersebut.";
+                return "Saya bantu untuk topik zakat dan layanan Masjid An-Nur dulu ya. Kalau mau, tanyakan soal zakat fitrah, zakat mal, fidyah, infaq/shodaqoh, atau cara bayar.";
             }
         }
 
@@ -66,7 +66,7 @@ class ChatbotGuardrailVerifier
             }
 
             if (!$hasDomainKeyword) {
-                return "Mohon maaf, sepertinya respons ini di luar jangkauan saya. Saya diprogram khusus untuk melayani konsultasi Zakat dan operasional Masjid An-Nur.";
+                return "Saya bantu untuk topik zakat dan layanan Masjid An-Nur dulu ya. Kalau mau, tanyakan soal zakat fitrah, zakat mal, fidyah, infaq/shodaqoh, atau cara bayar.";
             }
         }
 

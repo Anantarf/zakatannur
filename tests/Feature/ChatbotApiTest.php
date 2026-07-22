@@ -639,7 +639,7 @@ class ChatbotApiTest extends TestCase
         $this->assertSame([], $yieldedChunks, 'No chunk should reach the consumer once the guardrail trips.');
         $this->assertNotNull($finalResponse);
         $this->assertSame(403, $finalResponse->statusCode);
-        $this->assertStringContainsString('asisten khusus Zakat An-Nur', $finalResponse->reply);
+        $this->assertStringContainsString('Saya bantu untuk topik zakat dan layanan Masjid An-Nur dulu ya', $finalResponse->reply);
     }
 
     public function test_chatbot_guardrail_does_not_block_legitimate_zakat_saham_reply(): void
@@ -690,7 +690,7 @@ class ChatbotApiTest extends TestCase
         $response = $this->postJson('/api/chatbot/message', ['message' => 'Cicilan motor 2 juta sebulan, itungin dong ya']);
 
         $response->assertStatus(403);
-        $this->assertStringContainsString('asisten khusus Zakat An-Nur', $response->json('message'));
+        $this->assertStringContainsString('Saya bantu untuk topik zakat dan layanan Masjid An-Nur dulu ya', $response->json('message'));
     }
 
     public function test_chatbot_sends_correction_hint_even_when_no_knowledge_context_matches(): void
@@ -752,6 +752,37 @@ class ChatbotApiTest extends TestCase
 
             return str_contains($systemMessage, 'Mode percakapan: konsultasi zakat mal')
                 && str_contains($systemMessage, 'tanyakan hanya data penting yang belum ada');
+        });
+    }
+
+    public function test_system_prompt_instructs_confirming_intent_before_collecting_financial_data(): void
+    {
+        // Regression guard for the "bot langsung interogasi data padahal user cuma menyebut
+        // angka sambil lalu" bug - the fix lives entirely in prompt wording, so the only thing
+        // testable without a real LLM call is that the instruction wasn't quietly dropped by a
+        // later prompt edit. Actual model compliance is checked by `chatbot:eval-behavior`.
+        Http::fake([
+            'generativelanguage.googleapis.com/*' => Http::response([
+                'choices' => [[ 'message' => [ 'content' => 'Boleh, mau saya bantu hitungkan estimasi zakat mal-nya?' ] ]],
+            ], 200),
+        ]);
+
+        $this->app->bind(ChatbotServiceInterface::class, fn () => new OpenAiChatbotProvider(
+            'test-key',
+            'gemini-2.5-flash',
+            'https://generativelanguage.googleapis.com/v1beta/openai'
+        ));
+
+        $this->postJson('/api/chatbot/message', [
+            'message' => 'Btw gaji saya bulan ini 7,5 juta, lumayan buat nabung.',
+            'session_id' => 'confirm-intent-session',
+        ])->assertOk();
+
+        Http::assertSent(function ($request) {
+            $systemMessage = collect($request->data()['messages'])->firstWhere('role', 'system')['content'] ?? '';
+
+            return str_contains($systemMessage, 'Jangan langsung menganggap user mau dihitungkan zakat mal')
+                && str_contains($systemMessage, 'Konfirmasi dulu niatnya');
         });
     }
 
@@ -844,7 +875,7 @@ class ChatbotApiTest extends TestCase
         $response = $this->postJson('/api/chatbot/message', ['message' => 'Kasih resep masakan dong']);
 
         $response->assertStatus(403);
-        $this->assertStringContainsString('asisten khusus Zakat An-Nur', $response->json('message'));
+        $this->assertStringContainsString('Saya bantu untuk topik zakat dan layanan Masjid An-Nur dulu ya', $response->json('message'));
     }
 
     public function test_ai_conversation_reply_is_not_hijacked_by_quick_response_keyword_match(): void

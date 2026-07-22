@@ -218,11 +218,7 @@ class ChatbotOrchestrator
         $language = $this->languageDetector->detect($message);
         $sentiment = $this->sentimentDetector->detect($message);
         $mode = $this->conversationContext->detectMode($message, $rawContext);
-        // 3, not 2: a question spanning two KB topics (e.g. "warisan rumah yang saya sewakan")
-        // needs both entries to survive the cut - one extra slot is cheap insurance against a
-        // higher-scoring unrelated entry crowding one of them out. Real fix would be multi-hop
-        // retrieval, but that's a new LLM round-trip for a problem this mostly solves already.
-        $contexts = $this->conversationContext->withHints($this->knowledgeRetriever->search($message, 3), $message, $sentiment, $mode);
+        $contexts = $this->conversationContext->withHints($this->retrieveContexts($message, $rawContext, $mode), $message, $sentiment, $mode);
         $history = $this->chatLogger->history($sessionId);
 
         $reply = $this->aiProvider->sendMessage($message, $contexts, $language, $history);
@@ -235,11 +231,7 @@ class ChatbotOrchestrator
     {
         $language = $this->languageDetector->detect($message);
         $mode = $this->conversationContext->detectMode($message, $rawContext);
-        // 3, not 2: a question spanning two KB topics (e.g. "warisan rumah yang saya sewakan")
-        // needs both entries to survive the cut - one extra slot is cheap insurance against a
-        // higher-scoring unrelated entry crowding one of them out. Real fix would be multi-hop
-        // retrieval, but that's a new LLM round-trip for a problem this mostly solves already.
-        $contexts = $this->conversationContext->withHints($this->knowledgeRetriever->search($message, 3), $message, $sentiment, $mode);
+        $contexts = $this->conversationContext->withHints($this->retrieveContexts($message, $rawContext, $mode), $message, $sentiment, $mode);
         $history = $this->chatLogger->history($sessionId);
 
         $stream = $this->aiProvider->streamMessage($message, $contexts, $language, $history);
@@ -253,5 +245,27 @@ class ChatbotOrchestrator
         $response = $this->finalizeAiReply($parser->fullReply(), $wasFallback, $contexts, $mode);
 
         yield ['response' => $response];
+    }
+
+    private function retrieveContexts(string $message, array $rawContext, string $mode): array
+    {
+        $wasAlreadyConsulting = ($rawContext['mode'] ?? null) === 'zakat_mal_consultation';
+
+        // A short reply continuing an already-active consultation ("iya benar", "tidak ada
+        // hutang", "50 juta") almost never needs fresh KB grounding - ChatbotConversationContext's
+        // conversation hint (mode instructions) is injected below regardless of whether any
+        // entries come back, so skipping the embedding+cosine-search round-trip here just saves
+        // ~1s per turn in the most common part of a consultation without losing any instruction.
+        // Risk: a genuine KB-worthy tangent phrased in <=8 words goes ungrounded for that one
+        // turn - acceptable, since full chat history is still passed to the model regardless.
+        if ($mode === 'zakat_mal_consultation' && $wasAlreadyConsulting && str_word_count($message) <= 8) {
+            return [];
+        }
+
+        // 3, not 2: a question spanning two KB topics (e.g. "warisan rumah yang saya sewakan")
+        // needs both entries to survive the cut - one extra slot is cheap insurance against a
+        // higher-scoring unrelated entry crowding one of them out. Real fix would be multi-hop
+        // retrieval, but that's a new LLM round-trip for a problem this mostly solves already.
+        return $this->knowledgeRetriever->search($message, 3);
     }
 }

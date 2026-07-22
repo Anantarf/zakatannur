@@ -55,7 +55,7 @@ class ChatbotStreamParserTest extends TestCase
     {
         $parser = $this->consultationParser();
         $reply = 'Baik, saya catat pengeluaran rutin Anda sekitar Rp1.000.000 sampai Rp2.000.000 per bulan. '
-            . 'Data sementara: penghasilan bersih Rp8.500.000 per bulan. Berikutnya, apakah ada dana simpanan lain '
+            . 'Sejauh ini saya catat penghasilan bersih Rp8.500.000 per bulan. Berikutnya, apakah ada dana simpanan lain '
             . 'yang perlu saya masukkan ke perhitungan?';
 
         $sentences = iterator_to_array($parser->parse([$reply]));

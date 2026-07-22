@@ -42,7 +42,22 @@ class ChatbotActionDetector
             return 'ask_zakat_mal_nishab';
         }
 
-        if ($this->containsAny($message, ['zakat mal', 'apa itu zakat', 'definisi zakat', 'pengertian zakat'])) {
+        // A message like "hitungkan zakat mal saya: gaji 10 juta..." also contains the phrase
+        // "zakat mal", but it's a calculation request, not a definition question - without this
+        // guard it gets short-circuited to the generic KB definition before ever reaching the
+        // AI consultation flow, skipping the whole guided calculation entirely.
+        $looksLikeCalculationRequest = $this->containsAny($message, ['hitung', 'konsultasi']) && preg_match('/\d+/', $message);
+        $asksDefinition = $this->containsAny($message, [
+            'apa itu zakat mal',
+            'zakat mal itu apa',
+            'definisi zakat mal',
+            'pengertian zakat mal',
+            'apa itu zakat',
+            'definisi zakat',
+            'pengertian zakat',
+        ]);
+        $asksSpecificStyle = $this->containsAny($message, ['singkat', 'pendek', 'detail', 'rinci']);
+        if (!$looksLikeCalculationRequest && !$asksSpecificStyle && $asksDefinition) {
             return 'ask_zakat_mal_definition';
         }
 
@@ -66,7 +81,8 @@ class ChatbotActionDetector
             return 'ask_total_people';
         }
 
-        if ($this->containsAny($message, ['uang', 'rupiah', 'rp', 'terkumpul', 'penerimaan uang', 'nominal'])) {
+        if ($this->containsAny($message, ['uang', 'rupiah', 'rp', 'terkumpul', 'penerimaan uang', 'nominal'])
+            && $this->containsAny($message, ['berapa', 'total', 'jumlah', 'semua', 'terkumpul', 'penerimaan'])) {
             return 'ask_total_money';
         }
 
