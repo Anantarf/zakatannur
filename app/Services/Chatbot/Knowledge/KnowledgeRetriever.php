@@ -6,6 +6,12 @@ use App\Services\Chatbot\Providers\OpenAiEmbeddingsProvider;
 
 class KnowledgeRetriever
 {
+    private const GENERIC_TITLE_WORDS = [
+        'yang', 'dan', 'atau', 'untuk', 'dengan', 'dari', 'akan', 'bisa', 'ini', 'itu',
+        'saya', 'anda', 'apa', 'siapa', 'kapan', 'dimana', 'bagaimana', 'gimana',
+        'cara', 'jadwal', 'pada', 'oleh', 'jika', 'kalau', 'juga', 'saja',
+    ];
+
     private OpenAiEmbeddingsProvider $embeddingsProvider;
     private KnowledgeEmbeddingsCache $embeddingsCache;
 
@@ -110,13 +116,29 @@ class KnowledgeRetriever
 
         foreach (($entry['keywords'] ?? []) as $keyword) {
             $keyword = $this->normalize($keyword);
-            if ($keyword !== '' && str_contains($message, $keyword)) {
-                $score += str_contains($keyword, ' ') ? 5 : 3;
+            if ($keyword === '' || !$this->containsWholeWord($message, $keyword)) {
+                continue;
             }
+
+            $isMultiWord = str_contains($keyword, ' ');
+            // Single-word keywords under 4 chars (e.g. "mal") are too short to trust even with
+            // whole-word matching - "malam" is a different word from "mal" but this length floor
+            // is cheap insurance against the next short one.
+            if (!$isMultiWord && mb_strlen($keyword) < 4) {
+                continue;
+            }
+
+            $score += $isMultiWord ? 5 : 3;
         }
 
         foreach (explode(' ', $this->normalize((string) ($entry['title'] ?? ''))) as $token) {
-            if (mb_strlen($token) >= 4 && str_contains($message, $token)) {
+            // Title tokens are a weak fallback signal (curated keywords above are the primary
+            // one) - generic Indonesian function/connector words that happen to appear in a
+            // title (e.g. "atau" in "Zakat Penghasilan atau Profesi") would otherwise match any
+            // unrelated sentence using the same common word. See GENERIC_TITLE_WORDS.
+            if (mb_strlen($token) >= 4
+                && !in_array($token, self::GENERIC_TITLE_WORDS, true)
+                && $this->containsWholeWord($message, $token)) {
                 $score += 1;
             }
         }
@@ -129,5 +151,10 @@ class KnowledgeRetriever
         $value = preg_replace('/[^\pL\pN\s]/u', ' ', mb_strtolower($value)) ?? '';
 
         return trim(preg_replace('/\s+/', ' ', $value) ?? '');
+    }
+
+    private function containsWholeWord(string $haystack, string $needle): bool
+    {
+        return (bool) preg_match('/(?<![\pL\pN])' . preg_quote($needle, '/') . '(?![\pL\pN])/u', $haystack);
     }
 }
