@@ -41,4 +41,31 @@ class ChatbotKnowledgeRetrievalEvalTest extends TestCase
 
         $this->assertEmpty($failures, implode("\n", $failures));
     }
+
+    /**
+     * Companion to the positive-case test above. Positive cases alone can't catch a retriever
+     * that just returns something for everything - these out-of-scope questions must come back
+     * empty from the keyword-fallback path, so this measures specificity (true-negative rate),
+     * not just recall.
+     */
+    public function test_keyword_fallback_does_not_match_out_of_scope_questions(): void
+    {
+        Http::fake();
+
+        (new KnowledgeBaseSeeder())->run();
+
+        $retriever = $this->app->make(KnowledgeRetriever::class);
+        $falsePositives = [];
+
+        foreach (ChatbotEvalDataset::negativeCases() as $case) {
+            $results = $retriever->search($case['question'], 3);
+
+            if (!empty($results)) {
+                $slugs = collect($results)->pluck('id')->implode(', ');
+                $falsePositives[] = "\"{$case['question']}\" unexpectedly matched [{$slugs}]";
+            }
+        }
+
+        $this->assertEmpty($falsePositives, implode("\n", $falsePositives));
+    }
 }

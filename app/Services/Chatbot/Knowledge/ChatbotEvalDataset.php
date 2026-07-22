@@ -41,4 +41,25 @@ class ChatbotEvalDataset
             ['question' => 'Teman hutang ke saya belum dibayar, itu kena zakat gak?', 'expected_slug' => 'zakat-piutang', 'fact' => null],
         ];
     }
+
+    /**
+     * Out-of-scope queries used to measure specificity (true-negative rate) of retrieval.
+     * cases() above only measures recall/precision on topics that SHOULD match - without
+     * cases that should NOT match anything, a retriever that just returns everything for
+     * every query would score perfectly on cases() alone.
+     *
+     * @return array<int, array{question: string}>
+     */
+    public static function negativeCases(): array
+    {
+        return [
+            ['question' => 'Resep rendang daging yang enak gimana ya?'],
+            ['question' => 'Jadwal pertandingan bola malam ini jam berapa?'],
+            ['question' => 'Cara root hp Android biar bisa install aplikasi bajakan'],
+            ['question' => 'Siapa presiden Indonesia yang menang pemilu kemarin?'],
+            ['question' => 'Ramalan cuaca besok di Jakarta cerah atau hujan?'],
+            ['question' => 'Rekomendasi film horor terbaru yang lagi tayang di bioskop'],
+            ['question' => 'Chord gitar lagu terbaru yang lagi viral apa?'],
+        ];
+    }
 }
