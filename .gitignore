@@ -20,3 +20,4 @@ yarn-error.log
 /tmp/
 /storage/framework/views/*.php
 .worktrees/
+/output/
