@@ -23,6 +23,22 @@ class ChatbotGuardrailVerifierTest extends TestCase
         $this->assertNotNull($this->verifier->verify($reply));
     }
 
+    public function test_allows_financial_follow_up_in_zakat_mal_consultation_mode(): void
+    {
+        $reply = 'Baik, saya catat pengeluaran rutin Anda sekitar Rp1.000.000 sampai Rp2.000.000 per bulan. '
+            . 'Data sementara: penghasilan bersih Rp8.500.000 per bulan. Berikutnya, apakah ada dana simpanan lain '
+            . 'yang perlu saya masukkan ke perhitungan?';
+
+        $this->assertNull($this->verifier->verify($reply, 'zakat_mal_consultation'));
+    }
+
+    public function test_still_blocks_explicit_off_topic_keywords_in_zakat_mal_consultation_mode(): void
+    {
+        $reply = 'Kalau soal resep masakan rendang, saya bisa bantu, bumbu utamanya adalah santan dan cabai.';
+
+        $this->assertNotNull($this->verifier->verify($reply, 'zakat_mal_consultation'));
+    }
+
     public static function blockedKeywordCasesProvider(): array
     {
         return [

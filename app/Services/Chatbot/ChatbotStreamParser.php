@@ -13,7 +13,8 @@ class ChatbotStreamParser
 
     public function __construct(
         private ChatbotSentinelParser $sentinelParser,
-        private ChatbotGuardrailVerifier $guardrailVerifier
+        private ChatbotGuardrailVerifier $guardrailVerifier,
+        private ?string $mode = null
     ) {
     }
 
@@ -99,7 +100,7 @@ class ChatbotStreamParser
             }
 
             foreach ($this->extractCompleteSentences($sentenceBuffer) as $sentence) {
-                if ($this->guardrailVerifier->verify($this->fullReply) !== null) {
+                if ($this->guardrailVerifier->verify($this->fullReply, $this->mode) !== null) {
                     $this->guardrailTripped = true;
                     break;
                 }
@@ -115,7 +116,7 @@ class ChatbotStreamParser
             if ($buffer !== '' && !$isSwallowing) {
                 $sentenceBuffer .= $buffer;
             }
-            if ($sentenceBuffer !== '' && $this->guardrailVerifier->verify($this->fullReply) === null) {
+            if ($sentenceBuffer !== '' && $this->guardrailVerifier->verify($this->fullReply, $this->mode) === null) {
                 yield $sentenceBuffer;
             }
         }

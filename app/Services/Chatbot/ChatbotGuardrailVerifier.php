@@ -9,7 +9,7 @@ class ChatbotGuardrailVerifier
      * Jika melanggar (prompt injection / halusinasi di luar topik),
      * kembalikan respons error standar.
      */
-    public function verify(string $llmReply): ?string
+    public function verify(string $llmReply, ?string $mode = null): ?string
     {
         // Strip [HITUNG:{...}] sentinels (complete, or still mid-stream/incomplete) before
         // checking — they're internal calculation markers the LLM shouldn't be judged on, but
@@ -48,6 +48,14 @@ class ChatbotGuardrailVerifier
                 'panitia', 'amil', 'mustahik', 'muzakki', 'nisab', 'nishab', 'haul', 'harta', 
                 'penerimaan', 'jamaah', 'donasi', 'rupiah', 'beras', 'bayar', 'transfer'
             ];
+
+            if ($mode === 'zakat_mal_consultation') {
+                $domainKeywords = array_merge($domainKeywords, [
+                    'rp', 'juta', 'penghasilan', 'pengeluaran', 'rutin', 'bulanan', 'bulan',
+                    'tabungan', 'emas', 'hutang', 'cicilan', 'aset', 'data sementara',
+                    'estimasi', 'perhitungan', 'kebutuhan hidup', 'bersih', 'wajib',
+                ]);
+            }
             
             $hasDomainKeyword = false;
             foreach ($domainKeywords as $keyword) {

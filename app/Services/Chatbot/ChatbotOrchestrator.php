@@ -189,7 +189,7 @@ class ChatbotOrchestrator
 
         // --- Guardrail Verification ---
         // Verifikasi output untuk memastikan tidak ada prompt injection atau halusinasi di luar topik zakat
-        $guardrailViolation = $this->guardrailVerifier->verify($cleanReply);
+        $guardrailViolation = $this->guardrailVerifier->verify($cleanReply, $mode);
         if ($guardrailViolation !== null) {
             $cleanReply = $guardrailViolation;
             return ChatbotResponse::error($cleanReply, false, 403);
@@ -244,7 +244,7 @@ class ChatbotOrchestrator
 
         $stream = $this->aiProvider->streamMessage($message, $contexts, $language, $history);
 
-        $parser = new ChatbotStreamParser($this->sentinelParser, $this->guardrailVerifier);
+        $parser = new ChatbotStreamParser($this->sentinelParser, $this->guardrailVerifier, $mode);
         foreach ($parser->parse($stream) as $sentence) {
             yield $sentence;
         }

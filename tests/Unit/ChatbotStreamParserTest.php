@@ -14,6 +14,15 @@ class ChatbotStreamParserTest extends TestCase
         return new ChatbotStreamParser(new ChatbotSentinelParser(), new ChatbotGuardrailVerifier());
     }
 
+    private function consultationParser(): ChatbotStreamParser
+    {
+        return new ChatbotStreamParser(
+            new ChatbotSentinelParser(),
+            new ChatbotGuardrailVerifier(),
+            'zakat_mal_consultation'
+        );
+    }
+
     public function test_plain_text_streams_through_as_sentences(): void
     {
         $parser = $this->parser();
@@ -40,5 +49,18 @@ class ChatbotStreamParserTest extends TestCase
 
         $this->assertSame([], $sentences);
         $this->assertTrue($parser->guardrailTripped());
+    }
+
+    public function test_stream_allows_financial_follow_up_in_consultation_mode(): void
+    {
+        $parser = $this->consultationParser();
+        $reply = 'Baik, saya catat pengeluaran rutin Anda sekitar Rp1.000.000 sampai Rp2.000.000 per bulan. '
+            . 'Data sementara: penghasilan bersih Rp8.500.000 per bulan. Berikutnya, apakah ada dana simpanan lain '
+            . 'yang perlu saya masukkan ke perhitungan?';
+
+        $sentences = iterator_to_array($parser->parse([$reply]));
+
+        $this->assertSame($reply, implode('', $sentences));
+        $this->assertFalse($parser->guardrailTripped());
     }
 }
