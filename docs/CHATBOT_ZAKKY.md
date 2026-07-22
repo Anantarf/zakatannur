@@ -43,11 +43,16 @@ CHATBOT_PROVIDER=openai         # 'openai' or 'mock'
 ```
 ChatbotController (API endpoint)
     ↓
-ChatbotOrchestrator (routing logic)
+ChatbotOrchestrator (routing + logging + finalize)
     ├→ ChatbotActionDetector (intent classification)
+    ├→ ChatbotConversationContext (mode detection, prompt hints, cache key)
+    ├→ ChatbotChatLogger (persist + redact chat history)
+    ├→ ChatbotStreamParser (sentinel-swallowing state machine for /stream)
+    ├→ KnowledgeRetriever (semantic search → keyword fallback, see rag-threshold-evaluation.md)
     ├→ ChatbotPublicDataResponder (data context)
+    ├→ ChatbotGuardrailVerifier (keyword-blocklist output check — see Known Limitations below)
     └→ ChatbotServiceInterface
-        ├→ OpenAiChatbotProvider (production)
+        ├→ OpenAiChatbotProvider (production, fast/premium model routing)
         └→ MockChatbotProvider (fallback)
 ```
 
@@ -188,13 +193,10 @@ Log::channel('chatbot')->info('API call', [
 
 ---
 
-## Improvements & Score (v2.0)
-
-**Final Score: 8.8/10 ⭐⭐⭐⭐**
+## Current State
 
 ### 1. Security & Rate Limiting
-- **ThrottleChatbot middleware** - 30 requests/minute per user/IP
-- **Dual throttling** - Route middleware (30/1) + custom middleware
+- **`throttle.chatbot` middleware** (`App\Http\Middleware\ThrottleChatbot`, registered in `app/Http/Kernel.php`) - 50 requests/minute per user/IP, applied to both `/chatbot/message` and `/chatbot/stream` in `routes/api.php`.
 
 ### 2. UX Enhancements
 - **Auto-scroll** - Jumps to latest message when new one arrives
@@ -213,6 +215,16 @@ Log::channel('chatbot')->info('API call', [
 ### 5. Sentinel Pattern (Zakat Mal)
 - LLM diarahkan menghasilkan `[HITUNG:{...}]`
 - `ChatbotOrchestrator` memotong tag tersebut dan menjalankan perhitungan Zakat Mal murni di backend PHP (`ChatbotZakatMalGuide`), menghindari halusinasi.
+
+---
+
+## Keterbatasan yang Diketahui
+
+### Guardrail keluaran adalah keyword blocklist, bukan classifier semantik
+`ChatbotGuardrailVerifier::verify()` mencocokkan kata kunci terlarang + heuristik "balasan panjang tanpa kata kunci domain". Ini murah dan cepat, tapi bisa dilewati dengan parafrase yang tidak memakai kata kunci terlarang dan tetap di bawah 150 karakter. Bypass rate terukur ada di `tests/Unit/ChatbotGuardrailVerifierTest.php::test_known_limitation_paraphrased_off_topic_content_is_not_caught` — jangan diklaim sebagai perlindungan lengkap terhadap prompt injection di skripsi, sebutkan ini sebagai batasan desain yang disadari.
+
+### Refresh embeddings cache bersifat sinkron per simpan KB
+`App\Models\KnowledgeBase::booted()` (`app/Models/KnowledgeBase.php:46-55`) memanggil `KnowledgeEmbeddingsCache::refreshCache()` secara sinkron setiap kali entri KB disimpan/dihapus — jadi cache **selalu segar**, tidak butuh cron/observer tambahan. Trade-off-nya: `refreshCache()` memanggil OpenAI embeddings API satu kali per entri KB aktif secara berurutan, jadi menyimpan entri KB akan memblokir request admin selama kira-kira `(jumlah entri KB aktif) × latensi API embeddings`. Aman di skala ~20 entri saat ini; kalau KB tumbuh ke ratusan entri, ini layak dipertimbangkan ulang (misal batching atau queue) — bukan bug, tapi keputusan yang mengasumsikan KB kecil.
 
 ---
 

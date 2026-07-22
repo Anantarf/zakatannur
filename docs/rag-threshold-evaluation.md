@@ -39,3 +39,30 @@ Berdasarkan uji sampel di atas, ditetapkan `0.45` sebagai *threshold* minimum pa
 
 ## Kesimpulan Akademis
 Nilai threshold `0.45` bukan angka acak (hardcoded tanpa dasar), melainkan **hasil *tuning* empiris** yang mengoptimalkan keseimbangan antara *Precision* (ketepatan) dan *Recall* (kepekaan) dalam arsitektur klasifikasi semantik Zakat An-Nur.
+
+## Evaluasi Kuantitatif (Precision, Recall, Specificity, F1)
+
+Selain observasi kualitatif di atas, `php artisan chatbot:eval-rag` menghasilkan confusion matrix terukur dari:
+- 20 kasus positif (`ChatbotEvalDataset::cases()`) — satu per topik utama Knowledge Base, mengukur *recall* (apakah topik yang benar ditemukan).
+- 7 kasus negatif out-of-scope (`ChatbotEvalDataset::negativeCases()`) — pertanyaan yang sama sekali tidak berhubungan dengan zakat, mengukur *specificity* (apakah sistem berhasil TIDAK mengembalikan dokumen apa pun).
+
+Definisi metrik yang dipakai:
+- **Precision** = TP / (TP + FP) — dari hasil yang dikembalikan, berapa persen yang relevan.
+- **Recall** = TP / (TP + FN) — dari topik yang seharusnya ditemukan, berapa persen benar ditemukan.
+- **Specificity** = TN / (TN + FP) — dari pertanyaan out-of-scope, berapa persen benar-benar dikosongkan.
+- **F1-Score** = 2 × (Precision × Recall) / (Precision + Recall).
+
+### Cara menjalankan
+
+```bash
+php artisan chatbot:cache-embeddings   # pastikan cache embeddings segar
+php artisan chatbot:eval-rag           # butuh OPENAI_API_KEY asli, memanggil API sungguhan
+```
+
+### Hasil run terakhir
+
+> _(Isi tabel ini dengan output nyata dari `php artisan chatbot:eval-rag` setelah dijalankan dengan API key produksi/staging. Jangan menaruh angka perkiraan di sini — kosongkan sampai benar-benar dijalankan.)_
+
+| Tanggal run | TP | FN | TN | FP | Precision | Recall | Specificity | F1 |
+|---|---|---|---|---|---|---|---|---|
+| _(belum dijalankan)_ | | | | | | | | |
