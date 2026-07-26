@@ -265,19 +265,31 @@ class OpenAiChatbotProvider implements ChatbotServiceInterface
 
     private function needsPremiumModel(string $message, array $context): bool
     {
+        if (count($context) >= 3 || mb_strlen($message) > 350) {
+            return true;
+        }
+
+        // No overlapping substrings allowed here (e.g. NOT both 'hitung' and 'perhitungan', NOT
+        // both 'utang' and 'hutang') - one keyword being a substring of another silently double-
+        // counts a single real signal as two, defeating the >=2-signal check below entirely.
         $premiumKeywords = [
-            'hitung', 'perhitungan', 'zakat mal', 'zakat maal', 'nishab', 'nisab',
-            'haul', 'emas', 'tabungan', 'utang', 'hutang', 'aset', 'penghasilan',
+            'hitung', 'zakat mal', 'zakat maal', 'nishab', 'nisab',
+            'haul', 'emas', 'tabungan', 'hutang', 'aset', 'penghasilan',
             'gaji', 'investasi', 'saham', 'usaha', 'warisan', 'konsultasi',
         ];
 
+        $matches = 0;
         foreach ($premiumKeywords as $keyword) {
             if (str_contains($message, $keyword)) {
-                return true;
+                $matches++;
             }
         }
 
-        return count($context) >= 3 || mb_strlen($message) > 350;
+        // A single passing mention of one keyword ("gaji saya turun, ada saran?") isn't a real
+        // calculation/consultation signal - it was silently costing the premium model's ~2s extra
+        // latency over the default tier for no reasoning benefit. Two or more distinct keywords,
+        // or one keyword paired with an actual figure ("emas 100 gram"), are real signals.
+        return $matches >= 2 || ($matches === 1 && preg_match('/\d/', $message) === 1);
     }
 
     private function canUseFastModel(string $message, array $context): bool
@@ -338,6 +350,7 @@ class OpenAiChatbotProvider implements ChatbotServiceInterface
                 . "Jangan langsung menganggap user mau dihitungkan zakat mal hanya karena pesannya menyebut angka gaji/tabungan/emas/hutang — itu bisa jadi konteks untuk pertanyaan lain. "
                 . "Konfirmasi dulu niatnya (mis. 'Mau saya bantu hitungkan estimasi zakat mal-nya?') sebelum mulai mengumpulkan data. "
                 . "Setelah user mengonfirmasi atau memang secara eksplisit minta dihitungkan, baru kumpulkan informasi aset (gaji bulanan, tabungan, emas, hutang, pengeluaran rutin). "
+                . "Jika di tengah konsultasi user bilang sudah bayar/transfer duluan, JANGAN lanjut menghitung atau meminta data lagi — arahkan langsung ke konfirmasi pembayaran ke panitia. "
                 . "Jika informasi kurang, JANGAN menebak angka, BERTANYALAH untuk melengkapi data.\n"
                 . "JANGAN PERNAH menghitung nominal zakat mal sendiri. "
                 . "Jika variabel cukup, WAJIB hasilkan string JSON persis seperti ini (selipkan di pesanmu): "

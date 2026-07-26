@@ -3,6 +3,7 @@
 namespace App\Services\Chatbot;
 
 use App\Services\Chatbot\Knowledge\KnowledgeRetriever;
+use App\Services\Chatbot\Safety\ChatbotSafetyClassifier;
 use Illuminate\Support\Facades\Log;
 use Throwable;
 use Illuminate\Support\Facades\Cache;
@@ -15,6 +16,7 @@ class ChatbotOrchestrator
         private KnowledgeRetriever $knowledgeRetriever,
         private ChatbotPublicDataResponder $publicDataResponder,
         private ChatbotGuardrailVerifier $guardrailVerifier,
+        private ChatbotSafetyClassifier $safetyClassifier,
         private ChatbotLanguageDetector $languageDetector,
         private ChatbotSentimentDetector $sentimentDetector,
         private ChatbotCalculatorService $calculatorService,
@@ -195,6 +197,20 @@ class ChatbotOrchestrator
             return ChatbotResponse::error($cleanReply, false, 403);
         }
 
+        // --- Safety Classifier (lapisan tambahan) ---
+        // Embedding-similarity classifier, dijalankan SEKALI di sini atas balasan final - bukan
+        // di dalam ChatbotGuardrailVerifier::verify(), yang dipanggil per-kalimat saat streaming
+        // (ChatbotStreamParser) dan harus tetap murni regex/keyword agar tidak memicu satu
+        // panggilan embedding per kalimat. Fail-open: kalau embedding gagal/tidak tersedia,
+        // classify() mengembalikan null dan balasan tetap lolos - guardrail regex di atas sudah
+        // jadi lapisan pertama yang wajib lolos duluan.
+        if (!$wasFallback) {
+            $safetyViolation = $this->safetyClassifier->checkReply($cleanReply);
+            if ($safetyViolation !== null) {
+                return ChatbotResponse::error($safetyViolation, false, 403);
+            }
+        }
+
         return $wasFallback
             ? ChatbotResponse::error($cleanReply, true)
             // last_source:'ai' round-trips through the frontend's context and back on the next
@@ -256,9 +272,11 @@ class ChatbotOrchestrator
         // conversation hint (mode instructions) is injected below regardless of whether any
         // entries come back, so skipping the embedding+cosine-search round-trip here just saves
         // ~1s per turn in the most common part of a consultation without losing any instruction.
-        // Risk: a genuine KB-worthy tangent phrased in <=8 words goes ungrounded for that one
-        // turn - acceptable, since full chat history is still passed to the model regardless.
-        if ($mode === 'zakat_mal_consultation' && $wasAlreadyConsulting && str_word_count($message) <= 8) {
+        // But a short reply can still be a genuine tangent question ("nanti dulu, jelasin nisab
+        // itu apa") - found via chatbot:eval-behavior, where skipping retrieval made the bot claim
+        // it had no info on nisab even though it's in the KB. Question markers/words rule those out.
+        $looksLikeTangentQuestion = preg_match('/[?]|\b(apa|apa itu|kenapa|gimana|bagaimana|kapan|dimana|di mana|siapa|jelasin|jelaskan)\b/i', $message) === 1;
+        if ($mode === 'zakat_mal_consultation' && $wasAlreadyConsulting && str_word_count($message) <= 8 && !$looksLikeTangentQuestion) {
             return [];
         }
 

@@ -136,6 +136,78 @@ class ChatbotBehaviorDataset
                 'expect' => fn (string $reply): bool => str_contains($reply, '[[HASIL]]')
                     && preg_match('/(acuan|bayar|dibayar|panitia|koreksi|angka.*benar|siapkan)/i', $reply),
             ],
+            // Skenario tambahan di bawah ini mengangkat poin-poin dari docs/chatbot-behavior-notes.md
+            // yang paling bisa dicek objektif (boolean), bukan seluruh 96 poin - poin yang sifatnya
+            // gaya bahasa/nuansa (mis. "tidak sok akrab") tetap lewat chatbot:eval-behavior-rubric
+            // karena butuh penilaian manusia.
+            [
+                'name' => 'konfirmasi ulang angka yang kemungkinan kelebihan nol (poin 26)',
+                'turns' => [
+                    'Tolong hitung zakat mal saya, gaji 7500000000 per bulan.',
+                ],
+                'expect_description' => 'angka gaji Rp7.500.000.000/bulan janggal untuk gaji individu - bot harus konfirmasi ulang kemungkinan kelebihan nol dulu, bukan langsung anggap benar dan keluarkan sentinel HITUNG',
+                'expect' => fn (string $reply): bool => !str_contains($reply, '[HITUNG:')
+                    && preg_match('/(pastikan|yakin|benar|maksud|konfirmasi|nol)/i', $reply),
+            ],
+            [
+                'name' => 'hasil nol tidak terdengar seperti gagal (poin 38)',
+                'turns' => [
+                    'Tolong hitungkan zakat mal saya: gaji 2 juta/bulan, pengeluaran rutin 1,8 juta/bulan, tabungan 3 juta, tidak ada emas, tidak ada hutang.',
+                    'Iya sudah benar semua, tolong hitung sekarang.',
+                ],
+                'expect_description' => 'total harta jelas di bawah nisab sehingga hasilnya Rp0 - balasan tetap harus keluarkan sentinel HITUNG dan tidak boleh terdengar seperti kegagalan/error',
+                'expect' => fn (string $reply): bool => str_contains($reply, '[[HASIL]]')
+                    && !preg_match('/\b(gagal|error|maaf.*tidak (bisa|dapat))\b/i', $reply),
+            ],
+            [
+                'name' => 'tetap menjawab bahasa Indonesia saat user campur bahasa Inggris (poin 29)',
+                'turns' => [
+                    'Mau hitung zakat mal, income 7.5 mio per month, savings 10 juta.',
+                ],
+                'expect_description' => 'user menulis sebagian data dalam bahasa Inggris - balasan tetap harus berbahasa Indonesia, bukan ikut membalas dalam bahasa Inggris',
+                'expect' => fn (string $reply): bool => !preg_match('/\b(income|savings|month|please|thank you)\b/i', $reply),
+            ],
+            [
+                'name' => 'data yang disebut "tidak ada" dicatat sebagai nol, tidak ditanya ulang (poin 23)',
+                'turns' => [
+                    'Tolong hitungkan zakat mal saya: gaji 10 juta/bulan, pengeluaran rutin 3 juta/bulan, tabungan 50 juta, emas ga ada, tidak ada hutang.',
+                    'Iya sudah benar semua, tolong hitung sekarang.',
+                ],
+                'expect_description' => 'user sudah bilang emas "ga ada" di giliran pertama - balasan terakhir tidak boleh menanyakan emas lagi, harus lanjut ke hasil',
+                'expect' => fn (string $reply): bool => str_contains($reply, '[[HASIL]]')
+                    && !preg_match('/berapa\s+(nominal\s+)?emas|emas.*berapa|ada\s+emas/i', $reply),
+            ],
+            [
+                'name' => 'tidak lanjut menghitung saat user bilang sudah bayar (poin 36)',
+                'turns' => [
+                    'Tolong hitung zakat mal saya, gaji 10 juta per bulan, tabungan 50 juta.',
+                    'Eh sebenarnya saya sudah transfer duluan tadi pagi.',
+                ],
+                'expect_description' => 'user menyatakan sudah bayar di tengah konsultasi - bot tidak boleh lanjut menghitung/keluarkan sentinel HITUNG, harus arahkan ke konfirmasi pembayaran ke panitia',
+                'expect' => fn (string $reply): bool => !str_contains($reply, '[HITUNG:')
+                    && !str_contains($reply, '[[HASIL]]')
+                    && preg_match('/(konfirmasi|panitia)/i', $reply),
+            ],
+            [
+                'name' => 'follow-up ubah variabel setelah hasil, hitung ulang bukan mulai dari awal (poin 47)',
+                'turns' => [
+                    'Tolong hitungkan zakat mal saya: gaji 10 juta/bulan, pengeluaran rutin 3 juta/bulan, tabungan 50 juta, tidak ada emas, tidak ada hutang.',
+                    'Iya sudah benar semua, tolong hitung sekarang.',
+                    'Kalau tabungan saya jadi 100 juta gimana?',
+                ],
+                'expect_description' => 'setelah hasil pertama keluar, user tanya follow-up dengan mengubah satu variabel - bot harus hitung ulang dengan variabel baru (tetap keluarkan [[HASIL]]), bukan minta semua data diulang dari awal',
+                'expect' => fn (string $reply): bool => str_contains($reply, '[[HASIL]]')
+                    && !preg_match('/berapa\s+(nominal\s+)?(gaji|penghasilan|pengeluaran)/i', $reply),
+            ],
+            [
+                'name' => 'tidak memakai istilah internal ke user (poin 56)',
+                'turns' => [
+                    'Tolong hitungkan zakat mal saya: gaji 10 juta/bulan, pengeluaran rutin 3 juta/bulan, tabungan 60 juta, tidak ada emas, tidak ada hutang.',
+                    'Iya sudah benar semua, tolong hitung sekarang.',
+                ],
+                'expect_description' => 'balasan ke user tidak boleh menyebut istilah teknis internal seperti "mode konsultasi", "guardrail", "fallback", atau "dataset" - istilah itu cukup dipakai di kode/log/dokumentasi',
+                'expect' => fn (string $reply): bool => !preg_match('/\b(mode konsultasi|guardrail|fallback|dataset)\b/i', $reply),
+            ],
         ];
     }
 }

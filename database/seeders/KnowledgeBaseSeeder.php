@@ -110,12 +110,16 @@ TEXT,
             ],
             [
                 'id' => 'kapan-konsultasi-ustadz',
-                'title' => 'Kapan Harus Konsultasi ke Ustadz',
+                'title' => 'Kapan Harus Konsultasi ke Ustadz dan Harus Tanya Siapa',
                 'keywords' => [
                     'konsultasi ustadz',
                     'fatwa',
                     'hukum zakat',
                     'kasus khusus',
+                    'kasus rumit harus tanya siapa',
+                    'harus tanya siapa',
+                    'minta bantuan siapa',
+                    'siapa yang bisa dihubungi',
                     'ragu wajib zakat',
                     'qadha atau fidyah',
                     'emas perhiasan',
@@ -124,11 +128,11 @@ TEXT,
                     'menyusui',
                 ],
                 'answer' => <<<TEXT
-Kalau pertanyaan Anda butuh keputusan fikih yang sifatnya pribadi atau rumit, sebaiknya konsultasi langsung ke ustadz.
+Kalau kasus Anda rumit atau butuh keputusan fikih yang sifatnya pribadi, sebaiknya tanya langsung ke ustadz - bukan ke saya, karena saya cuma bisa kasih gambaran umum.
 
 Contoh kasusnya: punya hutang besar atau cicilan jangka panjang, penghasilan tidak tetap, emas perhiasan yang dipakai sehari-hari, ibu hamil/menyusui yang tidak berpuasa, utang puasa lama, zakat usaha dengan aset-piutang-hutang, atau masih ragu apakah sudah wajib zakat.
 
-Saya bisa kasih gambaran umum dulu supaya Anda lebih siap saat konsultasi nanti.
+Ceritakan dulu situasinya ke saya, biar Anda lebih siap saat konsultasi ke ustadz nanti.
 TEXT,
                 'source_label' => 'Panduan Publik Masjid An-Nur',
             ],
@@ -335,6 +339,29 @@ Dua kondisi yang sering ditanyakan:
 Ini estimasi sederhana. Kalau ada hutang, cicilan, atau tanggungan keluarga yang memengaruhi perhitungan, siapkan rinciannya supaya panitia atau ustadz bisa bantu memastikan hasil akhirnya.
 TEXT,
                 'source_label' => 'BAZNAS - Zakat Penghasilan',
+            ],
+            [
+                'id' => 'zakat-penghasilan-potongan-pajak-bpjs',
+                'title' => 'Zakat Penghasilan Dipotong Pajak dan BPJS Dulu atau Tidak',
+                'keywords' => [
+                    'potongan pajak',
+                    'pph 21',
+                    'bpjs',
+                    'gaji bersih atau kotor',
+                    'gaji netto',
+                    'gaji bruto',
+                    'zakat setelah potongan',
+                    'take home pay',
+                ],
+                'answer' => <<<TEXT
+Ini termasuk yang sering beda pendapat antar lembaga, jadi saya kasih gambaran umumnya dulu.
+
+- Pendekatan bruto (kotor): zakat dihitung dari total penghasilan sebelum dipotong pajak, BPJS, atau potongan lain. Nisab dan kadarnya sama seperti zakat penghasilan biasa.
+- Pendekatan netto (bersih): zakat dihitung dari penghasilan yang sudah dikurangi pajak, BPJS, dan kebutuhan pokok, baru dibandingkan dengan nisab.
+
+Sebagian ulama/lembaga memakai bruto supaya lebih hati-hati (ihtiyath), sebagian lain memakai netto karena pajak dan BPJS dianggap kewajiban yang mengurangi harta yang benar-benar dimiliki. Untuk pendekatan yang dipakai Masjid An-Nur, silakan konfirmasi ke panitia atau ustadz.
+TEXT,
+                'source_label' => 'BAZNAS; Panduan Publik Masjid An-Nur',
             ],
             [
                 'id' => 'zakat-emas-perak',
@@ -545,6 +572,29 @@ Di Masjid An-Nur, panitia zakat berperan:
 Saya cuma bantu informasi awal - keputusan layanan tetap ada di panitia.
 TEXT,
                 'source_label' => 'QS At-Taubah: 60; UU No. 23 Tahun 2011; Panduan Publik Masjid An-Nur',
+            ],
+            [
+                'id' => 'salur-zakat-sendiri-vs-panitia',
+                'title' => 'Boleh Menyalurkan Zakat Sendiri atau Harus Melalui Panitia',
+                'keywords' => [
+                    'salurkan zakat sendiri',
+                    'zakat langsung ke mustahik',
+                    'tidak melalui panitia',
+                    'bayar zakat langsung ke fakir miskin',
+                    'boleh zakat sendiri',
+                    'zakat tidak lewat amil',
+                ],
+                'answer' => <<<TEXT
+Secara fikih, boleh - zakat sah kalau langsung diberikan ke mustahik yang memenuhi syarat, tidak wajib melalui amil/panitia.
+
+Tapi ada pertimbangan praktis kenapa lewat panitia sering dianjurkan:
+- Verifikasi mustahik lebih akurat, menghindari penerima yang sebenarnya belum berhak.
+- Pendistribusian lebih merata, tidak menumpuk ke orang yang sama.
+- Ada pencatatan dan laporan yang bisa dipertanggungjawabkan.
+
+Kalau Anda tetap ingin menyalurkan sendiri, pastikan penerimanya benar-benar termasuk salah satu dari 8 golongan mustahik. Kalau ingin melalui Masjid An-Nur, panitia yang urus proses verifikasi dan penyalurannya.
+TEXT,
+                'source_label' => 'QS At-Taubah: 60; Panduan Publik Masjid An-Nur',
             ],
             [
                 'id' => 'bingung-pilih-pembayaran',
@@ -810,6 +860,29 @@ Punya hutang atau cicilan memang bisa memengaruhi perhitungan zakat, terutama ka
 Kalau setelah kebutuhan pokok dan kewajiban utama masih ada harta/penghasilan yang mencapai nisab, zakat tetap perlu diperhatikan. Tapi kalau hutang jatuh tempo membuat harta tidak lagi mencapai nisab, kondisinya perlu dihitung lebih hati-hati - dan untuk zakat penghasilan, caranya bisa beda tergantung panduan ulama atau lembaga yang diikuti.
 
 Karena kondisi tiap orang beda, saya cuma bisa kasih arah awal. Untuk hasil yang lebih tepat, bawa informasi penghasilan, hutang, kebutuhan pokok, dan jumlah tanggungan saat konsultasi ke panitia atau ustadz.
+TEXT,
+                'source_label' => 'Panduan Umum Zakat Mal; Panduan Publik Masjid An-Nur',
+            ],
+            [
+                'id' => 'zakat-mal-terlewat-tahun-lalu',
+                'title' => 'Zakat Mal yang Terlewat dari Tahun-Tahun Sebelumnya',
+                'keywords' => [
+                    'zakat terlewat',
+                    'lupa bayar zakat',
+                    'zakat tahun lalu',
+                    'zakat yang belum dibayar',
+                    'qadha zakat mal',
+                    'ganti zakat lama',
+                ],
+                'answer' => <<<TEXT
+Kalau baru sadar ada zakat mal tahun-tahun sebelumnya yang belum dibayar, itu tetap jadi kewajiban yang perlu ditunaikan - beda dengan ibadah sunnah yang gugur kalau terlewat.
+
+Langkah umumnya:
+1. Perkirakan kembali harta yang sudah mencapai nisab di tahun-tahun tersebut (sebisa mungkin, walau tidak 100% presisi).
+2. Hitung 2,5% dari perkiraan itu untuk tiap tahun yang terlewat.
+3. Bayarkan secara bertahap kalau jumlahnya besar - tidak harus lunas sekaligus.
+
+Kalau datanya sudah tidak lengkap atau susah dipastikan, ini termasuk kasus yang sebaiknya dikonsultasikan ke ustadz supaya ada arahan yang lebih pasti.
 TEXT,
                 'source_label' => 'Panduan Umum Zakat Mal; Panduan Publik Masjid An-Nur',
             ],
