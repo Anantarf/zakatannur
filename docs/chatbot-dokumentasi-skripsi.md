@@ -1,6 +1,3 @@
--[=]'
-
-']]
 
 # Dokumentasi Teknis Chatbot Zakky — Acuan Pembahasan Skripsi
 
@@ -132,11 +129,11 @@ Prinsip metodologi (didokumentasikan di KB entri `catatan-metodologi-zakat`): pe
 
 `OpenAiChatbotProvider::selectModel()` ([OpenAiChatbotProvider.php:255](../app/Services/Chatbot/Providers/OpenAiChatbotProvider.php#L255)) memilih salah satu dari 3 model berdasarkan kompleksitas pesan:
 
-| Tingkat           | Kapan dipakai                                                                                                                                                                          | Contoh trigger                               |
-| ----------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------- |
-| **Premium** | Pesan punya **≥2 sinyal kompleksitas berbeda** (hitung, zakat mal, nisab, haul, emas, tabungan, hutang, aset, penghasilan, gaji, investasi, saham, usaha, warisan, konsultasi), atau 1 sinyal + ada angka eksplisit, atau konteks ≥3 entri, atau pesan >350 karakter | "Saya mau hitung zakat mal, gaji 10 juta..." (4 sinyal) |
-| **Fast**    | Pesan pendek (≤6 kata) tanpa konteks, atau cocok pola sapaan/FAQ singkat                                                                                                              | "Halo", "jadwal zakat fitrah?"               |
-| **Default** | Sisanya, termasuk pesan dengan **hanya 1 sinyal kompleksitas** tanpa angka                                                                                                            | "Saya punya hutang, apakah tetap wajib zakat?" (1 sinyal) |
+| Tingkat           | Kapan dipakai                                                                                                                                                                                                                                                               | Contoh trigger                                            |
+| ----------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------- |
+| **Premium** | Pesan punya**≥2 sinyal kompleksitas berbeda** (hitung, zakat mal, nisab, haul, emas, tabungan, hutang, aset, penghasilan, gaji, investasi, saham, usaha, warisan, konsultasi), atau 1 sinyal + ada angka eksplisit, atau konteks ≥3 entri, atau pesan >350 karakter | "Saya mau hitung zakat mal, gaji 10 juta..." (4 sinyal)   |
+| **Fast**    | Pesan pendek (≤6 kata) tanpa konteks, atau cocok pola sapaan/FAQ singkat                                                                                                                                                                                                   | "Halo", "jadwal zakat fitrah?"                            |
+| **Default** | Sisanya, termasuk pesan dengan**hanya 1 sinyal kompleksitas** tanpa angka                                                                                                                                                                                             | "Saya punya hutang, apakah tetap wajib zakat?" (1 sinyal) |
 
 Aturan "≥2 sinyal" ini hasil tuning di Bab 7.4 — sebelumnya 1 kata kunci apa pun sudah cukup memicu premium. Diuji otomatis di `tests/Feature/ChatbotApiTest.php::test_openai_provider_routes_fast_default_and_premium_models`.
 
@@ -171,10 +168,10 @@ Ditemukan lewat pengukuran: setiap pesan — termasuk balasan lanjutan pendek se
 
 **Hasil terukur** (rata-rata 3 sampel per kondisi, model yang benar-benar dipakai dikonfirmasi lewat `lastUsageMetadata()['model']`, bukan diasumsikan):
 
-| Skenario | Sebelum tuning | Sesudah tuning |
-|---|---|---|
-| Pesan 1 sinyal, tanpa angka ("Saya punya hutang, apakah tetap wajib zakat?") | Premium (`gpt-5.6-sol`), ~4.400 ms | **Default** (`gpt-5.6-terra`), ~2.300 ms |
-| Pesan multi-sinyal ("Saya mau hitung zakat mal dari gaji dan tabungan") | Premium (`gpt-5.6-sol`), ~3.300 ms | Tetap premium (`gpt-5.6-sol`), ~3.100 ms *(tidak berubah, sesuai desain)* |
+| Skenario                                                                     | Sebelum tuning                       | Sesudah tuning                                                                |
+| ---------------------------------------------------------------------------- | ------------------------------------ | ----------------------------------------------------------------------------- |
+| Pesan 1 sinyal, tanpa angka ("Saya punya hutang, apakah tetap wajib zakat?") | Premium (`gpt-5.6-sol`), ~4.400 ms | **Default** (`gpt-5.6-terra`), ~2.300 ms                              |
+| Pesan multi-sinyal ("Saya mau hitung zakat mal dari gaji dan tabungan")      | Premium (`gpt-5.6-sol`), ~3.300 ms | Tetap premium (`gpt-5.6-sol`), ~3.100 ms *(tidak berubah, sesuai desain)* |
 
 **Verifikasi tanpa regresi**: setelah tuning, `chatbot:eval-behavior` tetap **11/11 skenario lolos** (saat itu masih 11 skenario, sebelum diperluas ke 18 di Bab 10.5) dan `chatbot:eval-rag` tetap **F1-score 0,987** (fact-check 0 gagal) — kualitas jawaban tidak berubah meski sebagian pesan sekarang diproses model yang lebih murah/cepat. F1-score naik ke **1,0** setelah perbaikan gap retrieval di Bab 10.6.
 
@@ -235,14 +232,14 @@ Ini metodologi paling "terukur" secara kuantitatif di antara keempatnya, cocok u
 
 **Dataset**: `ChatbotSafetyDataset` — awalnya **120 contoh** berlabel bergaya pertanyaan user, diperluas jadi **145 contoh** setelah ditemukan celah metodologis (lihat Bab 10.4), 6 kategori:
 
-| Kategori                      | Jumlah contoh | Deskripsi                                                  |
-| ----------------------------- | ------------- | ---------------------------------------------------------- |
-| `in_domain`                 | 40            | Pertanyaan zakat/masjid yang sah                           |
+| Kategori                      | Jumlah contoh | Deskripsi                                                                                      |
+| ----------------------------- | ------------- | ---------------------------------------------------------------------------------------------- |
+| `in_domain`                 | 40            | Pertanyaan zakat/masjid yang sah                                                               |
 | `out_of_scope`              | 30            | Topik jelas di luar domain (resep masakan, olahraga, dll.); 5 di antaranya bergaya balasan bot |
-| `prompt_injection`          | 25            | Upaya mengubah peran/aturan sistem; 5 di antaranya bergaya balasan bot |
-| `unsupported_fatwa`         | 20            | Meminta vonis fikih pasti tanpa mau dirujuk ke ustadz; 5 di antaranya bergaya balasan bot |
-| `privacy_risk`              | 15            | Meminta data pribadi muzakki/mustahik/jamaah lain; 5 di antaranya bergaya balasan bot |
-| `payment_verification_risk` | 15            | Meminta bot memverifikasi/mengubah/membatalkan transaksi; 5 di antaranya bergaya balasan bot |
+| `prompt_injection`          | 25            | Upaya mengubah peran/aturan sistem; 5 di antaranya bergaya balasan bot                         |
+| `unsupported_fatwa`         | 20            | Meminta vonis fikih pasti tanpa mau dirujuk ke ustadz; 5 di antaranya bergaya balasan bot      |
+| `privacy_risk`              | 15            | Meminta data pribadi muzakki/mustahik/jamaah lain; 5 di antaranya bergaya balasan bot          |
+| `payment_verification_risk` | 15            | Meminta bot memverifikasi/mengubah/membatalkan transaksi; 5 di antaranya bergaya balasan bot   |
 
 **Cara kerja classifier** (`ChatbotSafetyClassifier::classify()`):
 
@@ -261,11 +258,11 @@ Teks (pesan/balasan) → embedding vector (text-embedding-3-small)
 **Hasil terukur** (setelah perbaikan celah reply-style di Bab 10.4 — dataset 120→145 contoh, threshold tetap 0,68 karena masih titik potong optimal di sweep ulang):
 
 | Metrik                                                              | Sebelum perbaikan (dataset 120, semua bergaya pertanyaan) | Setelah perbaikan (dataset 145, +reply-style) |
-| ------------------------------------------------------------------- | --------------------- | ------------------------------------------------- |
-| Akurasi top-1 (semua tingkat keyakinan)                             | 78,3%                 | 80,7%                                              |
-| Akurasi kasus "confident"                                           | 91,7%                 | **95,1%**                                   |
-| Tingkat false-positive`in_domain` (pertanyaan sah salah diblokir) | 0%                     | **0%**                                      |
-| Cakupan "confident" dari total kasus                                 | 20,0%                 | 28,3%                                             |
+| ------------------------------------------------------------------- | --------------------------------------------------------- | --------------------------------------------- |
+| Akurasi top-1 (semua tingkat keyakinan)                             | 78,3%                                                     | 80,7%                                         |
+| Akurasi kasus "confident"                                           | 91,7%                                                     | **95,1%**                               |
+| Tingkat false-positive`in_domain` (pertanyaan sah salah diblokir) | 0%                                                        | **0%**                                  |
+| Cakupan "confident" dari total kasus                                | 20,0%                                                     | 28,3%                                         |
 
 **Kriteria pemilihan threshold**: dipilih titik potong **terendah** di mana tingkat false-positive `in_domain` mencapai 0% — bukan titik akurasi tertinggi murni. Justifikasi: karena classifier ini adalah lapisan **tambahan** di atas guardrail keyword yang sudah ada (Bab 8, Lapisan 2), risiko salah memblokir pengguna sah (false positive) dinilai lebih mahal secara operasional daripada risiko kasus berisiko halus yang lolos ke status "ambiguous"/"no_match" (yang tetap fail-open, tidak diblokir, tapi juga tidak mendapat perlindungan tambahan dari lapisan ini — lapisan keyword tetap menjadi jaring pengaman dasar untuk kasus yang jelas).
 
