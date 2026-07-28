@@ -536,7 +536,7 @@ class ChatbotApiTest extends TestCase
         Http::fake([
             'generativelanguage.googleapis.com/*' => Http::response([
                 'choices' => [[ 'message' => [ 'content' => 'Oke, datanya lengkap. '
-                    . '[HITUNG:{"income_monthly":10000000,"expenses_monthly":2000000,"savings":50000000,"gold_gram":0,"debt":0}]' ] ]],
+                    . '[HITUNG:{"income_monthly":10000000,"savings":50000000,"gold_gram":0,"debt":0}]' ] ]],
             ], 200),
         ]);
 
@@ -556,13 +556,13 @@ class ChatbotApiTest extends TestCase
         $this->assertStringContainsString('Penghasilan bulanan: Rp 10.000.000', $reply);
         $this->assertStringContainsString('Tabungan: Rp 50.000.000', $reply);
         // Income and savings are assessed against nisab separately (not pooled into one asset
-        // base) - see ChatbotZakatMalGuide. Net income 96jt/year clears nisab (76,5jt); the 50jt
-        // savings alone does not.
-        $this->assertStringContainsString('Penghasilan bersih tahunan: Rp 96.000.000', $reply);
-        $this->assertStringContainsString('wajib zakat penghasilan, sekitar Rp 2.400.000 per tahun', $reply);
+        // base) - see ChatbotZakatMalGuide. Income is bruto (no expense deduction): 120jt/year
+        // clears nisab (~91,68jt); the 50jt savings alone does not.
+        $this->assertStringContainsString('Penghasilan tahunan: Rp 120.000.000', $reply);
+        $this->assertStringContainsString('wajib zakat penghasilan, sekitar Rp 3.000.000 per tahun', $reply);
         $this->assertStringContainsString('Aset simpanan (tabungan + emas - hutang): Rp 50.000.000', $reply);
         $this->assertStringContainsString('belum wajib zakat tabungan/emas', $reply);
-        $this->assertStringContainsString('Total estimasi zakat: Rp 2.400.000 per tahun', $reply);
+        $this->assertStringContainsString('Total estimasi zakat: Rp 3.000.000 per tahun', $reply);
     }
 
     public function test_chatbot_rejects_implausible_hitung_amount_instead_of_computing(): void
@@ -587,6 +587,33 @@ class ChatbotApiTest extends TestCase
         $this->assertStringContainsString('kurang masuk akal', $reply);
         $this->assertStringNotContainsString('wajib zakat penghasilan', $reply);
         $this->assertStringNotContainsString('wajib zakat tabungan', $reply);
+    }
+
+    public function test_chatbot_asks_for_more_data_instead_of_computing_from_debt_alone(): void
+    {
+        // Debt alone isn't evidence the user discussed tabungan/emas - it's only a deduction
+        // against an asset base that was never mentioned. Rendering a wealth section here would
+        // misleadingly imply tabungan/emas were assessed and came up empty (the same bug fixed
+        // in ChatbotSentinelParser for expenses-only input, see chatbot-dokumentasi-skripsi.md).
+        Http::fake([
+            'generativelanguage.googleapis.com/*' => Http::response([
+                'choices' => [[ 'message' => [ 'content' => '[HITUNG:{"debt":5000000}]' ] ]],
+            ], 200),
+        ]);
+
+        $this->app->bind(ChatbotServiceInterface::class, fn () => new OpenAiChatbotProvider(
+            'test-key',
+            'gemini-2.5-flash',
+            'https://generativelanguage.googleapis.com/v1beta/openai'
+        ));
+
+        $response = $this->postJson('/api/chatbot/message', ['message' => 'Saya punya hutang 5 juta']);
+
+        $reply = $response->assertOk()->json('data.reply');
+
+        $this->assertStringContainsString('Bisa sebutkan nominal penghasilan atau tabungannya', $reply);
+        $this->assertStringNotContainsString('[[HASIL]]', $reply);
+        $this->assertStringNotContainsString('belum wajib zakat tabungan', $reply);
     }
 
     public function test_chatbot_stream_blocks_off_topic_reply_before_yielding_the_violating_sentence(): void
@@ -783,6 +810,71 @@ class ChatbotApiTest extends TestCase
 
             return str_contains($systemMessage, 'Jangan langsung menganggap user mau dihitungkan zakat mal')
                 && str_contains($systemMessage, 'Konfirmasi dulu niatnya');
+        });
+    }
+
+    public function test_system_prompt_instructs_clarifying_bruto_when_user_states_net_salary(): void
+    {
+        // Regression guard for a "landasan tidak jelas" gap: the system computes zakat penghasilan
+        // from bruto (Bab 6.2), but nothing told the LLM to catch it when a user volunteers a
+        // "gaji bersih"/net figure - that number would otherwise be silently used as if it were
+        // bruto. Fix lives entirely in prompt wording; actual model compliance is checked by
+        // `chatbot:eval-behavior`.
+        Http::fake([
+            'generativelanguage.googleapis.com/*' => Http::response([
+                'choices' => [[ 'message' => [ 'content' => 'Baik, ini sudah gaji bersih atau kotor ya?' ] ]],
+            ], 200),
+        ]);
+
+        $this->app->bind(ChatbotServiceInterface::class, fn () => new OpenAiChatbotProvider(
+            'test-key',
+            'gemini-2.5-flash',
+            'https://generativelanguage.googleapis.com/v1beta/openai'
+        ));
+
+        $this->postJson('/api/chatbot/message', [
+            'message' => 'Mau saya bantu hitungkan estimasi zakat mal-nya? Iya, gaji bersih saya 8,5 juta per bulan.',
+            'session_id' => 'clarify-bruto-session',
+        ])->assertOk();
+
+        Http::assertSent(function ($request) {
+            $systemMessage = collect($request->data()['messages'])->firstWhere('role', 'system')['content'] ?? '';
+
+            return str_contains($systemMessage, "gaji bersih', 'take home pay'")
+                && str_contains($systemMessage, 'menghitung zakat penghasilan dari gaji kotor/bruto');
+        });
+    }
+
+    public function test_system_prompt_forbids_self_calculating_advanced_zakat_mal_topics(): void
+    {
+        // Regression guard for a gap the sentinel pattern (Bab 6) doesn't cover: [HITUNG:] only
+        // has fields for income/savings/gold/debt, so pertanian/peternakan/properti/saham/warisan
+        // have zero technical guardrail against the LLM applying a formula to the user's own real
+        // numbers (e.g. "panen Anda 2000 kg jadi zakatnya 200 kg") - exactly the kind of unguarded
+        // self-calculation the sentinel pattern exists to prevent for income/tabungan/emas. Fix
+        // lives entirely in prompt wording; actual model compliance is checked by
+        // `chatbot:eval-behavior`.
+        Http::fake([
+            'generativelanguage.googleapis.com/*' => Http::response([
+                'choices' => [[ 'message' => [ 'content' => 'Untuk pertanian saya cuma bisa jelaskan rumus umumnya, ya.' ] ]],
+            ], 200),
+        ]);
+
+        $this->app->bind(ChatbotServiceInterface::class, fn () => new OpenAiChatbotProvider(
+            'test-key',
+            'gemini-2.5-flash',
+            'https://generativelanguage.googleapis.com/v1beta/openai'
+        ));
+
+        $this->postJson('/api/chatbot/message', [
+            'message' => 'Saya panen 2000 kg gabah pengairan alami, hitungkan zakatnya berapa kg.',
+        ])->assertOk();
+
+        Http::assertSent(function ($request) {
+            $systemMessage = collect($request->data()['messages'])->firstWhere('role', 'system')['content'] ?? '';
+
+            return str_contains($systemMessage, 'sentinel [HITUNG:] TIDAK mencakup topik ini')
+                && str_contains($systemMessage, 'JANGAN menerapkan rumus/persentase ke angka pribadi milik user');
         });
     }
 

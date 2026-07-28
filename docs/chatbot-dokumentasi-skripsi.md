@@ -114,12 +114,34 @@ Threshold 0,45 ditentukan dari observasi empiris: similarity >0,60 = relevansi s
 
 LLM **tidak pernah** menghitung nominal zakat mal sendiri — ini keputusan desain eksplisit untuk menghindari halusinasi angka. Alurnya:
 
-1. Prompt sistem melarang LLM menghitung sendiri dan mewajibkan output tag `[HITUNG:{"income_monthly":...,"expenses_monthly":...,"savings":...,"gold_gram":...,"debt":...}]` begitu data cukup ([OpenAiChatbotProvider.php:335-337](../app/Services/Chatbot/Providers/OpenAiChatbotProvider.php#L335-L337)).
-2. `ChatbotSentinelParser` mendeteksi tag ini, mengekstrak JSON variabelnya, dan memanggil `ChatbotZakatMalGuide::calculate()` — fungsi PHP murni yang menghitung zakat penghasilan (basis penghasilan bersih bulanan × 12, terpisah dari tabungan) dan zakat tabungan/emas (basis harta simpanan saat ini dikurangi hutang) secara independen terhadap nisab.
+1. Prompt sistem melarang LLM menghitung sendiri dan mewajibkan output tag `[HITUNG:{"income_monthly":...,"savings":...,"gold_gram":...,"debt":...}]` begitu data cukup ([OpenAiChatbotProvider.php:335-337](../app/Services/Chatbot/Providers/OpenAiChatbotProvider.php#L335-L337)).
+2. `ChatbotSentinelParser` mendeteksi tag ini, mengekstrak JSON variabelnya, dan memanggil `ChatbotZakatMalGuide::calculate()` — fungsi PHP murni yang menghitung zakat penghasilan (basis penghasilan bruto bulanan × 12, terpisah dari tabungan — lihat Bab 6.2) dan zakat tabungan/emas (basis harta simpanan saat ini dikurangi hutang) secara independen terhadap nisab.
 3. Hasil kalkulasi disisipkan kembali ke balasan sebagai blok `[[HASIL]]...[[/HASIL]]`, yang di-render frontend sebagai kartu hasil terpisah (lihat `resources/js/chatbot-widget.js`).
 4. Bagian penghasilan dan bagian tabungan/emas masing-masing hanya dirender kalau field terkait **benar-benar ada** di JSON `[HITUNG:{...}]` (`isset()`, bukan default ke 0) — lihat Bab 10.7 untuk bug yang mendasari aturan ini.
 
 Prinsip metodologi (didokumentasikan di KB entri `catatan-metodologi-zakat`): penghasilan tahunan **tidak** dijumlah mentah dengan saldo tabungan sebagai satu basis, karena saldo tabungan biasanya sudah mencerminkan penghasilan yang diterima dan dibelanjakan sepanjang tahun — menjumlahkannya akan menghitung penghasilan yang sama dua kali.
+
+### 6.1 Sumber Angka Nishab
+
+Nishab **tidak di-hardcode** sebagai satu angka tetap di kode chatbot, melainkan hasil kali dua variabel yang bisa diatur admin per periode zakat: `nishab = nishab_gold_gram × gold_price_per_gram` ([ChatbotZakatMalGuide.php:23](../app/Services/Chatbot/ChatbotZakatMalGuide.php#L23)). Kedua variabel diambil lewat `AnnualZakatDefaultsResolver::resolve()` ([AnnualZakatDefaultsResolver.php](../app/Services/Transactions/AnnualZakatDefaultsResolver.php)) dari `ZakatPeriod` aktif tahun berjalan, diisi lewat form **Pengaturan Periode** (`nishab_gold_gram`, `gold_price_per_gram`).
+
+**Nilai default**: 85 gram emas × Rp1.078.609/gram ≈ **Rp91.681.765/tahun** (target: Rp91.681.728/tahun — lihat catatan presisi di bawah), mengikuti nishab zakat penghasilan (profesi) per **SK Ketua BAZNAS Nomor 15 Tahun 2026** — standar nominal ini sendiri adalah konversi moderat dari nilai 85 gram emas yang dievaluasi berkala oleh BAZNAS, bukan angka yang ditetapkan sistem secara independen. Default lama (Rp900.000/gram, nishab ≈Rp76,5 juta/tahun) diganti ke nilai ini di [config/zakat.php](../config/zakat.php) (`annual_defaults.gold_price_per_gram`) karena berselisih ~17% dari acuan resmi terbaru.
+
+Nilai ini hanya **default awal** saat sebuah periode dibuat ([ZakatPeriodResolver::ensureForYear()](../app/Services/Periods/ZakatPeriodResolver.php), [createNextForYear()](../app/Services/Periods/ZakatPeriodResolver.php)) — periode baru mewarisi angka dari periode sebelumnya (bukan reset ke default), dan admin bisa mengubahnya kapan pun lewat Pengaturan Periode untuk mengikuti evaluasi nishab BAZNAS berikutnya. Karena harga emas acuan tidak ditarik dari API real-time (lihat Bab 11), akurasinya bergantung pada kedisiplinan admin memperbarui angka ini secara berkala.
+
+Catatan presisi: karena `gold_price_per_gram` disimpan sebagai bilangan bulat rupiah/gram, nilai Rp1.078.609 adalah pembulatan dari Rp91.681.728 ÷ 85 gram (Rp1.078.608,56...) — nishab tahunan hasil kali baliknya jadi **Rp91.681.765** (selisih +Rp37 dari angka SK BAZNAS, akibat pembulatan, bukan kesalahan input).
+
+### 6.2 Basis Zakat Penghasilan: Bruto, Bukan Netto
+
+Zakat penghasilan dihitung dari **penghasilan bruto** (gaji pokok + tunjangan, sebelum potongan pajak/BPJS/kebutuhan pokok) — `$incomeAnnual = $incomeMonthly * 12` ([ChatbotZakatMalGuide.php:22-25](../app/Services/Chatbot/ChatbotZakatMalGuide.php#L22-L25)), mengikuti metodologi **SK Ketua BAZNAS Nomor 15 Tahun 2026**.
+
+**Bukan pilihan awal yang disengaja** — versi sebelumnya diam-diam menghitung dari penghasilan **netto** (`(income_monthly - expenses_monthly) × 12`), sementara KB teks (`catatan-metodologi-zakat`, `zakat-penghasilan-potongan-pajak-bpjs`) sudah lebih dulu mengutip BAZNAS sebagai `source_label` dan menyajikan bruto-vs-netto sebagai "perdebatan terbuka, silakan konfirmasi ke panitia" — padahal kalkulator sendiri sudah menjatuhkan pilihan (netto) tanpa pernah menyatakannya secara eksplisit ke user. Ditemukan saat membandingkan detail perhitungan BAZNAS (nisab Rp7.640.144/bulan, basis bruto, kadar 2,5%) dengan kode yang berjalan.
+
+**Perbaikan**: `expenses_monthly` dihapus total dari model data — dari skema `[HITUNG:{...}]` di system prompt, dari validasi plausibilitas dan baris ringkasan input di `ChatbotSentinelParser`, dan dari kalkulasi di `ChatbotZakatMalGuide`. LLM tidak lagi diminta mengumpulkan "pengeluaran rutin bulanan" untuk zakat penghasilan. Teks KB diperbarui menyatakan langsung bahwa Masjid An-Nur memakai pendekatan bruto, bukan lagi menyerahkannya sebagai pertanyaan terbuka.
+
+**Yang tetap sama**: kadar 2,5%, cara nisab dihitung (Bab 6.1), dan pemisahan penilaian zakat penghasilan vs. zakat tabungan/emas (tidak dipooling — Bab 6). Hutang jatuh tempo tetap hanya memengaruhi basis zakat tabungan/emas, bukan zakat penghasilan — opsi BAZNAS untuk mengurangkan hutang mendesak dari penghasilan sengaja **tidak** diimplementasikan otomatis karena disebut "sebagian ulama membolehkan" (bukan konsensus), diarahkan ke konfirmasi manual panitia/ustadz alih-alih menambah cabang logika untuk kasus yang belum tentu berlaku umum.
+
+**Dampak numerik** (contoh dari `tests/Feature/ChatbotApiTest.php::test_chatbot_computes_zakat_mal_from_hitung_sentinel_and_shows_inputs_used`): penghasilan Rp10.000.000/bulan dengan pengeluaran rutin yang dulu ikut disebut user (Rp2.000.000/bulan) — versi lama menghasilkan penghasilan bersih tahunan Rp96.000.000 (zakat Rp2.400.000/tahun); versi bruto sekarang mengabaikan pengeluaran sama sekali, penghasilan tahunan penuh Rp120.000.000 (zakat Rp3.000.000/tahun). Regresi penuh tetap bersih: `php artisan test` 228/228.
 
 ---
 
@@ -195,6 +217,8 @@ Regex/keyword matching murni (tanpa panggilan API), dipanggil **per-kalimat saat
 2. Heuristik fallback: balasan >150 karakter tanpa satu pun kata kunci domain zakat dianggap mencurigakan.
 
 **Keterbatasan yang diketahui dan terdokumentasi** ([CHATBOT_ZAKKY.md](../docs/CHATBOT_ZAKKY.md), bagian "Keterbatasan"): bisa dilewati dengan parafrase yang tidak memakai kata terlarang dan tetap <150 karakter. Dibuktikan lewat test `ChatbotGuardrailVerifierTest::test_known_limitation_paraphrased_off_topic_content_is_not_caught`.
+
+**Celah yang ditemukan dan diperbaiki — kebocoran system prompt tidak tertangkap heuristik #2.** Heuristik fallback (>150 karakter tanpa kata kunci domain) diasumsikan menangkap balasan yang "melantur". Tapi kalau LLM benar-benar dijebak mengulang instruksi sistemnya sendiri secara verbatim, balasan itu justru **padat** kata kunci domain (system prompt menyebut "zakat", "An-Nur" berkali-kali) — sehingga heuristik #2 tidak pernah terpicu, dan pertahanan satu-satunya jatuh sepenuhnya ke Lapisan 3 yang probabilistik dan cakupan "confident"-nya cuma ~28% (Bab 9.4) serta fail-open kalau API embedding tidak tersedia. Diperbaiki dengan menambah beberapa frasa khas yang diambil verbatim dari system prompt Zakky sendiri (mis. "asisten digital zakat an-nur", "jangan pernah menghitung nominal zakat mal sendiri") ke daftar kata terlarang Lapisan 2 ([ChatbotGuardrailVerifier.php:28-41](../app/Services/Chatbot/ChatbotGuardrailVerifier.php#L28-L41)) — presisi tinggi karena balasan normal ke pertanyaan zakat tidak akan pernah mengucapkan frasa-frasa itu kembali ke user. Diuji lewat kasus baru di `blockedKeywordCasesProvider()`.
 
 ### Lapisan 3 — `ChatbotSafetyClassifier` (embedding similarity)
 
@@ -288,7 +312,8 @@ Selain 4 command evaluasi di atas (yang butuh API key asli dan bersifat manual/n
 - `ChatbotSafetyClassifierTest` — logika cosine similarity + threshold tiering (matematika murni).
 - `ChatbotGuardrailVerifierTest` — keyword blocklist, termasuk test yang secara eksplisit mendokumentasikan keterbatasannya.
 - `ChatbotStreamParserTest` — parsing sentinel saat streaming.
-- `ChatbotApiTest` (33 test) — routing model, mode percakapan, guardrail, regression test untuk instruksi prompt spesifik (mis. memastikan instruksi "konfirmasi niat sebelum kumpulkan data" tidak hilang di edit prompt berikutnya).
+- `ChatbotSentinelParserTest` — parsing sentinel `[HITUNG:...]` di luar streaming: satu tag, banyak tag sekaligus (Bab 10.9), dan kasus data tidak cukup untuk dinilai (Bab 10.8).
+- `ChatbotApiTest` (34 test) — routing model, mode percakapan, guardrail, regression test untuk instruksi prompt spesifik (mis. memastikan instruksi "konfirmasi niat sebelum kumpulkan data" tidak hilang di edit prompt berikutnya).
 
 ---
 
@@ -352,6 +377,65 @@ Bersamaan dengan itu, ditambahkan **3 entri KB baru** untuk menutup gap konten y
 
 **Verifikasi**: diuji ulang terhadap skenario yang dilaporkan plus edge case (hanya pengeluaran, hanya hutang). Regresi penuh tetap bersih: `php artisan test` 228/228.
 
+### 10.8 Bug: kombinasi "hanya hutang" masih lolos dari perbaikan Bab 10.7
+
+**Gejala**: ditemukan lewat audit ulang kode setelah perubahan Bab 6.2 (bukan laporan user) — kalau JSON `[HITUNG:{...}]` cuma berisi `debt` (mis. `{"debt":5000000}`, tanpa `savings`/`gold_gram`/`income_monthly`), sistem tetap merender seksi "Estimasi Zakat Tabungan & Emas" lengkap dengan kesimpulan "belum wajib zakat tabungan/emas saat ini" — padahal tabungan/emas tidak pernah disebut user sama sekali.
+
+**Akar masalah**: perbaikan Bab 10.7 mendefinisikan `$hasWealthData = isset(savings) || isset(gold_gram) || isset(debt)` — hutang dianggap sebagai bukti bahwa "tabungan/emas dibahas", padahal hutang sebenarnya cuma **pengurang** dari basis aset (tabungan + emas), bukan basis itu sendiri. Debt-only adalah persis pola bug yang sama dengan yang diperbaiki di Bab 10.7 (field yang tidak disebut ditampilkan seolah dinilai), cuma untuk kombinasi input yang belum tercakup saat itu — desain awal sengaja menyertakan `debt` di `hasWealthData` supaya kasus ini tidak menghasilkan blok `[[HASIL]]` kosong, tapi trade-off itu berarti hasilnya tetap menyesatkan (menyiratkan tabungan/emas = Rp0 yang "dinilai", bukan "tidak ditanyakan").
+
+**Perbaikan** ([ChatbotSentinelParser.php](../app/Services/Chatbot/ChatbotSentinelParser.php)): `hasWealthData` dipersempit jadi `isset(savings) || isset(gold_gram)` saja — hutang tidak lagi dihitung sebagai sinyal "tabungan/emas dibahas" (kalkulasi `wealthBase` di `ChatbotZakatMalGuide` tetap menerima dan mengurangkan `debt` seperti biasa, kalau ada `savings`/`gold_gram` untuk dikurangi). Supaya penyempitan ini tidak memunculkan kembali masalah blok `[[HASIL]]` kosong (alasan `debt` dimasukkan di awal), guard `!$hasIncomeData && !$hasWealthData` yang tadinya dianggap redundan di Bab 6.2 (dan sempat dihapus) **dikembalikan** — kombinasi tanpa penghasilan maupun tabungan/emas kini diarahkan ke "Bisa sebutkan nominal penghasilan atau tabungannya agar bisa saya hitung?" alih-alih menampilkan hasil yang menyesatkan atau blok kosong.
+
+**Verifikasi**: test baru `test_chatbot_asks_for_more_data_instead_of_computing_from_debt_alone` memastikan input `{"debt":5000000}` sendirian tidak lagi menghasilkan `[[HASIL]]` maupun klaim "belum wajib zakat tabungan". Regresi penuh tetap bersih: `php artisan test` 229/229.
+
+### 10.9 Bug: sentinel `[HITUNG:...]` kedua bisa bocor mentah ke user
+
+**Gejala**: ditemukan lewat audit ulang pola parsing (bukan laporan produksi) — `parseAndCalculateSentinel()` sebelumnya memakai `preg_match()` (satu match) lalu `str_replace($matches[0], $replacement, $reply)`. Kalau balasan LLM memuat **lebih dari satu** tag `[HITUNG:{...}]` yang isinya berbeda — di luar desain prompt (LLM diinstruksikan hanya keluarkan satu tag gabungan), tapi tidak sepenuhnya bisa dicegah dari sisi kode karena keluaran LLM tidak deterministik — cuma tag **pertama** yang dihitung dan diganti. Tag kedua tetap lolos apa adanya, sehingga sintaks internal seperti `[HITUNG:{"savings":50000000}]` bisa tampil mentah ke user, alih-alih hasil kalkulasi.
+
+**Perbaikan** ([ChatbotSentinelParser.php](../app/Services/Chatbot/ChatbotSentinelParser.php)): parsing diubah dari `preg_match` + `str_replace` menjadi `preg_replace_callback`, sehingga setiap tag `[HITUNG:...]` yang ditemukan diproses dan diganti secara independen — logika kalkulasi per-tag dipindah ke method privat `calculateSentinel()`, dipanggil oleh callback untuk tiap match. Perilaku untuk kasus normal (satu tag) tidak berubah; `ChatbotStreamParser` (jalur streaming) sudah lebih dulu memanggil parser per-tag satu per satu saat sentinel ditemukan di stream, jadi tidak terdampak oleh perubahan ini.
+
+**Verifikasi**: test unit baru `tests/Unit/ChatbotSentinelParserTest.php` menambahkan kasus khusus `test_multiple_hitung_tags_are_each_replaced_not_just_the_first` (dua tag berbeda dalam satu balasan, keduanya harus terganti, tidak ada `[HITUNG:` tersisa) plus 2 kasus regresi cepat (satu tag normal, debt-only). Regresi penuh tetap bersih: `php artisan test` 232/232.
+
+### 10.10 Bug: nilai berformat Rupiah di JSON `[HITUNG:...]` dihitung diam-diam salah
+
+**Gejala**: ditemukan lewat audit lanjutan (bukan laporan produksi) terhadap cara `(int) $data[$key]` dipakai untuk membaca tiap field dari JSON sentinel. `(int)` cast di PHP tidak menolak string yang tidak sepenuhnya numerik — ia cuma berhenti membaca di karakter tidak valid pertama, lalu memakai apa pun yang sudah terbaca. Dibuktikan langsung: `(int) "10.000.000"` (format ribuan ala Rupiah — gaya yang justru dipakai Zakky sendiri di **setiap** balasannya lewat `number_format(..., ',', '.')`) menghasilkan **10**, bukan 10 juta, karena parsing berhenti di titik kedua.
+
+**Kenapa ini lebih serius dari bug-bug sebelumnya**: bug-bug Bab 10.7–10.9 membuat sistem menampilkan sesuatu yang *terlihat* aneh (seksi kosong, blok `[HASIL]` menyesatkan, sintaks bocor) — user punya sinyal ada yang salah. Bug ini **tidak ada sinyal sama sekali**: kalau LLM sekali saja menulis nilai dengan format ribuan (bukan angka mentah seperti diinstruksikan di system prompt) alih-alih `10000000`, hasilnya kesimpulan "belum wajib zakat" yang tampil percaya diri dan rapi, padahal dihitung dari data yang senyap-senyap ter-truncate — persis kelas bug yang paling berbahaya untuk konteks fikih/finansial: salah tapi tidak kelihatan salah.
+
+**Perbaikan** ([ChatbotSentinelParser.php](../app/Services/Chatbot/ChatbotSentinelParser.php)): setiap nilai divalidasi dengan `is_numeric()` **sebelum** di-cast ke `int` — `is_numeric("10.000.000")` mengembalikan `false` (beda dari `(int)` cast yang diam-diam menerimanya), begitu juga format lain seperti `"10,000,000"` atau `"10 juta"`. Kalau ada field yang lolos `isset()` tapi gagal `is_numeric()`, seluruh sentinel diperlakukan sama seperti JSON yang rusak — diminta ulang, bukan dihitung dari data yang sudah tercemar.
+
+**Verifikasi**: test unit baru `test_rupiah_formatted_string_value_is_rejected_instead_of_silently_truncated` mengonfirmasi input `{"income_monthly":"10.000.000","savings":50000000}` ditolak (pesan "kurang mengerti datanya"), bukan dihitung jadi Rp10. Regresi penuh tetap bersih: `php artisan test` 234/234.
+
+### 10.11 Celah kualitas jawaban: bot tidak mengklarifikasi kalau user menyebut angka "bersih"
+
+**Gejala**: ditemukan lewat tinjauan kualitas jawaban (bukan bug kode/logic seperti Bab 10.7–10.10) — setelah pindah ke basis bruto (Bab 6.2), system prompt cuma menginstruksikan LLM untuk **mengumpulkan** "gaji bulanan kotor/bruto", tapi tidak ada instruksi untuk **menangkap** kalau user malah menyebut angkanya sebagai "gaji bersih"/"take home pay" (skenario ini bahkan sudah ada di `ChatbotBehaviorDataset.php` — *"Saya mau hitung zakat mal, gaji bersih 8,5 juta per bulan."* — tapi ekspektasi test di skenario itu cuma mengecek soal klarifikasi rentang, bukan soal bruto/netto). Tanpa instruksi eksplisit, angka yang disebut user sebagai "bersih" kemungkinan besar langsung dipakai apa adanya di rumus bruto — bukan salah hitung secara kode (rumus tetap konsisten terhadap input apa pun), tapi berpotensi **salah basis**: angka net dipakai seolah gross, tanpa klarifikasi apa pun ke user tentang bahwa Masjid An-Nur memakai basis bruto.
+
+**Perbaikan** ([OpenAiChatbotProvider.php](../app/Services/Chatbot/Providers/OpenAiChatbotProvider.php)): menambah satu kalimat instruksi — kalau user menyebut angka gajinya sebagai "gaji bersih", "take home pay", atau "setelah potongan pajak/BPJS", LLM wajib klarifikasi dulu (jelaskan Masjid An-Nur pakai basis bruto sesuai BAZNAS) dan tanyakan angka bruto-nya, alih-alih langsung memakai angka net yang disebutkan.
+
+**Verifikasi**: test regresi baru `test_system_prompt_instructs_clarifying_bruto_when_user_states_net_salary` (pola sama dengan `test_system_prompt_instructs_confirming_intent_before_collecting_financial_data` — cuma memastikan instruksi tidak hilang di edit prompt berikutnya; kepatuhan model sesungguhnya perlu dicek lewat `chatbot:eval-behavior` manual). Regresi penuh tetap bersih: `php artisan test` 235/235.
+
+### 10.12 Celah arsitektur: topik zakat mal lanjutan tidak dilindungi sentinel pattern
+
+**Gejala**: ditemukan lewat pertanyaan "apakah ada yang belum memuaskan soal properti/pertanian" — KB sudah mencakup 5 topik zakat mal lanjutan (`zakat-pertanian-perkebunan`, `zakat-peternakan`, `zakat-properti-sewa`, `zakat-saham-investasi-reksadana`, `zakat-warisan`), lengkap dengan entri `batas-hitung-zakat-mal-lanjutan` yang secara jujur bilang "belum bisa hitung otomatis" untuk topik-topik ini. Tapi instruksi "JANGAN PERNAH menghitung nominal zakat mal sendiri" di system prompt cuma dipasangkan dengan satu jalur keluar: sentinel `[HITUNG:{...}]`, yang skemanya cuma punya field untuk income/savings/gold/debt. Untuk pertanian/peternakan/properti/saham/warisan, LLM tidak diberi instruksi eksplisit soal apa yang harus dilakukan kalau user memberi angka nyata dan minta dihitungkan — sehingga LLM bisa saja (meniru contoh ilustrasi di teks KB, mis. "1.000 kg gabah → zakat 100 kg") menerapkan rumus itu ke angka pribadi user secara bebas di teks biasa, persis jenis self-calculation tanpa pengaman yang sentinel pattern (Bab 6) dibuat untuk mencegah — hanya saja di sini tidak ada pengaman teknis sama sekali.
+
+**Perbaikan** ([OpenAiChatbotProvider.php](../app/Services/Chatbot/Providers/OpenAiChatbotProvider.php)): menambah instruksi eksplisit — untuk topik zakat mal lanjutan, sentinel `[HITUNG:]` tidak berlaku, LLM dilarang menerapkan rumus ke angka pribadi user, cuma boleh menjelaskan rumus/nisab secara umum (boleh pakai angka ilustrasi seperti di panduan) lalu arahkan ke panitia/ustadz untuk angka final.
+
+**Verifikasi**: test regresi baru `test_system_prompt_forbids_self_calculating_advanced_zakat_mal_topics` — proses menulis test inilah yang secara tidak sengaja membongkar bug jauh lebih besar di Bab 10.13 di bawah (pesan pertanian dalam test ini ternyata tidak pernah sampai ke AI sama sekali).
+
+### 10.13 Bug: pertanyaan zakat mal paling wajar dibajak ke jawaban "total terkumpul se-masjid"
+
+**Gejala**: ditemukan tidak sengaja saat memverifikasi Bab 10.12 — test dengan pesan pertanian gagal dengan pesan "An expected request was not recorded", artinya **AI tidak pernah dipanggil sama sekali**. Ditelusuri ke `ChatbotActionDetector::intent()`: pengecekan intent `ask_total_summary` di baris paling atas fungsi cuma mensyaratkan kombinasi kata **"berapa" + "zakat"** (atau "semua"/"terkumpul"/"penerimaan") — tanpa pengecualian apa pun. Dikonfirmasi langsung lewat `php artisan tinker`: pesan **"Saya mau hitung zakat mal, gaji 10 juta, berapa zakatnya?"** dan **"Zakat penghasilan saya berapa kalau gaji 8 juta?"** — dua cara paling wajar dan umum untuk bertanya soal zakat mal pribadi — sama-sama ter-resolve ke `ask_total_summary`, balasan cepat berisi total zakat terkumpul se-masjid, **sebelum pernah sampai ke pengecekan intent zakat-mal spesifik manapun, apalagi ke AI**.
+
+**Kenapa ini paling parah dari semua temuan hari ini**: bug-bug sebelumnya (Bab 10.7–10.11) muncul di kasus-kasus yang cukup spesifik/jarang (data tidak lengkap, format angka aneh, dua sentinel sekaligus). Bug ini menghantam **frasa paling umum** yang orang pakai untuk bertanya "zakat saya berapa" — persis pola bug yang sama seperti Bab 10.1 (fast-path terlalu agresif), tapi mengenai jalur yang jauh lebih sering dilalui pengguna nyata.
+
+**Akar masalah**: `ask_zakat_mal_definition` sudah punya guard `$looksLikeCalculationRequest` sejak Bab 10.1 (kata "hitung"/"konsultasi" + angka) untuk mencegah pembajakan serupa — tapi guard itu didefinisikan **di tengah fungsi**, setelah pengecekan `ask_total_summary`, `ask_total_people`, dan `ask_total_money` di bagian atas fungsi sudah sempat dieksekusi lebih dulu. Guard yang sudah ada pun ternyata terlalu sempit: cuma menangkap kata "hitung"/"konsultasi", padahal "Zakat penghasilan saya berapa kalau gaji 8 juta?" tidak memakai kata "hitung" sama sekali.
+
+**Perbaikan** ([ChatbotActionDetector.php](../app/Services/Chatbot/ChatbotActionDetector.php)):
+1. `$looksLikeCalculationRequest` dipindah ke **paling atas** fungsi `intent()`, dipakai untuk menjaga keempat pengecekan `ask_total_summary`/`ask_total_people`/`ask_total_money` (dua kali muncul di fungsi ini) — bukan cuma `ask_zakat_mal_definition`.
+2. Definisinya diperluas: selain "hitung"/"konsultasi" + angka, sekarang juga mengenali kata sinyal finansial (`gaji`, `tabungan`, `penghasilan`, `emas`, `hutang`, `aset`) + angka — memakai universe kata kunci yang sama dengan `ChatbotConversationContext::detectMode()`'s `$hasFinancialSignal`, supaya konsisten dengan definisi "sinyal finansial" yang sudah dipakai di tempat lain.
+3. Pengecekan `ask_total_rice` (baris terpisah, Bab audit sebelumnya) juga diperbaiki: anchor wajib diganti dari `beras`/`kg` (dua-duanya opsional) jadi `beras` wajib + `kg` sebagai salah satu qualifier — karena "kg" sendirian terlalu generik (bisa muncul di pertanyaan berat apa pun, termasuk pertanian) untuk jadi penentu utama topik "total beras zakat fitrah terkumpul".
+
+**Verifikasi**: test unit baru `tests/Unit/ChatbotActionDetectorTest.php` — 4 kasus pembajakan (termasuk kasus pertanian yang memicu temuan ini) dipastikan `null` (lolos ke AI), plus 2 kasus soal pertanyaan agregat asli (`ask_total_summary`) dipastikan tetap jalan seperti biasa supaya fix ini tidak mematikan fitur yang sah. Regresi penuh tetap bersih: `php artisan test` 241/241.
+
 ---
 
 ## 11. Keterbatasan yang Diketahui (Untuk Bab Batasan Penelitian)
@@ -363,6 +447,7 @@ Bersamaan dengan itu, ditambahkan **3 entri KB baru** untuk menutup gap konten y
 5. **Refresh embedding cache KB bersifat sinkron** — menyimpan entri KB memblokir request admin selama kira-kira (jumlah entri aktif × latensi API embedding). Aman di skala 54 entri saat ini, perlu dipertimbangkan ulang (batching/queue) kalau KB tumbuh jadi ratusan entri.
 6. **Evaluasi `eval-behavior`, `eval-behavior-rubric`, dan `eval-safety` bergantung pada API key asli** dan bersifat nondeterministik (jawaban LLM bisa sedikit berbeda antar run) — dijalankan manual sebagai regression check sebelum perubahan besar ke prompt, bukan gate CI otomatis seperti unit test biasa.
 7. **Rubric kualitas konsultatif (Bab 9.3) butuh skor manual manusia** — sistem menyediakan bahan evaluasinya (balasan Zakky per skenario dalam format tabel), tapi penilaian 1–5 per aspek tetap memerlukan evaluator manusia (dosen/panitia/peneliti), bukan otomatis.
+8. **Harga emas acuan nishab (Bab 6.1) tidak real-time** — `gold_price_per_gram` adalah input manual admin per periode (default mengikuti SK BAZNAS No. 15/2026 saat dokumen ini ditulis), bukan hasil tarikan API harga emas harian. Kalau periode berjalan lama tanpa admin memperbarui angkanya sementara harga emas pasar bergerak signifikan, nishab yang dipakai sistem bisa menyimpang dari acuan resmi terbaru.
 
 ---
 

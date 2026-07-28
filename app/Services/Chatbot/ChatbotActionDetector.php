@@ -8,19 +8,34 @@ class ChatbotActionDetector
     {
         $message = $this->normalize($message);
 
+        // Computed up front (not just further down near ask_zakat_mal_definition) because the
+        // very first public-data checks below ("berapa" + "zakat") already match an extremely
+        // common, natural zakat mal calculation phrasing - "gaji 10 juta, berapa zakatnya?" - and
+        // would otherwise hijack it into an unrelated "total zakat terkumpul se-masjid" answer
+        // before the message ever reaches any zakat-mal-specific intent check below, let alone AI.
+        // The financial-keyword branch (same keyword universe as
+        // ChatbotConversationContext::detectMode()'s $hasFinancialSignal) catches phrasing that
+        // skips "hitung"/"konsultasi" entirely, e.g. "Zakat penghasilan saya berapa kalau gaji 8
+        // juta?" - a personal figure + "berapa", not a request for the mosque's aggregate total.
+        $looksLikeCalculationRequest = preg_match('/\d+/', $message) && (
+            $this->containsAny($message, ['hitung', 'konsultasi'])
+            || $this->containsAny($message, ['gaji', 'tabungan', 'penghasilan', 'emas', 'hutang', 'aset'])
+        );
+
         if ($this->containsAny($message, ['bisa bantu apa', 'seberapa jago', 'kemampuan', 'zakky bisa apa', 'chatbot bisa apa', 'jago bahas zakat'])) {
             return 'ask_zakky_capability';
         }
 
-        if ($this->containsAny($message, ['jiwa', 'orang', 'muzakki fitrah']) && $this->containsAny($message, ['total', 'jumlah'])) {
+        if (!$looksLikeCalculationRequest && $this->containsAny($message, ['jiwa', 'orang', 'muzakki fitrah']) && $this->containsAny($message, ['total', 'jumlah'])) {
             return 'ask_total_people';
         }
 
-        if ($this->containsAny($message, ['uang', 'rupiah', 'rp', 'terkumpul', 'penerimaan uang', 'nominal']) && $this->containsAny($message, ['total', 'jumlah', 'semua'])) {
+        if (!$looksLikeCalculationRequest && $this->containsAny($message, ['uang', 'rupiah', 'rp', 'terkumpul', 'penerimaan uang', 'nominal']) && $this->containsAny($message, ['total', 'jumlah', 'semua'])) {
             return 'ask_total_money';
         }
 
-        if (!$this->containsAny($message, ['seberapa'])
+        if (!$looksLikeCalculationRequest
+            && !$this->containsAny($message, ['seberapa'])
             && $this->containsAny($message, ['berapa', 'total', 'jumlah', 'ringkasan penerimaan', 'rekap penerimaan'])
             && $this->containsAny($message, ['zakat', 'semua', 'terkumpul', 'penerimaan'])) {
             return 'ask_total_summary';
@@ -46,7 +61,8 @@ class ChatbotActionDetector
         // "zakat mal", but it's a calculation request, not a definition question - without this
         // guard it gets short-circuited to the generic KB definition before ever reaching the
         // AI consultation flow, skipping the whole guided calculation entirely.
-        $looksLikeCalculationRequest = $this->containsAny($message, ['hitung', 'konsultasi']) && preg_match('/\d+/', $message);
+        // ($looksLikeCalculationRequest itself is computed at the top of the function - it guards
+        // the ask_total_* checks above too.)
         $asksDefinition = $this->containsAny($message, [
             'apa itu zakat mal',
             'zakat mal itu apa',
@@ -73,20 +89,28 @@ class ChatbotActionDetector
             return 'ask_categories';
         }
 
-        if ($this->containsAny($message, ['beras', 'kg'])) {
+        // "beras" is the required anchor, not "kg" - "kg" alone (even paired with "berapa"/"total")
+        // is generic enough to appear in any weight question unrelated to rice zakat, e.g. a zakat
+        // mal pertanian question like "panen saya 2000 kg gabah, hitungkan zakatnya berapa kg" -
+        // that would otherwise get hijacked into an unrelated "total beras terkumpul" public-data
+        // answer before it ever reaches AI (same class of bug as Bab 10.1, different keyword).
+        if ($this->containsAny($message, ['beras'])
+            && $this->containsAny($message, ['berapa', 'total', 'jumlah', 'terkumpul', 'kg'])) {
             return 'ask_total_rice';
         }
 
-        if ($this->containsAny($message, ['jiwa', 'orang', 'muzakki fitrah'])) {
+        if (!$looksLikeCalculationRequest && $this->containsAny($message, ['jiwa', 'orang', 'muzakki fitrah'])) {
             return 'ask_total_people';
         }
 
-        if ($this->containsAny($message, ['uang', 'rupiah', 'rp', 'terkumpul', 'penerimaan uang', 'nominal'])
+        if (!$looksLikeCalculationRequest
+            && $this->containsAny($message, ['uang', 'rupiah', 'rp', 'terkumpul', 'penerimaan uang', 'nominal'])
             && $this->containsAny($message, ['berapa', 'total', 'jumlah', 'semua', 'terkumpul', 'penerimaan'])) {
             return 'ask_total_money';
         }
 
-        if (!$this->containsAny($message, ['seberapa'])
+        if (!$looksLikeCalculationRequest
+            && !$this->containsAny($message, ['seberapa'])
             && $this->containsAny($message, ['berapa', 'total', 'jumlah', 'ringkasan penerimaan', 'rekap penerimaan'])) {
             return 'ask_total_summary';
         }

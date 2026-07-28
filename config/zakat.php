@@ -80,6 +80,10 @@ return [
         'fitrah_beras_per_jiwa' => 2.5,
         'fidyah_per_hari' => 30000,
         'fidyah_beras_per_hari' => 0.75,
+        // 1.078.609/gram = 85 gram emas ~ Rp91.681.728/tahun, nisab zakat penghasilan
+        // per SK Ketua BAZNAS No. 15 Tahun 2026.
+        'nishab_gold_gram' => 85,
+        'gold_price_per_gram' => 1078609,
     ],
 
     /**

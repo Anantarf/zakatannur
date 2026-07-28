@@ -14,7 +14,6 @@ class ChatbotZakatMalGuide
     public function calculate(array $data, \App\Services\Transactions\AnnualZakatDefaults $defaults): array
     {
         $incomeMonthly = (int) ($data['income_monthly'] ?? 0);
-        $expensesMonthly = (int) ($data['expenses_monthly'] ?? 0);
         $savings = (int) ($data['savings'] ?? 0);
         $goldGram = (int) ($data['gold_gram'] ?? 0);
         $debt = (int) ($data['debt'] ?? 0);
@@ -22,10 +21,11 @@ class ChatbotZakatMalGuide
         $goldValue = $goldGram * $defaults->goldPricePerGram;
         $nishab = $defaults->nishabGoldGram * $defaults->goldPricePerGram;
 
-        // 1. Zakat penghasilan - basis dari penghasilan bersih (setelah pengeluaran rutin bulanan).
-        $netIncomeAnnual = max(0, $incomeMonthly - $expensesMonthly) * 12;
-        $incomeIsDue = $netIncomeAnnual >= $nishab;
-        $incomeZakat = $incomeIsDue ? (int) ($netIncomeAnnual * 0.025) : 0;
+        // 1. Zakat penghasilan - basis dari penghasilan bruto (gaji pokok + tunjangan), TANPA
+        // dikurangi kebutuhan pokok/pengeluaran rutin - mengikuti SK Ketua BAZNAS No. 15/2026.
+        $incomeAnnual = $incomeMonthly * 12;
+        $incomeIsDue = $incomeAnnual >= $nishab;
+        $incomeZakat = $incomeIsDue ? (int) ($incomeAnnual * 0.025) : 0;
 
         // 2. Zakat tabungan & emas - basis dari harta simpanan saat ini, dikurangi hutang.
         $wealthBase = max(0, $savings + $goldValue - $debt);
@@ -34,7 +34,7 @@ class ChatbotZakatMalGuide
 
         return [
             'nishab' => $nishab,
-            'net_income_annual' => $netIncomeAnnual,
+            'income_annual' => $incomeAnnual,
             'income_is_due' => $incomeIsDue,
             'income_zakat' => $incomeZakat,
             'gold_value' => $goldValue,

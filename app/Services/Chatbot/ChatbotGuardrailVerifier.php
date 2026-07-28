@@ -31,7 +31,17 @@ class ChatbotGuardrailVerifier
             'lirik lagu', 'chord gitar', 'film', 'movie', 'bioskop',
             // Prompt injection indicators
             'sebagai asisten ai umum', 'sebagai model bahasa', 'as an ai language model',
-            'ignore previous instructions', 'abaikan instruksi'
+            'ignore previous instructions', 'abaikan instruksi',
+            // Distinctive fragments lifted verbatim from Zakky's own system prompt
+            // (OpenAiChatbotProvider::getSystemInstruction) - a normal answer to a zakat
+            // question would never say these back to the user, so seeing them in a reply
+            // is a strong signal the LLM is echoing/leaking its instructions rather than
+            // answering. This is deterministic (Layer 2) precisely because Layer 3's
+            // embedding classifier is probabilistic and fails open when unavailable - see
+            // ChatbotSafetyClassifier's confident-tier coverage caveat.
+            'asisten digital zakat an-nur', 'digital assistant for zakat an-nur',
+            'jangan pernah menghitung nominal zakat mal sendiri',
+            'wajib hasilkan string json persis seperti ini',
         ];
 
         foreach ($forbiddenTopics as $topic) {

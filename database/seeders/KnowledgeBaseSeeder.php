@@ -66,7 +66,7 @@ TEXT,
                     'batas zakky',
                     'zakky bisa apa',
                     'fatwa',
-                    'konsultasi',
+                    'konsultasi'    ,
                     'keputusan zakat',
                     'validasi pembayaran',
                     'data pribadi',
@@ -303,7 +303,7 @@ Prinsip yang saya pakai:
 - Harta yang belum dimiliki penuh, dana titipan, atau harta campur usaha perlu dipisahkan dulu sebelum dihitung.
 - Untuk kasus yang punya perbedaan pendapat ulama, saya cuma kasih arah awal - bukan keputusan final.
 
-Perlu diketahui juga, sebagian lembaga menghitung zakat penghasilan dari bruto, sebagian lain dari bersih setelah kebutuhan pokok. Untuk pendekatan yang dipakai Masjid An-Nur, silakan konfirmasi ke panitia atau ustadz.
+Zakat penghasilan dihitung dari penghasilan bruto (kotor, sebelum potongan pajak/BPJS/kebutuhan pokok), mengikuti pendekatan BAZNAS - bukan dari sisa setelah dikurangi pengeluaran rutin.
 TEXT,
                 'source_label' => 'BAZNAS; Panduan Publik Masjid An-Nur',
             ],
@@ -359,7 +359,7 @@ Ini termasuk yang sering beda pendapat antar lembaga, jadi saya kasih gambaran u
 - Pendekatan bruto (kotor): zakat dihitung dari total penghasilan sebelum dipotong pajak, BPJS, atau potongan lain. Nisab dan kadarnya sama seperti zakat penghasilan biasa.
 - Pendekatan netto (bersih): zakat dihitung dari penghasilan yang sudah dikurangi pajak, BPJS, dan kebutuhan pokok, baru dibandingkan dengan nisab.
 
-Sebagian ulama/lembaga memakai bruto supaya lebih hati-hati (ihtiyath), sebagian lain memakai netto karena pajak dan BPJS dianggap kewajiban yang mengurangi harta yang benar-benar dimiliki. Untuk pendekatan yang dipakai Masjid An-Nur, silakan konfirmasi ke panitia atau ustadz.
+Masjid An-Nur memakai pendekatan **bruto** (mengikuti BAZNAS) - zakat penghasilan dihitung dari total gaji/honor sebelum dipotong pajak, BPJS, atau kebutuhan pokok. Kalau Anda punya hutang jatuh tempo yang mendesak, ada pendapat ulama yang membolehkan itu dipertimbangkan tersendiri - untuk kasus seperti ini silakan konfirmasi ke panitia atau ustadz.
 TEXT,
                 'source_label' => 'BAZNAS; Panduan Publik Masjid An-Nur',
             ],

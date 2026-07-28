@@ -17,7 +17,7 @@ final class AnnualZakatDefaults
         float $fitrahBerasPerJiwa,
         float $fidyahBerasPerHari,
         int $nishabGoldGram = 85,
-        int $goldPricePerGram = 900000
+        int $goldPricePerGram = 1078609
     ) {
         $this->fitrahCashPerJiwa = $fitrahCashPerJiwa;
         $this->fidyahPerHari = $fidyahPerHari;

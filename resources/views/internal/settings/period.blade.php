@@ -191,7 +191,7 @@
                                 <div class="flex-1">
                                     <h4 class="ui-settings-section-title">Nominal Default Transaksi & Zakat Mal</h4>
                                     <p class="ui-settings-section-copy" x-show="expandedSection === 3" x-cloak>Isian awal saat panitia input transaksi baru dan acuan nishab AI.</p>
-                                    <p class="text-sm text-slate-500 mt-0.5" x-show="expandedSection !== 3" x-cloak>Fitrah Rp {{ number_format($defaultFitrahCashPerJiwa, 0, ',', '.') }} &middot; Nishab {{ $nishabGoldGram ?? 85 }}g (Rp {{ number_format($goldPricePerGram ?? 900000, 0, ',', '.') }}/g)</p>
+                                    <p class="text-sm text-slate-500 mt-0.5" x-show="expandedSection !== 3" x-cloak>Fitrah Rp {{ number_format($defaultFitrahCashPerJiwa, 0, ',', '.') }} &middot; Nishab {{ $nishabGoldGram ?? 85 }}g (Rp {{ number_format($goldPricePerGram ?? 1078609, 0, ',', '.') }}/g)</p>
                                 </div>
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-slate-400 transition-transform" :class="expandedSection === 3 ? 'rotate-180' : ''" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
@@ -226,7 +226,7 @@
                                     </div>
                                     <div>
                                         <label class="ui-form-label" for="gold_price_per_gram">Harga Emas per Gram (Rp)</label>
-                                        <input id="gold_price_per_gram" name="gold_price_per_gram" type="number" min="1" value="{{ old('gold_price_per_gram', $goldPricePerGram ?? 900000) }}" class="ui-input w-full" required />
+                                        <input id="gold_price_per_gram" name="gold_price_per_gram" type="number" min="1" value="{{ old('gold_price_per_gram', $goldPricePerGram ?? 1078609) }}" class="ui-input w-full" required />
                                         <x-input-error class="mt-2" :messages="$errors->get('gold_price_per_gram')" />
                                     </div>
                                 </div>

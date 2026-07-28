@@ -65,6 +65,8 @@ class ZakatPeriodResolver
             'default_fitrah_beras_per_jiwa' => (float) $annual->default_fitrah_beras_per_jiwa,
             'default_fidyah_per_hari' => (int) $annual->default_fidyah_per_hari,
             'default_fidyah_beras_per_hari' => (float) $annual->default_fidyah_beras_per_hari,
+            'nishab_gold_gram' => (int) config('zakat.annual_defaults.nishab_gold_gram', 85),
+            'gold_price_per_gram' => (int) config('zakat.annual_defaults.gold_price_per_gram', 1078609),
             'chart_starts_at' => $annual->chart_starts_at,
             'chart_ends_at' => $annual->chart_ends_at,
             'chart_fallback_buffer_days' => (int) ($annual->chart_fallback_buffer_days ?? 2),
@@ -110,6 +112,8 @@ class ZakatPeriodResolver
             'default_fitrah_beras_per_jiwa' => (float) ($source?->default_fitrah_beras_per_jiwa ?? config('zakat.annual_defaults.fitrah_beras_per_jiwa', 2.50)),
             'default_fidyah_per_hari' => (int) ($source?->default_fidyah_per_hari ?? config('zakat.annual_defaults.fidyah_per_hari', 30000)),
             'default_fidyah_beras_per_hari' => (float) ($source?->default_fidyah_beras_per_hari ?? config('zakat.annual_defaults.fidyah_beras_per_hari', 0.75)),
+            'nishab_gold_gram' => (int) ($source?->nishab_gold_gram ?? config('zakat.annual_defaults.nishab_gold_gram', 85)),
+            'gold_price_per_gram' => (int) ($source?->gold_price_per_gram ?? config('zakat.annual_defaults.gold_price_per_gram', 1078609)),
             'chart_fallback_buffer_days' => (int) ($source?->chart_fallback_buffer_days ?? 2),
         ]);
     }
