@@ -117,6 +117,7 @@ LLM **tidak pernah** menghitung nominal zakat mal sendiri — ini keputusan desa
 1. Prompt sistem melarang LLM menghitung sendiri dan mewajibkan output tag `[HITUNG:{"income_monthly":...,"expenses_monthly":...,"savings":...,"gold_gram":...,"debt":...}]` begitu data cukup ([OpenAiChatbotProvider.php:335-337](../app/Services/Chatbot/Providers/OpenAiChatbotProvider.php#L335-L337)).
 2. `ChatbotSentinelParser` mendeteksi tag ini, mengekstrak JSON variabelnya, dan memanggil `ChatbotZakatMalGuide::calculate()` — fungsi PHP murni yang menghitung zakat penghasilan (basis penghasilan bersih bulanan × 12, terpisah dari tabungan) dan zakat tabungan/emas (basis harta simpanan saat ini dikurangi hutang) secara independen terhadap nisab.
 3. Hasil kalkulasi disisipkan kembali ke balasan sebagai blok `[[HASIL]]...[[/HASIL]]`, yang di-render frontend sebagai kartu hasil terpisah (lihat `resources/js/chatbot-widget.js`).
+4. Bagian penghasilan dan bagian tabungan/emas masing-masing hanya dirender kalau field terkait **benar-benar ada** di JSON `[HITUNG:{...}]` (`isset()`, bukan default ke 0) — lihat Bab 10.7 untuk bug yang mendasari aturan ini.
 
 Prinsip metodologi (didokumentasikan di KB entri `catatan-metodologi-zakat`): penghasilan tahunan **tidak** dijumlah mentah dengan saldo tabungan sebagai satu basis, karena saldo tabungan biasanya sudah mencerminkan penghasilan yang diterima dan dibelanjakan sepanjang tahun — menjumlahkannya akan menghitung penghasilan yang sama dua kali.
 
@@ -338,6 +339,18 @@ Kedua bug diverifikasi ulang secara manual (balasan benar setelah perbaikan) dan
 Satu-satunya kasus retrieval yang masih gagal di `chatbot:eval-rag` (F1 0,987) adalah pertanyaan *"Kalau kasus saya rumit harus tanya siapa?"* — seharusnya menemukan entri `kapan-konsultasi-ustadz`, tapi entri `cara-zakky-menganalisis-kasus` (topik konseptual berdekatan: sama-sama soal "kasus rumit", beda sudut pandang) menang dengan similarity 0,452, sedikit di atas threshold 0,45. **Perbaikan**: menajamkan keyword `kapan-konsultasi-ustadz` dengan frasa yang lebih cocok dengan pola pertanyaan "harus tanya siapa" (`database/seeders/KnowledgeBaseSeeder.php`). Percobaan pertama sempat memunculkan false positive baru (pertanyaan "Rute tercepat ke Bandung pagi ini lewat mana?" ikut cocok karena kata "lewat" terlalu generik di judul entri baru lainnya) — diperbaiki dengan mengganti "lewat" jadi "melalui" di entri terkait. Setelah kedua perbaikan, `chatbot:eval-rag` mencapai **F1-score 1,0 (precision 1,0, recall 1,0)**.
 
 Bersamaan dengan itu, ditambahkan **3 entri KB baru** untuk menutup gap konten yang teridentifikasi lewat tinjauan manual (bukan lewat eval otomatis, karena eval hanya bisa mengukur retrieval terhadap pertanyaan yang sudah ada di dataset, bukan menemukan topik yang belum pernah dimasukkan sama sekali): zakat penghasilan bruto vs. netto (potongan pajak/BPJS), boleh tidaknya menyalurkan zakat sendiri tanpa lewat panitia, dan zakat mal yang terlewat dari tahun-tahun sebelumnya. Konten ditulis mengikuti pola epistemik yang sama dengan entri KB lain (beri gambaran umum, akui ada beda pendapat ulama/lembaga, arahkan ke ustadz/panitia untuk keputusan final) sehingga tidak mengklaim fatwa tunggal.
+
+---
+
+### 10.7 Bug: seksi hasil ditampilkan untuk data yang tidak pernah disebut user
+
+**Gejala**: dilaporkan langsung dari chat nyata — user hanya membahas zakat penghasilan (gaji), tapi balasan `[[HASIL]]` ikut menampilkan seksi "Estimasi Zakat Tabungan & Emas" dengan kesimpulan "belum wajib zakat tabungan/emas saat ini", padahal tabungan/emas tidak pernah disinggung sama sekali. Baris ringkasan input di atasnya juga ikut menampilkan "Tabungan: Rp 0", "Emas: 0 gram", dst. untuk field yang tidak pernah dibahas.
+
+**Akar masalah**: `ChatbotSentinelParser` sebelumnya selalu merender **kedua** seksi (penghasilan dan tabungan/emas) begitu sentinel `[HITUNG:{...}]` valid, memakai `$data['savings'] ?? 0` dkk. — field yang memang tidak ada di JSON (karena user tidak pernah menyebutnya) didefaultkan ke 0 dan ditampilkan seolah sudah dinilai ("dihitung, hasilnya nihil"), bukan "tidak pernah ditanyakan".
+
+**Perbaikan** ([ChatbotSentinelParser.php](../app/Services/Chatbot/ChatbotSentinelParser.php)): seksi dan baris ringkasan sekarang hanya dirender untuk field yang benar-benar `isset()` di JSON. Seksi penghasilan digerbang khusus oleh `income_monthly` (bukan gabungan dengan `expenses_monthly`), karena pengeluaran saja tetap menghasilkan penghasilan bersih Rp0 (`max(0, 0 - expenses)`) — masalah "didefaultkan, bukan benar-benar dinilai" yang sama persis. Baris **Total** hanya muncul kalau kedua seksi relevan (bukan cuma satu). Ditambahkan juga guard untuk edge case yang muncul dari pengetatan ini (pengeluaran diberikan tanpa penghasilan) yang tadinya menghasilkan blok `[[HASIL]]` kosong.
+
+**Verifikasi**: diuji ulang terhadap skenario yang dilaporkan plus edge case (hanya pengeluaran, hanya hutang). Regresi penuh tetap bersih: `php artisan test` 228/228.
 
 ---
 
