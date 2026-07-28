@@ -277,6 +277,7 @@ class ChatbotApiTest extends TestCase
         $this->assertSame([
             'model' => 'gpt-5.6-sol',
             'prompt_tokens' => 100,
+            'cached_tokens' => 0,
             'completion_tokens' => 25,
             'total_tokens' => 125,
             'estimated_cost_usd' => 0.00125,
@@ -318,6 +319,48 @@ class ChatbotApiTest extends TestCase
         $this->assertSame(200, $log->completion_tokens);
         $this->assertSame(1400, $log->total_tokens);
         $this->assertEquals(0.012, (float) $log->estimated_cost_usd);
+    }
+
+    public function test_chatbot_bills_cached_prompt_tokens_at_the_discounted_rate(): void
+    {
+        // OpenAI's automatic prompt caching (kicks in for prompts >1024 tokens - the system
+        // prompt alone already exceeds that, see Bab 15) reports how many prompt tokens hit cache
+        // via usage.prompt_tokens_details.cached_tokens, billed at ~50% of the fresh input rate.
+        // Counting all 1200 prompt tokens at full price here would overstate real cost by exactly
+        // the amount this test pins down.
+        Http::fake([
+            'api.openai.com/*' => Http::response([
+                'choices' => [[ 'message' => [ 'content' => 'Zakat emas termasuk zakat mal dengan nisab 85 gram.' ] ]],
+                'usage' => [
+                    'prompt_tokens' => 1200,
+                    'completion_tokens' => 200,
+                    'total_tokens' => 1400,
+                    'prompt_tokens_details' => ['cached_tokens' => 1024],
+                ],
+            ], 200),
+        ]);
+
+        $this->app->bind(ChatbotServiceInterface::class, fn () => new OpenAiChatbotProvider(
+            'test-key',
+            'gpt-5.6-terra',
+            'https://api.openai.com/v1',
+            models: [
+                'fast' => 'gpt-5.6-luna',
+                'premium' => 'gpt-5.6-sol',
+            ],
+        ));
+
+        $this->postJson('/api/chatbot/message', [
+            'message' => 'Jelaskan zakat emas untuk konsultasi saya',
+            'session_id' => 'cached-cost-session',
+        ])->assertOk();
+
+        $log = AiChatLog::where('session_id', 'cached-cost-session')->firstOrFail();
+
+        $this->assertSame(1024, $log->cached_tokens);
+        // 176 fresh tokens @ $5.00/M + 1024 cached tokens @ $2.50/M + 200 completion @ $30.00/M
+        // = 0.00088 + 0.00256 + 0.006 = 0.00944 (vs 0.012 if cached tokens were billed at full price)
+        $this->assertEquals(0.00944, (float) $log->estimated_cost_usd);
     }
 
     public function test_chatbot_answers_total_from_public_data(): void
@@ -782,6 +825,71 @@ class ChatbotApiTest extends TestCase
         });
     }
 
+    public function test_ai_reply_citations_do_not_leak_internal_conversation_hints(): void
+    {
+        // ChatbotOrchestrator::finalizeAiReply() used to pass the raw internal $contexts array
+        // straight through as the response's "citations" - that array carries hint-only entries
+        // (_conversation_hint, _sentiment_hint, _correction_hint) meant only for the LLM's system
+        // prompt, so they leaked verbatim into the public API response for a zakat_mal_consultation
+        // turn like this one (which always injects a conversation hint). The reply itself never
+        // exposed anything (guardrail-tested elsewhere) - this was a separate leak in the citations
+        // field of the JSON payload, visible in the browser network tab even though the frontend
+        // template doesn't render it directly.
+        Http::fake([
+            'generativelanguage.googleapis.com/*' => Http::response([
+                'choices' => [[ 'message' => [ 'content' => 'Baik, mau saya bantu hitungkan estimasi zakat mal-nya?' ] ]],
+            ], 200),
+        ]);
+
+        $this->app->bind(ChatbotServiceInterface::class, fn () => new OpenAiChatbotProvider(
+            'test-key',
+            'gemini-2.5-flash',
+            'https://generativelanguage.googleapis.com/v1beta/openai'
+        ));
+
+        $response = $this->postJson('/api/chatbot/message', [
+            'message' => 'Saya mau hitung zakat mal, gaji saya 10 juta per bulan',
+        ]);
+
+        $response->assertOk()->assertJsonPath('data.citations', []);
+        $this->assertStringNotContainsString('_conversation_hint', $response->getContent());
+    }
+
+    public function test_ai_reply_citations_use_the_label_key_the_frontend_reads(): void
+    {
+        // chatbot-widget.blade.php renders the citation footer as "'Acuan: ' +
+        // message.citations[0].label" - but KnowledgeBase::toKnowledgeArray() only exposes
+        // 'source_label', never 'label'. Passing KB context straight through as citations (as
+        // finalizeAiReply() used to) meant that footer rendered literally "Acuan: undefined" on
+        // any AI reply that had matched KB context.
+        (new \Database\Seeders\KnowledgeBaseSeeder())->run();
+
+        Http::fake([
+            'generativelanguage.googleapis.com/*' => Http::response([
+                'choices' => [[ 'message' => [ 'content' => 'Zakat properti sewa dihitung dari pendapatan bersih.' ] ]],
+            ], 200),
+        ]);
+
+        $this->app->bind(ChatbotServiceInterface::class, fn () => new OpenAiChatbotProvider(
+            'test-key',
+            'gemini-2.5-flash',
+            'https://generativelanguage.googleapis.com/v1beta/openai'
+        ));
+
+        $response = $this->postJson('/api/chatbot/message', [
+            'message' => 'Rumah kontrakan saya kena zakat properti sewa gak?',
+        ]);
+
+        $response->assertOk();
+        $citations = $response->json('data.citations');
+        $this->assertNotEmpty($citations);
+        foreach ($citations as $citation) {
+            $this->assertArrayHasKey('label', $citation);
+            $this->assertNotNull($citation['label']);
+            $this->assertArrayNotHasKey('source_label', $citation);
+        }
+    }
+
     public function test_system_prompt_instructs_confirming_intent_before_collecting_financial_data(): void
     {
         // Regression guard for the "bot langsung interogasi data padahal user cuma menyebut
@@ -878,6 +986,46 @@ class ChatbotApiTest extends TestCase
         });
     }
 
+    /**
+     * Bab 10.16 found the English system prompt missing every hard rule the Indonesian one had
+     * (including the [HITUNG:] sentinel and the "never self-calculate" rule itself - an
+     * English-speaking user had zero protection against the LLM hallucinating a zakat mal figure
+     * in free text). This table is the single source of truth for "every correctness-critical
+     * rule must exist in BOTH language prompts" - a future prompt edit that updates one language
+     * and forgets the other fails here with a clear "rule X missing from language Y" message,
+     * instead of silently reintroducing the Bab 10.16 gap.
+     *
+     * Reflection is used instead of an HTTP round trip because ChatbotLanguageDetector uses a
+     * fixed marker-word list, not a general English/Indonesian classifier - crafting a message
+     * that reliably clears its 30% ratio threshold is brittle and orthogonal to what this test
+     * actually verifies (the prompts' own content, not language detection). Actual model
+     * compliance with these instructions is checked by `chatbot:eval-behavior`.
+     *
+     * @dataProvider hardRulePresentInBothLanguagesProvider
+     */
+    public function test_hard_rule_is_present_in_both_language_prompts(string $ruleName, string $idSubstring, string $enSubstring): void
+    {
+        $provider = new OpenAiChatbotProvider('test-key', 'gemini-2.5-flash', 'https://example.test');
+        $method = new \ReflectionMethod(OpenAiChatbotProvider::class, 'getSystemInstruction');
+        $method->setAccessible(true);
+
+        $this->assertStringContainsString($idSubstring, $method->invoke($provider, 'id', []), "Rule '{$ruleName}' missing from Indonesian prompt");
+        $this->assertStringContainsString($enSubstring, $method->invoke($provider, 'en', []), "Rule '{$ruleName}' missing from English prompt");
+    }
+
+    public static function hardRulePresentInBothLanguagesProvider(): array
+    {
+        return [
+            'never self-calculate' => ['never_self_calculate', 'JANGAN PERNAH menghitung nominal zakat mal sendiri', 'NEVER calculate a zakat mal amount yourself'],
+            'hitung json schema' => ['hitung_json_schema', '[HITUNG:{"income_monthly":10000000,"savings":50000000,"gold_gram":0,"debt":0}]', '[HITUNG:{"income_monthly":10000000,"savings":50000000,"gold_gram":0,"debt":0}]'],
+            'confirm intent before collecting data' => ['confirm_intent', 'Konfirmasi dulu niatnya', 'Confirm their intent first'],
+            'bruto clarification for net salary' => ['bruto_clarification', 'menghitung zakat penghasilan dari gaji kotor/bruto', 'calculates zakat penghasilan from the gross salary'],
+            'advanced topics not covered by sentinel' => ['advanced_topics_restriction', 'sentinel [HITUNG:] TIDAK mencakup topik ini', 'the [HITUNG:] sentinel does NOT cover these'],
+            'no self-invented UI tags' => ['no_suggest_tags', 'JANGAN membuat tag [SUGGEST]', 'Do not output [SUGGEST] tags'],
+            'stop calculating if already paid' => ['stop_if_already_paid', 'JANGAN lanjut menghitung atau meminta data lagi', 'do NOT continue calculating or asking for more data'],
+        ];
+    }
+
     public function test_switching_topic_mid_consultation_leaves_zakat_mal_consultation_mode(): void
     {
         Http::fake([
@@ -951,6 +1099,8 @@ class ChatbotApiTest extends TestCase
 
     public function test_chatbot_guardrail_blocks_off_topic_reply(): void
     {
+        $chatbotLogTail = $this->chatbotLogTail();
+
         Http::fake([
             'generativelanguage.googleapis.com/*' => Http::response([
                 'choices' => [[ 'message' => [ 'content' =>
@@ -968,6 +1118,84 @@ class ChatbotApiTest extends TestCase
 
         $response->assertStatus(403);
         $this->assertStringContainsString('Saya bantu untuk topik zakat dan layanan Masjid An-Nur dulu ya', $response->json('message'));
+
+        // ChatbotDiagnostics: a block at this layer must be traceable to "guardrail" specifically,
+        // not just visible as a generic 403 - that's the whole point of layer-tagged logging.
+        $this->assertStringContainsString('[guardrail] blocked_by_keyword', $chatbotLogTail());
+    }
+
+    public function test_sentinel_parser_rejection_is_logged_with_layer_tag(): void
+    {
+        $chatbotLogTail = $this->chatbotLogTail();
+
+        Http::fake([
+            'generativelanguage.googleapis.com/*' => Http::response([
+                'choices' => [[ 'message' => [ 'content' => '[HITUNG:{"income_monthly":"10.000.000"}]' ] ]],
+            ], 200),
+        ]);
+
+        $this->app->bind(ChatbotServiceInterface::class, fn () => new OpenAiChatbotProvider(
+            'test-key',
+            'gemini-2.5-flash',
+            'https://generativelanguage.googleapis.com/v1beta/openai'
+        ));
+
+        $this->postJson('/api/chatbot/message', ['message' => 'Gaji saya 10.000.000, hitungkan zakatnya'])->assertOk();
+
+        $this->assertStringContainsString('[sentinel_parser] rejected_non_numeric_value', $chatbotLogTail());
+    }
+
+    public function test_orchestrator_exception_is_logged_with_layer_tag(): void
+    {
+        $chatbotLogTail = $this->chatbotLogTail();
+
+        $this->app->bind(ChatbotServiceInterface::class, fn () => new class implements ChatbotServiceInterface
+        {
+            public function sendMessage(string $message, array $context = [], string $language = 'id', array $history = []): string
+            {
+                throw new \RuntimeException('secret failure details');
+            }
+
+            public function streamMessage(string $message, array $context = [], string $language = 'id', array $history = []): \Generator
+            {
+                throw new \RuntimeException('secret failure details');
+                yield;
+            }
+
+            public function wasLastReplyFallback(): bool
+            {
+                return false;
+            }
+
+            public function lastUsageMetadata(): array
+            {
+                return [];
+            }
+        });
+
+        $this->postJson('/api/chatbot/message', ['message' => 'Apa itu reksa dana syariah di pasar modal global?'])
+            ->assertStatus(500);
+
+        $tail = $chatbotLogTail();
+        $this->assertStringContainsString('[orchestrator] unhandled_exception', $tail);
+        $this->assertStringContainsString('RuntimeException', $tail);
+    }
+
+    /** Returns a closure capturing today's chatbot log size now, so callers can read back only
+     *  what THIS test appended - the file accumulates across every test run, an unscoped read
+     *  would false-positive on a string a completely different test happened to log earlier. */
+    private function chatbotLogTail(): \Closure
+    {
+        $path = storage_path('logs/chatbot-' . now()->format('Y-m-d') . '.log');
+        $offset = file_exists($path) ? filesize($path) : 0;
+
+        return function () use ($path, $offset): string {
+            if (!file_exists($path)) {
+                return '';
+            }
+
+            return substr(file_get_contents($path), $offset);
+        };
     }
 
     public function test_ai_conversation_reply_is_not_hijacked_by_quick_response_keyword_match(): void

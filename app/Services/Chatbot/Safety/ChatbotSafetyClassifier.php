@@ -2,6 +2,7 @@
 
 namespace App\Services\Chatbot\Safety;
 
+use App\Services\Chatbot\ChatbotDiagnostics;
 use App\Services\Chatbot\Knowledge\KnowledgeEmbeddingsCache;
 use App\Services\Chatbot\Providers\OpenAiEmbeddingsProvider;
 
@@ -114,13 +115,22 @@ class ChatbotSafetyClassifier
     public function checkReply(string $reply): ?string
     {
         $result = $this->classify($reply);
-        if ($result === null || $result['confidence'] !== 'confident') {
+        if ($result === null) {
+            // Distinct from "classified but not blockable" - this is the fail-open path (no
+            // embeddings API key, request failure, or empty reference set), worth knowing about
+            // separately since it means Layer 3 provided zero protection for this reply.
+            ChatbotDiagnostics::info(ChatbotDiagnostics::LAYER_SAFETY_CLASSIFIER, 'skipped_fail_open');
             return null;
         }
 
-        if (!in_array($result['category'], self::BLOCKABLE_CATEGORIES, true)) {
+        if ($result['confidence'] !== 'confident' || !in_array($result['category'], self::BLOCKABLE_CATEGORIES, true)) {
             return null;
         }
+
+        ChatbotDiagnostics::warning(ChatbotDiagnostics::LAYER_SAFETY_CLASSIFIER, 'blocked', [
+            'category' => $result['category'],
+            'score' => $result['score'],
+        ]);
 
         return self::REJECTION_MESSAGES[$result['category']] ?? null;
     }

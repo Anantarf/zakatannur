@@ -46,6 +46,11 @@ class ChatbotGuardrailVerifier
 
         foreach ($forbiddenTopics as $topic) {
             if (str_contains($lowerReply, $topic)) {
+                ChatbotDiagnostics::warning(ChatbotDiagnostics::LAYER_GUARDRAIL, 'blocked_by_keyword', [
+                    'matched_keyword' => $topic,
+                    'mode' => $mode,
+                ]);
+
                 return "Saya bantu untuk topik zakat dan layanan Masjid An-Nur dulu ya. Kalau mau, tanyakan soal zakat fitrah, zakat mal, fidyah, infaq/shodaqoh, atau cara bayar.";
             }
         }
@@ -76,6 +81,11 @@ class ChatbotGuardrailVerifier
             }
 
             if (!$hasDomainKeyword) {
+                ChatbotDiagnostics::warning(ChatbotDiagnostics::LAYER_GUARDRAIL, 'blocked_by_no_domain_keyword_heuristic', [
+                    'reply_length' => strlen($lowerReply),
+                    'mode' => $mode,
+                ]);
+
                 return "Saya bantu untuk topik zakat dan layanan Masjid An-Nur dulu ya. Kalau mau, tanyakan soal zakat fitrah, zakat mal, fidyah, infaq/shodaqoh, atau cara bayar.";
             }
         }

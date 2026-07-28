@@ -27,6 +27,7 @@ class ChatbotChatLogger
                     'confidence_source' => $confidenceSource,
                     'model' => $usage['model'] ?? null,
                     'prompt_tokens' => $usage['prompt_tokens'] ?? null,
+                    'cached_tokens' => $usage['cached_tokens'] ?? null,
                     'completion_tokens' => $usage['completion_tokens'] ?? null,
                     'total_tokens' => $usage['total_tokens'] ?? null,
                     'estimated_cost_usd' => $usage['estimated_cost_usd'] ?? null,

@@ -3,60 +3,33 @@
 namespace App\Services;
 
 use App\Models\ZakatTransaction;
-use App\Services\Periods\ZakatPeriodResolver;
 use App\Services\Transactions\AnnualZakatDefaultsResolver;
-use App\Services\Transactions\MuzakkiResolver;
-use App\Services\Transactions\TransactionAuditLogger;
 use App\Services\Transactions\TransactionNominalValidator;
-use App\Services\Transactions\TransactionNumberGenerator;
-use App\Services\Transactions\TransactionPayloadBuilder;
-use App\Services\Transactions\TransactionLockManager;
 use App\Services\Transactions\TransactionReviewAssistantService;
-use App\Services\Transactions\TransactionRowPersister;
+use App\Services\Transactions\TransactionSyncService;
 use Carbon\Carbon;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Database\QueryException;
 use Illuminate\Validation\ValidationException;
 use App\Events\ZakatTransactionCreated;
-use App\Exceptions\DuplicateTransactionNumberException;
 use Illuminate\Database\Eloquent\Collection;
 
 class ZakatService
 {
-    private TransactionNumberGenerator $numberGenerator;
     private TransactionNominalValidator $nominalValidator;
-    private TransactionRowPersister $rowPersister;
     private TransactionReviewAssistantService $reviewAssistantService;
     private AnnualZakatDefaultsResolver $defaultsResolver;
-    private MuzakkiResolver $muzakkiResolver;
-    private TransactionPayloadBuilder $payloadBuilder;
-    private TransactionAuditLogger $auditLogger;
-    private ZakatPeriodResolver $periodResolver;
-    private TransactionLockManager $lockManager;
+    private TransactionSyncService $syncService;
 
     public function __construct(
-        TransactionNumberGenerator $numberGenerator,
         TransactionNominalValidator $nominalValidator,
-        TransactionRowPersister $rowPersister,
         TransactionReviewAssistantService $reviewAssistantService,
         AnnualZakatDefaultsResolver $defaultsResolver,
-        MuzakkiResolver $muzakkiResolver,
-        TransactionPayloadBuilder $payloadBuilder,
-        TransactionAuditLogger $auditLogger,
-        ZakatPeriodResolver $periodResolver,
-        TransactionLockManager $lockManager,
+        TransactionSyncService $syncService,
     ) {
-        $this->numberGenerator = $numberGenerator;
         $this->nominalValidator = $nominalValidator;
-        $this->rowPersister = $rowPersister;
         $this->reviewAssistantService = $reviewAssistantService;
         $this->defaultsResolver = $defaultsResolver;
-        $this->muzakkiResolver = $muzakkiResolver;
-        $this->payloadBuilder = $payloadBuilder;
-        $this->auditLogger = $auditLogger;
-        $this->periodResolver = $periodResolver;
-        $this->lockManager = $lockManager;
+        $this->syncService = $syncService;
     }
 
     public function storeTransaction(array $data, int $petugasId, ?string $noTransaksiOverride = null): array
@@ -72,35 +45,26 @@ class ZakatService
 
         $this->assertItemsBelongToEditableGroup($items, $noTransaksiOverride);
 
-        $lockName = 'sync_tx_' . $waktuTerima->format('Ymd');
-
-        $syncResult = $this->executeWithRetry(
-            fn() => $this->performSync($data, $items, $petugasId, $waktuTerima, $noTransaksiOverride),
-            $lockName
-        );
-
-        $syncResults = $syncResult['results'];
-        $oldUang = $syncResult['oldUang'];
-        $oldBeras = $syncResult['oldBeras'];
-        $newUang = collect($syncResults)->sum('nominal_uang');
-        $newBeras = collect($syncResults)->sum('jumlah_beras_kg');
-        $isNominalChanged = (int)$oldUang !== (int)$newUang || abs((float)$oldBeras - (float)$newBeras) > 0.001;
-        $hasSignificantNominalChange = $this->hasSignificantNominalChange((int) $oldUang, (int) $newUang, (float) $oldBeras, (float) $newBeras);
+        $syncResult = $this->syncService->sync($data, $items, $petugasId, $waktuTerima, $noTransaksiOverride);
+        $syncResults = $syncResult->transactions;
+        $newUang = $syncResult->newUang();
+        $newBeras = $syncResult->newBeras();
+        $hasSignificantNominalChange = $this->hasSignificantNominalChange($syncResult->oldUang, $newUang, $syncResult->oldBeras, $newBeras);
 
         foreach ($syncResults as $transaction) {
             $transaction->setAttribute('anomaly_context', [
-                'updated_after_receipt_printed' => (bool) ($syncResult['wasReceiptPrinted'] && $noTransaksiOverride !== null),
+                'updated_after_receipt_printed' => (bool) ($syncResult->wasReceiptPrinted && $noTransaksiOverride !== null),
                 'significant_nominal_change' => (bool) ($noTransaksiOverride !== null && $hasSignificantNominalChange),
-                'old_total_uang' => (int) $oldUang,
+                'old_total_uang' => $syncResult->oldUang,
                 'new_total_uang' => (int) $newUang,
-                'old_total_beras' => (float) $oldBeras,
+                'old_total_beras' => $syncResult->oldBeras,
                 'new_total_beras' => (float) $newBeras,
             ]);
         }
 
         $this->reviewAssistantService->syncForTransactions($syncResults);
 
-        if (count($syncResults) > 0 && ($noTransaksiOverride === null || $isNominalChanged)) {
+        if (count($syncResults) > 0 && ($noTransaksiOverride === null || $syncResult->nominalChanged())) {
             try {
                 event(new ZakatTransactionCreated(new Collection($syncResults)));
             } catch (\Throwable $e) {
@@ -147,178 +111,6 @@ class ZakatService
     private function extractItems(array $data): array
     {
         return isset($data['items']) && is_array($data['items']) ? $data['items'] : [$data];
-    }
-
-    /**
-     * Synchronizes a batch of transactions under a daily lock.
-     *
-     * This method is responsible for the full write flow: generating or reusing
-     * the transaction number, persisting the payer data, processing each item,
-     * deleting removed rows, and writing the audit log.
-     *
-     * @return array{results: array<int, ZakatTransaction>, oldUang: int, oldBeras: float}
-     */
-    private function performSync(array $data, array $items, int $petugasId, Carbon $waktuTerima, ?string $noTransaksiOverride): array
-    {
-        $noTransaksi = $noTransaksiOverride ?? $this->numberGenerator->generate($waktuTerima);
-        $wasReceiptPrinted = ZakatTransaction::withTrashed()
-            ->where('no_transaksi', $noTransaksi)
-            ->whereNotNull('receipt_printed_at')
-            ->exists();
-
-        if (!$noTransaksiOverride && ZakatTransaction::withTrashed()->where('no_transaksi', $noTransaksi)->exists()) {
-            throw new DuplicateTransactionNumberException("Nomor Transaksi {$noTransaksi} sudah terpakai. Sila klik simpan sekali lagi untuk mendapatkan nomor baru.");
-        }
-
-        $oldTotals = $this->getExistingTransactionTotals($noTransaksi);
-        $pembayarData = $this->muzakkiResolver->payerData($data);
-
-        $existingIds = ZakatTransaction::where('no_transaksi', $noTransaksi)->pluck('id')->toArray();
-        [$results, $newIds] = $this->processItems($items, $data, $pembayarData, $petugasId, $waktuTerima, $noTransaksi);
-
-        $idsToDelete = $this->deleteRemovedTransactions($existingIds, $newIds);
-        $summary = $this->buildSyncSummary($existingIds, $newIds, $idsToDelete);
-
-        $this->auditLogger->logSync(
-            request(),
-            $noTransaksi,
-            $pembayarData['muzakki_name'],
-            $summary,
-            $oldTotals,
-            $results,
-            $noTransaksiOverride !== null,
-            $wasReceiptPrinted
-        );
-
-        return [
-            'results' => $results,
-            'oldUang' => (int) $oldTotals['uang'],
-            'oldBeras' => (float) $oldTotals['beras'],
-            'wasReceiptPrinted' => $wasReceiptPrinted,
-        ];
-    }
-
-    /**
-     * @return array{uang:int,beras:float}
-     */
-    private function getExistingTransactionTotals(string $noTransaksi): array
-    {
-        $oldTotals = ZakatTransaction::where('no_transaksi', $noTransaksi)
-            ->selectRaw('SUM(nominal_uang) as uang, SUM(jumlah_beras_kg) as beras')
-            ->first();
-
-        return [
-            'uang' => (int) ($oldTotals->uang ?? 0),
-            'beras' => (float) ($oldTotals->beras ?? 0),
-        ];
-    }
-
-    /**
-     * @param array<int, int> $existingIds
-     * @param array<int, int> $newIds
-     * @return array<int, int>
-     */
-    private function deleteRemovedTransactions(array $existingIds, array $newIds): array
-    {
-        $idsToDelete = array_diff($existingIds, $newIds);
-        if (!empty($idsToDelete)) {
-            ZakatTransaction::whereIn('id', $idsToDelete)->delete();
-        }
-
-        return $idsToDelete;
-    }
-
-    /**
-     * @param array<int, int> $existingIds
-     * @param array<int, int> $newIds
-     * @param array<int, int> $idsToDelete
-     * @return array{added:int,updated:int,removed:int}
-     */
-    private function buildSyncSummary(array $existingIds, array $newIds, array $idsToDelete): array
-    {
-        $updatedCount = count(array_intersect($existingIds, $newIds));
-
-        return [
-            'added'   => count($newIds) - $updatedCount,
-            'updated' => $updatedCount,
-            'removed' => count($idsToDelete),
-        ];
-    }
-
-    /**
-     * Converts one request payload or batch item set into persisted transaksi rows.
-     *
-     * Each item can override category, metode, tahun zakat, and payer identity.
-     * Existing soft-deleted rows are restored and updated so edits preserve IDs.
-     *
-     * @return array{0: array<int, ZakatTransaction>, 1: array<int, int>}
-     */
-    private function processItems(array $items, array $data, array $pembayarData, int $petugasId, Carbon $waktuTerima, string $noTransaksi): array
-    {
-        $results = [];
-        $newIds = [];
-
-        foreach ($items as $item) {
-            $itemContext = $this->resolveItemContext($item, $data, $waktuTerima);
-            if ($itemContext === null) {
-                continue;
-            }
-
-            $category = $itemContext['category'];
-            $metode = $itemContext['metode'];
-            $tahunZakat = $itemContext['tahun_zakat'];
-            $period = $this->periodResolver->ensureForYear($tahunZakat);
-            $defaults = $this->defaultsResolver->resolve($tahunZakat);
-
-            $itemForComputation = $itemContext['item_for_computation'];
-            $muzakki = $this->muzakkiResolver->resolveItem($item, $pembayarData);
-
-            $txData = $this->payloadBuilder->build(
-                $item,
-                $data,
-                $pembayarData,
-                $petugasId,
-                $waktuTerima,
-                $noTransaksi,
-                $muzakki->id,
-                $category,
-                $metode,
-                $tahunZakat,
-                $itemForComputation,
-                $defaults,
-                $period
-            );
-
-            $transaction = $this->rowPersister->persist($item, $txData);
-
-            $newIds[] = $transaction->id;
-            $results[] = $transaction;
-        }
-
-        return [$results, $newIds];
-    }
-
-    private function resolveItemContext(array $item, array $data, Carbon $waktuTerima): ?array
-    {
-        $category = $item['category'] ?? $data['category'] ?? null;
-        $metode = $item['metode'] ?? $data['metode'] ?? null;
-
-        if (!$category || !$metode) {
-            return null;
-        }
-
-        $tahunZakat = (int) ($item['tahun_zakat'] ?? $data['tahun_zakat'] ?? $waktuTerima->year);
-
-        return [
-            'category' => $category,
-            'metode' => $metode,
-            'tahun_zakat' => $tahunZakat,
-            'item_for_computation' => array_merge($item, [
-                'category' => $category,
-                'metode' => $metode,
-                'tahun_zakat' => $tahunZakat,
-            ]),
-        ];
     }
 
     /**
@@ -369,32 +161,6 @@ class ZakatService
             $defaultFidyahBeras,
             $requireActiveYear
         );
-    }
-
-    private function executeWithRetry(\Closure $callback, ?string $lockName = null)
-    {
-        $maxAttempts = (int) config('zakat.transaction.retry_attempts', 5);
-        $attempts = 0;
-        while ($attempts < $maxAttempts) {
-            $attempts++;
-            $lockToken = $lockName ? $this->lockManager->acquire($lockName) : null;
-
-            try {
-                return DB::transaction($callback);
-            } catch (QueryException $e) {
-                // Retry on unique constraint collision or deadlock
-                if ($e->getCode() === '40001' || $e->errorInfo[1] === 1213) continue;
-                
-                throw $e;
-            } catch (DuplicateTransactionNumberException) {
-                continue;
-            } catch (\RuntimeException $e) {
-                throw $e;
-            } finally {
-                $this->lockManager->release($lockToken);
-            }
-        }
-        throw new \RuntimeException("Gagal memproses transaksi setelah beberapa kali percobaan karena kepadatan trafik. Silakan klik simpan sekali lagi.");
     }
 
     private function hasSignificantNominalChange(int $oldUang, int $newUang, float $oldBeras, float $newBeras): bool

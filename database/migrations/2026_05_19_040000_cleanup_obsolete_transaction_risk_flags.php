@@ -59,6 +59,7 @@ return new class extends Migration
 
     public function down(): void
     {
-        //
+        // Irreversible data cleanup: obsolete flags, reasons, and derived scores are removed.
+        // Reconstructing them would reintroduce retired risk rules with no reliable original context.
     }
 };

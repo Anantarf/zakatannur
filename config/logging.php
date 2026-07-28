@@ -67,6 +67,16 @@ return [
             'days' => 14,
         ],
 
+        // Isolated from the general app log so chatbot pipeline events (which layer handled a
+        // message, why a layer blocked/rejected it, how long each stage took) are grep-able
+        // without wading through unrelated Laravel log noise. See ChatbotDiagnostics.
+        'chatbot' => [
+            'driver' => 'daily',
+            'path' => storage_path('logs/chatbot.log'),
+            'level' => env('LOG_LEVEL', 'debug'),
+            'days' => 14,
+        ],
+
         'slack' => [
             'driver' => 'slack',
             'url' => env('LOG_SLACK_WEBHOOK_URL'),

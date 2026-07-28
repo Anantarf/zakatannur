@@ -47,7 +47,7 @@ return new class extends Migration
      */
     public function down()
     {
-        // Irreversible by design - the deleted rows are stale content, not schema.
+        // Irreversible data cleanup: the deleted rows are stale content, not schema.
         // Re-run KnowledgeBaseSeeder to repopulate the consolidated entries if needed.
     }
 };

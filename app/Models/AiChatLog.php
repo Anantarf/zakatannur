@@ -20,6 +20,7 @@ class AiChatLog extends Model
         'confidence_source',
         'model',
         'prompt_tokens',
+        'cached_tokens',
         'completion_tokens',
         'total_tokens',
         'estimated_cost_usd',

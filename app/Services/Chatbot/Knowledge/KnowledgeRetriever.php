@@ -2,6 +2,7 @@
 
 namespace App\Services\Chatbot\Knowledge;
 
+use App\Services\Chatbot\ChatbotDiagnostics;
 use App\Services\Chatbot\Providers\OpenAiEmbeddingsProvider;
 
 class KnowledgeRetriever
@@ -34,7 +35,9 @@ class KnowledgeRetriever
         }
 
         // 2. Fallback to Keyword Search
-        \Illuminate\Support\Facades\Log::info('KnowledgeRetriever falling back to keyword search', ['message' => $message]);
+        ChatbotDiagnostics::warning(ChatbotDiagnostics::LAYER_KNOWLEDGE_RETRIEVER, 'fell_back_to_keyword_search', [
+            'message_length' => mb_strlen($message),
+        ]);
         return $this->searchViaKeywords($message, $entries, $limit);
     }
 
@@ -53,19 +56,21 @@ class KnowledgeRetriever
     private function searchViaEmbeddings(string $message, array $entries, float $threshold = 0.45): array
     {
         if (empty(trim($message))) {
-            \Illuminate\Support\Facades\Log::warning('KnowledgeRetriever: empty message for semantic search');
+            ChatbotDiagnostics::warning(ChatbotDiagnostics::LAYER_KNOWLEDGE_RETRIEVER, 'empty_message_for_semantic_search');
             return [];
         }
 
         $messageEmbedding = $this->embeddingsProvider->getEmbedding($message);
         if (!$messageEmbedding) {
-            \Illuminate\Support\Facades\Log::warning('KnowledgeRetriever: embedding generation failed', ['message_length' => strlen($message)]);
+            ChatbotDiagnostics::warning(ChatbotDiagnostics::LAYER_KNOWLEDGE_RETRIEVER, 'embedding_generation_failed', [
+                'message_length' => mb_strlen($message),
+            ]);
             return [];
         }
 
         $knowledgeEmbeddings = $this->embeddingsCache->getCachedEmbeddings();
         if (empty($knowledgeEmbeddings)) {
-            \Illuminate\Support\Facades\Log::warning('KnowledgeRetriever: no cached embeddings available');
+            ChatbotDiagnostics::warning(ChatbotDiagnostics::LAYER_KNOWLEDGE_RETRIEVER, 'no_cached_embeddings_available');
             return [];
         }
 

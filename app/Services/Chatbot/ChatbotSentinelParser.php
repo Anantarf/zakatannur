@@ -22,7 +22,12 @@ class ChatbotSentinelParser
         $data = json_decode($jsonStr, true);
 
         if (json_last_error() !== JSON_ERROR_NONE || !is_array($data)) {
-            // Rusak
+            // Rusak - almost always means the LLM emitted a sentinel that doesn't match the
+            // schema in its own system prompt, worth knowing if it happens often.
+            ChatbotDiagnostics::warning(ChatbotDiagnostics::LAYER_SENTINEL_PARSER, 'malformed_json', [
+                'json_error' => json_last_error_msg(),
+            ]);
+
             return "\n\n(Mohon maaf, saya kurang mengerti datanya. Bisa sebutkan nominal penghasilan bulanan, tabungan, dan emas yang dimiliki?)";
         }
 
@@ -70,14 +75,17 @@ class ChatbotSentinelParser
         $hasWealthData = isset($data['savings']) || isset($data['gold_gram']);
 
         if ($hasNonNumeric) {
+            ChatbotDiagnostics::warning(ChatbotDiagnostics::LAYER_SENTINEL_PARSER, 'rejected_non_numeric_value', ['data' => $data]);
             return "\n\n(Mohon maaf, saya kurang mengerti datanya. Bisa sebutkan nominal penghasilan bulanan, tabungan, dan emas yang dimiliki?)";
         }
 
         if ($hasNegative) {
+            ChatbotDiagnostics::warning(ChatbotDiagnostics::LAYER_SENTINEL_PARSER, 'rejected_negative_value', ['data' => $data]);
             return "\n\n(Pastikan nominal yang Anda masukkan tidak kurang dari nol. Mari coba hitung ulang.)";
         }
 
         if ($hasImplausible) {
+            ChatbotDiagnostics::warning(ChatbotDiagnostics::LAYER_SENTINEL_PARSER, 'rejected_implausible_value', ['data' => $data]);
             return "\n\n(Sepertinya ada nominal yang kurang masuk akal. Mohon sebutkan ulang angkanya, misalnya \"10 juta\" bukan \"10 miliar\".)";
         }
 
@@ -86,6 +94,7 @@ class ChatbotSentinelParser
             // key) without income/savings/gold - not "empty" (a key was set), but not
             // enough to anchor either section, which would otherwise render an empty
             // [[HASIL]] block.
+            ChatbotDiagnostics::info(ChatbotDiagnostics::LAYER_SENTINEL_PARSER, 'insufficient_data_to_anchor_a_section', ['data' => $data]);
             return "\n\n(Bisa sebutkan nominal penghasilan atau tabungannya agar bisa saya hitung?)";
         }
 

@@ -21,3 +21,4 @@ yarn-error.log
 /storage/framework/views/*.php
 .worktrees/
 /output/
+/vendor.zip

@@ -18,6 +18,7 @@ return new class extends Migration
 
     public function down(): void
     {
-        //
+        // Irreversible data cleanup: the original suspicious/warning distinction was collapsed.
+        // Recreating the previous value would require historical data that this migration no longer has.
     }
 };

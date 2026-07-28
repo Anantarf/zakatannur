@@ -37,6 +37,7 @@ return new class extends Migration
 
     public function down(): void
     {
-        //
+        // Irreversible data cleanup: infaq outlier flags, reasons, and derived scores are removed.
+        // Reconstructing them would reintroduce a retired risk rule with no reliable original context.
     }
 };

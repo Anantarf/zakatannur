@@ -64,8 +64,14 @@ class ChatbotConversationContext
             || str_contains($normalized, 'nisab')
             || str_contains($normalized, 'nishab');
 
-        $hasFinancialSignal = preg_match('/\d/', $normalized)
-            || str_contains($normalized, 'gaji')
+        // A bare "any digit" check used to sit here - it fired on literally any message with a
+        // number in it ("jadwal shalat jam 5 sore", "nomor antrian saya 15"), pushing totally
+        // unrelated questions into zakat_mal_consultation mode (injecting the consultation hint
+        // into the system prompt, and sticking there via the mode round-trip below). Digits paired
+        // with an actual financial keyword are already covered by the checks below; a bare numeric
+        // follow-up mid-consultation ("10 juta") is handled by the "stay in mode" branch further
+        // down, which doesn't need this signal at all - it keys off the previous turn's mode.
+        $hasFinancialSignal = str_contains($normalized, 'gaji')
             || str_contains($normalized, 'tabungan')
             || str_contains($normalized, 'emas')
             || str_contains($normalized, 'hutang')

@@ -32,7 +32,7 @@ ChatbotController (HTTP endpoint: /api/chatbot/message, /api/chatbot/stream)
 ChatbotOrchestrator                              [app/Services/Chatbot/ChatbotOrchestrator.php]
     ├─ 1. getQuickResponse()  → fast-path rule-based (tanpa LLM)
     │     └─ ChatbotActionDetector                [ChatbotActionDetector.php]      (intent classification, keyword-based)
-    │     └─ ChatbotCalculatorService              (kalkulasi fitrah/fidyah deterministik)
+    │     └─ ChatbotCalcuelatorService              (kalkulasi fitrah/fidyah deterministik)
     │     └─ ChatbotPublicDataResponder            (data dashboard publik)
     │
     └─ 2. answerFromAi() / streamFromAi()  → jalur AI penuh
@@ -222,7 +222,7 @@ Regex/keyword matching murni (tanpa panggilan API), dipanggil **per-kalimat saat
 
 ### Lapisan 3 — `ChatbotSafetyClassifier` (embedding similarity)
 
-Layer tambahan (bukan pengganti lapisan 2) yang dipanggil **sekali** setelah balasan final selesai (bukan per-kalimat, supaya tidak menambah panggilan embedding di setiap kalimat streaming). Metodologi dan hasil evaluasinya di Bab 9.4.
+Layer tambahan (bukan pengganti lapisan 2) yang dipanggil **sekali** setelah balasan final selesai (bukan per-kalimat, supaya tidak menambah panggilan embedding di setiap kalimat streaming). Metodologi dan hasil evaluasinya di Bab 9.4. Observability lintas-lapisan (termasuk instrumentasi Lapisan 2 & 3) dibahas terpisah di Bab 13.
 
 ---
 
@@ -313,7 +313,10 @@ Selain 4 command evaluasi di atas (yang butuh API key asli dan bersifat manual/n
 - `ChatbotGuardrailVerifierTest` — keyword blocklist, termasuk test yang secara eksplisit mendokumentasikan keterbatasannya.
 - `ChatbotStreamParserTest` — parsing sentinel saat streaming.
 - `ChatbotSentinelParserTest` — parsing sentinel `[HITUNG:...]` di luar streaming: satu tag, banyak tag sekaligus (Bab 10.9), dan kasus data tidak cukup untuk dinilai (Bab 10.8).
-- `ChatbotApiTest` (34 test) — routing model, mode percakapan, guardrail, regression test untuk instruksi prompt spesifik (mis. memastikan instruksi "konfirmasi niat sebelum kumpulkan data" tidak hilang di edit prompt berikutnya).
+- `ChatbotActionDetectorTest` — pembajakan fast-path oleh kata kunci generik (Bab 10.13–10.15).
+- `ChatbotConversationContextTest` — deteksi mode konsultasi zakat mal, termasuk regresi bug "angka apa pun" (Bab 10.18).
+- `ChatbotDiagnosticsSummaryTest` — command ringkasan log diagnostik per layer (Bab 13).
+- `ChatbotApiTest` (41 test) — routing model, mode percakapan, guardrail, regression test untuk instruksi prompt spesifik (mis. memastikan instruksi "konfirmasi niat sebelum kumpulkan data" tidak hilang di edit prompt berikutnya), plus verifikasi log diagnostik per-layer (Bab 13).
 
 ---
 
@@ -430,11 +433,103 @@ Bersamaan dengan itu, ditambahkan **3 entri KB baru** untuk menutup gap konten y
 **Akar masalah**: `ask_zakat_mal_definition` sudah punya guard `$looksLikeCalculationRequest` sejak Bab 10.1 (kata "hitung"/"konsultasi" + angka) untuk mencegah pembajakan serupa — tapi guard itu didefinisikan **di tengah fungsi**, setelah pengecekan `ask_total_summary`, `ask_total_people`, dan `ask_total_money` di bagian atas fungsi sudah sempat dieksekusi lebih dulu. Guard yang sudah ada pun ternyata terlalu sempit: cuma menangkap kata "hitung"/"konsultasi", padahal "Zakat penghasilan saya berapa kalau gaji 8 juta?" tidak memakai kata "hitung" sama sekali.
 
 **Perbaikan** ([ChatbotActionDetector.php](../app/Services/Chatbot/ChatbotActionDetector.php)):
+
 1. `$looksLikeCalculationRequest` dipindah ke **paling atas** fungsi `intent()`, dipakai untuk menjaga keempat pengecekan `ask_total_summary`/`ask_total_people`/`ask_total_money` (dua kali muncul di fungsi ini) — bukan cuma `ask_zakat_mal_definition`.
 2. Definisinya diperluas: selain "hitung"/"konsultasi" + angka, sekarang juga mengenali kata sinyal finansial (`gaji`, `tabungan`, `penghasilan`, `emas`, `hutang`, `aset`) + angka — memakai universe kata kunci yang sama dengan `ChatbotConversationContext::detectMode()`'s `$hasFinancialSignal`, supaya konsisten dengan definisi "sinyal finansial" yang sudah dipakai di tempat lain.
 3. Pengecekan `ask_total_rice` (baris terpisah, Bab audit sebelumnya) juga diperbaiki: anchor wajib diganti dari `beras`/`kg` (dua-duanya opsional) jadi `beras` wajib + `kg` sebagai salah satu qualifier — karena "kg" sendirian terlalu generik (bisa muncul di pertanyaan berat apa pun, termasuk pertanian) untuk jadi penentu utama topik "total beras zakat fitrah terkumpul".
 
 **Verifikasi**: test unit baru `tests/Unit/ChatbotActionDetectorTest.php` — 4 kasus pembajakan (termasuk kasus pertanian yang memicu temuan ini) dipastikan `null` (lolos ke AI), plus 2 kasus soal pertanyaan agregat asli (`ask_total_summary`) dipastikan tetap jalan seperti biasa supaya fix ini tidak mematikan fitur yang sah. Regresi penuh tetap bersih: `php artisan test` 241/241.
+
+### 10.14 Refactor + 2 bug tambahan: duplikasi blok intent yang tidak disadari
+
+**Konteks**: setelah Bab 10.13, ditinjau ulang struktur `ChatbotActionDetector::intent()` secara keseluruhan (bukan cuma titik bug yang sudah ditemukan) untuk menilai seberapa rapuh detektor ini secara umum. Ditemukan: tiga intent (`ask_total_people`, `ask_total_money`, `ask_total_summary`) **masing-masing dicek dua kali** di fungsi yang sama — satu di bagian atas (dengan syarat pasangan kata kunci yang ketat), satu lagi ~60 baris di bawahnya (versi lebih longgar, sisa dari edit-edit masa lalu yang tidak saling sadar). Ini persis pola yang menyebabkan Bab 10.13: waktu memperbaiki bug itu, guard `!$looksLikeCalculationRequest` harus ditempel di **dua tempat** — kalau satu ketinggalan, perbaikannya cuma setengah jalan.
+
+**Dibuktikan lewat `php artisan tinker`, versi duplikat (blok bawah) menyembunyikan 2 bug aktif lain yang belum pernah ketahuan:**
+- `ask_total_people` versi longgar tidak mensyaratkan pasangan "total"/"jumlah" sama sekali — kata **"orang"** sendirian sudah cukup. Pesan *"Orang tua saya sudah wafat, warisannya kena zakat gak?"* salah dibajak ke jawaban "total jiwa zakat fitrah terkumpul".
+- `ask_total_summary` versi longgar tidak mensyaratkan pasangan kata bertopik zakat/agregat — kata **"berapa"** sendirian sudah cukup. Pesan *"Masjidnya di jalan apa, rumahnya nomor berapa ya?"* (soal alamat) ikut ter-hijack.
+
+**Perbaikan** ([ChatbotActionDetector.php](../app/Services/Chatbot/ChatbotActionDetector.php)): blok duplikat (versi longgar) dihapus total, bukan dipertahankan "untuk jaga-jaga" — versi ketat di bagian atas fungsi sudah mencakup semua kasus sah yang dimaksudkan versi longgar. Sekalian ditemukan bug ketiga di versi yang **tidak dihapus** (blok atas, Bab 6/9 lama): syarat pasangan kata untuk `ask_total_summary` mengizinkan kata **"zakat"** sebagai salah satu pemenuhnya — padahal "zakat" muncul di hampir semua pertanyaan bertopik zakat apa pun, jadi kombinasi "berapa" + "zakat" nyaris selonggar tanpa syarat sama sekali. Pesan KB yang sah seperti *"Zakat perdagangan itu dihitung dari modal atau omzet, berapa persennya?"* ikut ter-hijack ke jawaban total terkumpul. Diperbaiki dengan menghapus "zakat" dari daftar itu — sisanya (`semua`, `terkumpul`, `penerimaan`) memang secara semantik menyiratkan agregat, beda dari "zakat" yang cuma penanda topik.
+
+**Verifikasi**: 2 test baru di `ChatbotActionDetectorTest.php` — `test_unrelated_questions_are_not_hijacked_by_bare_generic_words` (dataset warisan + zakat perdagangan) plus penambahan assertion `ask_total_money`/`ask_total_people` genuine di test yang sudah ada, supaya penghapusan blok duplikat tidak diam-diam mematikan salah satu jalur yang sah. Regresi penuh tetap bersih: `php artisan test` 243/243.
+
+**Pembelajaran metodologis**: bug paling berbahaya di sistem berbasis aturan keyword bukan selalu dari kata kunci baru yang ditambahkan sembarangan — kadang dari **kode lama yang dilupakan**, tetap aktif, tidak pernah dihapus meski sudah ada versi yang lebih baik di tempat lain dalam file yang sama. Tinjauan struktural (bukan cuma menambal titik bug yang dilaporkan) menemukan 2 bug tambahan yang tidak pernah muncul sebagai keluhan spesifik.
+
+### 10.15 Audit sistematis seluruh `ChatbotActionDetector`: 11 kasus pembajakan tambahan
+
+**Konteks**: setelah tiga temuan berturut-turut di `ChatbotActionDetector` (Bab 10.13–10.14), muncul pertanyaan eksplisit — apakah detektor ini sudah cukup andal, atau masih ada ruang perbaikan? Alih-alih menambal titik-titik yang kebetulan dilaporkan, seluruh fungsi `intent()` diaudit sistematis: tiap cabang diuji satu per satu lewat `php artisan tinker` dengan pesan-pesan adversarial yang secara sengaja mengandung kata kunci pemicu tapi topiknya tidak relevan.
+
+**Prinsip yang dipakai untuk audit**: kata kunci tunggal yang **generik dalam bahasa Indonesia sehari-hari** ("orang", "hari", "harian", "paling besar", "tertinggi", "rekening", "transfer", "cara bayar", "kategori") tidak boleh jadi satu-satunya penentu topik zakat/masjid — harus dipasangkan dengan kata yang benar-benar spesifik ke domain (mis. "jiwa" utk zakat fitrah, "penerimaan"/"terkumpul" utk data agregat), atau kalau tidak bisa dipasangkan dengan aman, kata itu dilepas dari daftar sepenuhnya dan pesan dibiarkan lolos ke AI.
+
+**11 kasus pembajakan baru ditemukan dan diperbaiki** ([ChatbotActionDetector.php](../app/Services/Chatbot/ChatbotActionDetector.php)):
+
+| Pesan | Salah dibajak ke (sebelum) | Sekarang |
+|---|---|---|
+| "Total pengeluaran ... untuk orang tua ..., ngurangin zakat gak?" | `ask_total_people` (dari "orang") | lolos ke AI |
+| "Saya mau hitung THR buat 3 orang karyawan..." | `calculate_fitrah_case` (dari "orang"+hitung+angka) | lolos ke AI |
+| "Ada 5 hari libur lebaran ini, mau hitung cuti tambahan..." | `calculate_fidyah_case` (dari "hari"+hitung+angka) | lolos ke AI |
+| "Petugas piket harian siapa aja ya minggu ini?" | `open_chart` (dari "harian") | lolos ke AI |
+| "Nisab yang paling besar itu emas atau uang tunai?" | `ask_top_category` (dari "paling besar") | lolos ke AI |
+| "...mana yang nisabnya tertinggi?" | `ask_top_category` (dari "tertinggi") | lolos ke AI |
+| "Kategori aset yang kena zakat itu apa aja?" | `ask_categories` (dari "kategori") | lolos ke AI |
+| "Jenis zakat mal yang paling sering ditanyakan apa ya?" | `ask_categories` (dari "jenis zakat") | lolos ke AI |
+| "Ringkasan singkat soal zakat mal dong" | `open_summary` (dari "ringkasan") | lolos ke AI |
+| "Rekening BCA punya saya kena zakat gak..." | `ask_payment_info` (dari "rekening") | lolos ke AI |
+| "Cara bayar hutang riba itu gimana..." | `ask_payment_info` (dari "cara bayar") | lolos ke AI |
+
+**Perbaikan per cabang** — pola yang konsisten dengan Bab 10.13–10.14 (anchor spesifik, bukan kata generik dipasangkan longgar):
+- `ask_total_people`, `calculate_fitrah_case`: kata "orang" dihapus, disisakan "jiwa"/"muzakki fitrah" yang secara istilah memang khas domain zakat fitrah.
+- `calculate_fidyah_case`: kata "hari" dihapus, disisakan "fidyah"/"puasa".
+- `open_chart`: kata "harian" dihapus (sudah tercakup lewat "grafik"/"chart"/"tren").
+- `ask_top_category`, `ask_categories`: kini wajib dipasangkan dengan kata "kategori" atau "penerimaan"/"tercatat"/"terkumpul" — bukan cuma kata pembanding generik ("paling besar"/"tertinggi") atau kata "kategori" sendirian.
+- `open_summary`: kini wajib dipasangkan dengan kata kerja aksi ("buka"/"lihat"/"tampilkan"/"cek") atau kata data ("penerimaan"/"terkumpul") — membedakan "buka ringkasan [fitur dashboard]" dari "ringkasan [penjelasan singkat] soal X".
+- `ask_payment_info`: daftar kata kunci diganti dari kata tunggal (`rekening`, `transfer`, `cara bayar`) jadi frasa penuh yang menyertakan "zakat" (`rekening zakat`, `cara bayar zakat`, dst.) — mencegah tabrakan dengan pertanyaan soal rekening/pembayaran di luar konteks zakat.
+
+**Verifikasi**: 12 test baru di `ChatbotActionDetectorTest.php` — `test_unrelated_questions_are_not_hijacked_by_other_generic_anchor_words` (11 kasus di atas, dipastikan `null`/lolos ke AI) dan `test_narrowed_intents_still_resolve_for_their_genuine_phrasing` (5 kasus sah, dipastikan tetap jalan seperti biasa supaya penyempitan ini tidak mematikan fitur yang sah). Regresi penuh tetap bersih: `php artisan test` 255/255.
+
+**Catatan untuk bab metodologi**: pendekatan "audit sistematis lewat pengujian adversarial manual" ini menemukan 11 bug sekaligus dalam satu sesi tinjauan — jauh lebih efektif dibanding menunggu tiap kasus dilaporkan satu per satu lewat penggunaan nyata (pola Bab 10.1, 10.5, 10.13 sebelumnya). Trade-off yang disengaja: fast-path (tanpa panggil AI) sekarang mencakup lebih sedikit variasi kalimat — pesan yang topiknya ambigu kini konsisten dilempar ke AI, yang memang sudah punya pemahaman bahasa natural (sinonim, negasi, konteks) tanpa perlu dibangun ulang di lapisan keyword-matching ini. Fast-path yang tersisa jadi lebih sempit tapi jauh lebih presisi.
+
+### 10.16 Restrukturisasi system prompt + bug serius: versi Bahasa Inggris tanpa pengaman sama sekali
+
+**Konteks**: ditinjau kualitas system prompt (`OpenAiChatbotProvider::getSystemInstruction()`) secara keseluruhan, bukan menunggu laporan spesifik. Diukur langsung: versi Indonesia **714 kata, 37 kalimat**, semuanya digabung jadi **satu paragraf datar** tanpa heading/bullet/pengelompokan sama sekali — hasil akumulasi organik, setiap perbaikan sepanjang sesi ini (konfirmasi niat, klarifikasi bruto, larangan topik lanjutan, dst.) cuma ditempel sebagai satu kalimat lagi di ujung string yang sama.
+
+**Bug serius ditemukan saat membandingkan versi ID vs EN**: versi Bahasa Inggris cuma **120 kata**, dan setelah dicek satu per satu — **sama sekali tidak menyebut** sentinel `[HITUNG:...]` maupun larangan "JANGAN PERNAH menghitung nominal zakat mal sendiri". Dikonfirmasi lewat `ChatbotLanguageDetector`: begitu >30% kata pesan cocok daftar kata penanda Inggris, `language='en'` otomatis dikirim ke `getSystemInstruction()`. Artinya **user yang chat dalam Bahasa Inggris kehilangan seluruh pengaman zakat-mal** — LLM bisa saja langsung menghitung sendiri di teks bebas tanpa lewat kalkulator PHP, tanpa validasi angka, tanpa satu pun dari 6 aturan keras yang sudah dibangun sepanjang sesi ini (Bab 6, 10.11, 10.12) — karena semua aturan itu ditambahkan **hanya** ke blok `if ($language === 'id')`, tidak pernah ke blok default (EN).
+
+**Perbaikan** ([OpenAiChatbotProvider.php](../app/Services/Chatbot/Providers/OpenAiChatbotProvider.php)):
+1. **Restrukturisasi kedua bahasa** jadi dua bagian berlabel jelas: **ATURAN KERAS (jangan pernah dilanggar)** — berisi semua instruksi yang kalau dilanggar berakibat salah hitung/halusinasi/kebocoran (never self-calculate, skema JSON wajib, konfirmasi niat, klarifikasi bruto, larangan topik lanjutan, dst.) — dipisah dari **GAYA BICARA** — preferensi nada/tone yang kalau dilanggar cuma bikin jawaban kurang natural, bukan salah secara substansi. Pemisahan ini penting karena LLM (dan pembaca manusia) lebih andal mengikuti instruksi terstruktur dibanding satu paragraf 37-kalimat tanpa hierarki.
+2. **Versi EN ditulis ulang dari nol** dengan paritas penuh terhadap seluruh Aturan Keras versi ID (diterjemahkan, bukan disingkat) — termasuk skema `[HITUNG:...]`, larangan self-calculate, klarifikasi gaji bersih/bruto, dan larangan topik lanjutan. Bagian Gaya Bicara EN sengaja tetap lebih ringkas dari ID (bahasa Inggris adalah jalur sekunder/edge-case di aplikasi ini — seluruh KB, dokumentasi, dan dataset eval berbahasa Indonesia) — tapi seluruh Aturan Keras (yang menentukan benar/salah, bukan cuma gaya) kini identik cakupannya di kedua bahasa.
+3. Label heading "Konteks resmi:" yang disisipkan sebelum entri KB juga ternyata hardcode Indonesia terlepas dari bahasa pesan — diperbaiki jadi language-aware ("Official Context:" untuk EN).
+
+**Verifikasi**: test baru `test_english_system_prompt_has_the_same_hard_rules_as_indonesian` (lewat reflection langsung ke `getSystemInstruction('en', [])`, bukan lewat deteksi bahasa otomatis — `ChatbotLanguageDetector` memakai daftar kata penanda tetap yang rapuh untuk dipicu secara reliable lewat teks bebas, jadi diuji langsung isinya) memastikan versi EN sekarang memuat larangan self-calculate, skema JSON persis, dan klarifikasi gaji bersih. Semua substring yang di-assert test lain terhadap prompt ID (konfirmasi niat, klarifikasi bruto, larangan topik lanjutan) dipertahankan persis sama meski struktur teksnya berubah — tidak ada test lama yang perlu diubah. Regresi penuh tetap bersih: `php artisan test` 256/256.
+
+**Catatan tambahan**: `ChatbotLanguageDetector` sendiri (heuristik daftar kata penanda tetap, bukan classifier) juga teridentifikasi sebagai komponen yang cukup rapuh selama proses debug test ini — di luar scope perbaikan sesi ini, dicatat sebagai kandidat perbaikan lanjutan di Bab 12.
+
+### 10.17 Bug: field `citations` di respons API membocorkan instruksi internal + gagal tampil di UI
+
+**Gejala**: ditemukan tidak sengaja lewat inspeksi payload JSON respons API (bukan laporan user) saat mendebug test lain — field `citations` pada balasan jalur AI ternyata berisi objek mentah `_conversation_hint` (instruksi prompt-engineering internal seperti *"Mode percakapan: konsultasi zakat mal. Rangkum singkat data yang sudah diberikan user..."*), bukan daftar sumber/rujukan yang wajar ditampilkan ke user. Diverifikasi lewat `php artisan test`: pada percakapan mode `zakat_mal_consultation` (kondisi yang sangat umum), payload JSON yang dikirim ke browser memuat instruksi internal ini apa adanya.
+
+**Akar masalah ganda**:
+1. `ChatbotOrchestrator::finalizeAiReply()` mengoper `$contexts` — array internal yang dipakai `ChatbotConversationContext::withHints()` untuk menyisipkan hint (`_conversation_hint`, `_sentiment_hint`, `_correction_hint`) ke system prompt LLM — **langsung** sebagai `citations` di `ChatbotResponse::success()`, tanpa filter. Hint-hint ini seharusnya cuma untuk konsumsi LLM, tidak pernah dimaksudkan sampai ke response API publik.
+2. Bahkan untuk entri KB asli (bukan hint) yang berhasil match, field yang dipakai adalah `source_label` ([KnowledgeBase.php:41](../app/Models/KnowledgeBase.php#L41)) — sementara frontend (`chatbot-widget.blade.php:208`) merender footer sitasi dengan `'Acuan: ' + message.citations[0].label` (`label`, bukan `source_label`). Akibatnya, untuk **setiap** balasan jalur AI yang punya `citations` (termasuk hint-only tanpa KB match sama sekali), UI menampilkan literal **"Acuan: undefined"** di bawah balasan bot — bug tampilan yang selalu bisa direproduksi, bukan cuma kadang-kadang.
+
+Dua bug ini saling menutupi: karena field yang salah (`source_label`) dipakai, bug kebocoran hint tidak pernah terlihat sebagai teks aneh di layar (cuma "undefined" yang tampak) — kebocoran instruksi internalnya cuma terlihat kalau membuka Network tab browser atau memeriksa payload JSON langsung.
+
+**Perbaikan** ([ChatbotOrchestrator.php](../app/Services/Chatbot/ChatbotOrchestrator.php)): method baru `buildCitations()` — memfilter `$contexts` supaya cuma entri yang benar-benar berisi `title` (KB asli) yang lolos jadi citation (entri hint-only otomatis tersaring karena tidak punya `title`), lalu memetakan `source_label` → `label` supaya bentuknya konsisten dengan yang sudah dipakai jalur fast-path ([ChatbotOrchestrator.php:143](../app/Services/Chatbot/ChatbotOrchestrator.php#L143), yang sejak awal sudah benar).
+
+**Verifikasi**: 2 test baru — `test_ai_reply_citations_do_not_leak_internal_conversation_hints` (memastikan `citations` kosong dan tidak ada string `_conversation_hint` di body respons untuk turn yang men-trigger mode konsultasi) dan `test_ai_reply_citations_use_the_label_key_the_frontend_reads` (memastikan tiap citation asli punya key `label` terisi dan tidak lagi punya key `source_label`). Regresi penuh tetap bersih: `php artisan test` 258/258.
+
+**Pembelajaran metodologis**: bug ini luput dari 3 lapisan verifikasi yang sudah ada — guardrail (Bab 8) cuma memeriksa teks balasan LLM, bukan field lain di response JSON; test manual sebelumnya cuma memeriksa `data.reply`, tidak pernah memeriksa `data.citations`; dan secara visual di UI, kegagalannya cuma tampak sebagai kata "undefined" yang mudah diabaikan/tidak dicurigai sebagai kebocoran data. Ditemukan murni karena kebiasaan membaca payload JSON penuh saat verifikasi, bukan cuma memeriksa field yang "diduga" relevan.
+
+---
+
+### 10.18 Bug: `ChatbotConversationContext::detectMode()` masuk mode konsultasi zakat mal cuma karena ada angka apa pun
+
+**Gejala**: ditemukan lewat audit konteks/knowledge secara umum (bukan laporan produksi) — `$hasFinancialSignal` di `detectMode()` memakai `preg_match('/\d/', $normalized)`, cek "ada digit di mana pun" tanpa syarat tambahan. Dibuktikan lewat `php artisan tinker`: pesan *"Assalamualaikum, saya mau tanya jadwal shalat jam 5 sore"*, *"Ada acara kajian jam 7 malam ini gak?"*, dan *"Nomor antrian saya 15, sudah dipanggil belum?"* — tiga pertanyaan yang sama sekali tidak berkaitan dengan zakat mal — semuanya ter-resolve ke mode `zakat_mal_consultation` cuma karena mengandung angka (jam, nomor antrian).
+
+**Dampak**: begitu mode salah terdeteksi, `applyConversationHint()` menyuntikkan instruksi *"Mode percakapan: konsultasi zakat mal. Rangkum singkat data yang sudah diberikan user..."* ke system prompt untuk pertanyaan yang tidak relevan sama sekali, dan mode ini **menempel** ke giliran-giliran berikutnya lewat context yang di-roundtrip ke frontend dan kembali (logika "stay in mode" di baris 81-100 kalau tidak ada kata pemicu ganti topik eksplisit).
+
+**Akar masalah**: cek digit polos ini sebenarnya redundan — pasangan kata kunci finansial eksplisit (`gaji`, `tabungan`, `emas`, `hutang`, `pengeluaran`, `aset`) sudah cukup menangkap kasus sah ("gaji 10 juta" tetap match lewat kata "gaji"), dan follow-up angka polos di tengah konsultasi ("50 juta" tanpa kata kunci) sudah ditangani terpisah oleh logika "stay in mode" yang mengandalkan mode giliran sebelumnya, bukan `$hasFinancialSignal`.
+
+**Perbaikan** ([ChatbotConversationContext.php](../app/Services/Chatbot/ChatbotConversationContext.php)): hapus klausa `preg_match('/\d/', ...)`, sisakan kata kunci finansial eksplisit saja. Diverifikasi lewat `tinker`: ketiga pesan adversarial di atas sekarang resolve ke `general`; kasus sah ("gaji 10 juta", "tabungan...hutang...") tetap `zakat_mal_consultation`; follow-up angka polos mid-konsultasi ("50 juta", "tidak ada hutang") tetap bertahan di mode lewat logika stay-in-mode yang independen dari perubahan ini. Regresi penuh tetap bersih: `php artisan test` 258/258 (di titik ini, sebelum penambahan fitur observability Bab 13).
 
 ---
 
@@ -448,6 +543,7 @@ Bersamaan dengan itu, ditambahkan **3 entri KB baru** untuk menutup gap konten y
 6. **Evaluasi `eval-behavior`, `eval-behavior-rubric`, dan `eval-safety` bergantung pada API key asli** dan bersifat nondeterministik (jawaban LLM bisa sedikit berbeda antar run) — dijalankan manual sebagai regression check sebelum perubahan besar ke prompt, bukan gate CI otomatis seperti unit test biasa.
 7. **Rubric kualitas konsultatif (Bab 9.3) butuh skor manual manusia** — sistem menyediakan bahan evaluasinya (balasan Zakky per skenario dalam format tabel), tapi penilaian 1–5 per aspek tetap memerlukan evaluator manusia (dosen/panitia/peneliti), bukan otomatis.
 8. **Harga emas acuan nishab (Bab 6.1) tidak real-time** — `gold_price_per_gram` adalah input manual admin per periode (default mengikuti SK BAZNAS No. 15/2026 saat dokumen ini ditulis), bukan hasil tarikan API harga emas harian. Kalau periode berjalan lama tanpa admin memperbarui angkanya sementara harga emas pasar bergerak signifikan, nishab yang dipakai sistem bisa menyimpang dari acuan resmi terbaru.
+9. **`ChatbotActionDetector` (fast-path, Bab 10.13–10.15) tetap berbasis keyword-matching murni, tanpa toleransi typo/sinonim/negasi** — trade-off desain yang disengaja (bukan kegagalan tak disadari): setelah rangkaian bug pembajakan ditemukan, keputusannya adalah mempersempit cakupan fast-path (anchor kata yang lebih spesifik/ketat) daripada membangun NLU sendiri di lapisan ini. Alasannya, classifier berbasis embedding pun terkenal lemah untuk kasus negasi, dan menambahkannya ke fast-path menghilangkan tujuan fast-path itu sendiri (instan, tanpa panggilan API). Konsekuensinya: pesan dengan topik ambigu sekarang lebih sering lolos ke AI (bukan dijawab instan lewat KB/kalkulator) — trade-off presisi lebih tinggi ditukar dengan sedikit lebih banyak pesan yang butuh panggilan AI.
 
 ---
 
@@ -457,6 +553,86 @@ Bersamaan dengan itu, ditambahkan **3 entri KB baru** untuk menutup gap konten y
 2. Terapkan `chatbot:eval-safety` juga terhadap **pesan masuk user** (bukan cuma balasan LLM) — dataset sudah mendukung ini (banyak contoh `prompt_injection` ditulis dari sudut pandang pesan user), tapi integrasinya saat ini baru menyasar balasan akhir untuk menghindari penambahan panggilan embedding di jalur kritis.
 3. Pertimbangkan caching/batching untuk refresh embedding KB kalau jumlah entri bertambah signifikan.
 4. Lengkapi evaluasi kuantitatif (Bab 9.1, 9.2, 9.4) dengan evaluasi kualitatif oleh responden manusia (dosen pembimbing, panitia masjid, atau sampel jamaah) menggunakan rubric di Bab 9.3 — kombinasi keduanya (terukur otomatis + manusia) memberi validitas yang lebih kuat untuk klaim "chatbot ini membantu" di skripsi.
+5. `ChatbotLanguageDetector` (Bab 10.16) memakai daftar kata penanda Inggris yang tetap dan rasio ambang 30% — cukup rapuh untuk kalimat pendek atau campuran ID/EN (dibuktikan tidak sengaja saat menulis test regresi Bab 10.16, sebuah kalimat Inggris wajar gagal terdeteksi sebagai EN). Bukan bug aktif yang berdampak sekarang (fallback ke ID tetap aman karena versi ID lebih lengkap), tapi layak diperkuat kalau basis pengguna berbahasa Inggris bertambah.
+
+---
+
+## 13. Observability: `ChatbotDiagnostics` (Layer-Tagged Diagnostic Logging)
+
+**Latar belakang**: sebelum ini, logging chatbot tersebar tidak konsisten — sebagian lapisan (`ChatbotGuardrailVerifier`, `ChatbotSafetyClassifier`, `ChatbotSentinelParser`) **sama sekali tidak punya jejak log** saat memblokir/menolak sesuatu, padahal justru titik-titik itu yang paling penting untuk didiagnosis kalau ada perilaku aneh di produksi. Lapisan lain (`KnowledgeRetriever`, provider LLM) sudah punya `Log::` tapi bercampur dengan log Laravel umum di `storage/logs/laravel.log`, tanpa penanda "lapisan mana" yang konsisten untuk di-grep.
+
+**Desain**: `ChatbotDiagnostics` ([ChatbotDiagnostics.php](../app/Services/Chatbot/ChatbotDiagnostics.php)) — helper statis tipis dengan 3 method (`info`/`warning`/`error`), masing-masing mewajibkan nama **layer** (konstanta: `action_detector`, `knowledge_retriever`, `llm_provider`, `sentinel_parser`, `guardrail`, `safety_classifier`, `orchestrator`) dan nama **event**. Semua entri masuk ke channel log terpisah `chatbot` ([config/logging.php](../config/logging.php), file harian `storage/logs/chatbot-YYYY-MM-DD.log`, retensi 14 hari) — terisolasi dari log Laravel umum supaya bisa di-grep per lapisan tanpa noise.
+
+**Lapisan yang diinstrumentasi** (titik-titik yang sebelumnya bisu, sekarang tercatat):
+- **Guardrail** (Lapisan 2): `blocked_by_keyword` (kata kunci mana yang cocok) dan `blocked_by_no_domain_keyword_heuristic`.
+- **Safety Classifier** (Lapisan 3): `blocked` (kategori + skor kemiripan) dan `skipped_fail_open` (kapan lapisan ini tidak memberi proteksi sama sekali, mis. API embedding tidak tersedia).
+- **Sentinel Parser**: `malformed_json`, `rejected_non_numeric_value` (Bab 10.10), `rejected_negative_value`, `rejected_implausible_value`, `insufficient_data_to_anchor_a_section` (Bab 10.8).
+- **Knowledge Retriever**: `embedding_generation_failed`, `fell_back_to_keyword_search`, `no_cached_embeddings_available`, `empty_message_for_semantic_search`.
+- **Orchestrator**: `handled_fast_path`/`handled_ai_path`/`handled_ai_path_stream` (dengan `duration_ms` per giliran) dan `unhandled_exception` (menyertakan nama class exception + `file:line` — bukan cuma pesan generik, supaya akar masalah bisa langsung dilacak ke lapisan yang benar-benar melempar error, bukan cuma "ada yang gagal di suatu tempat").
+
+**Command ringkasan**: `php artisan chatbot:diagnostics {--days=1}` ([ChatbotDiagnosticsSummary.php](../app/Console/Commands/ChatbotDiagnosticsSummary.php)) — mem-parsing file log harian, menghitung kemunculan tiap kombinasi (layer, event, level), menampilkannya sebagai tabel terurut dari yang paling sering, dan menyorot khusus baris berlevel WARNING/ERROR di akhir sebagai "titik paling relevan untuk dicek duluan". Contoh output nyata (dari log selama satu sesi test suite lokal, `--days=1`):
+
+```
+| Layer               | Event                                 | Level   | Jumlah |
+| knowledge_retriever | embedding_generation_failed           | WARNING | 257    |
+| orchestrator        | handled_ai_path                       | INFO    | 72     |
+| safety_classifier   | skipped_fail_open                     | INFO    | 56     |
+| guardrail           | blocked_by_keyword                    | WARNING | 43     |
+| sentinel_parser     | rejected_non_numeric_value            | WARNING | 7      |
+| orchestrator        | unhandled_exception                   | ERROR   | 5      |
+```
+
+**Verifikasi**: 3 test baru di `ChatbotApiTest.php` memverifikasi tiap titik instrumentasi kritis benar-benar menulis ke file log sungguhan (bukan mocking `Log` facade — pendekatan itu berisiko mengganggu panggilan `Log::` lain yang tidak terkait di sepanjang pipeline) — `test_chatbot_guardrail_blocks_off_topic_reply` (ditambah assertion log), `test_sentinel_parser_rejection_is_logged_with_layer_tag`, `test_orchestrator_exception_is_logged_with_layer_tag`. Pembacaan log dibatasi ke bagian yang ditulis **setelah** test dimulai (via offset ukuran file), supaya tidak salah lolos akibat entri dari test lain yang kebetulan menulis string serupa ke file harian yang sama. Ditambah `ChatbotDiagnosticsSummaryTest.php` untuk command ringkasannya sendiri. Regresi penuh tetap bersih: `php artisan test` 262/262.
+
+**Batasan yang disadari**: ini logger berbasis file, bukan dashboard/alerting — cukup untuk kebutuhan "telusur manual setelah insiden" (`php artisan chatbot:diagnostics`), belum untuk pemantauan real-time atau notifikasi otomatis saat error/block-rate melonjak. Sudah dicatat sebagai rekomendasi pengembangan lanjutan terpisah (Bab 12) kalau kebutuhan itu muncul.
+
+---
+
+## 14. Pengerasan Struktural: `ChatbotCitation` (Value Object) + Konsolidasi Test Paritas Prompt
+
+Setelah audit kualitas arsitektur (dipicu pertanyaan "sudah level enterprise yang rapi belum?"), tiga celah struktural diidentifikasi sebagai akar penyebab berulang dari bug-bug di Bab 10: (1) data lintas-layer masih array asosiatif mentah tanpa kontrak eksplisit, (2) tidak ada satu titik verifikasi paritas aturan system prompt ID/EN, (3) tidak ada tooling anti-duplikasi. Dua yang pertama ditutup di bagian ini; yang ketiga **sengaja tidak dikerjakan** — dijelaskan di akhir bagian.
+
+### 14.1 `ChatbotCitation`: value object pengganti array `['id' => ..., 'label' => ...]`
+
+**Alasan**: bug Bab 10.17 (citations menampilkan "Acuan: undefined") berakar dari mismatch nama field (`source_label` vs `label`) yang tidak pernah ketahuan sampai payload JSON dibaca manual — PHP tidak punya cara memberi peringatan untuk key array yang salah nama. `ChatbotCitation` ([ChatbotCitation.php](../app/Services/Chatbot/ChatbotCitation.php)) — class readonly dengan properti `id`/`label` bertipe eksplisit, plus factory `fromKnowledgeArray()` sebagai **satu-satunya** tempat terjemahan `source_label` → `label` boleh terjadi. `ChatbotResponse::$citations` sekarang bertipe `ChatbotCitation[]` (didokumentasikan lewat PHPDoc `@param`/`@var`, PHP tidak mendukung generic array secara native), dan `toArray()` memanggil `->toArray()` di tiap elemen saat serialisasi ke JSON.
+
+Empat titik yang tadinya membangun array sitasi mentah langsung ([ChatbotActionDetector.php](../app/Services/Chatbot/ChatbotActionDetector.php), [ChatbotPublicDataResponder.php](../app/Services/Chatbot/ChatbotPublicDataResponder.php), 2 titik di [ChatbotOrchestrator.php](../app/Services/Chatbot/ChatbotOrchestrator.php)) diubah memakai `ChatbotCitation`.
+
+**Bug tambahan ditemukan sambil lalu**: constructor `ChatbotResponse` menerima parameter `$actions` tapi **mengabaikannya sepenuhnya** — `$this->actions = [];` di-hardcode, bukan `$this->actions = $actions;`. Saat ini tidak berdampak (belum ada caller yang mengisi actions dengan data nyata — diverifikasi lewat `grep` ke seluruh pemanggilan `ChatbotResponse::success()`), tapi tetap bug nyata di level constructor: parameter yang diterima lalu didiam-diamkan dibuang. Diperbaiki sekalian.
+
+**Verifikasi**: `ChatbotCitationTest.php` (factory method, fallback label, bentuk `toArray()`) dan `ChatbotResponseTest.php` (parameter `$actions` tidak lagi dibuang, citations tetap serialisasi dengan key `label`).
+
+### 14.2 Konsolidasi test paritas aturan keras ID/EN
+
+Sebelumnya, verifikasi "aturan X ada di kedua bahasa" tersebar sebagai assertion terpisah-pisah di beberapa test (Bab 10.11, 10.12, 10.16) tanpa satu sumber kebenaran. Dikonsolidasi jadi satu test data-provider, `test_hard_rule_is_present_in_both_language_prompts` ([ChatbotApiTest.php](../tests/Feature/ChatbotApiTest.php)) — tabel pasangan `(nama aturan, substring ID, substring EN)` untuk 7 aturan keras (never-self-calculate, skema JSON `[HITUNG:]`, konfirmasi niat, klarifikasi bruto, larangan topik lanjutan, larangan tag `[SUGGEST]`, berhenti hitung kalau sudah bayar). Kalau prompt diedit lagi nanti dan satu bahasa lupa diupdate, pesan kegagalan test langsung menyebut nama aturan dan bahasa mana yang hilang — bukan cuma "assertion failed" generik.
+
+**Kenapa bukan restrukturisasi penuh jadi prompt builder terpisah dari string**: dipertimbangkan, tapi ditolak sebagai over-engineering untuk skala proyek ini — risiko regresi dari refactor besar terhadap string yang sudah teruji lewat `chatbot:eval-behavior` (butuh API key asli, sulit di-otomatisasi ulang) dinilai lebih mahal daripada manfaat konsolidasi tesnya sendiri, yang sudah cukup didapat lewat pendekatan data-provider di atas.
+
+### 14.3 Yang sengaja TIDAK dikerjakan: tooling anti-duplikasi otomatis
+
+Dari 3 celah struktural yang diidentifikasi, poin "tooling yang mencegah duplikasi kode secara otomatis" (mis. custom PHPStan rule atau static analysis khusus) **sengaja dilewati**. Pertimbangan: kompleksitas membangun dan merawat tooling semacam itu tidak sepadan untuk basis kode seukuran ini (satu aplikasi masjid, bukan monorepo multi-tim) — kelas bug duplikasi yang sudah ditemukan (Bab 10.14) cukup dicegah lewat kombinasi komentar penjelas di lokasi rawan + kebiasaan review eksplisit ("apakah aturan ini sudah ada di tempat lain?"), bukan infrastruktur baru. Ini konsisten dengan prinsip yang dipakai sepanjang dokumen ini: menambah kompleksitas cuma kalau manfaatnya sepadan dengan biaya perawatannya.
+
+**Verifikasi keseluruhan Bab 14**: `php artisan test` 278/278.
+
+---
+
+## 15. Performa: Prompt Caching Otomatis + Pengukuran Cache Hit Nyata
+
+**Latar belakang**: Bab 7.2 mencatat latensi terukur, tapi belum pernah membahas *prompt caching* — teknik menyimpan hasil pemrosesan prefix prompt yang identik antar giliran supaya tidak diproses ulang dari nol. `config/services.php` menunjukkan provider LLM yang dipakai adalah **OpenAI asli** (`base_url` default `https://api.openai.com/v1`, bukan sekadar API yang kompatibel) — dan OpenAI menerapkan **prompt caching otomatis di level platform** untuk prompt di atas ~1024 token, tanpa perlu parameter atau kode tambahan apa pun di sisi klien.
+
+**Prompt sistem sudah melewati ambang itu**: diukur langsung, system prompt versi Indonesia (Bab 10.16) sekitar **~1.281 token** — sudah di atas ambang 1024 token OpenAI sejak sebelum sesi ini, artinya caching kemungkinan **sudah aktif secara otomatis** tanpa pernah disadari/diverifikasi.
+
+**Struktur prompt sudah kebetulan optimal untuk ini**: caching OpenAI mencocokkan **prefix** permintaan dari awal — dan `getSystemInstruction()` (Bab 10.16) sudah menaruh bagian yang stabil (identitas, ATURAN KERAS, GAYA BICARA) di **awal** string, baru menambahkan bagian yang berubah-ubah tiap giliran (konteks KB hasil RAG, hint sentimen/koreksi/mode) di **akhir** lewat `.=`. Urutan ini persis yang dibutuhkan supaya prefix yang identik antar giliran (bagian stabil) bisa cache-hit, sementara bagian yang genuinely berbeda tiap pesan tidak ikut menggagalkan cache.
+
+**Yang tadinya tidak terlihat**: kode sebelumnya mem-parsing `usage.prompt_tokens`/`completion_tokens`/`total_tokens` dari respons API, tapi **tidak pernah membaca** `usage.prompt_tokens_details.cached_tokens` — field yang OpenAI kirim balik untuk melaporkan berapa banyak token prompt yang benar-benar cache-hit. Tanpa ini, tidak ada cara memverifikasi "caching kemungkinan aktif" jadi "caching terbukti aktif, sekian token/giliran".
+
+**Perbaikan** ([OpenAiChatbotProvider.php](../app/Services/Chatbot/Providers/OpenAiChatbotProvider.php)):
+1. `usageMetadata()` sekarang membaca `usage['prompt_tokens_details']['cached_tokens']`, disimpan sebagai kolom `cached_tokens` baru di `ai_chat_logs` (migrasi terpisah).
+2. `estimateCostUsd()` diperbaiki — sebelumnya menghitung **semua** token prompt di harga penuh, padahal OpenAI membebankan token yang cache-hit di harga diskon (~50% dari harga input segar). Tanpa perbaikan ini, begitu caching aktif, angka `estimated_cost_usd` yang tersimpan akan **melebih-lebihkan** biaya riil — bug estimasi yang baru kelihatan sekarang justru karena caching-nya diasumsikan sudah lama berjalan otomatis.
+
+**Verifikasi**: test baru `test_chatbot_bills_cached_prompt_tokens_at_the_discounted_rate` memastikan 1024 dari 1200 token prompt yang dilaporkan cache-hit dihitung di tarif diskon, bukan tarif penuh (estimasi biaya turun dari $0,01200 jadi $0,00944 untuk skenario yang sama). Regresi penuh tetap bersih: `php artisan test` 279/279.
+
+**Batasan yang disadari dan diakui secara jujur**: sesi ini **tidak bisa** mengukur ulang latensi end-to-end secara langsung (Bab 7.2's angka ~1.000-4.600ms) karena tidak ada akses API key produksi di lingkungan pengerjaan ini — jadi klaim "caching sudah aktif" di atas didasarkan pada penalaran dari dokumentasi resmi OpenAI (ambang 1024 token, billing model) dan struktur kode, **bukan** hasil pengukuran `cached_tokens` yang sesungguhnya dari trafik nyata. Yang sudah tersedia sekarang adalah **instrumennya**: kolom `cached_tokens` di `ai_chat_logs` dan `duration_ms` di log diagnostik (Bab 13) sudah siap dipakai untuk verifikasi nyata begitu aplikasi berjalan dengan API key produksi — tinggal jalankan `php artisan chatbot:diagnostics` atau query `ai_chat_logs` setelah beberapa hari trafik nyata untuk memastikan angka cache-hit dan latensi aktual, alih-alih hanya berasumsi dari dokumentasi vendor.
 
 ---
 
@@ -465,6 +641,7 @@ Bersamaan dengan itu, ditambahkan **3 entri KB baru** untuk menutup gap konten y
 | Area                     | File                                                                                                                                                                                      |
 | ------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Orkestrasi utama         | `app/Services/Chatbot/ChatbotOrchestrator.php`                                                                                                                                          |
+| Kontrak respons/sitasi   | `app/Services/Chatbot/ChatbotResponse.php`, `ChatbotCitation.php`                                                                                                                       |
 | Deteksi intent fast-path | `app/Services/Chatbot/ChatbotActionDetector.php`                                                                                                                                        |
 | RAG / retrieval          | `app/Services/Chatbot/Knowledge/KnowledgeRetriever.php`, `KnowledgeEmbeddingsCache.php`                                                                                               |
 | Manajemen konteks        | `app/Services/Chatbot/ChatbotConversationContext.php`                                                                                                                                   |
@@ -473,6 +650,7 @@ Bersamaan dengan itu, ditambahkan **3 entri KB baru** untuk menutup gap konten y
 | Guardrail keyword        | `app/Services/Chatbot/ChatbotGuardrailVerifier.php`                                                                                                                                     |
 | Safety classifier        | `app/Services/Chatbot/Safety/ChatbotSafetyClassifier.php`, `ChatbotSafetyDataset.php`, `ChatbotSafetyEmbeddingsCache.php`                                                           |
 | Logging & privasi        | `app/Services/Chatbot/ChatbotChatLogger.php`                                                                                                                                            |
+| Observability/diagnostik | `app/Services/Chatbot/ChatbotDiagnostics.php`, `app/Console/Commands/ChatbotDiagnosticsSummary.php`                                                                                    |
 | Basis pengetahuan        | `database/seeders/KnowledgeBaseSeeder.php`                                                                                                                                              |
 | Dataset evaluasi         | `app/Services/Chatbot/Knowledge/ChatbotEvalDataset.php`, `ChatbotBehaviorDataset.php`, `ChatbotBehaviorRubricDataset.php`, `app/Services/Chatbot/Safety/ChatbotSafetyDataset.php` |
 | Command evaluasi         | `app/Console/Commands/EvaluateChatbotRag.php`, `EvaluateChatbotBehavior.php`, `EvaluateChatbotBehaviorRubric.php`, `EvaluateChatbotSafety.php`                                    |

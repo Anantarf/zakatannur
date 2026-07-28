@@ -26,7 +26,11 @@ class ChatbotActionDetector
             return 'ask_zakky_capability';
         }
 
-        if (!$looksLikeCalculationRequest && $this->containsAny($message, ['jiwa', 'orang', 'muzakki fitrah']) && $this->containsAny($message, ['total', 'jumlah'])) {
+        // "orang" dropped as an anchor - it's one of the most common words in Indonesian (e.g.
+        // "orang tua"), so even paired with "total"/"jumlah" it hijacked unrelated questions like
+        // "Total pengeluaran rumah tangga saya untuk orang tua per bulan itu ngurangin zakat gak?".
+        // "jiwa" and "muzakki fitrah" are specific enough to this domain to keep as anchors.
+        if (!$looksLikeCalculationRequest && $this->containsAny($message, ['jiwa', 'muzakki fitrah']) && $this->containsAny($message, ['total', 'jumlah'])) {
             return 'ask_total_people';
         }
 
@@ -34,18 +38,28 @@ class ChatbotActionDetector
             return 'ask_total_money';
         }
 
+        // "zakat" used to be one of the second-clause options here, but it's present in nearly
+        // every message about any zakat topic - paired with the loose "berapa" in the first
+        // clause, that hijacked plain KB questions like "Zakat perdagangan dihitung dari modal
+        // atau omzet, berapa persennya?" into an unrelated "total zakat terkumpul" answer. The
+        // remaining words (semua/terkumpul/penerimaan) actually imply an aggregate/total, which
+        // "zakat" alone never did.
         if (!$looksLikeCalculationRequest
             && !$this->containsAny($message, ['seberapa'])
             && $this->containsAny($message, ['berapa', 'total', 'jumlah', 'ringkasan penerimaan', 'rekap penerimaan'])
-            && $this->containsAny($message, ['zakat', 'semua', 'terkumpul', 'penerimaan'])) {
+            && $this->containsAny($message, ['semua', 'terkumpul', 'penerimaan'])) {
             return 'ask_total_summary';
         }
 
-        if ($this->containsAny($message, ['fitrah', 'orang', 'jiwa']) && $this->containsAny($message, ['berapa', 'hitung', 'brp']) && preg_match('/\d+/', $message)) {
+        // "orang" dropped as an anchor here too - "Saya mau hitung THR buat 3 orang karyawan"
+        // (hitung + orang + digit, nothing to do with zakat fitrah) used to match this.
+        if ($this->containsAny($message, ['fitrah', 'jiwa']) && $this->containsAny($message, ['berapa', 'hitung', 'brp']) && preg_match('/\d+/', $message)) {
             return 'calculate_fitrah_case';
         }
 
-        if ($this->containsAny($message, ['fidyah', 'hari', 'puasa']) && $this->containsAny($message, ['berapa', 'hitung', 'brp']) && preg_match('/\d+/', $message)) {
+        // "hari" dropped as an anchor - "Ada 5 hari libur lebaran ini, mau hitung cuti tambahan
+        // gimana?" (hitung + hari + digit, about leave days, not fidyah) used to match this.
+        if ($this->containsAny($message, ['fidyah', 'puasa']) && $this->containsAny($message, ['berapa', 'hitung', 'brp']) && preg_match('/\d+/', $message)) {
             return 'calculate_fidyah_case';
         }
 
@@ -81,11 +95,21 @@ class ChatbotActionDetector
             return 'ask_latest_update';
         }
 
-        if ($this->containsAny($message, ['kategori terbesar', 'paling besar', 'terbanyak', 'tertinggi'])) {
+        // "paling besar"/"terbanyak"/"tertinggi" alone are generic comparison words - "Nisab yang
+        // paling besar itu emas atau uang tunai?" and "mana yang nisabnya tertinggi?" used to
+        // match this even though they're not asking about transaction categories at all. Now
+        // requires "kategori" or "penerimaan" alongside the comparison word.
+        if ($this->containsAny($message, ['kategori', 'penerimaan'])
+            && $this->containsAny($message, ['terbesar', 'paling besar', 'terbanyak', 'tertinggi'])) {
             return 'ask_top_category';
         }
 
-        if ($this->containsAny($message, ['kategori', 'jenis zakat', 'jenis penerimaan'])) {
+        // Requires pairing with a "recorded data" word (tercatat/terkumpul/penerimaan) - bare
+        // "kategori"/"jenis zakat" used to hijack conceptual questions like "Kategori aset yang
+        // kena zakat itu apa aja?" or "Jenis zakat mal yang paling sering ditanyakan apa ya?" into
+        // an unrelated transaction-category dashboard answer.
+        if ($this->containsAny($message, ['kategori', 'jenis zakat', 'jenis penerimaan'])
+            && $this->containsAny($message, ['tercatat', 'terkumpul', 'penerimaan'])) {
             return 'ask_categories';
         }
 
@@ -99,31 +123,39 @@ class ChatbotActionDetector
             return 'ask_total_rice';
         }
 
-        if (!$looksLikeCalculationRequest && $this->containsAny($message, ['jiwa', 'orang', 'muzakki fitrah'])) {
-            return 'ask_total_people';
-        }
+        // ask_total_people/money/summary are decided once, near the top of this function (right
+        // after $looksLikeCalculationRequest) - a second, looser copy of these three checks used
+        // to live here. It required no total/jumlah pairing at all for ask_total_people (bare
+        // "orang" - one of the most common words in Indonesian - was enough to hijack a warisan
+        // question into "total jiwa zakat fitrah"), and dropped the zakat-topic pairing for
+        // ask_total_summary (bare "berapa" hijacked an unrelated address question). Removed
+        // rather than kept "for safety" - the stricter versions above already cover every
+        // legitimate case the loose versions were meant to catch.
 
-        if (!$looksLikeCalculationRequest
-            && $this->containsAny($message, ['uang', 'rupiah', 'rp', 'terkumpul', 'penerimaan uang', 'nominal'])
-            && $this->containsAny($message, ['berapa', 'total', 'jumlah', 'semua', 'terkumpul', 'penerimaan'])) {
-            return 'ask_total_money';
-        }
-
-        if (!$looksLikeCalculationRequest
-            && !$this->containsAny($message, ['seberapa'])
-            && $this->containsAny($message, ['berapa', 'total', 'jumlah', 'ringkasan penerimaan', 'rekap penerimaan'])) {
-            return 'ask_total_summary';
-        }
-
-        if ($this->containsAny($message, ['grafik', 'harian', 'chart', 'tren', 'pola penerimaan'])) {
+        // "harian" dropped as a standalone anchor - "Petugas piket harian siapa aja ya minggu
+        // ini?" used to match this even though it has nothing to do with the receipts chart.
+        // "grafik"/"chart"/"tren" already cover "grafik harian" and similar phrasing on their own.
+        if ($this->containsAny($message, ['grafik', 'chart', 'tren', 'pola penerimaan'])) {
             return 'open_chart';
         }
 
-        if ($this->containsAny($message, ['ringkasan', 'laporan', 'rekap'])) {
+        // Requires an action verb (buka/lihat/tampilkan/cek) or a data word (penerimaan/terkumpul)
+        // alongside ringkasan/laporan/rekap - bare "ringkasan" used to hijack a conceptual request
+        // like "Ringkasan singkat soal zakat mal dong" (wants a short explanation, not the
+        // dashboard summary feature) into an unrelated "buka ringkasan" reply.
+        if ($this->containsAny($message, ['ringkasan', 'laporan', 'rekap'])
+            && $this->containsAny($message, ['buka', 'lihat', 'tampilkan', 'cek', 'penerimaan', 'terkumpul'])) {
             return 'open_summary';
         }
 
-        if ($this->containsAny($message, ['cara bayar', 'bayar zakat', 'pembayaran', 'rekening', 'transfer'])) {
+        // Full phrases, not bare words - "rekening"/"transfer"/"cara bayar" alone used to hijack
+        // "Rekening BCA punya saya kena zakat gak kalau isinya banyak?" (a zakat-mal savings
+        // question) and "Cara bayar hutang riba itu gimana, ada hubungannya sama zakat?" (a debt
+        // question) into an unrelated "how to pay zakat" reply.
+        if ($this->containsAny($message, [
+            'cara bayar zakat', 'cara bayar infaq', 'cara bayar fidyah', 'cara bayar sedekah',
+            'bayar zakat', 'pembayaran zakat', 'rekening zakat', 'transfer zakat', 'qris zakat',
+        ])) {
             return 'ask_payment_info';
         }
 
@@ -179,7 +211,7 @@ class ChatbotActionDetector
                 . "Untuk angka zakat mal, saya tidak menebak sendiri. Saya kumpulkan data dulu, lalu sistem menghitungnya lewat kalkulator backend agar hasilnya lebih aman. Kalau kasusnya butuh keputusan fikih pribadi, saya tetap akan arahkan ke panitia atau ustadz.",
                 'knowledge',
                 [],
-                [['id' => 'tentang-zakky', 'label' => 'Panduan Publik Masjid An-Nur']]
+                [new ChatbotCitation('tentang-zakky', 'Panduan Publik Masjid An-Nur')]
             ),
             'ask_location' => ChatbotResponse::success(
                 "Masjid An-Nur berlokasi di Jl. Contoh Alamat No. 123, Kelurahan Maju, Kecamatan Bersama, Kota Sejahtera.\n\n"

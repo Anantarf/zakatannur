@@ -39,7 +39,7 @@ class ChatbotPublicDataResponder
                 'Untuk pembayaran zakat, silakan serahkan langsung ke amil di Masjid An-Nur. Untuk transfer, Anda bisa menghubungi panitia untuk informasi rekening resmi.',
                 'knowledge',
                 [],
-                [['id' => 'payment-info', 'label' => 'Panduan Zakat Masjid An-Nur']]
+                [new ChatbotCitation('payment-info', 'Panduan Zakat Masjid An-Nur')]
             ),
             default => null,
         };

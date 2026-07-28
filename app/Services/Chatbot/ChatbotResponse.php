@@ -7,11 +7,13 @@ class ChatbotResponse
     public string $reply;
     public string $source;
     public array $actions;
+    /** @var ChatbotCitation[] */
     public array $citations;
     public array $context;
     public bool $retryable;
     public int $statusCode;
 
+    /** @param ChatbotCitation[] $citations */
     public function __construct(
         string $reply,
         string $source = 'ai',
@@ -23,13 +25,14 @@ class ChatbotResponse
     ) {
         $this->reply = $reply;
         $this->source = $source;
-        $this->actions = [];
+        $this->actions = $actions;
         $this->citations = $citations;
         $this->context = $context;
         $this->retryable = $retryable;
         $this->statusCode = $statusCode;
     }
 
+    /** @param ChatbotCitation[] $citations */
     public static function success(string $reply, string $source = 'ai', array $actions = [], array $citations = []): self
     {
         return new self($reply, $source, $actions, $citations);
@@ -63,7 +66,7 @@ class ChatbotResponse
                 'reply' => $this->reply,
                 'source' => $this->source,
                 'actions' => $this->actions,
-                'citations' => $this->citations,
+                'citations' => array_map(fn (ChatbotCitation $c) => $c->toArray(), $this->citations),
                 'context' => $this->context,
             ],
         ];

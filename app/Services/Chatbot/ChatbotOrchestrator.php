@@ -28,8 +28,16 @@ class ChatbotOrchestrator
 
     public function handle(string $message, array $rawContext = [], ?string $sessionId = null): ChatbotResponse
     {
+        $startedAt = microtime(true);
+
         $quickResponse = $this->getQuickResponse($message, $rawContext, $sessionId);
         if ($quickResponse) {
+            ChatbotDiagnostics::info(ChatbotDiagnostics::LAYER_ORCHESTRATOR, 'handled_fast_path', [
+                'session_id' => $sessionId,
+                'source' => $quickResponse->source,
+                'duration_ms' => (int) ((microtime(true) - $startedAt) * 1000),
+            ]);
+
             return $quickResponse;
         }
 
@@ -39,9 +47,26 @@ class ChatbotOrchestrator
             $confidenceSource = $this->aiProvider->wasLastReplyFallback() ? 'fallback' : 'ai';
             $this->chatLogger->save($message, null, $response->source, $response->reply, $sessionId, $sentiment, $confidenceSource, $this->aiProvider->lastUsageMetadata());
 
+            ChatbotDiagnostics::info(ChatbotDiagnostics::LAYER_ORCHESTRATOR, 'handled_ai_path', [
+                'session_id' => $sessionId,
+                'source' => $response->source,
+                'confidence_source' => $confidenceSource,
+                'duration_ms' => (int) ((microtime(true) - $startedAt) * 1000),
+            ]);
+
             // Cache jalur AI dimatikan sesuai spesifikasi (RAG memory butuh stateful)
             return $response;
         } catch (Throwable $e) {
+            // exception class + file:line pinpoints which layer threw, not just that "something"
+            // failed - a bare $e->getMessage() often reads identically across very different root
+            // causes (e.g. a null-property access vs an HTTP timeout can both say "null given").
+            ChatbotDiagnostics::error(ChatbotDiagnostics::LAYER_ORCHESTRATOR, 'unhandled_exception', [
+                'session_id' => $sessionId,
+                'exception' => get_class($e),
+                'message' => $e->getMessage(),
+                'file' => $e->getFile() . ':' . $e->getLine(),
+                'duration_ms' => (int) ((microtime(true) - $startedAt) * 1000),
+            ]);
             Log::error('Chatbot orchestration failed.', [
                 'message' => $e->getMessage(),
             ]);
@@ -52,8 +77,15 @@ class ChatbotOrchestrator
 
     public function stream(string $message, array $rawContext = [], ?string $sessionId = null): \Generator
     {
+        $startedAt = microtime(true);
+
         $quickResponse = $this->getQuickResponse($message, $rawContext, $sessionId);
         if ($quickResponse) {
+            ChatbotDiagnostics::info(ChatbotDiagnostics::LAYER_ORCHESTRATOR, 'handled_fast_path', [
+                'session_id' => $sessionId,
+                'source' => $quickResponse->source,
+                'duration_ms' => (int) ((microtime(true) - $startedAt) * 1000),
+            ]);
             yield ['response' => $quickResponse];
             return;
         }
@@ -84,10 +116,24 @@ class ChatbotOrchestrator
             $confidenceSource = $this->aiProvider->wasLastReplyFallback() ? 'fallback' : 'ai';
             $this->chatLogger->save($message, null, $responseObj->source, $fullReply, $sessionId, $sentiment, $confidenceSource, $this->aiProvider->lastUsageMetadata());
 
+            ChatbotDiagnostics::info(ChatbotDiagnostics::LAYER_ORCHESTRATOR, 'handled_ai_path_stream', [
+                'session_id' => $sessionId,
+                'source' => $responseObj->source,
+                'confidence_source' => $confidenceSource,
+                'duration_ms' => (int) ((microtime(true) - $startedAt) * 1000),
+            ]);
+
             // Cache jalur AI dimatikan sesuai spesifikasi (RAG memory butuh stateful)
 
             yield ['response' => $responseObj];
         } catch (Throwable $e) {
+            ChatbotDiagnostics::error(ChatbotDiagnostics::LAYER_ORCHESTRATOR, 'unhandled_exception_stream', [
+                'session_id' => $sessionId,
+                'exception' => get_class($e),
+                'message' => $e->getMessage(),
+                'file' => $e->getFile() . ':' . $e->getLine(),
+                'duration_ms' => (int) ((microtime(true) - $startedAt) * 1000),
+            ]);
             Log::error('Chatbot stream orchestration failed.', ['message' => $e->getMessage()]);
             yield ['response' => ChatbotResponse::error('Gagal memproses pesan. Silakan coba beberapa saat lagi.', true, 500)];
         }
@@ -140,7 +186,7 @@ class ChatbotOrchestrator
                             (string) $knowledge['answer'],
                             'knowledge',
                             [],
-                            [['id' => $knowledge['id'], 'label' => $knowledge['source_label'] ?? 'Panduan Zakat Masjid An-Nur']]
+                            [ChatbotCitation::fromKnowledgeArray($knowledge)]
                         )->withContext($this->conversationContext->forIntent($entryId, 'knowledge'));
                         return $this->finalizeQuickResponse($response, $message, $rawContext, $intent, 'knowledge', $sessionId, 'knowledge');
                     }
@@ -161,6 +207,12 @@ class ChatbotOrchestrator
 
             return null;
         } catch (Throwable $e) {
+            ChatbotDiagnostics::error(ChatbotDiagnostics::LAYER_ACTION_DETECTOR, 'unhandled_exception', [
+                'session_id' => $sessionId,
+                'exception' => get_class($e),
+                'message' => $e->getMessage(),
+                'file' => $e->getFile() . ':' . $e->getLine(),
+            ]);
             Log::error('Quick response failed.', [
                 'message' => $e->getMessage(),
             ]);
@@ -216,8 +268,26 @@ class ChatbotOrchestrator
             // last_source:'ai' round-trips through the frontend's context and back on the next
             // request, so getQuickResponse() can tell "we're mid AI-conversation" and defer to
             // the AI instead of the fast-path keyword matcher hijacking the user's next reply.
-            : ChatbotResponse::success($cleanReply, 'ai', [], $contexts)
+            : ChatbotResponse::success($cleanReply, 'ai', [], $this->buildCitations($contexts))
                 ->withContext($this->conversationContext->aiContext($mode));
+    }
+
+    // $contexts also carries hint-only entries (_conversation_hint, _sentiment_hint,
+    // _correction_hint) meant only for the LLM's system prompt (see
+    // ChatbotConversationContext::withHints()) - passing it straight through as citations used to
+    // leak those raw internal instructions into the public API response. Building ChatbotCitation
+    // objects (not raw arrays) here also means a 'label' vs 'source_label' mismatch like Bab
+    // 10.17's bug ("Acuan: undefined" on nearly every zakat-mal-consultation reply) can't happen
+    // silently again - ChatbotCitation::fromKnowledgeArray() is the one place that translation
+    // happens, and ChatbotResponse only accepts ChatbotCitation instances.
+    /** @return ChatbotCitation[] */
+    private function buildCitations(array $contexts): array
+    {
+        return collect($contexts)
+            ->filter(fn ($item) => isset($item['title']))
+            ->map(fn ($item) => ChatbotCitation::fromKnowledgeArray($item))
+            ->values()
+            ->all();
     }
 
     private function polishReply(string $reply): string
