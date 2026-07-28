@@ -1,4 +1,3 @@
-
 # Dokumentasi Teknis Chatbot Zakky — Acuan Pembahasan Skripsi
 
 Dokumen ini merangkum arsitektur, metodologi, dan hasil evaluasi terukur dari chatbot Zakky (asisten zakat Masjid An-Nur), disusun sebagai bahan mentah untuk bab pembahasan/hasil skripsi. Semua angka di sini berasal dari pengujian nyata terhadap kode yang berjalan (bukan estimasi), dengan referensi file dan baris kode supaya bisa ditelusuri ulang.
@@ -129,11 +128,11 @@ Prinsip metodologi (didokumentasikan di KB entri `catatan-metodologi-zakat`): pe
 
 `OpenAiChatbotProvider::selectModel()` ([OpenAiChatbotProvider.php:255](../app/Services/Chatbot/Providers/OpenAiChatbotProvider.php#L255)) memilih salah satu dari 3 model berdasarkan kompleksitas pesan:
 
-| Tingkat           | Kapan dipakai                                                                                                                                                                                                                                                               | Contoh trigger                                            |
-| ----------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------- |
+| Tingkat           | Kapan dipakai                                                                                                                                                                                                                                                         | Contoh trigger                                            |
+| ----------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------- |
 | **Premium** | Pesan punya**≥2 sinyal kompleksitas berbeda** (hitung, zakat mal, nisab, haul, emas, tabungan, hutang, aset, penghasilan, gaji, investasi, saham, usaha, warisan, konsultasi), atau 1 sinyal + ada angka eksplisit, atau konteks ≥3 entri, atau pesan >350 karakter | "Saya mau hitung zakat mal, gaji 10 juta..." (4 sinyal)   |
-| **Fast**    | Pesan pendek (≤6 kata) tanpa konteks, atau cocok pola sapaan/FAQ singkat                                                                                                                                                                                                   | "Halo", "jadwal zakat fitrah?"                            |
-| **Default** | Sisanya, termasuk pesan dengan**hanya 1 sinyal kompleksitas** tanpa angka                                                                                                                                                                                             | "Saya punya hutang, apakah tetap wajib zakat?" (1 sinyal) |
+| **Fast**    | Pesan pendek (≤6 kata) tanpa konteks, atau cocok pola sapaan/FAQ singkat                                                                                                                                                                                             | "Halo", "jadwal zakat fitrah?"                            |
+| **Default** | Sisanya, termasuk pesan dengan**hanya 1 sinyal kompleksitas** tanpa angka                                                                                                                                                                                       | "Saya punya hutang, apakah tetap wajib zakat?" (1 sinyal) |
 
 Aturan "≥2 sinyal" ini hasil tuning di Bab 7.4 — sebelumnya 1 kata kunci apa pun sudah cukup memicu premium. Diuji otomatis di `tests/Feature/ChatbotApiTest.php::test_openai_provider_routes_fast_default_and_premium_models`.
 
