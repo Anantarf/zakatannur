@@ -688,10 +688,10 @@ TEXT,
                     'metode pembayaran',
                     'rekening zakat',
                     'pembayaran online',
-                    'cek',
-                    'cheque',
-                    'giro',
-                    'bilyet giro',
+                    // 'cek'/'cheque'/'giro'/'bilyet giro' sengaja TIDAK dimasukkan di sini - itu
+                    // bikin fallback keyword scoring (dipakai kalau embedding API gagal) bersaing
+                    // seri dengan entri khusus 'pembayaran-cek' untuk query yang jelas soal cek,
+                    // padahal entri itu jawabannya jauh lebih spesifik untuk kasus itu.
                 ],
                 'answer' => <<<TEXT
 Alurnya simpel:

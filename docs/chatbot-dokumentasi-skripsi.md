@@ -114,7 +114,7 @@ Threshold 0,45 ditentukan dari observasi empiris: similarity >0,60 = relevansi s
 
 LLM **tidak pernah** menghitung nominal zakat mal sendiri — ini keputusan desain eksplisit untuk menghindari halusinasi angka. Alurnya:
 
-1. Prompt sistem melarang LLM menghitung sendiri dan mewajibkan output tag `[HITUNG:{"income_monthly":...,"savings":...,"gold_gram":...,"debt":...}]` begitu data cukup ([OpenAiChatbotProvider.php:335-337](../app/Services/Chatbot/Providers/OpenAiChatbotProvider.php#L335-L337)).
+1. Prompt sistem melarang LLM menghitung sendiri dan mewajibkan output tag `[HITUNG:{"income_monthly":...,"savings":...,"gold_gram":...,"debt":...}]` begitu data cukup ([OpenAiChatbotProvider.php:382](../app/Services/Chatbot/Providers/OpenAiChatbotProvider.php#L382)).
 2. `ChatbotSentinelParser` mendeteksi tag ini, mengekstrak JSON variabelnya, dan memanggil `ChatbotZakatMalGuide::calculate()` — fungsi PHP murni yang menghitung zakat penghasilan (basis penghasilan bruto bulanan × 12, terpisah dari tabungan — lihat Bab 6.2) dan zakat tabungan/emas (basis harta simpanan saat ini dikurangi hutang) secara independen terhadap nisab.
 3. Hasil kalkulasi disisipkan kembali ke balasan sebagai blok `[[HASIL]]...[[/HASIL]]`, yang di-render frontend sebagai kartu hasil terpisah (lihat `resources/js/chatbot-widget.js`).
 4. Bagian penghasilan dan bagian tabungan/emas masing-masing hanya dirender kalau field terkait **benar-benar ada** di JSON `[HITUNG:{...}]` (`isset()`, bukan default ke 0) — lihat Bab 10.7 untuk bug yang mendasari aturan ini.
@@ -149,7 +149,7 @@ Zakat penghasilan dihitung dari **penghasilan bruto** (gaji pokok + tunjangan, s
 
 ### 7.1 Routing 3 Model
 
-`OpenAiChatbotProvider::selectModel()` ([OpenAiChatbotProvider.php:255](../app/Services/Chatbot/Providers/OpenAiChatbotProvider.php#L255)) memilih salah satu dari 3 model berdasarkan kompleksitas pesan:
+`OpenAiChatbotProvider::selectModel()` ([OpenAiChatbotProvider.php:265](../app/Services/Chatbot/Providers/OpenAiChatbotProvider.php#L265)) memilih salah satu dari 3 model berdasarkan kompleksitas pesan (sejak Bab 20.1, setiap keputusan routing juga dicatat ke `ChatbotDiagnostics` — `model_used`, `route_reason`, `message_length`, `conversation_turn_count`):
 
 | Tingkat           | Kapan dipakai                                                                                                                                                                                                                                                         | Contoh trigger                                            |
 | ----------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------- |
@@ -182,7 +182,7 @@ Ditemukan lewat pengukuran: setiap pesan — termasuk balasan lanjutan pendek se
 
 **Masalah**: `needsPremiumModel()` awalnya memicu model premium (~4,4–4,6 detik) hanya dengan **satu** kata kunci apa pun dari 18 kata yang ada — termasuk kata umum seperti "emas", "gaji", "usaha", "warisan" yang sering muncul di pertanyaan ringan/tangensial, bukan cuma di kalkulasi kompleks yang sungguh butuh model bertenaga. Karena pertanyaan definisi murni (mis. "apa itu nisab?") sudah lebih dulu terjawab lewat fast-path KB tanpa pernah sampai ke pemilihan model (Bab 3, langkah 2), keyword ini justru banyak menjaring pertanyaan yang lolos fast-path tapi tetap sederhana secara reasoning.
 
-**Fix**: `needsPremiumModel()` diubah untuk mensyaratkan **≥2 sinyal kompleksitas berbeda**, atau 1 sinyal dipasangkan dengan angka eksplisit ("emas 100 gram"), sebelum menaikkan ke tier premium ([OpenAiChatbotProvider.php:266](../app/Services/Chatbot/Providers/OpenAiChatbotProvider.php#L266)).
+**Fix**: `needsPremiumModel()` diubah untuk mensyaratkan **≥2 sinyal kompleksitas berbeda**, atau 1 sinyal dipasangkan dengan angka eksplisit ("emas 100 gram"), sebelum menaikkan ke tier premium ([OpenAiChatbotProvider.php:290](../app/Services/Chatbot/Providers/OpenAiChatbotProvider.php#L290)).
 
 **Bug yang ditemukan saat verifikasi (bukan cacat desain, tapi pelajaran metodologis penting)**: implementasi pertama dari fix ini tidak langsung berfungsi — pesan uji "Saya punya hutang, apakah tetap wajib zakat?" (seharusnya 1 sinyal) tetap ter-route ke premium. Investigasi menunjukkan kata kunci `'utang'` secara substring **tercakup di dalam** `'hutang'` (h-**utang**), sehingga satu kata "hutang" di pesan dihitung sebagai 2 sinyal berbeda, bukan 1 — meniadakan efek threshold ≥2 sepenuhnya untuk kasus itu. Diperbaiki dengan menghapus `'utang'` dari daftar (sudah tercakup `'hutang'`) dan `'perhitungan'` (sudah tercakup `'hitung'`) — dua pasangan kata kunci yang saling ber-substring dalam daftar 18 kata aslinya.
 
@@ -222,7 +222,7 @@ Regex/keyword matching murni (tanpa panggilan API), dipanggil **per-kalimat saat
 
 ### Lapisan 3 — `ChatbotSafetyClassifier` (embedding similarity)
 
-Layer tambahan (bukan pengganti lapisan 2) yang dipanggil **sekali** setelah balasan final selesai (bukan per-kalimat, supaya tidak menambah panggilan embedding di setiap kalimat streaming). Metodologi dan hasil evaluasinya di Bab 9.4. Observability lintas-lapisan (termasuk instrumentasi Lapisan 2 & 3) dibahas terpisah di Bab 13.
+Layer tambahan (bukan pengganti lapisan 2) yang dipanggil **sekali** setelah balasan final selesai (bukan per-kalimat, supaya tidak menambah panggilan embedding di setiap kalimat streaming). Metodologi awal dan hasil evaluasi baseline di Bab 9.4; algoritma dan angka **terkini** (k-NN berbobot, threshold 0,66, cakupan "confident" 7,5%) ada di Bab 20.2 — perlakukan Bab 9.4 sebagai snapshot metodologi, bukan angka final. Observability lintas-lapisan (termasuk instrumentasi Lapisan 2 & 3) dibahas terpisah di Bab 13.
 
 ---
 
@@ -251,6 +251,8 @@ Empat command evaluasi, masing-masing menguji aspek berbeda dari sistem:
 - Target realistis (dari `docs/chatbot-thesis-notes.md`): rata-rata ≥4,0/5, tidak ada aspek utama di bawah 3.
 
 ### 9.4 `chatbot:eval-safety` — Classifier Keamanan Berbasis Embedding Similarity
+
+> **Catatan pembaruan**: bagian ini adalah snapshot metodologi & hasil pada saat dataset masih 145 contoh dan algoritma masih 1-nearest-neighbor murni — dipertahankan apa adanya sebagai jejak historis (konsisten dengan gaya "temuan per waktu" di Bab 10). Dataset bertambah jadi 161 contoh di **Bab 18**, dan algoritmanya berubah jadi k-NN berbobot dengan threshold re-tuning di **Bab 20.2** — angka akurasi/error rate/cakupan **terkini** ada di sana, bukan di tabel bawah ini. Metodologi leave-one-out dan threshold sweep yang dijelaskan di sini tetap berlaku tanpa perubahan.
 
 Ini metodologi paling "terukur" secara kuantitatif di antara keempatnya, cocok untuk bab evaluasi/hasil skripsi yang butuh angka statistik.
 
@@ -356,7 +358,7 @@ Dua skenario di `chatbot:eval-behavior` sempat dilaporkan "GAGAL" karena mengece
 
 Saat menambah 7 skenario baru ke `chatbot:eval-behavior` (11 → 18, menutup lebih banyak poin dari `docs/chatbot-behavior-notes.md`), dua di antaranya langsung menemukan bug produk nyata pada percobaan pertama — bukti lain bahwa evaluasi perilaku end-to-end menangkap kelas bug yang tidak tertangkap review kode atau unit test level-fungsi (pola yang sama seperti Bab 10.1).
 
-**Bug 1 — bot tidak berhenti menghitung saat user bilang sudah bayar.** Skenario "tidak lanjut menghitung saat user bilang sudah bayar" (poin 36 di `chatbot-behavior-notes.md`) awalnya gagal: setelah user berkata *"Eh sebenarnya saya sudah transfer duluan tadi pagi"* di tengah konsultasi, bot tetap melanjutkan menanyakan data kalkulasi (mis. status haul tabungan), bukan mengarahkan ke konfirmasi pembayaran ke panitia — karena system prompt memang belum pernah punya instruksi eksplisit untuk kasus ini. **Perbaikan**: menambah satu kalimat instruksi baru di system prompt ([OpenAiChatbotProvider.php:352](../app/Services/Chatbot/Providers/OpenAiChatbotProvider.php#L352)) yang secara eksplisit melarang lanjut menghitung dan mengarahkan langsung ke konfirmasi panitia.
+**Bug 1 — bot tidak berhenti menghitung saat user bilang sudah bayar.** Skenario "tidak lanjut menghitung saat user bilang sudah bayar" (poin 36 di `chatbot-behavior-notes.md`) awalnya gagal: setelah user berkata *"Eh sebenarnya saya sudah transfer duluan tadi pagi"* di tengah konsultasi, bot tetap melanjutkan menanyakan data kalkulasi (mis. status haul tabungan), bukan mengarahkan ke konfirmasi pembayaran ke panitia — karena system prompt memang belum pernah punya instruksi eksplisit untuk kasus ini. **Perbaikan**: menambah satu kalimat instruksi baru di system prompt ([OpenAiChatbotProvider.php:380](../app/Services/Chatbot/Providers/OpenAiChatbotProvider.php#L380)) yang secara eksplisit melarang lanjut menghitung dan mengarahkan langsung ke konfirmasi panitia.
 
 **Bug 2 — regresi dari optimasi latensi Bab 7.4.** Skenario "pause konsultasi saat user minta penjelasan konsep" (skenario lama, bukan baru) ikut gagal saat regression run: pesan *"Nanti dulu, jelasin nisab itu apa."* (≤8 kata, di tengah mode konsultasi) kena aturan skip-retrieval yang ditambahkan untuk optimasi latensi (Bab 7.4) — akibatnya bot menjawab *"Saya belum punya info itu di panduan Masjid An-Nur"* padahal nisab jelas ada di KB. Aturan skip itu awalnya mengasumsikan balasan pendek di tengah konsultasi selalu berupa **lanjutan data** ("50 juta", "tidak ada hutang"), padahal bisa juga berupa **pertanyaan tangensial pendek** yang tetap butuh grounding KB. **Perbaikan**: `ChatbotOrchestrator::retrieveContexts()` ([ChatbotOrchestrator.php:266](../app/Services/Chatbot/ChatbotOrchestrator.php#L266)) sekarang mengecualikan pesan yang mengandung pola pertanyaan (tanda `?` atau kata tanya seperti "apa", "kenapa", "jelasin") dari aturan skip, walau tetap pendek dan di tengah konsultasi.
 
@@ -536,8 +538,8 @@ Dua bug ini saling menutupi: karena field yang salah (`source_label`) dipakai, b
 ## 11. Keterbatasan yang Diketahui (Untuk Bab Batasan Penelitian)
 
 1. **Guardrail keyword (Lapisan 2) bisa dilewati parafrase** yang tidak memakai kata terlarang eksplisit dan tetap di bawah 150 karakter. Terdokumentasi dan dibuktikan test, bukan diklaim sebagai perlindungan penuh terhadap prompt injection.
-2. **Safety classifier (Lapisan 3) punya cakupan "confident" sekitar 28%** setelah tuning — sisanya jatuh ke ambiguous/no_match dan tidak mendapat keputusan tegas dari lapisan ini (fail-open, mengandalkan Lapisan 1–2). Trade-off precision-vs-recall yang disengaja, bukan kegagalan tak disadari.
-3. **Kategori `unsupported_fatwa` punya error rate tertinggi** (35,0%) di leave-one-out — dataset 20 contoh untuk kategori ini kemungkinan masih terlalu kecil/terlalu mirip `in_domain` secara struktur kalimat untuk representasi yang stabil; menambah contoh yang ditargetkan ke kategori ini adalah perbaikan lanjutan yang jelas.
+2. **Safety classifier (Lapisan 3) punya cakupan "confident" sekitar 7,5%** (diperbarui Bab 20.2 — turun dari ~28% setelah beralih ke k-NN dan re-tuning threshold demi false-positive `in_domain` 0%) — sisanya jatuh ke ambiguous/no_match dan tidak mendapat keputusan tegas dari lapisan ini (fail-open, mengandalkan Lapisan 1–2). Trade-off precision-vs-recall yang disengaja, bukan kegagalan tak disadari; tier "ambiguous" (mayoritas kasus) saat ini murni pass-through, belum dimanfaatkan sebagai sinyal apa pun — lihat Bab 12 poin 1 (baru).
+3. **Kategori `unsupported_fatwa` sudah membaik dari 35,0% ke 10,0% error rate** (Bab 20.2, hasil switch 1-NN → k-NN berbobot) — perbaikan lanjutan sebelumnya (Bab 18, sekadar menambah jumlah contoh dataset) terbukti **tidak** memperbaiki angka ini; yang berpengaruh nyata adalah mengganti algoritma klasifikasinya, bukan volume datanya.
 4. **Dataset reference untuk safety classifier tercampur dua gaya penulisan** (pertanyaan user + balasan bot, lihat Bab 10.4) setelah perbaikan celah distribusi — cukup untuk menutup gap yang ditemukan, tapi rasio 5 contoh reply-style per 25-40 contoh question-style per kategori masih kecil; menambah lebih banyak contoh reply-style adalah perbaikan lanjutan yang jelas kalau classifier ini dikembangkan lebih jauh.
 5. **Refresh embedding cache KB bersifat sinkron** — menyimpan entri KB memblokir request admin selama kira-kira (jumlah entri aktif × latensi API embedding). Aman di skala 54 entri saat ini, perlu dipertimbangkan ulang (batching/queue) kalau KB tumbuh jadi ratusan entri.
 6. **Evaluasi `eval-behavior`, `eval-behavior-rubric`, dan `eval-safety` bergantung pada API key asli** dan bersifat nondeterministik (jawaban LLM bisa sedikit berbeda antar run) — dijalankan manual sebagai regression check sebelum perubahan besar ke prompt, bukan gate CI otomatis seperti unit test biasa.
@@ -549,11 +551,12 @@ Dua bug ini saling menutupi: karena field yang salah (`source_label`) dipakai, b
 
 ## 12. Rekomendasi Pengembangan Lanjutan
 
-1. Tambah contoh dataset di kategori `unsupported_fatwa` dan `privacy_risk` (error rate tertinggi), lalu ukur ulang lewat `chatbot:eval-safety` apakah akurasi confident-tier membaik.
+1. ~~Tambah contoh dataset di kategori `unsupported_fatwa` dan `privacy_risk`~~ — **selesai dicoba, terbukti tidak cukup** (Bab 18: dataset diperluas, error rate `unsupported_fatwa` tetap flat 23,3%). Perbaikan yang benar-benar berdampak ternyata mengganti algoritma klasifikasi 1-NN → k-NN berbobot (Bab 20.2, error rate turun ke 10,0%). **Rekomendasi baru menggantikan poin ini**: manfaatkan tier "ambiguous" (Bab 20.2, ~79% dari total kasus, saat ini murni pass-through/no-op) sebagai sinyal tambahan — misalnya untuk menaikkan kehati-hatian prompt LLM atau menandai giliran untuk tinjauan manual — alih-alih membiarkannya tidak berkontribusi apa pun ke sistem.
 2. Terapkan `chatbot:eval-safety` juga terhadap **pesan masuk user** (bukan cuma balasan LLM) — dataset sudah mendukung ini (banyak contoh `prompt_injection` ditulis dari sudut pandang pesan user), tapi integrasinya saat ini baru menyasar balasan akhir untuk menghindari penambahan panggilan embedding di jalur kritis.
 3. Pertimbangkan caching/batching untuk refresh embedding KB kalau jumlah entri bertambah signifikan.
-4. Lengkapi evaluasi kuantitatif (Bab 9.1, 9.2, 9.4) dengan evaluasi kualitatif oleh responden manusia (dosen pembimbing, panitia masjid, atau sampel jamaah) menggunakan rubric di Bab 9.3 — kombinasi keduanya (terukur otomatis + manusia) memberi validitas yang lebih kuat untuk klaim "chatbot ini membantu" di skripsi.
+4. Lengkapi evaluasi kuantitatif (Bab 9.1, 9.2, 9.4/Bab 20.2) dengan evaluasi kualitatif oleh responden manusia (dosen pembimbing, panitia masjid, atau sampel jamaah) menggunakan rubric di Bab 9.3 — kombinasi keduanya (terukur otomatis + manusia) memberi validitas yang lebih kuat untuk klaim "chatbot ini membantu" di skripsi.
 5. `ChatbotLanguageDetector` (Bab 10.16) memakai daftar kata penanda Inggris yang tetap dan rasio ambang 30% — cukup rapuh untuk kalimat pendek atau campuran ID/EN (dibuktikan tidak sengaja saat menulis test regresi Bab 10.16, sebuah kalimat Inggris wajar gagal terdeteksi sebagai EN). Bukan bug aktif yang berdampak sekarang (fallback ke ID tetap aman karena versi ID lebih lengkap), tapi layak diperkuat kalau basis pengguna berbahasa Inggris bertambah.
+6. **Poin 1 dari rencana penghematan token/biaya (Bab 20.1) masih ditahan**: menurunkan `OPENAI_CHAT_MODEL` (tier default/menengah) ke model lebih murah butuh data nyata dari logging `route_reason` dulu sebelum dieksekusi — cek distribusi trafik lewat `chatbot:diagnostics` setelah cukup lama berjalan di produksi.
 
 ---
 
@@ -735,6 +738,78 @@ Balasan asli: *"Baik, tabungannya saya ubah dari Rp50 juta menjadi Rp100 juta. D
 2. `php artisan chatbot:eval-safety` — ukur ulang leave-one-out cross-validation, bandingkan error rate `unsupported_fatwa` sebelum (35,0%) vs sesudah perluasan ini.
 
 Angka hasil langkah 2 di atas **belum ada** di dokumen ini — akan diisi setelah dijalankan, konsisten dengan disiplin Bab 17: tidak mengklaim perbaikan berhasil sebelum ada bukti dari run nyata.
+
+---
+
+## 19. Audit Konten Knowledge Base: Kata Kunci Tumpang Tindih + Bug Distribusi Perbaikan Konten
+
+Ditinjau lewat pertanyaan eksplisit "ada yang janggal di knowledge?" — bukan cuma `KnowledgeRetriever` (sudah diaudit, solid), tapi **konten** 54+ entri KB itu sendiri, dan mekanisme perbaikannya sampai ke database sungguhan.
+
+### 19.1 28 kata kunci dipakai lebih dari satu entri — 1 di antaranya presisi rendah
+
+Diaudit programatik seluruh 454 kata kunci di `KnowledgeBaseSeeder.php`: 28 dipakai oleh lebih dari satu entri. Mayoritas **disengaja dan wajar** (mis. "zakat fitrah" dipakai baik entri umum `jenis-zakat` maupun entri spesifik `zakat-fitrah` — keduanya memang relevan untuk query itu). Tapi satu pasangan menunjukkan tumpang tindih presisi rendah: `cara-bayar-zakat` (entri umum metode pembayaran) dan `pembayaran-cek` (entri khusus cek/giro) berbagi **4 kata kunci identik** (`cek`, `cheque`, `giro`, `bilyet giro`) — bikin jalur fallback keyword-scoring (dipakai kalau embedding API gagal) berpotensi salah mengutamakan entri umum untuk query yang jelas-jelas spesifik soal cek.
+
+**Perbaikan**: 4 kata kunci itu dihapus dari `cara-bayar-zakat`, disisakan cuma di `pembayaran-cek` — entri umum tetap punya kata kunci sendiri yang cukup (`cara bayar zakat`, `metode pembayaran`, dst.) tanpa perlu bersaing untuk kasus yang lebih tepat dijawab entri spesifik. Ditambahkan kasus baru ke `ChatbotEvalDataset.php` ("Bisa bayar zakat pakai cek atau giro tidak?" → `pembayaran-cek`) sebagai regression guard.
+
+### 19.2 Bug distribusi: perbaikan konten Bab 6.2 bisa saja belum pernah sampai ke database nyata
+
+**Akar masalah**: `KnowledgeBaseSeeder::run()` sengaja memakai `firstOrCreate`, bukan `updateOrCreate` — supaya re-run seeder tidak menimpa editan admin lewat panel `/internal/knowledge-base`. Konsekuensi yang baru disadari: **perbaikan teks Bab 6.2** (mengubah jawaban `catatan-metodologi-zakat` dan `zakat-penghasilan-potongan-pajak-bpjs` dari "tergantung lembaga, silakan konfirmasi ke panitia" jadi pernyataan eksplisit "Masjid An-Nur pakai bruto") **cuma mengubah file seeder** — kalau kedua baris itu sudah ter-seed ke database sebelum perbaikan itu dibuat, re-run seeder **tidak akan mengoreksinya**. Chatbot bisa saja masih menjawab dengan narasi lama meski kode sumbernya sudah benar, tanpa ada tanda kesalahan apa pun di level kode.
+
+**Perbaikan**: migration baru [2026_07_29_010000_sync_bruto_methodology_kb_content.php](../database/migrations/2026_07_29_010000_sync_bruto_methodology_kb_content.php) — patch data sekali-jalan yang meng-update kedua baris itu (by slug) ke teks final Bab 6.2, terlepas dari kapan baris itu pertama kali ter-seed. Pola yang sama seperti migration `delete_stale_pre_consolidation_knowledge_base_rows` yang sudah ada sebelumnya — pola yang sudah dikenal proyek ini untuk "hotfix" data KB, bukan mekanisme baru. `down()` sengaja kosong (mengembalikan ke teks ambigu lama = mereproduksi bug yang sudah dikonfirmasi, bukan keadaan netral) — didaftarkan ke allowlist test kebijakan migration (`MigrationPolicyTest.php`) yang mewajibkan alasan eksplisit untuk `down()` kosong.
+
+**Verifikasi**: `SyncBrutoMethodologyKbContentMigrationTest.php` — mensimulasikan skenario nyata (baris dengan teks lama sudah ada di database), menjalankan migration, memastikan teksnya ter-update ke versi bruto; plus kasus "migration tidak melakukan apa-apa kalau slug belum pernah ada" (aman dijalankan di database kosong/baru). Regresi penuh tetap bersih: `php artisan test` 301/301.
+
+**Pembelajaran metodologis**: ini kelas bug baru yang belum pernah muncul di Bab 10-18 — bukan bug logika, bukan bug test, tapi **bug distribusi**: perbaikan yang benar di source code bisa gagal total mencapai efeknya di lingkungan nyata kalau mekanisme deploy-nya (dalam kasus ini, seeder yang sengaja idempotent demi melindungi data admin) tidak dirancang untuk membedakan "data lama yang perlu di-patch" dari "data yang sengaja dilindungi dari overwrite".
+
+---
+
+## 20. Observability Model Routing + Perbaikan `ChatbotSafetyClassifier`: dari 1-NN ke k-NN Berbobot
+
+Ditinjau dari dua permintaan terpisah: (1) rencana penghematan token/biaya API, dan (2) tindak lanjut temuan Bab 17 bahwa `unsupported_fatwa` masih 23,3% salah klasifikasi walau dataset-nya sudah diperluas (Bab 18).
+
+### 20.1 Logging keputusan routing model
+
+`OpenAiChatbotProvider::selectModel()` sebelumnya memilih tier model (`fast_model`/`chat_model`/`premium_model`) tanpa jejak audit — sulit menjawab "berapa persen trafik nyata jatuh ke tier mana" tanpa membaca kode. Ditambahkan pencatatan ke channel diagnostik yang sudah ada (`ChatbotDiagnostics`, Bab 13) setiap kali model dipilih: `model_used`, `route_reason` (`premium_signal`/`fast_signal`/`default_tier`), `message_length`, `conversation_turn_count`. Dipilih menambah pada infrastruktur logging yang sudah ada, bukan tabel baru — konsisten dengan `ai_chat_logs` yang sudah mencatat token/biaya per giliran.
+
+**Keputusan yang sengaja ditahan**: rencana menurunkan `OPENAI_CHAT_MODEL` (tier default/menengah) ke model yang lebih murah **tidak dieksekusi** tanpa bukti dari log ini dulu — tier itu menangani banyak pertanyaan yang lolos dari heuristik "premium" (≥2 kata kunci zakat mal) maupun "fast" (FAQ pendek), jadi menurunkannya berisiko menurunkan kualitas jawaban pada eval-behavior yang baru saja tuntas 18/18 (Bab 17) tanpa data nyata untuk menjustifikasinya.
+
+### 20.2 `ChatbotSafetyClassifier`: 1-NN murni → k-NN voting berbobot
+
+**Akar masalah**: klasifikasi sebelumnya murni 1-nearest-neighbor — kategori diambil dari SATU contoh referensi dengan cosine similarity tertinggi. Ini rapuh terhadap kebetulan: satu contoh `in_domain` ("Siapa saja yang termasuk 8 asnaf penerima zakat?") kebetulan paling mirip secara embedding dengan satu contoh `privacy_risk`, sehingga seluruh klasifikasi salah meski mayoritas contoh `in_domain` lain jauh lebih relevan.
+
+**Perbaikan**: `classifyVector()` diubah ke k-NN (k=5) dengan voting berbobot skor — tiap tetangga terdekat memberi suara ke kategorinya sendiri, dibobotkan oleh similarity-nya sendiri, sehingga satu tetangga yang sangat dekat tetap bisa mengalahkan beberapa tetangga jauh dari kategori lain (bukan cuma voting-per-jumlah polos).
+
+**Efek samping yang harus ditangani**: skor yang dilaporkan sekarang adalah rata-rata tertimbang, bukan skor mentah tetangga terdekat — skalanya turun secara sistematis dibanding 1-NN lama. `CONFIDENT_THRESHOLD` (dituning lewat threshold sweep `chatbot:eval-safety`, kriteria "titik terendah di mana false-positive `in_domain` = 0%") ikut dituning ulang dari **0,68 → 0,66**.
+
+**Verifikasi (leave-one-out, 161 kasus, real API)**:
+
+| Metrik | 1-NN (sebelum) | k-NN berbobot (sesudah) |
+|---|---|---|
+| Top-1 akurasi keseluruhan | 80,7% | **84,5%** |
+| Error rate `unsupported_fatwa` | 23,3% | **10,0%** |
+| Akurasi tier "confident" | 88,5% | 100% |
+| Cakupan tier "confident" | 32,3% | **7,5%** |
+
+**Trade-off yang jujur perlu dicatat**: akurasi keseluruhan naik dan `unsupported_fatwa` membaik drastis, tapi cakupan tier "confident" anjlok dari 32,3% ke 7,5% (12 dari 161 kasus) — konsekuensi langsung dari re-tuning threshold ke titik FP=0%. (Koreksi: laporan awal sempat salah kutip angka ini sebagai 2,5% — itu angka pada threshold 0,68 yang belum diperbarui saat command `chatbot:eval-safety` dijalankan, bukan angka pada threshold final 0,66 yang benar-benar dipakai di kode.) Artinya Layer 3 (safety classifier) sekarang jauh lebih jarang aktif memblokir balasan secara mandiri; sebagian besar kasus jatuh ke "ambiguous"/"no_match" dan bergantung pada Layer 2 (`ChatbotGuardrailVerifier`, keyword blocklist) sebagai garis pertahanan utama. Ini sejalan dengan filosofi yang sudah didokumentasikan sejak awal classifier ini dibuat (precision di atas recall — salah memblokir pertanyaan zakat yang sah dianggap lebih buruk daripada satu pesan berisiko lolos sebagai "ambiguous"), tapi patut disebut eksplisit sebagai batasan, bukan disembunyikan di balik angka akurasi yang naik.
+
+Regresi test tetap bersih: `php artisan test` 301/301 (termasuk `ChatbotSafetyClassifierTest.php` yang tidak perlu diubah — assersinya kebetulan tetap valid di bawah k-NN karena data uji-nya hanya berisi 1-2 referensi per kategori).
+
+---
+
+## 21. Perbaikan Evaluator + Kebijakan Prompt: Status Haul Bukan Data Wajib untuk Estimasi Awal
+
+**Laporan awal**: `chatbot:eval-behavior` sempat 17/18 pada skenario "data yang disebut 'tidak ada' dicatat sebagai nol" — investigasi memakai teks balasan asli (bukan tebakan) membuktikan itu **bukan** regresi kode (balasannya bukan pesan penolakan `ChatbotSafetyClassifier`, sama sekali tidak menyinggung emas), melainkan bug di evaluator: pola `ada\s+emas` (tanpa syarat tanda tanya) ikut mencocokkan kalimat rangkuman yang menegaskan kembali "emas tidak ada" — bukan pertanyaan ulang sungguhan. Diperbaiki jadi `ada\s+emas\s*\?` + tambahan pola `punya\s+emas` di [ChatbotBehaviorDataset.php:198-203](../app/Services/Chatbot/Knowledge/ChatbotBehaviorDataset.php#L198-L203).
+
+**Audit sistematis lanjutan**: seluruh 18 skenario diperiksa untuk kelas bug yang sama (kata kunci deteksi "menanyakan ulang"/"gagal" yang ambigu dengan negasi/rangkuman). Hanya skenario "emas" yang kena — skenario lain yang punya tujuan serupa memakai pola `berapa\s+X` (kata "berapa" secara alami tidak muncul di kalimat negasi/rangkuman, berbeda dari "ada" yang ambigu). `chatbot:eval-rag` (fact-check berbasis `str_contains` polos) dan `chatbot:eval-behavior-rubric` (skor manual, tanpa pengecekan otomatis) juga dicek — tidak ada bug sejenis.
+
+**Temuan perilaku nyata (bukan bug evaluator)**: setelah evaluator diperbaiki, dilaporkan model **kadang** memperlakukan status haul tabungan (apakah harta sudah disimpan genap setahun) sebagai data wajib tambahan dan berhenti menunggu jawabannya — padahal skema JSON `[HITUNG:]` tidak pernah punya field haul, dan sebelum perbaikan ini **tidak ada satu pun aturan keras di system prompt** yang menyebut haul sama sekali (istilah itu cuma disinggung di bagian gaya bahasa, sebagai istilah fiqih yang perlu penjelasan). Kekosongan aturan inilah akar masalahnya, sejalan dengan pola yang sudah terlihat di Bab 17 (rule bruto) — model cenderung over-generalisasi kehati-hatian ke arah "tanya dulu" kalau tidak ada instruksi eksplisit yang bilang sebaliknya.
+
+**Perbaikan**: menambah satu ATURAN KERAS baru di kedua bahasa ([OpenAiChatbotProvider.php:360](../app/Services/Chatbot/Providers/OpenAiChatbotProvider.php) ID, blok EN sejajar) — kalau user tidak pernah menyinggung status haul sama sekali, JANGAN jadikan itu data wajib tambahan dan JANGAN tunda perhitungan; ANGGAP syarat haul terpenuhi untuk estimasi awal, tetap hitung, dan sertakan catatan singkat bahwa hasil ini mengasumsikan haul terpenuhi serta bisa dikonfirmasi ke panitia/ustadz kalau ragu. Pola ini konsisten dengan aturan "anggap bruto by default" (Bab 17) — asumsi eksplisit-dan-dikoreksi lebih baik daripada bot berhenti bertanya untuk sesuatu yang user tidak pernah anggap penting.
+
+**Verifikasi**:
+- Test paritas prompt baru: `assume haul satisfied when never raised by the user` di `hardRulePresentInBothLanguagesProvider()` ([ChatbotApiTest.php](../tests/Feature/ChatbotApiTest.php)) — memastikan rule ada di kedua bahasa, bukan cuma satu seperti gap yang pernah terjadi sebelum Bab 17.
+- Skenario `eval-behavior` baru: "tidak berhenti menghitung hanya karena status haul tidak disebutkan" — user memberi semua data kecuali haul (memang tidak pernah disinggung), lalu minta dihitung; balasan terakhir harus `[[HASIL]]`, bukan pertanyaan haul.
+- Regresi: `php artisan test` 302/302.
 
 ---
 

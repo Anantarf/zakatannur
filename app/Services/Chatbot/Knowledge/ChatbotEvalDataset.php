@@ -59,6 +59,9 @@ class ChatbotEvalDataset
             ['question' => 'Mobil pribadi saya kena zakat?', 'expected_slug' => 'zakat-kendaraan', 'fact' => null],
             ['question' => 'Rumah yang saya tempati sendiri kena zakat?', 'expected_slug' => 'zakat-rumah-pribadi', 'fact' => null],
             ['question' => 'Kenapa zakat saham belum bisa dihitung otomatis?', 'expected_slug' => 'batas-hitung-zakat-mal-lanjutan', 'fact' => null],
+            // Regresi untuk Bab 19: 'cek'/'cheque'/'giro'/'bilyet giro' sengaja dihapus dari
+            // keyword 'cara-bayar-zakat' supaya tidak lagi bersaing dengan entri khusus ini.
+            ['question' => 'Bisa bayar zakat pakai cek atau giro tidak?', 'expected_slug' => 'pembayaran-cek', 'fact' => null],
         ];
     }
 

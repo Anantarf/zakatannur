@@ -195,8 +195,12 @@ class ChatbotBehaviorDataset
                     'Iya sudah benar semua, tolong hitung sekarang.',
                 ],
                 'expect_description' => 'user sudah bilang emas "ga ada" di giliran pertama - balasan terakhir tidak boleh menanyakan emas lagi, harus lanjut ke hasil',
+                // ada\s+emas (tanpa syarat tanda tanya) dulu ikut mencocokkan kalimat rangkuman yang
+                // menegaskan kembali "emas tidak ada"/"sudah ada emas: 0" sebelum menghitung - itu bukan
+                // pertanyaan ulang, jadi false positive. Pola pertanyaan ulang yang sebenarnya (berapa
+                // emas / emas...berapa / punya emas / ada emas?) tetap ditolak.
                 'expect' => fn (string $reply): bool => str_contains($reply, '[[HASIL]]')
-                    && !preg_match('/berapa\s+(nominal\s+)?emas|emas.*berapa|ada\s+emas/i', $reply),
+                    && !preg_match('/berapa\s+(nominal\s+)?emas|emas.*berapa|punya\s+emas|ada\s+emas\s*\?/i', $reply),
             ],
             [
                 'name' => 'tidak lanjut menghitung saat user bilang sudah bayar (poin 36)',
@@ -219,6 +223,19 @@ class ChatbotBehaviorDataset
                 'expect_description' => 'setelah hasil pertama keluar, user tanya follow-up dengan mengubah satu variabel - bot harus hitung ulang dengan variabel baru (tetap keluarkan [[HASIL]]), bukan minta semua data diulang dari awal',
                 'expect' => fn (string $reply): bool => str_contains($reply, '[[HASIL]]')
                     && !preg_match('/berapa\s+(nominal\s+)?(gaji|penghasilan|pengeluaran)/i', $reply),
+            ],
+            [
+                'name' => 'tidak berhenti menghitung hanya karena status haul tidak disebutkan',
+                'turns' => [
+                    'Tolong hitungkan zakat mal saya: gaji 10 juta/bulan, pengeluaran rutin 3 juta/bulan, tabungan 50 juta, tidak ada emas, tidak ada hutang.',
+                    'Iya sudah benar semua, tolong hitung sekarang.',
+                ],
+                // Real report: model kadang memperlakukan haul tabungan sebagai data wajib
+                // tambahan dan berhenti menunggu jawabannya, padahal [HITUNG:] tidak pernah punya
+                // field haul dan user tidak pernah menyinggungnya sama sekali di kedua giliran ini.
+                'expect_description' => 'user tidak pernah menyebut status haul sama sekali - balasan terakhir tidak boleh menunda perhitungan untuk menanyakan haul, harus tetap keluarkan hasil (estimasi awal dengan asumsi haul terpenuhi)',
+                'expect' => fn (string $reply): bool => str_contains($reply, '[[HASIL]]')
+                    && !preg_match('/\bhaul\b.*\?|apakah.*haul|sudah.*setahun\s*\?|genap\s*setahun\s*\?/i', $reply),
             ],
             [
                 'name' => 'tidak memakai istilah internal ke user (poin 56)',

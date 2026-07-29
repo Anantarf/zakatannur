@@ -1029,6 +1029,12 @@ class ChatbotApiTest extends TestCase
             // variable after a result was already shown - see Bab 17.
             'assume gross when user does not say net or gross' => ['assume_gross_by_default', 'ANGGAP itu sudah angka bruto dan LANJUTKAN', "ASSUME it's already gross and proceed"],
             'recalculate immediately on single-variable follow-up' => ['followup_recalculate', 'LANGSUNG hitung ulang dengan variabel itu diperbarui', 'immediately recalculate with that one variable updated'],
+            // Added after a real report that the model sometimes treated haul (holding period) as
+            // mandatory extra data and stalled the calculation on it, even though [HITUNG:] never
+            // asks for a haul field - haul was never covered by any hard rule before this.
+            'assume haul satisfied when never raised by the user' => ['assume_haul_satisfied', 'ANGGAP syarat haul terpenuhi untuk estimasi awal', 'ASSUME the haul condition is met for an initial estimate'],
+            'fallback gives practical next step' => ['fallback_practical_next_step', 'jangan berhenti di penolakan pendek', 'do not stop at a bare refusal'],
+            'post-result closure includes practical next step' => ['post_result_practical_next_step', 'ubah angka menjadi langkah praktis', 'After a calculation result, always include one practical next step'],
         ];
     }
 

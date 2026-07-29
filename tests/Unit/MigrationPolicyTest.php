@@ -11,6 +11,7 @@ class MigrationPolicyTest extends TestCase
         '2026_05_19_040000_cleanup_obsolete_transaction_risk_flags.php',
         '2026_05_19_050000_remove_infaq_outlier_risk_flags.php',
         '2026_07_17_134428_delete_stale_pre_consolidation_knowledge_base_rows.php',
+        '2026_07_29_010000_sync_bruto_methodology_kb_content.php',
     ];
 
     public function test_migrations_do_not_hide_empty_rollbacks(): void

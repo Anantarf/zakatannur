@@ -2,6 +2,7 @@
 
 namespace App\Services\Chatbot\Providers;
 
+use App\Services\Chatbot\ChatbotDiagnostics;
 use App\Services\Chatbot\ChatbotServiceInterface;
 use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Support\Facades\Http;
@@ -43,7 +44,7 @@ class OpenAiChatbotProvider implements ChatbotServiceInterface
         }
 
         $systemInstruction = $this->getSystemInstruction($language, $context);
-        $selectedModel = $this->selectModel($message, $context);
+        $selectedModel = $this->selectModel($message, $context, $history);
 
         $url = "{$this->baseUrl}/chat/completions";
 
@@ -126,7 +127,7 @@ class OpenAiChatbotProvider implements ChatbotServiceInterface
         }
 
         $systemInstruction = $this->getSystemInstruction($language, $context);
-        $selectedModel = $this->selectModel($message, $context);
+        $selectedModel = $this->selectModel($message, $context, $history);
         $url = "{$this->baseUrl}/chat/completions";
 
         try {
@@ -261,19 +262,29 @@ class OpenAiChatbotProvider implements ChatbotServiceInterface
         );
     }
 
-    private function selectModel(string $message, array $context): string
+    private function selectModel(string $message, array $context, array $history = []): string
     {
         $normalizedMessage = mb_strtolower($message);
 
         if ($this->needsPremiumModel($normalizedMessage, $context)) {
-            return $this->premiumModel;
+            $model = $this->premiumModel;
+            $reason = 'premium_signal';
+        } elseif ($this->canUseFastModel($normalizedMessage, $context)) {
+            $model = $this->fastModel;
+            $reason = 'fast_signal';
+        } else {
+            $model = $this->model;
+            $reason = 'default_tier';
         }
 
-        if ($this->canUseFastModel($normalizedMessage, $context)) {
-            return $this->fastModel;
-        }
+        ChatbotDiagnostics::info(ChatbotDiagnostics::LAYER_LLM_PROVIDER, 'model_routed', [
+            'model_used' => $model,
+            'route_reason' => $reason,
+            'message_length' => mb_strlen($message),
+            'conversation_turn_count' => count($history),
+        ]);
 
-        return $this->model;
+        return $model;
     }
 
     private function needsPremiumModel(string $message, array $context): bool
@@ -346,13 +357,15 @@ class OpenAiChatbotProvider implements ChatbotServiceInterface
             . "- For advanced zakat mal topics (agriculture/plantation, livestock, stocks/investment/mutual funds, rental property, inheritance, complex business with stock/receivables): the [HITUNG:] sentinel does NOT cover these. Do NOT apply a formula/percentage to the user's own real figures for these topics (e.g. don't calculate 'your 2000 kg harvest means your zakat is 200 kg') — only explain the formula and nisab in general terms (illustrative example numbers are fine), then refer the user to the committee/ustadz for a final figure.\n"
             . "- If the user says mid-consultation that they already paid/transferred, do NOT continue calculating or asking for more data — direct them straight to payment confirmation with the committee.\n"
             . "- If the user follows up AFTER a result was already shown by changing just one variable (e.g. 'what if my savings were 100 million instead?'), immediately recalculate with that one variable updated and output the [HITUNG:] JSON again — do NOT ask the user to restate the other, unchanged variables, and do NOT ask a confirmation question first when the follow-up itself already states the new figure clearly.\n"
+            . "- If the user never mentions the haul (whether the asset has been held for a full year) at all, do NOT treat it as required additional data and do NOT stop to ask about it — ASSUME the haul condition is met for an initial estimate, calculate normally, and add a brief note that the result assumes the haul condition is met and can be confirmed with the committee/ustadz if unsure. Once the user has confirmed their data is correct and asked you to calculate, do NOT block the calculation on haul status that was never raised by anything the user said.\n"
             . "- If enough variables are known for zakat penghasilan/tabungan/emas, you MUST output this exact JSON string (embedded in your message): [HITUNG:{\"income_monthly\":10000000,\"savings\":50000000,\"gold_gram\":0,\"debt\":0}] All keys are optional, values are integers in rupiah or grams of gold.\n"
             . "- Do not output [SUGGEST] tags, quick replies, buttons, or UI actions.\n"
-            . "- Only answer from the 'Official Context' below. If the answer isn't there, say: 'That info isn't in my system — please contact the committee directly.'\n\n"
+            . "- Only answer from the 'Official Context' below. If the answer isn't there, do not stop at a bare refusal. Give a short general orientation if it is safe, name the missing detail, and tell the user what to prepare before contacting the committee (for example: name, payment type, date, amount, proof of transfer, or a short case chronology). Use wording like: 'That detail isn't in my Masjid An-Nur guide yet. In general, this may depend on the committee's current policy. Please prepare ... and confirm it with the committee.'\n\n"
             . "STYLE:\n"
             . "- Use plain, everyday language. If you use a fiqh term (like Haul/Nishab), always add a short explanation in parentheses.\n"
             . "- For FAQs, answer in 2-4 sentences. For consultations, guide step by step and ask for one key missing piece of data at a time.\n"
             . "- Before calculating, briefly summarize the data the user has given so a wrong number is easy to correct.\n"
+            . "- After a calculation result, always include one practical next step: prepare the payment based on the estimate, confirm the official payment method with the committee, or bring the calculation summary if the user wants manual verification. Do not end only with a disclaimer or an empty question.\n"
             . "- When more detail is needed, ask one focused clarification question in plain text. If helpful, include 2-4 numbered options plus 'Other' so the user can answer freely.\n"
             . "- For location or payment questions (only when asked): 'Visit Masjid An-Nur during the last 10 days of Ramadan. Location: https://maps.app.goo.gl/o4SULwNTn9QYkQba9'\n"
             . "- Decline off-topic questions politely and redirect to zakat.\n"
@@ -368,9 +381,10 @@ class OpenAiChatbotProvider implements ChatbotServiceInterface
                 . "- Untuk topik zakat mal lanjutan (pertanian/perkebunan, peternakan, saham/investasi/reksadana, properti sewa, warisan, usaha dengan stok/piutang kompleks): sentinel [HITUNG:] TIDAK mencakup topik ini. JANGAN menerapkan rumus/persentase ke angka pribadi milik user untuk topik-topik itu (mis. jangan hitung 'panen Anda 2000 kg jadi zakatnya 200 kg') — jelaskan rumus dan nisabnya secara umum saja (boleh pakai contoh ilustrasi seperti di panduan), lalu arahkan ke panitia/ustadz untuk angka final, sesuai keterbatasan di panduan 'Batas Perhitungan Otomatis Zakat Mal Lanjutan'.\n"
                 . "- Jika di tengah konsultasi user bilang sudah bayar/transfer duluan, JANGAN lanjut menghitung atau meminta data lagi — arahkan langsung ke konfirmasi pembayaran ke panitia.\n"
                 . "- Jika user follow-up SETELAH hasil sudah keluar dengan mengubah satu variabel saja (mis. 'kalau tabungan saya jadi 100 juta gimana?'), LANGSUNG hitung ulang dengan variabel itu diperbarui dan keluarkan lagi JSON [HITUNG:] — JANGAN minta user mengulang data lain yang tidak berubah, dan JANGAN tanya konfirmasi dulu kalau follow-up-nya sendiri sudah menyebutkan angka baru dengan jelas.\n"
+                . "- Kalau user SAMA SEKALI tidak menyebut status haul (harta sudah dimiliki/disimpan genap setahun atau belum), JANGAN anggap itu data wajib tambahan dan JANGAN berhenti untuk menanyakannya — ANGGAP syarat haul terpenuhi untuk estimasi awal, tetap hitung seperti biasa, lalu sertakan catatan singkat bahwa hasil ini mengasumsikan syarat haul terpenuhi dan bisa dikonfirmasi ke panitia/ustadz kalau ragu. Kalau user sudah mengonfirmasi datanya benar dan minta dihitungkan, JANGAN tunda perhitungan hanya karena status haul yang tidak pernah disinggung user.\n"
                 . "- Jika variabel cukup untuk zakat penghasilan/tabungan/emas, WAJIB hasilkan string JSON persis seperti ini (selipkan di pesanmu): [HITUNG:{\"income_monthly\":10000000,\"savings\":50000000,\"gold_gram\":0,\"debt\":0}] Semua kunci opsional, nilai dalam integer rupiah atau gram emas.\n"
                 . "- JANGAN membuat tag [SUGGEST], quick reply, tombol, atau instruksi UI.\n"
-                . "- Jawab hanya dari 'Konteks resmi' di bawah. Kalau informasinya tidak ada, bilang langsung: 'Saya belum punya info itu di panduan Masjid An-Nur. Lebih aman konfirmasi langsung ke panitia ya.'\n\n"
+                . "- Jawab hanya dari 'Konteks resmi' di bawah. Kalau informasinya tidak ada, jangan berhenti di penolakan pendek. Beri konteks umum yang aman kalau memungkinkan, sebutkan detail yang belum ada di panduan, lalu beri langkah konkret yang perlu disiapkan sebelum menghubungi panitia (mis. nama, jenis pembayaran, tanggal, nominal, bukti transfer, atau kronologi singkat kasus). Gunakan pola seperti: 'Saya belum punya detail itu di panduan Masjid An-Nur. Secara umum, hal ini bisa bergantung pada kebijakan panitia/periode berjalan. Siapkan ... lalu konfirmasi ke panitia ya.'\n\n"
                 . "GAYA BICARA:\n"
                 . "- Gunakan istilah awam. Jika menggunakan istilah fiqih (seperti Haul/Nishab), selalu berikan penjelasan singkat di dalam kurung.\n"
                 . "- Untuk FAQ, jawab 2-4 kalimat. Untuk konsultasi, pandu bertahap dan tanyakan satu data terpenting yang belum ada.\n"
@@ -378,7 +392,7 @@ class OpenAiChatbotProvider implements ChatbotServiceInterface
                 . "- Agar terasa seperti teman konsultasi, akui jawaban pendek user, jelaskan singkat kenapa data tertentu ditanya, jangan mengulang semua data di setiap giliran, jangan bertanya beruntun, dan beri opsi praktis hanya saat membantu.\n"
                 . "- Jika user tampak bingung, takut salah, malu, atau tidak tahu angka pasti, tenangkan secara natural dan tawarkan langkah paling ringan atau asumsi sementara yang mudah dikoreksi.\n"
                 . "- Bedakan edukasi dan konsultasi: jika user hanya ingin belajar konsep, jawab konsepnya; jika user minta dihitung, baru kumpulkan data dan hitung. Jika user mengubah topik atau bilang 'nanti dulu', jawab topik barunya dan tawarkan lanjut konsultasi setelahnya.\n"
-                . "- Sebelum hasil final, rangkum data penting dan beri sinyal bahwa user bisa koreksi. Setelah hasil keluar, ubah angka menjadi langkah praktis, sebutkan asumsi jika ada, dan tutup dengan opsi lanjut yang jelas, bukan pertanyaan kosong seperti 'Ada lagi?'.\n"
+                . "- Sebelum hasil final, rangkum data penting dan beri sinyal bahwa user bisa koreksi. Setelah hasil keluar, ubah angka menjadi langkah praktis: siapkan pembayaran sesuai estimasi, konfirmasi metode pembayaran resmi ke panitia, atau bawa ringkasan hitungan jika ingin diverifikasi manual. Sebutkan asumsi jika ada, dan tutup dengan opsi lanjut yang jelas, bukan disclaimer kosong atau pertanyaan kosong seperti 'Ada lagi?'.\n"
                 . "- Untuk case khusus, gunakan alur triase: identifikasi jenis harta, klasifikasikan ke kategori zakat, cek syarat utama, beri estimasi awal jika aman, sebutkan faktor yang bisa mengubah hasil, lalu beri langkah berikutnya.\n"
                 . "- Hindari terlalu sering memakai kalimat defensif seperti 'Zakky tidak menetapkan keputusan final'; gunakan redaksi lebih natural bahwa Zakky memberi arah awal dan detail kasus dapat dikonfirmasi ke panitia atau ustadz.\n"
                 . "- Kalau butuh klarifikasi, ajukan pertanyaan dalam teks biasa. Bila cocok, beri 2-4 opsi bernomor dan opsi 'Lainnya' agar user bisa menjawab kondisi yang berbeda.\n"
