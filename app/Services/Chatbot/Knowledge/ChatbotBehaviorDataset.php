@@ -92,8 +92,29 @@ class ChatbotBehaviorDataset
                     'Eh bukan 75 juta, maksud saya 7,5 juta per bulan.',
                 ],
                 'expect_description' => 'koreksi angka harus mengganti nilai lama, bukan menjumlahkan atau mempertahankan angka lama',
-                'expect' => fn (string $reply): bool => preg_match('/(ganti|koreksi|catat|ubah).*7[,.]?5/i', $reply)
-                    && !preg_match('/75\s*juta/i', $reply),
+                // Verified against two real runs (2026-07-29). Originally required an acknowledgment
+                // keyword ("ganti"/"koreksi"/"catat"/"ubah") near the new value - but a model reply
+                // can correctly apply a correction while phrasing it in ways that keyword list
+                // never anticipated ("gaji yang benar Rp7.500.000 per bulan", no "ganti"/"koreksi"/
+                // "catat"/"ubah" anywhere). What expect_description actually cares about is the
+                // VALUE, not the wording used to announce it - so this checks the substance
+                // directly: the new value (7,5 juta / Rp7.500.000) is present, and the old value
+                // (75 juta) doesn't linger anywhere unnegated (stripping a legitimate "bukan Rp75
+                // juta" mention first, since restating the old value to negate it - as the model
+                // also correctly did in an earlier run - is good UX, not a failure to correct).
+                //
+                // The new-value pattern requires an explicit separator between 7 and 5
+                // (7[,.]5, not 7[,.]?5) specifically so it can't accidentally match "75" itself -
+                // an optional separator would make "Rp75 juta" (the WRONG, uncorrected value) look
+                // like a match for "7,5 juta" too.
+                'expect' => function (string $reply): bool {
+                    $withoutNegatedMention = preg_replace('/bukan\s*(rp\.?\s*)?75\s*juta/i', '', $reply);
+
+                    $hasNewValue = preg_match('/7[,.]5\s*juta|rp\.?\s*7\.?500\.?000\b/i', $reply);
+                    $oldValueLingersUnnegated = preg_match('/75\s*juta/i', $withoutNegatedMention);
+
+                    return (bool) $hasNewValue && !$oldValueLingersUnnegated;
+                },
             ],
             [
                 'name' => 'menjawab edukasi tanpa masuk alur hitung',

@@ -21,12 +21,14 @@ class ChatbotSafetyClassifierTest extends TestCase
 
     public function test_classify_vector_picks_nearest_reference_by_cosine_similarity(): void
     {
-        // ChatbotSafetyDataset::cases()[0] is the first in_domain example, [40] is the first
-        // out_of_scope example (40 in_domain cases precede it) - indices must line up with a
-        // reference array shaped like the real cache for classifyVector() to resolve a category.
+        // ChatbotSafetyDataset::cases()[0] is the first in_domain example, [46] is the first
+        // out_of_scope example (46 in_domain cases precede it, Bab 18) - indices must line up
+        // with a reference array shaped like the real cache for classifyVector() to resolve a
+        // category. This index is inherently coupled to inDomainCases()'s count - if it drifts
+        // out of sync again, this test starts asserting against the wrong category's cases.
         $reference = [
             0 => [1.0, 0.0, 0.0],
-            40 => [0.0, 1.0, 0.0],
+            46 => [0.0, 1.0, 0.0],
         ];
 
         $result = $this->classifier()->classifyVector([0.0, 1.0, 0.0], $reference);

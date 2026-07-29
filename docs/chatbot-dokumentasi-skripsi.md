@@ -636,6 +636,108 @@ Dari 3 celah struktural yang diidentifikasi, poin "tooling yang mencegah duplika
 
 ---
 
+## 16. Audit Komponen yang Belum Pernah Disentuh: Kalkulator, Deteksi Sentimen, Rate Limiting
+
+Setelah pertanyaan eksplisit "masih ada ruang perbaikan?", tiga komponen yang **belum pernah diaudit sama sekali** sepanjang sesi ini ditinjau: `ChatbotCalculatorService` (kalkulator fitrah/fidyah), `ChatbotSentimentDetector::isCorrectingPreviousNumber()`, dan `ThrottleChatbot` (middleware rate-limit). Ketiganya sebelum ini punya **nol test coverage**, langsung maupun tidak langsung.
+
+### 16.1 Bug paling parah di seluruh sesi: `ChatbotCalculatorService` salah tangkap angka tahun sebagai jumlah
+
+**Gejala**: `extractNumberFromText()` punya fallback tahap 3 — kalau tidak ada angka yang ketemu di dekat kata kunci ("orang"/"jiwa" untuk fitrah, "hari" untuk fidyah), sistem **asal ambil angka pertama di mana pun dalam pesan**. Dibuktikan langsung: pesan *"Fitrah tahun 2026 itu berapa ya per orang?"* — pertanyaan biasa soal tarif tahun ini, bukan permintaan hitung — dihitung jadi **"Fitrah untuk 2026 orang: Rp101.300.000"**. Pola sama persis untuk fidyah (*"Fidyah tahun 2026 per hari berapa ya?"* → "Fidyah untuk 2026 hari: Rp60.780.000").
+
+**Kenapa ini paling parah dari semua temuan sesi ini**: jalur ini murni **fast-path deterministik** — tidak pernah lewat AI, tidak pernah lewat guardrail Lapisan 2/3 (Bab 8), tidak ada satu lapisan pun yang berkesempatan menangkap hasil yang salah sebelum sampai ke user. Kombinasi "kata kunci + kata terkait tahun + angka tahun" ini juga sangat mudah terpicu tanpa maksud jahat sama sekali — cuma pertanyaan wajar soal tarif.
+
+**Perbaikan** ([ChatbotCalculatorService.php](../app/Services/Chatbot/ChatbotCalculatorService.php)): fallback "asal ambil angka pertama" dihapus total. Deteksi angka tahap 1 diperluas supaya tetap menjangkau angka yang muncul **setelah** kata kunci dalam jarak dekat (bukan cuma sebelum), plus ditambah batas plausibilitas (`MAX_PLAUSIBLE_COUNT = 1000`) sebagai lapis pertahanan tambahan — angka besar seperti tahun otomatis ditolak meski kebetulan lolos regex kedekatan, dan sistem meminta klarifikasi alih-alih menghitung dari angka yang meragukan (konsisten dengan prinsip "jangan menebak, tanya" yang dipakai di seluruh sistem ini).
+
+**Verifikasi**: `ChatbotCalculatorServiceTest.php` (test pertama untuk class ini) — kasus digit dekat kata kunci, kata-angka ("empat orang"), dan dua kasus regresi eksplisit untuk skenario tahun yang ditemukan. Regresi penuh tetap bersih.
+
+### 16.2 Bug: kata umum bahasa Indonesia salah dikira sinyal koreksi angka
+
+**Gejala**: `ChatbotSentimentDetector::isCorrectingPreviousNumber()` memakai `str_contains()` (substring, bukan kata utuh) untuk daftar kata koreksi termasuk `'eh'` dan `'salah'`, dipasangkan dengan "ada angka di mana pun dalam pesan". Dibuktikan: pesan *"Apakah boleh saya bayar zakat fitrah untuk 4 orang sekaligus?"* — pertanyaan biasa, bukan koreksi — salah terdeteksi sebagai koreksi karena kata **"boleh"** mengandung substring "eh". Pola sama untuk *"Salah satu syarat zakat..."* (frasa "salah satu" = "one of", bukan soal salah-benar) dan *"Ini bukan zakat mal, tapi zakat fitrah untuk 4 jiwa"*.
+
+**Dampak**: setiap false-positive menyisipkan `_correction_hint` ("User tampaknya sedang mengoreksi angka...") ke system prompt untuk pertanyaan yang sama sekali bukan koreksi — berpotensi membingungkan LLM di awal percakapan yang sebenarnya baru mulai, bukan mengoreksi apa pun.
+
+**Perbaikan** ([ChatbotSentimentDetector.php](../app/Services/Chatbot/ChatbotSentimentDetector.php)): diganti dari substring matching + "angka di mana pun" jadi pencocokan **kata utuh** + **jendela kedekatan** (6 kata di kiri-kanan kata koreksi) terhadap token yang mengandung digit — otomatis menghilangkan masalah "eh" di dalam "boleh"/"oleh" (karena "boleh" ≠ kata utuh "eh") sekaligus masalah "bukan" yang jauh dari angka manapun dalam kalimat. Frasa "salah satu" dikecualikan eksplisit karena tetap lolos pencocokan kata-utuh.
+
+**Verifikasi**: 3 kasus regresi (false-positive lama) + 3 kasus koreksi asli (termasuk pesan yang sudah dipakai test lain, `"eh salah, harusnya 12 juta bukan 10 juta"`) ditambahkan ke `ChatbotSentimentDetectorTest.php` yang sudah ada.
+
+### 16.3 `ThrottleChatbot`: tidak ada bug logic, tapi dua celah kecil ditutup
+
+Middleware rate-limit ini **tidak menunjukkan bug separah dua di atas** — key per-user/IP masuk akal, kedua rute chatbot (`/message`, `/stream`) sama-sama ter-cover, batas 50/menit wajar. Dua perbaikan minor:
+1. Respons 429 sebelumnya tidak menyertakan header `Retry-After`/`X-RateLimit-Remaining` — klien (frontend) tidak punya cara terukur mengetahui kapan aman mencoba lagi, cuma teks "Tunggu beberapa menit". Ditambahkan.
+2. Zero test coverage — ditambahkan `ThrottleChatbotTest.php` (request di bawah limit lolos + header benar, request ke-51 diblokir dengan header retry yang benar).
+
+**Catatan operasional yang disadari, tidak diperbaiki**: `getKey()` pakai `$request->ip()` untuk user yang belum login. Kalau aplikasi di-deploy di belakang reverse proxy tanpa `TrustProxies` dikonfigurasi (defaultnya `null`, belum diset di proyek ini), semua user di belakang proxy yang sama bisa berbagi satu IP yang sama di mata Laravel — artinya satu bucket rate-limit collectively, bukan per-user. Ini murni **isu konfigurasi deployment**, bukan sesuatu yang bisa/boleh diperbaiki lewat kode tanpa tahu topologi deployment sesungguhnya (menyetel `$proxies = '*'` secara membabi buta justru downgrade keamanan kalau salah konteks) — dicatat sebagai perhatian operasional, bukan dieksekusi.
+
+**Verifikasi keseluruhan Bab 16**: `php artisan test` 293/293.
+
+---
+
+## 17. Validasi Nyata Pertama: `chatbot:eval-behavior`/`eval-safety` dengan API Key Asli (2026-07-29)
+
+Sepanjang Bab 10–16, seluruh perbaikan cuma diverifikasi lewat simulasi (`Http::fake()`, `tinker`) — kepatuhan LLM sungguhan terhadap instruksi prompt selalu dicatat sebagai "perlu dicek manual lewat `chatbot:eval-behavior`" tapi belum pernah benar-benar dijalankan. Setelah MySQL/XAMPP aktif, ketiga command evaluasi dijalankan dengan API key produksi asli — inilah validasi nyata pertama sepanjang proses pengerjaan ini.
+
+**`chatbot:eval-safety`**: 145 kasus — top-1 accuracy 0,807, confident-tier accuracy 0,951, confident coverage 0,283, kategori terlemah `unsupported_fatwa` (error rate 0,35). **Angka ini persis cocok dengan yang sudah didokumentasikan di Bab 9.4/10.4** — konfirmasi kuat bahwa seluruh perbaikan Bab 10–16 tidak meregresi apa pun di lapisan keamanan ini.
+
+**`chatbot:eval-behavior-rubric --markdown`**: 12 skenario berhasil menghasilkan tabel bahan skor manual. Belum diisi skor oleh evaluator manusia (di luar scope sesi ini), tapi sekilas ada dua sinyal kualitatif yang layak dicatat untuk peninjauan lanjutan: satu balasan skenario "detail" terasa terlalu defensif/pendek ("belum punya info itu"), dan beberapa closure hasil kalkulasi cukup panjang. Belum ditindaklanjuti — butuh skor rubric formal dulu untuk memastikan ini pola nyata, bukan kesan sekali baca.
+
+**`chatbot:eval-behavior`**: 18 skenario, **15 lolos, 3 gagal**. Ketiga kegagalan ditelusuri satu per satu ke teks balasan asli (bukan ditebak) — ternyata tiga akar masalah yang **berbeda jenis**:
+
+### 17.1 Bug di evaluator, bukan di model — "mengganti angka lama saat user mengoreksi" (2 putaran perbaikan)
+
+**Putaran 1**: balasan asli — *"Baik, saya ganti ya: gaji Rp7,5 juta per bulan, bukan Rp75 juta, dan tabungan..."* — model **sudah benar**, secara eksplisit menyatakan nilai baru lalu menegasikan nilai lama untuk kejelasan (gaya yang justru bagus). Tapi ekspektasi test (`ChatbotBehaviorDataset.php`) memakai `!preg_match('/75\s*juta/i', $reply)` — larangan blanket, menganggap SEGALA kemunculan "75 juta" sebagai kegagalan, termasuk saat kemunculannya ada di dalam frasa negasi "bukan Rp75 juta" sendiri. Diperbaiki dengan menghapus frasa negasi dulu sebelum memeriksa sisa teks — plus tetap mensyaratkan kata pengakuan (`ganti`/`koreksi`/`catat`/`ubah`) di dekat nilai baru.
+
+**Putaran 2 (run ulang setelah putaran 1)**: 17 dari 18 skenario lolos — **kedua perbaikan 17.2 dan 17.3 terkonfirmasi berhasil di trafik nyata**, tapi skenario koreksi ini **masih gagal**, dengan balasan yang beda lagi: *"Baik, gaji yang benar Rp7.500.000 per bulan, dan tabungan Rp10.000.000. Apak..."* — model tetap benar mengganti nilai, tapi memakai frasa **"gaji yang benar"**, bukan salah satu dari 4 kata kunci pengakuan yang disyaratkan putaran 1 (`ganti`/`koreksi`/`catat`/`ubah`). Ini bukti nyata: daftar kata kunci untuk "mendeteksi pengakuan koreksi" secara inheren rapuh — terlalu banyak cara valid berbahasa Indonesia untuk mengumumkan "nilai yang benar adalah X".
+
+**Perbaikan final**: `expect` closure direstrukturisasi total — bukan lagi mencari kata kunci pengakuan (proxy yang rapuh), tapi langsung memeriksa **substansi** yang sebenarnya diminta `expect_description`: apakah nilai baru (`7,5 juta` / `Rp7.500.000`) ada, DAN nilai lama (`75 juta`) tidak lagi muncul tanpa negasi. Pola nilai baru sengaja mensyaratkan pemisah eksplisit antara "7" dan "5" (`7[,.]5`, bukan `7[,.]?5`) — supaya tidak salah cocok dengan angka lama "75" itu sendiri (pemisah opsional bikin "75" ikut kecocokan sebagai "7.5").
+
+**Verifikasi**: diuji terhadap 3 kasus — dua balasan asli dari kedua putaran (harus lolos) plus satu balasan hipotetis yang benar-benar tidak mengoreksi ("gaji Rp75 juta" tetap dipakai, harus gagal) — dipastikan lewat `ChatbotBehaviorDatasetTest.php` baru (test unit langsung untuk closure ini, bukan cuma lewat `chatbot:eval-behavior` yang butuh API key asli setiap kali mau verifikasi).
+
+### 17.2 Bug prompt nyata — instruksi klarifikasi bruto di-generalisasi berlebihan oleh model
+
+Balasan asli: *"Terima kasih. Untuk bisa diproses, saya perlu pastikan satu hal: gaji Rp2.000..."* — pada skenario di mana user cuma bilang "gaji 2 juta/bulan" (angka polos, **tidak pernah** bilang "bersih"/"kotor") dan bahkan sudah eksplisit bilang "Iya sudah benar semua, tolong hitung sekarang" di giliran berikutnya. Model tetap berhenti untuk menanyakan klarifikasi bruto/bersih.
+
+**Diagnosis**: instruksi Bab 10.11 ("Jika user menyebut gajinya sebagai 'gaji bersih'... klarifikasi dulu") secara desain seharusnya cuma trigger kalau user **eksplisit** memakai kata "bersih"/"take home pay" — tapi model tampaknya men-generalisasi jadi "selalu konfirmasi bruto/kotor untuk setiap sebutan gaji", bahkan mengabaikan konfirmasi eksplisit user untuk lanjut menghitung.
+
+**Perbaikan** ([OpenAiChatbotProvider.php](../app/Services/Chatbot/Providers/OpenAiChatbotProvider.php)): ditambahkan klausa eksplisit di kedua bahasa — kalau user **tidak** menyebutkan bersih/kotor sama sekali, ANGGAP itu sudah angka bruto dan **lanjutkan**, jangan tanya klarifikasi yang tidak pernah dipicu apa pun dari user.
+
+### 17.3 Gap prompt yang belum pernah ditutup — follow-up ubah variabel setelah hasil
+
+Balasan asli: *"Baik, tabungannya saya ubah dari Rp50 juta menjadi Rp100 juta. Data lain..."* — model mengakui perubahan tapi **tidak langsung mengeluarkan `[[HASIL]]`** pada balasan yang sama; sepertinya berhenti dulu untuk konfirmasi data lain yang sebenarnya tidak berubah. Ditelusuri: poin ini sudah ada di spesifikasi perilaku (`chatbot-behavior-notes.md`, poin 47) sejak lama, tapi **tidak pernah benar-benar diterjemahkan jadi instruksi eksplisit** di system prompt — dicek langsung, tidak ada satu kalimat pun soal ini sebelum perbaikan ini.
+
+**Perbaikan**: ditambahkan aturan eksplisit baru di kedua bahasa — kalau user follow-up dengan mengubah satu variabel setelah hasil sudah keluar, langsung hitung ulang dan keluarkan `[HITUNG:]` lagi, tanpa minta konfirmasi data lain yang tidak berubah.
+
+### Ringkasan Bab 17
+
+**Verifikasi**: 2 aturan baru ditambahkan ke tabel paritas ID/EN yang sudah ada (`test_hard_rule_is_present_in_both_language_prompts`, Bab 14.2), plus `ChatbotBehaviorDatasetTest.php` baru untuk closure koreksi angka. Regresi penuh tetap bersih: `php artisan test` 298/298.
+
+**Yang sudah benar-benar terkonfirmasi dari trafik nyata** (bukan cuma "instruksi ada di prompt"): setelah perbaikan 17.2 dan 17.3, `chatbot:eval-behavior` run kedua naik dari **15/18 ke 17/18** — kedua perbaikan itu terbukti bekerja di percakapan sungguhan dengan model asli, bukan cuma lolos test string-matching. Satu-satunya sisa kegagalan (17.1) sudah bukan soal perilaku model — melainkan cara `expect` closure mendeteksi perilaku itu — dan sudah diperbaiki dengan pendekatan yang jauh lebih tahan terhadap variasi bahasa alami (memeriksa substansi nilai, bukan menebak kata kunci pengakuan).
+
+**Konfirmasi final (2026-07-29, run ketiga)**: `chatbot:eval-behavior` — **18/18 skenario lolos, 0 gagal, exit code 0**. Ini titik pertama sepanjang seluruh proses pengerjaan (Bab 1–17) di mana perilaku multi-turn Zakky tervalidasi **penuh** terhadap model LLM sungguhan dengan API key produksi asli — bukan lagi simulasi `Http::fake()`/`tinker`, dan bukan lagi cuma "instruksi ada di kode prompt". Bersamaan dengan `chatbot:eval-safety` yang angkanya persis cocok dengan dokumentasi sebelumnya (Bab 17, paragraf pembuka), ini menutup gap validasi terbesar yang berulang kali dicatat di seluruh dokumen ini (Bab 11 poin 6, dan penilaian jujur di percakapan pengerjaan) sebagai "belum pernah benar-benar dibuktikan, cuma diasumsikan lewat test string-matching".
+
+**Pembelajaran metodologis Bab 17**: dua dari tiga "kegagalan" pertama yang tampak seperti bug perilaku model ternyata adalah **bug di alat ukurnya sendiri** (evaluator dataset), bukan di sistem yang diukur — dan bahkan setelah diperbaiki "putaran pertama", satu di antaranya masih butuh putaran kedua karena perbaikan awal masih menebak pola bahasa yang sempit. Ini menegaskan pelajaran yang sudah dicatat di Bab 10.3 sebelumnya: evaluasi otomatis butuh divalidasi lagi lapisannya sendiri (apakah ekspektasinya benar-benar mengukur yang dimaksud, dan tahan terhadap variasi frasa alami), bukan langsung dipercaya sebagai kebenaran mutlak begitu satu run selesai — dan kadang butuh lebih dari satu putaran verifikasi-perbaikan sebelum benar-benar tuntas.
+
+---
+
+## 18. Perluasan Dataset `unsupported_fatwa` (Rekomendasi Bab 12 Poin 1, Dikerjakan)
+
+**Latar belakang**: Bab 9.4/10.4 mencatat kategori `unsupported_fatwa` punya error rate tertinggi di leave-one-out cross-validation (35,0%), paling sering rancu dengan `in_domain` — dijelaskan sebagai "secara struktur kalimat mirip pertanyaan case-consultation biasa, bedanya di nada 'menuntut vonis pasti' yang lebih sulit dipisahkan lewat embedding semantik murni." Dataset kategori ini juga paling kecil (20 contoh) dibanding kategori lain (`in_domain` 40, `out_of_scope` 30).
+
+**Pendekatan yang dipilih**: bukan sekadar menambah jumlah, tapi menambah **variasi topik dengan nada tegas yang konsisten** di sisi `unsupported_fatwa` (10 contoh baru — 7 gaya pertanyaan, 3 gaya balasan bot, topik baru: NFT, saham, bonus tahunan, bunga tabungan), **dipasangkan** dengan menambah `in_domain` (6 contoh baru) di topik yang **sengaja sama** (gono-gini/cerai, crypto, riba, judi, zakat mal terlewat, trading forex) tapi dibingkai sebagai pertanyaan wajar, bukan tuntutan vonis. Tujuannya: classifier nearest-neighbor punya sinyal lebih kaya untuk belajar membedakan berdasarkan **nada**, bukan cuma kebetulan topiknya beda dari contoh lama.
+
+**Dataset sekarang**: `in_domain` 40→46, `unsupported_fatwa` 20→30, total dataset 145→161 contoh.
+
+**Efek samping yang ditemukan dan diperbaiki**: `ChatbotSafetyClassifierTest.php` ternyata hardcode index `40` sebagai asumsi "batas akhir contoh in_domain" saat membangun reference array sintetis untuk test cosine-similarity — begitu `inDomainCases()` bertambah jadi 46, index itu diam-diam menunjuk ke entri `in_domain` lain, bukan lagi entri `out_of_scope` pertama seperti yang test itu asumsikan. Diperbaiki jadi index 46, dengan komentar eksplisit bahwa angka ini terikat ke jumlah `inDomainCases()` dan berisiko drift lagi kalau dataset bertambah lagi tanpa mengecek test ini.
+
+**Verifikasi yang SUDAH bisa dilakukan tanpa API key**: struktur dataset (jumlah per kategori, tidak ada duplikat/typo fatal) dan seluruh 298 test regresi tetap bersih.
+
+**Yang BELUM bisa diverifikasi di sesi ini (butuh API key + langkah manual)**: apakah perluasan ini benar-benar menurunkan error rate `unsupported_fatwa`. Langkah yang perlu dijalankan manual:
+1. `php artisan chatbot:cache-safety-embeddings` — regenerasi embedding untuk seluruh 161 contoh (termasuk yang lama, karena cache lama cuma untuk 145 entri).
+2. `php artisan chatbot:eval-safety` — ukur ulang leave-one-out cross-validation, bandingkan error rate `unsupported_fatwa` sebelum (35,0%) vs sesudah perluasan ini.
+
+Angka hasil langkah 2 di atas **belum ada** di dokumen ini — akan diisi setelah dijalankan, konsisten dengan disiplin Bab 17: tidak mengklaim perbaikan berhasil sebelum ada bukti dari run nyata.
+
+---
+
 ## Lampiran: Indeks File Kode Sumber
 
 | Area                     | File                                                                                                                                                                                      |

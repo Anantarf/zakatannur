@@ -20,11 +20,17 @@ class ThrottleChatbot
         $decayMinutes = 1;
 
         if ($this->limiter->tooManyAttempts($key, $maxAttempts, $decayMinutes)) {
+            $retryAfter = $this->limiter->availableIn($key);
+
+            // Without these headers a client has no machine-readable way to know when it's safe
+            // to retry - it's left guessing at "beberapa menit" from the message text alone.
             return response()->json([
                 'status' => 'error',
                 'message' => 'Terlalu banyak permintaan. Tunggu beberapa menit.',
                 'retryable' => false,
-            ], 429);
+            ], 429)
+                ->header('Retry-After', (string) $retryAfter)
+                ->header('X-RateLimit-Remaining', '0');
         }
 
         $this->limiter->hit($key, $decayMinutes * 60);

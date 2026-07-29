@@ -46,9 +46,33 @@ class ChatbotSentimentDetector
         $lower = strtolower($message);
         $correctionWords = ['bukan', 'salah', 'harusnya', 'koreksi', 'maksudnya', 'eh', 'ralat', 'seharusnya'];
 
-        foreach ($correctionWords as $word) {
-            if (str_contains($lower, $word)) {
-                return (bool) preg_match('/\d/', $message);
+        // Whole-word matching (not str_contains substring) + a proximity window around any digit,
+        // not "any correction word anywhere and any digit anywhere in the whole message". The old
+        // substring check matched 'eh' inside "boleh"/"oleh" - both extremely common Indonesian
+        // words - so "Apakah boleh saya bayar zakat fitrah untuk 4 orang sekaligus?" (an ordinary
+        // first-time question, not a correction) triggered this. Whole-word matching alone doesn't
+        // fix 'salah' inside the equally common phrase "salah satu" ("one of"), so that phrase is
+        // excluded explicitly.
+        $words = preg_split('/\s+/', $lower, -1, PREG_SPLIT_NO_EMPTY) ?: [];
+        $wordCount = count($words);
+        $proximityWindow = 6;
+
+        foreach ($words as $index => $rawWord) {
+            $word = trim($rawWord, ".,!?;:()\"'");
+            if (!in_array($word, $correctionWords, true)) {
+                continue;
+            }
+
+            if ($word === 'salah' && ($words[$index + 1] ?? '') === 'satu') {
+                continue;
+            }
+
+            $start = max(0, $index - $proximityWindow);
+            $end = min($wordCount - 1, $index + $proximityWindow);
+            for ($i = $start; $i <= $end; $i++) {
+                if (preg_match('/\d/', $words[$i])) {
+                    return true;
+                }
             }
         }
 

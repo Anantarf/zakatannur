@@ -1023,6 +1023,12 @@ class ChatbotApiTest extends TestCase
             'advanced topics not covered by sentinel' => ['advanced_topics_restriction', 'sentinel [HITUNG:] TIDAK mencakup topik ini', 'the [HITUNG:] sentinel does NOT cover these'],
             'no self-invented UI tags' => ['no_suggest_tags', 'JANGAN membuat tag [SUGGEST]', 'Do not output [SUGGEST] tags'],
             'stop calculating if already paid' => ['stop_if_already_paid', 'JANGAN lanjut menghitung atau meminta data lagi', 'do NOT continue calculating or asking for more data'],
+            // Both added after a real chatbot:eval-behavior run (2026-07-29, 15/18 pass) found the
+            // model over-generalizing the bruto-clarification rule into always asking bruto/net
+            // even when the user never said "bersih", and never recalculating a single changed
+            // variable after a result was already shown - see Bab 17.
+            'assume gross when user does not say net or gross' => ['assume_gross_by_default', 'ANGGAP itu sudah angka bruto dan LANJUTKAN', "ASSUME it's already gross and proceed"],
+            'recalculate immediately on single-variable follow-up' => ['followup_recalculate', 'LANGSUNG hitung ulang dengan variabel itu diperbarui', 'immediately recalculate with that one variable updated'],
         ];
     }
 
