@@ -1,6 +1,6 @@
 # Dokumentasi Teknis Chatbot Zakky — Acuan Pembahasan Skripsi
 
-Dokumen ini merangkum arsitektur, metodologi, dan hasil evaluasi terukur dari chatbot Zakky (asisten zakat Masjid An-Nur), disusun sebagai bahan mentah untuk bab pembahasan/hasil skripsi. Semua angka di sini berasal dari pengujian nyata terhadap kode yang berjalan (bukan estimasi), dengan referensi file dan baris kode supaya bisa ditelusuri ulang.
+Dokumen ini merangkum arsitektur, metodologi, dan hasil evaluasi terukur dari chatbot Zakky (asisten zakat Masjid An-Nur), disusun sebagai bahan mentah untuk bab pembahasan/hasil skripsi. Angka evaluasi di sini berasal dari pengujian pada lingkungan proyek dengan jumlah sampel dan konfigurasi yang dicatat per bagian; beberapa bagian adalah snapshot historis sebelum tuning lanjutan, sehingga angka terkini harus selalu diambil dari kode aktual dan output command evaluasi terbaru.
 
 Dokumen pelengkap yang relevan:
 
@@ -20,7 +20,7 @@ Zakky adalah chatbot berbasis RAG (Retrieval-Augmented Generation) yang menjawab
 3. **Kalkulasi deterministik** — perhitungan zakat mal TIDAK dihitung oleh LLM; LLM hanya mengekstrak variabel, backend PHP yang menghitung.
 4. **Guardrail berlapis** — tiga lapisan independen untuk mencegah jawaban di luar topik, prompt injection, dan halusinasi (detail di Bab 6).
 
-Provider LLM: OpenAI-compatible API (mendukung model apa pun yang expose endpoint `/chat/completions` bergaya OpenAI — di lingkungan ini dikonfigurasi ke tiga model dengan peran berbeda, lihat Bab 7).
+Provider LLM: OpenAI-compatible API (mendukung model apa pun yang expose endpoint `/chat/completions` bergaya OpenAI — di lingkungan ini dikonfigurasi ke tiga tier/peran model berbeda, lihat Bab 7).
 
 ---
 
@@ -147,9 +147,9 @@ Zakat penghasilan dihitung dari **penghasilan bruto** (gaji pokok + tunjangan, s
 
 ## 7. Optimasi Model & Latensi
 
-### 7.1 Routing 3 Model
+### 7.1 Routing 3 Tier Model
 
-`OpenAiChatbotProvider::selectModel()` ([OpenAiChatbotProvider.php:265](../app/Services/Chatbot/Providers/OpenAiChatbotProvider.php#L265)) memilih salah satu dari 3 model berdasarkan kompleksitas pesan (sejak Bab 20.1, setiap keputusan routing juga dicatat ke `ChatbotDiagnostics` — `model_used`, `route_reason`, `message_length`, `conversation_turn_count`):
+`OpenAiChatbotProvider::selectModel()` ([OpenAiChatbotProvider.php:265](../app/Services/Chatbot/Providers/OpenAiChatbotProvider.php#L265)) memilih salah satu dari 3 tier model berdasarkan kompleksitas pesan (sejak Bab 20.1, setiap keputusan routing juga dicatat ke `ChatbotDiagnostics` — `model_used`, `route_reason`, `message_length`, `conversation_turn_count`). Tier atau perannya adalah `fast`, `default`, dan `premium`; nama model aktual mengikuti konfigurasi runtime (`OPENAI_FAST_MODEL`, `OPENAI_CHAT_MODEL`, `OPENAI_PREMIUM_MODEL` di `.env`/`.env.example`, dengan fallback di `config/chatbot.php` dan `config/services.php`).
 
 | Tingkat           | Kapan dipakai                                                                                                                                                                                                                                                         | Contoh trigger                                            |
 | ----------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------- |
@@ -232,7 +232,7 @@ Empat command evaluasi, masing-masing menguji aspek berbeda dari sistem:
 
 ### 9.1 `chatbot:eval-rag` — Kualitas Retrieval + Fact-Check
 
-- Dataset: `ChatbotEvalDataset` — **40 kasus positif** (satu per topik KB utama) + **20 kasus negatif** (pertanyaan di luar topik, untuk mengukur specificity/true-negative rate).
+- Dataset: `ChatbotEvalDataset` — **41 kasus positif** (satu per topik KB utama/regression guard) + **20 kasus negatif** (pertanyaan di luar topik, untuk mengukur specificity/true-negative rate).
 - Metodologi: untuk tiap kasus positif, cek apakah slug KB yang diharapkan muncul di top-3 hasil retrieval; untuk kasus yang punya `fact` (angka/istilah spesifik yang aman dicek via substring), panggil LLM sungguhan dan cek apakah jawabannya mengandung fakta tersebut.
 - Output: confusion matrix (TP/FN/TN/FP), **precision, recall, specificity, F1-score**.
 - Sifat: butuh API key asli untuk fact-check; retrieval-only version tersedia sebagai `tests/Feature/ChatbotKnowledgeRetrievalEvalTest.php` (tanpa API, jalan di CI).
@@ -256,7 +256,7 @@ Empat command evaluasi, masing-masing menguji aspek berbeda dari sistem:
 
 Ini metodologi paling "terukur" secara kuantitatif di antara keempatnya, cocok untuk bab evaluasi/hasil skripsi yang butuh angka statistik.
 
-**Dataset**: `ChatbotSafetyDataset` — awalnya **120 contoh** berlabel bergaya pertanyaan user, diperluas jadi **145 contoh** setelah ditemukan celah metodologis (lihat Bab 10.4), 6 kategori:
+**Dataset historis bagian ini**: `ChatbotSafetyDataset` — awalnya **120 contoh** berlabel bergaya pertanyaan user, diperluas jadi **145 contoh** setelah ditemukan celah metodologis (lihat Bab 10.4), 6 kategori. Dataset aktual sekarang berjumlah **161 contoh** setelah perluasan Bab 18; angka hasil terkini ada di Bab 20.2 dan output terbaru `php artisan chatbot:eval-safety`.
 
 | Kategori                      | Jumlah contoh | Deskripsi                                                                                      |
 | ----------------------------- | ------------- | ---------------------------------------------------------------------------------------------- |

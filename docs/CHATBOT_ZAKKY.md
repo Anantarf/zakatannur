@@ -198,7 +198,7 @@ Log::channel('chatbot')->info('API call', [
 ## Current State
 
 ### 1. Security & Rate Limiting
-- **`throttle:50,1`** (Laravel's built-in `ThrottleRequests` middleware) - 50 requests/minute per user/IP, applied directly to `/chatbot/message` and `/chatbot/stream` in `routes/api.php:26-30`. Note: `app/Http/Middleware/ThrottleChatbot.php` exists in the codebase but is not currently wired up to any route or middleware alias — it's unused.
+- **`throttle.chatbot`** (custom `App\Http\Middleware\ThrottleChatbot`, aliased in `app/Http/Kernel.php:68`) - 50 requests/minute per key, applied to `/chatbot/message` and `/chatbot/stream` in `routes/api.php:27,30`. Replaces the old built-in `throttle:50,1`; adds `Retry-After` and `X-RateLimit-Remaining` headers on top of what `ThrottleRequests` gives for free.
 
 ### 2. UX Enhancements
 - **Auto-scroll** - Jumps to latest message when new one arrives
@@ -206,8 +206,8 @@ Log::channel('chatbot')->info('API call', [
 - **Better error messages** - Include actionable suggestions
 
 ### 3. Performance & Caching
-- **ChatbotResponseCache** - Caches identical questions for 1 hour
-- **MD5-based cache keys** - Normalized for minor variations
+- **`KnowledgeEmbeddingsCache`** / **`ChatbotSafetyEmbeddingsCache`** - Cache pre-computed embedding vectors for knowledge base entries and safety classifier training examples (populated via `chatbot:cache-embeddings` and `chatbot:cache-safety-embeddings`), so retrieval/classification don't re-embed on every request.
+- **`question_md5`** - Logged per message in `ai_chat_logs` (via `ChatbotChatLogger`) for analytics/dedup, not used to cache responses.
 
 ### 4. User Feedback Mechanism
 - **Feedback buttons** - 👍 (helpful) / 👎 (unhelpful) on bot messages
@@ -219,7 +219,7 @@ Log::channel('chatbot')->info('API call', [
 - `ChatbotOrchestrator` memotong tag tersebut dan menjalankan perhitungan Zakat Mal murni di backend PHP (`ChatbotZakatMalGuide`), menghindari halusinasi.
 
 ### 6. Evaluasi RAG untuk Skripsi
-- `php artisan test tests/Feature/ChatbotKnowledgeRetrievalEvalTest.php` menguji retrieval tanpa API: 40 kasus positif harus menemukan topik benar di top-3, dan 20 kasus negatif harus kosong.
+- `php artisan test tests/Feature/ChatbotKnowledgeRetrievalEvalTest.php` menguji retrieval tanpa API: 41 kasus positif harus menemukan topik benar di top-3, dan 20 kasus negatif harus kosong.
 - `php artisan chatbot:eval-rag` menguji retrieval + sebagian fact-check jawaban akhir dengan API asli. Metrik retrieval seperti precision, recall, specificity, dan F1 belum cukup jika fact-check jawaban akhir masih gagal.
 - Log token dan estimasi biaya tersimpan di `ai_chat_logs` untuk membuktikan dampak routing model terhadap biaya.
 - Klaim aman untuk skripsi: sistem mengurangi risiko halusinasi melalui RAG, guardrail, dan kalkulasi deterministik; bukan menghilangkan halusinasi sepenuhnya.

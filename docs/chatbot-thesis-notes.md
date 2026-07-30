@@ -6,9 +6,9 @@ Bagian ini dapat dibuktikan dari test otomatis dan command evaluasi:
 
 1. Retrieval RAG diuji lewat `php artisan test tests/Feature/ChatbotKnowledgeRetrievalEvalTest.php`.
 2. Evaluasi live dengan API asli diuji lewat `php artisan chatbot:eval-rag`.
-3. Dataset evaluasi mencakup 40 kasus positif dan 20 kasus negatif.
+3. Dataset evaluasi RAG aktual mencakup 41 kasus positif dan 20 kasus negatif.
 4. Log biaya/token tersimpan di `ai_chat_logs`: model, prompt token, completion token, total token, dan estimasi biaya USD.
-5. Routing 3 model diuji otomatis: Luna untuk pertanyaan ringan, Terra untuk default, Sol untuk konsultasi/hitung zakat kompleks.
+5. Routing 3 tier model diuji otomatis: `fast` untuk pertanyaan ringan, `default` untuk pertanyaan umum, dan `premium` untuk konsultasi/hitung zakat kompleks. Nama model aktual mengikuti `.env.example`/konfigurasi runtime (`OPENAI_FAST_MODEL`, `OPENAI_CHAT_MODEL`, `OPENAI_PREMIUM_MODEL`), bukan istilah tier di naskah.
 6. Evaluasi perilaku multi-turn deterministik diuji lewat `php artisan chatbot:eval-behavior`.
 7. Evaluasi kualitas konsultan berbasis rubric disiapkan lewat `php artisan chatbot:eval-behavior-rubric`.
 

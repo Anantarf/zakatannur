@@ -34,7 +34,7 @@ Kami melakukan observasi jarak vektor antara sekumpulan pertanyaan uji (Queries)
 ## Justifikasi Penetapan Threshold = 0.45
 Berdasarkan uji sampel di atas, ditetapkan `0.45` sebagai *threshold* minimum pada fungsi `KnowledgeRetriever::searchViaEmbeddings()`.
 
-- **Mencegah False Positives (Menaikkan Precision):** Pertanyaan ngawur yang nilainya `< 0.45` akan otomatis dibuang, memaksa sistem menggunakan insting *fallback* atau menolak menjawab (guardrail).
+- **Mencegah False Positives (Menaikkan Precision):** Pertanyaan ngawur yang nilainya `< 0.45` akan otomatis dibuang, sehingga sistem menggunakan pencarian kata kunci sebagai jalur cadangan atau mengaktifkan mekanisme penolakan (guardrail).
 - **Mencegah False Negatives (Menaikkan Recall):** Menurunkan threshold dari angka aman (misal 0.60) menjadi 0.45 memungkinkan chatbot mengenali variasi bahasa dan parafrase masyarakat awam yang seringkali tidak terstruktur.
 
 ## Kesimpulan Akademis
@@ -43,8 +43,8 @@ Nilai threshold `0.45` bukan angka acak (hardcoded tanpa dasar), melainkan **has
 ## Evaluasi Kuantitatif (Precision, Recall, Specificity, F1)
 
 Selain observasi kualitatif di atas, `php artisan chatbot:eval-rag` menghasilkan confusion matrix terukur dari:
-- 20 kasus positif (`ChatbotEvalDataset::cases()`) — satu per topik utama Knowledge Base, mengukur *recall* (apakah topik yang benar ditemukan).
-- 7 kasus negatif out-of-scope (`ChatbotEvalDataset::negativeCases()`) — pertanyaan yang sama sekali tidak berhubungan dengan zakat, mengukur *specificity* (apakah sistem berhasil TIDAK mengembalikan dokumen apa pun).
+- 41 kasus positif (`ChatbotEvalDataset::cases()`) — topik utama Knowledge Base plus regression guard, mengukur *recall* (apakah topik yang benar ditemukan).
+- 20 kasus negatif out-of-scope (`ChatbotEvalDataset::negativeCases()`) — pertanyaan yang sama sekali tidak berhubungan dengan zakat, mengukur *specificity* (apakah sistem berhasil TIDAK mengembalikan dokumen apa pun).
 
 Definisi metrik yang dipakai:
 - **Precision** = TP / (TP + FP) — dari hasil yang dikembalikan, berapa persen yang relevan.
