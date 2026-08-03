@@ -18,11 +18,11 @@ Pengukuran ini adalah observasi waktu pemrosesan berulang, bukan benchmark forma
 | PERF-02 | 3 | Berapa total penerimaan zakat tahun ini? | Data publik | - | 11 | 0 | Berhasil |
 | PERF-02 | 4 | Berapa total penerimaan zakat tahun ini? | Data publik | - | 8 | 0 | Berhasil |
 | PERF-02 | 5 | Berapa total penerimaan zakat tahun ini? | Data publik | - | 18 | 0 | Berhasil |
-| PERF-03 | 1 | Apa yang dimaksud nisab dan haul dalam zakat mal? | RAG | - | 12 | 0 | Berhasil |
-| PERF-03 | 2 | Apa yang dimaksud nisab dan haul dalam zakat mal? | RAG | - | 8 | 0 | Berhasil |
-| PERF-03 | 3 | Apa yang dimaksud nisab dan haul dalam zakat mal? | RAG | - | 22 | 0 | Berhasil |
-| PERF-03 | 4 | Apa yang dimaksud nisab dan haul dalam zakat mal? | RAG | - | 8 | 0 | Berhasil |
-| PERF-03 | 5 | Apa yang dimaksud nisab dan haul dalam zakat mal? | RAG | - | 9 | 0 | Berhasil |
+| PERF-03 | 1 | Apa yang dimaksud nisab dan haul dalam zakat mal? | Pengetahuan cepat / retrieval langsung | - | 12 | 0 | Berhasil |
+| PERF-03 | 2 | Apa yang dimaksud nisab dan haul dalam zakat mal? | Pengetahuan cepat / retrieval langsung | - | 8 | 0 | Berhasil |
+| PERF-03 | 3 | Apa yang dimaksud nisab dan haul dalam zakat mal? | Pengetahuan cepat / retrieval langsung | - | 22 | 0 | Berhasil |
+| PERF-03 | 4 | Apa yang dimaksud nisab dan haul dalam zakat mal? | Pengetahuan cepat / retrieval langsung | - | 8 | 0 | Berhasil |
+| PERF-03 | 5 | Apa yang dimaksud nisab dan haul dalam zakat mal? | Pengetahuan cepat / retrieval langsung | - | 9 | 0 | Berhasil |
 | PERF-04 | 1 | Saya punya penghasilan Rp10.000.000 per bulan, tabungan Rp100.000.000, emas 0 gram, dan hutang 0. Hitungkan zakat mal saya. | RAG dengan kalkulasi deterministik | gpt-5.6-terra | 7424 | 2734 | Berhasil |
 | PERF-04 | 2 | Saya punya penghasilan Rp10.000.000 per bulan, tabungan Rp100.000.000, emas 0 gram, dan hutang 0. Hitungkan zakat mal saya. | RAG dengan kalkulasi deterministik | gpt-5.6-terra | 4566 | 2758 | Berhasil |
 | PERF-04 | 3 | Saya punya penghasilan Rp10.000.000 per bulan, tabungan Rp100.000.000, emas 0 gram, dan hutang 0. Hitungkan zakat mal saya. | RAG dengan kalkulasi deterministik | gpt-5.6-terra | 5304 | 2767 | Berhasil |
@@ -35,7 +35,7 @@ Pengukuran ini adalah observasi waktu pemrosesan berulang, bukan benchmark forma
 |---|---|---:|---:|---:|---:|---:|---:|---|
 | PERF-01 | Berbasis aturan | 5 | 103 | 26,00 | 0 | 0 | 0,00 | 5/5 berhasil |
 | PERF-02 | Data publik | 8 | 36 | 19,80 | 0 | 0 | 0,00 | 5/5 berhasil |
-| PERF-03 | RAG | 8 | 22 | 11,80 | 0 | 0 | 0,00 | 5/5 berhasil |
+| PERF-03 | Pengetahuan cepat / retrieval langsung | 8 | 22 | 11,80 | 0 | 0 | 0,00 | 5/5 berhasil |
 | PERF-04 | RAG dengan kalkulasi deterministik | 4566 | 7424 | 5719,80 | 2734 | 2767 | 2749,80 | 5/5 berhasil |
 
-Catatan: token 0 pada jalur berbasis aturan, data publik, dan RAG pengetahuan cepat terjadi karena respons diselesaikan tanpa pemanggilan model LLM.
+Catatan: PERF-03 bukan jalur RAG generatif penuh. Token 0 dan model `-` menunjukkan respons diselesaikan dari entri pengetahuan cepat/retrieval langsung tanpa pemanggilan model LLM.

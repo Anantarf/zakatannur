@@ -31,6 +31,8 @@ Tanggal pengujian: 2026-08-03
 - `php artisan test`: valid, exit code `0`, hasil `304 passed`.
 - `npm run build`: valid, exit code `0`, build berhasil. Ada warning Browserslist/caniuse-lite usang, tidak menggagalkan build.
 
+File pemetaan 304 test ke KF-01 sampai KF-09: `hasil-pengujian/01-fungsional/pemetaan-304-test-ke-kf.md`
+
 ## Hasil Evaluasi Retrieval
 
 Command: `php artisan chatbot:eval-rag`
@@ -93,6 +95,7 @@ Catatan interpretasi: angka ini adalah hasil classifier, bukan jaminan keamanan 
 
 File bukti utama: `hasil-pengujian/05-keamanan/chatbot-eval-safety.txt`
 Tabel skenario Bab III: `hasil-pengujian/05-keamanan/tabel-skenario-keamanan-bab-iii.md`
+Respons aktual enam skenario: `hasil-pengujian/05-keamanan/respons-aktual-keamanan.txt`
 
 ## Hasil E2E Publik
 
@@ -128,8 +131,10 @@ Status: valid, 4 skenario x 5 pengulangan.
 
 - Berbasis aturan: rata-rata `26,00 ms`, token `0`.
 - Data publik: rata-rata `19,80 ms`, token `0`.
-- RAG pengetahuan cepat: rata-rata `11,80 ms`, token `0`.
+- Pengetahuan cepat / retrieval langsung: rata-rata `11,80 ms`, token `0`.
 - RAG dengan kalkulasi deterministik: rata-rata `5719,80 ms`, rata-rata token `2749,80`, model `gpt-5.6-terra`.
+
+Catatan: `PERF-03` tidak diklaim sebagai RAG generatif penuh karena model `-` dan token `0`; jalurnya adalah pengetahuan cepat/retrieval langsung.
 
 File data mentah: `hasil-pengujian/06-performa/pengukuran-performa-berulang.json`
 File ringkasan: `hasil-pengujian/06-performa/pengukuran-performa-berulang.md`
@@ -142,10 +147,15 @@ Status: valid.
 - Fidyah 3 hari: Rp90.000 dan 2,25 kg beras.
 - Zakat mal lengkap: estimasi Rp5.500.000 per tahun.
 - Data zakat mal tidak lengkap: sistem meminta klarifikasi, tidak memaksa hasil.
+- Kasus batas nisab penghasilan: Rp6.375.000/bulan menghasilkan zakat Rp1.912.500/tahun.
+- Format tidak valid: angka tahun 2026 tidak dipakai sebagai jumlah jiwa.
+- Perhitungan luar cakupan: zakat pertanian diberi arahan umum dan diarahkan ke panitia/ustadz.
+
+Nisab Rp76.500.000 berasal dari periode aktif MySQL lokal: 85 gram emas x Rp900.000/gram. Zakat penghasilan dan tabungan/emas dinilai terhadap nisab secara terpisah, lalu hanya nilai zakat akhirnya yang dijumlahkan.
 
 File bukti: `hasil-pengujian/03-kalkulasi/tabel-kalkulasi-deterministik.md`
 
 ## Catatan Pembekuan
 
-Setelah seluruh evidence ditambahkan, repository perlu dibekukan dengan commit baru agar versi penelitian dapat ditelusuri.
+Commit revisi perlu dibuat setelah koreksi ini agar versi penelitian dapat ditelusuri.
 

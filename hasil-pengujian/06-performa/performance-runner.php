@@ -29,7 +29,7 @@ $scenarios = [
     [
         'code' => 'PERF-03',
         'question' => 'Apa yang dimaksud nisab dan haul dalam zakat mal?',
-        'path' => 'RAG',
+        'path' => 'Pengetahuan cepat / retrieval langsung',
         'context' => [],
     ],
     [
