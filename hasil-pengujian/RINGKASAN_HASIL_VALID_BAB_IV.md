@@ -7,7 +7,8 @@ Tanggal pengujian: 2026-08-03
 - Branch: `master`
 - Commit awal pengujian: `044afd16195b1e6aac5316f834e06a5dfcb38cd2`
 - Pesan commit awal: `docs(db-schema): document chatbot and zakat_periods tables`
-- Commit pembekuan Bab IV: diisi setelah `git commit -m "docs(thesis): finalize Bab IV testing evidence"`.
+- Commit pembekuan evidence Bab IV: `034f6b93523a08118d502874c89423b6e7884939`
+- Pesan commit pembekuan: `docs(thesis): finalize Bab IV testing evidence`
 
 ## Konfigurasi Terverifikasi
 
@@ -163,5 +164,5 @@ File bukti teks yang sebelumnya terdeteksi sebagai UTF-16LE/UTF-8 BOM sudah diko
 
 ## Catatan Pembekuan
 
-Commit pembekuan final diambil dari `git rev-parse HEAD` setelah seluruh koreksi evidence ini dikomit.
+Commit pembekuan evidence Bab IV: `034f6b93523a08118d502874c89423b6e7884939`.
 

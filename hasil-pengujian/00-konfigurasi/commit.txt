@@ -9,6 +9,11 @@ Commit terakhir saat pengujian awal:
 2026-07-30 15:08:19 +0700
 docs(db-schema): document chatbot and zakat_periods tables
 
+Commit pembekuan evidence Bab IV:
+034f6b93523a08118d502874c89423b6e7884939
+2026-08-03
+docs(thesis): finalize Bab IV testing evidence
+
 Tanggal pengujian:
 2026-08-03 19.16.46 +07:00
 
