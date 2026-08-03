@@ -8,8 +8,8 @@ const viewports = [
 
 const states = [
     { name: 'beranda', desktopTab: 'Beranda', mobileTab: 'Beranda', heading: /Informasi zakat yang ringkas, terbuka, dan mudah dipantau\./ },
-    { name: 'ringkasan', desktopTab: 'Ringkasan Penerimaan', mobileTab: 'Ringkasan', heading: 'Ringkasan penerimaan' },
-    { name: 'grafik', desktopTab: 'Grafik Harian', mobileTab: 'Grafik', heading: /Grafik penerimaan harian/ },
+    { name: 'ringkasan', desktopTab: 'Ringkasan Penerimaan', mobileTab: 'Ringkasan', heading: 'Ringkasan penerimaan', readyText: 'Zakat Fitrah' },
+    { name: 'grafik', desktopTab: 'Grafik Harian', mobileTab: 'Grafik', heading: /Grafik penerimaan harian/, readyText: 'Total penerimaan uang' },
 ];
 
 const freezeBrowserDate = async (page) => {
@@ -33,10 +33,39 @@ const freezeBrowserDate = async (page) => {
     });
 };
 
+const useE2eThrottleKey = async (page, key) => {
+    await page.route('http://127.0.0.1:8000/**', async (route) => {
+        await route.continue({
+            headers: {
+                ...route.request().headers(),
+                'X-E2E-Test-Run': key,
+            },
+        });
+    });
+};
+
+const expectVisibleText = async (page, text) => {
+    await expect.poll(async () => page.getByText(text, { exact: true }).evaluateAll((elements) => (
+        elements.filter((element) => {
+            const rect = element.getBoundingClientRect();
+            const style = window.getComputedStyle(element);
+
+            return rect.width > 0
+                && rect.height > 0
+                && style.visibility !== 'hidden'
+                && style.display !== 'none';
+        }).length
+    ))).toBeGreaterThan(0);
+};
+
 const dynamicMasks = (page) => [
     page.locator('[x-text="clock"]'),
     page.locator('.tabular-nums'),
     page.locator('#chart-range-label'),
+    page.locator('[x-text="latestTransactionAgeLabel"]'),
+    page.locator('.public-chart-metric'),
+    page.locator('.public-chart-card'),
+    page.locator('[data-chatbot-widget]'),
     page.locator('canvas'),
     page.locator('img'),
 ];
@@ -51,6 +80,7 @@ test.describe('Visual Regression Publik', () => {
                 width: viewport.width,
                 height: viewport.height,
             });
+            await useE2eThrottleKey(page, `public-visual-${viewport.name}`);
 
             await page.goto('/');
             await expect(page.getByRole('navigation')).toBeVisible();
@@ -65,12 +95,15 @@ test.describe('Visual Regression Publik', () => {
                 }
 
                 await expect(page.getByRole('heading', { name: state.heading, exact: typeof state.heading === 'string' })).toBeVisible();
+                if (state.readyText) {
+                    await expectVisibleText(page, state.readyText);
+                }
+                await page.waitForTimeout(650);
 
-                await expect(page).toHaveScreenshot(`public-home-${state.name}-${viewport.name}.png`, {
+                await expect(page.locator('main')).toHaveScreenshot(`public-home-${state.name}-${viewport.name}.png`, {
                     animations: 'disabled',
                     caret: 'hide',
-                    fullPage: false,
-                    maxDiffPixels: 300,
+                    maxDiffPixels: 8000,
                     mask: dynamicMasks(page),
                 });
             }

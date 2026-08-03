@@ -1,0 +1,22 @@
+﻿Branch:
+master
+
+Commit awal sebelum pembekuan Bab IV:
+044afd16195b1e6aac5316f834e06a5dfcb38cd2
+
+Commit terakhir saat pengujian awal:
+044afd16195b1e6aac5316f834e06a5dfcb38cd2
+2026-07-30 15:08:19 +0700
+docs(db-schema): document chatbot and zakat_periods tables
+
+Tanggal pengujian:
+2026-08-03 19.16.46 +07:00
+
+Status working tree saat pengujian awal:
+?? AUDIT_REPOSITORY_UNTUK_BAB_IV.md
+
+Runtime:
+PHP 8.2.12 (cli) (built: Oct 24 2023 21:15:15) (ZTS Visual C++ 2019 x64)
+Laravel Framework 9.52.21
+Node v24.14.1
+npm 11.17.0

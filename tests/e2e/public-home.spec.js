@@ -1,7 +1,20 @@
 import { test, expect } from '@playwright/test';
 
+const useE2eThrottleKey = async (page, key) => {
+    await page.route('http://127.0.0.1:8000/**', async (route) => {
+        await route.continue({
+            headers: {
+                ...route.request().headers(),
+                'X-E2E-Test-Run': key,
+            },
+        });
+    });
+};
+
 test.describe('Halaman Utama Publik (Home)', () => {
     test('halaman utama menampilkan judul dan elemen UI dengan benar', async ({ page }) => {
+        await useE2eThrottleKey(page, 'public-home');
+
         // Akses halaman utama (baseURL sudah diset di playwright.config.js)
         await page.goto('/');
 

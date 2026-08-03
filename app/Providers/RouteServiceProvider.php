@@ -67,8 +67,14 @@ class RouteServiceProvider extends ServiceProvider
         });
 
         // Public endpoints that may be auto-refreshed; keep it strict enough to block abuse,
-        // but loose enough for refresh interval 30–60s.
+        // but loose enough for refresh interval 30-60s.
         RateLimiter::for('public-summary', function (Request $request) {
+            $e2eKey = $request->headers->get('X-E2E-Test-Run');
+
+            if (app()->environment(['local', 'testing']) && is_string($e2eKey) && $e2eKey !== '') {
+                return Limit::perMinute(120)->by('public-summary|e2e|' . $e2eKey);
+            }
+
             return Limit::perMinute(30)->by('public-summary|' . $request->ip());
         });
     }

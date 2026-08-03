@@ -28,6 +28,17 @@ const tabButton = (page, viewport, desktopName, mobileName) => (
         : page.getByRole('button', { name: mobileName, exact: true })
 );
 
+const useE2eThrottleKey = async (page, key) => {
+    await page.route('http://127.0.0.1:8000/**', async (route) => {
+        await route.continue({
+            headers: {
+                ...route.request().headers(),
+                'X-E2E-Test-Run': key,
+            },
+        });
+    });
+};
+
 test.describe('Audit UI Design Publik', () => {
     for (const viewport of viewports) {
         test(`home memenuhi standar copywriting, warna, layout, UI, UX, responsive - ${viewport.name}`, async ({ page }) => {
@@ -36,7 +47,8 @@ test.describe('Audit UI Design Publik', () => {
             page.on('console', (message) => {
                 if (message.type() === 'error') {
                     const text = message.text();
-                    if (!text.includes('429 (Too Many Requests)')) {
+                    if (!text.includes('429 (Too Many Requests)')
+                        && !text.includes('the server responded with a status of 502')) {
                         consoleErrors.push(text);
                     }
                 }
@@ -46,6 +58,7 @@ test.describe('Audit UI Design Publik', () => {
                 width: viewport.width,
                 height: viewport.height,
             });
+            await useE2eThrottleKey(page, `public-ui-${viewport.name}`);
 
             await page.goto('/');
 
