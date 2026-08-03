@@ -31,7 +31,9 @@ Tanggal pengujian: 2026-08-03
 - `php artisan test`: valid, exit code `0`, hasil `304 passed`.
 - `npm run build`: valid, exit code `0`, build berhasil. Ada warning Browserslist/caniuse-lite usang, tidak menggagalkan build.
 
-File pemetaan 304 test ke KF-01 sampai KF-09: `hasil-pengujian/01-fungsional/pemetaan-304-test-ke-kf.md`
+File pemetaan test ke KF-01 sampai KF-09 khusus AI Assistant Zakky: `hasil-pengujian/01-fungsional/pemetaan-304-test-ke-kf.md`
+
+Catatan: `304 passed` dipakai sebagai bukti stabilitas suite penuh. Untuk Bab IV Zakky, pemetaan KF hanya memakai test/evaluator yang relevan dengan AI Assistant, bukan modul umum seperti autentikasi, transaksi umum, dashboard admin, atau export.
 
 ## Hasil Evaluasi Retrieval
 
@@ -155,7 +157,11 @@ Nisab Rp76.500.000 berasal dari periode aktif MySQL lokal: 85 gram emas x Rp900.
 
 File bukti: `hasil-pengujian/03-kalkulasi/tabel-kalkulasi-deterministik.md`
 
+## Format Arsip Evidence
+
+File bukti teks yang sebelumnya terdeteksi sebagai UTF-16LE/UTF-8 BOM sudah dikonversi ke UTF-8 tanpa BOM untuk arsip final.
+
 ## Catatan Pembekuan
 
-Commit revisi perlu dibuat setelah koreksi ini agar versi penelitian dapat ditelusuri.
+Commit pembekuan final diambil dari `git rev-parse HEAD` setelah seluruh koreksi evidence ini dikomit.
 

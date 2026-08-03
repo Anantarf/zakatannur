@@ -1,4 +1,4 @@
-﻿Branch:
+Branch:
 master
 
 Commit awal sebelum pembekuan Bab IV:

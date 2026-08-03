@@ -1,8 +1,26 @@
 # Rubrik Kualitas Jawaban Zakky
 
 Sumber respons: `chatbot:eval-behavior-rubric --markdown` pada MySQL lokal.
-Skala: 1 = sangat kurang, 2 = kurang, 3 = cukup, 4 = baik.
 Penilaian ini adalah penilaian manual peneliti terhadap 12 respons aktual Zakky, bukan pengganti hasil evaluasi perilaku 19/19.
+
+## Definisi Operasional Skala
+
+| Skor | Definisi Operasional |
+|---:|---|
+| 1 | Tidak memenuhi kriteria; jawaban salah, tidak relevan, membingungkan, atau bertentangan dengan sumber. |
+| 2 | Memenuhi sebagian kecil kriteria; masih ada kekeliruan penting, informasi pokok hilang, atau arahan kurang dapat dipakai pengguna. |
+| 3 | Memenuhi kriteria secara cukup; jawaban benar dan relevan, tetapi masih ada kekurangan minor pada kelengkapan, kejelasan, atau ketepatan batasan. |
+| 4 | Memenuhi kriteria secara utuh; jawaban benar, relevan, lengkap sesuai kebutuhan skenario, jelas, dan konsisten dengan sumber/acuan sistem. |
+
+## Sumber Acuan Penilaian
+
+| Kriteria | Sumber Acuan Eksplisit |
+|---|---|
+| Ketepatan | Respons aktual pada `chatbot-eval-behavior-rubric-mysql.md`, aturan kalkulasi `ChatbotZakatMalGuide`, dan output kalkulasi aktual. |
+| Relevansi | Fokus skenario pada `ChatbotBehaviorRubricDataset` dan alur AI Assistant pada `docs/ACUAN.md` bagian 6.1-6.3. |
+| Kelengkapan | Kebutuhan data dalam prompt Zakky, basis pengetahuan `KnowledgeBaseSeeder`, dan batas kalkulasi otomatis. |
+| Kejelasan | Respons aktual Zakky, ekspektasi tone panitia masjid pada dataset rubrik, dan keterbacaan langkah pengguna. |
+| Konsistensi terhadap Sumber | Basis pengetahuan Zakky, konfigurasi periode aktif MySQL, batas kewenangan panitia/ustadz, dan hasil evaluator retrieval/perilaku. |
 
 | Skenario | Ketepatan | Alasan | Relevansi | Alasan | Kelengkapan | Alasan | Kejelasan | Alasan | Konsistensi terhadap Sumber | Alasan |
 |---|---:|---|---:|---|---:|---|---:|---|---:|---|
@@ -33,3 +51,20 @@ Total seluruh skor: 233 dari 240.
 Rata-rata keseluruhan: 233 / (12 x 5) = 3,88 dari 4.
 
 Catatan interpretasi: hasil evaluasi perilaku 19/19 menunjukkan skenario teknis multi-turn memenuhi kondisi yang diuji. Nilai kualitas jawaban di atas menilai mutu isi respons aktual berdasarkan rubrik Bab IV.
+
+## Sumber Acuan per Skenario
+
+| Skenario | Sumber Acuan |
+|---|---|
+| BEH-01 | Respons aktual rubrik; alur konsultasi zakat mal; prompt Zakky untuk menggali data sebelum menghitung. |
+| BEH-02 | Respons aktual rubrik; konsep nisab/haul pada basis pengetahuan; batasan agar tidak menghakimi pengguna. |
+| BEH-03 | Respons aktual rubrik; basis pengetahuan zakat mal; permintaan pengguna untuk jawaban singkat. |
+| BEH-04 | Respons aktual rubrik; kebutuhan data zakat mal; aturan pemisahan penghasilan, tabungan, emas, dan hutang. |
+| BEH-05 | Respons aktual rubrik; basis pengetahuan aset produktif/properti sewa; batas kewenangan panitia/ustadz. |
+| BEH-06 | Respons aktual rubrik; basis pengetahuan saham/reksadana; batas perhitungan otomatis topik lanjutan. |
+| BEH-07 | Respons aktual rubrik; aturan tidak menghitung tanpa data cukup; kebutuhan klarifikasi aset/hutang/haul. |
+| BEH-08 | Respons aktual rubrik; skenario koreksi multi-turn; `ChatbotConversationContext` dan kalkulasi sentinel. |
+| BEH-09 | Respons aktual rubrik; ekspektasi langkah ringan untuk pengguna awam; tone panitia masjid. |
+| BEH-10 | Respons aktual rubrik; basis pengetahuan nisab/haul; aturan menjaga konteks saat interupsi konsep. |
+| BEH-11 | Respons aktual rubrik; hasil kalkulasi di bawah nisab; aturan membedakan tidak wajib zakat dan infaq sukarela. |
+| BEH-12 | Respons aktual rubrik; hasil kalkulasi final; arahan pembayaran resmi ke panitia Masjid An-Nur. |
