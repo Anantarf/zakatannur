@@ -109,8 +109,15 @@ document.addEventListener('alpine:init', () => {
             // 3. Parse Italic (*text*)
             html = html.replace(/\*([^*]+)\*/g, '<em>$1</em>');
             
-            // 4. Parse Links [text](url)
-            html = html.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank" rel="noopener noreferrer" class="text-brand-600 underline hover:text-brand-800">$1</a>');
+            // 4. Parse Links [text](url) - only http(s) allowed as the href scheme. Without this
+            // check a bot reply containing [text](javascript:...) would render as a real clickable
+            // link that runs attacker JS on click when the user clicks it (text was HTML-escaped in
+            // step 1, so quote/tag injection is blocked, but the URL scheme itself was not).
+            html = html.replace(/\[([^\]]+)\]\(([^)]+)\)/g, (match, label, url) => {
+                return /^https?:\/\//i.test(url)
+                    ? `<a href="${url}" target="_blank" rel="noopener noreferrer" class="text-brand-600 underline hover:text-brand-800">${label}</a>`
+                    : label;
+            });
             
             // 5. Parse Lists (Unordered and Ordered)
             const lines = html.split('\n');

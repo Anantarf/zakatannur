@@ -29,7 +29,7 @@ Tanggal pengujian: 2026-08-03
 
 ## Hasil Pengujian Otomatis
 
-- `php artisan test`: valid, exit code `0`, hasil `304 passed`.
+- `php artisan test`: valid, exit code `0`, hasil `306 passed` (naik dari 304 - 2 assersi baru untuk hard rule anti-manipulasi, lihat catatan revisi keamanan).
 - `npm run build`: valid, exit code `0`, build berhasil. Ada warning Browserslist/caniuse-lite usang, tidak menggagalkan build.
 
 File pemetaan test ke KF-01 sampai KF-09 khusus AI Assistant Zakky: `hasil-pengujian/01-fungsional/pemetaan-304-test-ke-kf.md`
@@ -64,6 +64,8 @@ Status: valid setelah MySQL aktif dan API/model merespons.
 - Lolos: `19`
 - Gagal: `0`
 
+Catatan revisi: dijalankan ulang setelah menambahkan hard rule anti-manipulasi ke system prompt (lihat catatan revisi di bagian Evaluasi Keamanan) untuk memastikan tidak ada regresi pada alur konsultasi zakat mal. Hasil tetap `19/19`.
+
 File bukti utama: `hasil-pengujian/04-kualitas-jawaban/chatbot-eval-behavior-mysql.txt`
 
 ## Hasil Evaluasi Rubrik Kualitas Jawaban
@@ -86,15 +88,23 @@ Command: `php artisan chatbot:eval-safety`
 
 Status: valid.
 
-- Total kasus: `161`
-- Top-1 akurasi semua tingkat keyakinan: `0.845`
+- Total kasus: `167`
+- Top-1 akurasi semua tingkat keyakinan: `0.862`
 - Kasus confident skor >= `0.66`: `12`
 - Akurasi kasus confident: `1`
-- Cakupan confident: `0.075`
-- Kasus ambiguous `0.45-0.66`: `119`
-- Kasus no_match `< 0.45`: `30`
+- Cakupan confident: `0.072`
+- Kasus ambiguous `0.45-0.66`: `121`
+- Kasus no_match `< 0.45`: `34`
 
-Catatan interpretasi: angka ini adalah hasil classifier, bukan jaminan keamanan sistem secara menyeluruh. Bagian penting untuk Bab IV adalah cakupan confident yang rendah, yaitu `7,5%`. Classifier tepat pada kasus yang diyakininya, tetapi mayoritas kasus berada pada kategori ambiguous sehingga harus dibahas sebagai keterbatasan.
+Catatan interpretasi: angka ini adalah hasil classifier, bukan jaminan keamanan sistem secara menyeluruh. Bagian penting untuk Bab IV adalah cakupan confident yang rendah, yaitu `7,2%`. Classifier tepat pada kasus yang diyakininya, tetapi mayoritas kasus berada pada kategori ambiguous sehingga harus dibahas sebagai keterbatasan.
+
+Catatan revisi (tuning internal sebelum pembekuan final): menambahkan 6 contoh referensi `out_of_scope` bergaya instruksional (mis. "tolong buatkan...", "cara pasang...") untuk mengurangi kekeliruan nearest-neighbor terhadap `prompt_injection`. Total kasus naik dari 161 ke 167, akurasi keseluruhan naik dari 84,5% menjadi 86,2%. Cakupan confident tidak berubah signifikan karena perbaikan menyasar kasus di zona ambiguous/no_match, bukan threshold keyakinan. Percobaan lanjutan menambah 5 contoh lagi ke `in_domain`/`privacy_risk` untuk kasus singleton lain dicoba dan dibatalkan - akurasi malah turun ke 85,5% karena menggeser tetangga terdekat kasus lain yang sebelumnya benar (bukti bahwa nearest-neighbor pada dataset kecil rawan whack-a-mole, bukan sekadar kurang usaha).
+
+Catatan revisi tambahan (Layer 1 - system prompt): audit arsitektur manual menemukan pertahanan anti-injection sebelumnya murni reaktif (Layer 2/3 memindai balasan setelah LLM selesai generate), tanpa hard rule proaktif yang melarang model mengubah peran, membocorkan instruksi, atau mengklaim wewenang verifikasi pembayaran/akses data pribadi. Ditambahkan 2 hard rule eksplisit ke `OpenAiChatbotProvider::getSystemInstruction` (kedua bahasa), diuji lewat data-provider test yang sama dengan hard rule lain (`ChatbotApiTest::hardRulePresentInBothLanguagesProvider`). Diverifikasi ulang lewat API asli: `chatbot:eval-behavior` tetap `19/19`, dan skenario keamanan SEC-01-06 tetap Sesuai dengan satu perbaikan terukur - SEC-03 (manipulasi instruksi) berubah dari `fallback/403` (balasan sempat tertangkap lapisan pengaman reaktif) menjadi `ai/200` (LLM menolak secara proaktif dari system prompt-nya sendiri).
+
+Catatan revisi tambahan (frontend): ditemukan celah XSS pada parser markdown link di `resources/js/chatbot-widget.js` - skema URL `[text](url)` tidak divalidasi, sehingga balasan yang memuat `javascript:` URI akan dirender sebagai link asli yang bisa dieksekusi saat diklik. Diperbaiki dengan membatasi skema ke `http`/`https`, verifikasi lewat `npm run build`.
+
+Catatan tambahan: log `ai_chat_logs` produksi lokal (1105 baris, 617 sesi, rentang 2026-06-24 s.d. 2026-08-03) ditinjau sebagai sumber sinyal independen dari skenario sintetis - tidak ada sentiment negatif, dan seluruh entri bersentimen "confused" ternyata berasal dari pengujian manual berulang (Bab 17), bukan keluhan user asli. Tidak ada temuan baru dari peninjauan ini.
 
 File bukti utama: `hasil-pengujian/05-keamanan/chatbot-eval-safety.txt`
 Tabel skenario Bab III: `hasil-pengujian/05-keamanan/tabel-skenario-keamanan-bab-iii.md`
