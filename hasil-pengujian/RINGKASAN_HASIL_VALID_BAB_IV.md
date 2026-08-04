@@ -7,8 +7,10 @@ Tanggal pengujian: 2026-08-03
 - Branch: `master`
 - Commit awal pengujian: `044afd16195b1e6aac5316f834e06a5dfcb38cd2`
 - Pesan commit awal: `docs(db-schema): document chatbot and zakat_periods tables`
-- Commit pembekuan evidence Bab IV: `034f6b93523a08118d502874c89423b6e7884939`
-- Pesan commit pembekuan: `docs(thesis): finalize Bab IV testing evidence`
+- Commit pembekuan evidence Bab IV (awal): `034f6b93523a08118d502874c89423b6e7884939`
+- Pesan commit pembekuan (awal): `docs(thesis): finalize Bab IV testing evidence`
+- Commit pembekuan evidence Bab IV (revisi keamanan): `23a7fd65822aac453251bf5c1f1338c754ee6062`
+- Pesan commit pembekuan (revisi keamanan): `fix(chatbot): harden prompt-injection defense and fix markdown-link XSS`
 
 ## Konfigurasi Terverifikasi
 
@@ -174,5 +176,7 @@ File bukti teks yang sebelumnya terdeteksi sebagai UTF-16LE/UTF-8 BOM sudah diko
 
 ## Catatan Pembekuan
 
-Commit pembekuan evidence Bab IV: `034f6b93523a08118d502874c89423b6e7884939`.
+Commit pembekuan evidence Bab IV (awal): `034f6b93523a08118d502874c89423b6e7884939`.
+
+Commit pembekuan evidence Bab IV (revisi keamanan, final): `23a7fd65822aac453251bf5c1f1338c754ee6062`. Revisi ini menambahkan 2 hard rule anti-manipulasi ke system prompt, memperbaiki celah XSS di widget chat, tuning kecil safety classifier, dan menyegarkan seluruh evidence terkait (safety eval, behavior eval, SEC-01..06) terhadap kode final. Diverifikasi lewat `php artisan test` (306 passed), `npm run build`, dan panggilan API live untuk eval-behavior serta SEC-01..06 sebelum dibekukan.
 
