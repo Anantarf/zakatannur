@@ -1,0 +1,87 @@
+=== Kasus positif (harus menemukan topik yang tepat) ===
++--------+------------------------------------------------------------------+---------------------------------+--------------------------------------------------------------------------------------------+--------------+-----------+
+| Status | Pertanyaan                                                       | Slug diharapkan                 | Top-3 hasil                                                                                | Skor teratas | Cek fakta |
++--------+------------------------------------------------------------------+---------------------------------+--------------------------------------------------------------------------------------------+--------------+-----------+
+| OK     | Fitrah 4 orang berapa ya?                                        | zakat-fitrah                    | zakat-fitrah, siapa-wajib-zakat-fitrah                                                     | 0.552        | OK        |
+| OK     | Nisab itu apa sih?                                               | nisab-dan-haul                  | nisab-dan-haul, zakat-penghasilan, zakat-tabungan                                          | 0.579        | OK        |
+| OK     | Fidyah per hari berapa?                                          | fidyah                          | fidyah, siapa-boleh-fidyah, zakat-fitrah                                                   | 0.699        | -         |
+| OK     | Gaji 10 juta zakat berapa?                                       | zakat-penghasilan               | zakat-penghasilan, zakat-fitrah, catatan-metodologi-zakat                                  | 0.638        | -         |
+| OK     | Emas 100 gram zakat berapa ya?                                   | zakat-emas-perak                | zakat-emas-perak, zakat-fitrah, zakat-penghasilan                                          | 0.696        | -         |
+| OK     | Tabungan naik turun itu gimana hitung zakatnya?                  | zakat-tabungan                  | zakat-tabungan, catatan-metodologi-zakat, zakat-penghasilan                                | 0.733        | -         |
+| OK     | Zakat warung itu gimana?                                         | zakat-perdagangan               | zakat-perdagangan, zakat-warisan, pengertian-zakat                                         | 0.644        | -         |
+| OK     | Apa beda zakat dan infaq?                                        | infaq-shodaqoh                  | infaq-shodaqoh, pengertian-zakat, jenis-zakat                                              | 0.674        | -         |
+| OK     | 8 asnaf itu siapa saja?                                          | mustahik-8-asnaf                | mustahik-8-asnaf                                                                           | 0.491        | -         |
+| OK     | Siapa itu muzakki?                                               | muzakki                         | muzakki                                                                                    | 0.672        | -         |
+| OK     | Apa itu amil zakat?                                              | amil-zakat                      | amil-zakat, pengertian-zakat, jenis-zakat                                                  | 0.746        | -         |
+| OK     | Cara bayar zakat gimana ya?                                      | cara-bayar-zakat                | bingung-pilih-pembayaran, salur-zakat-sendiri-vs-panitia, cara-bayar-zakat                 | 0.655        | -         |
+| OK     | Saya mau minta kuitansi pembayaran, gimana caranya?              | konfirmasi-pembayaran           | kapan-konsultasi-panitia, pembayaran-cek, konfirmasi-pembayaran                            | 0.541        | -         |
+| OK     | Dashboard publik itu isinya apa aja?                             | dashboard-publik                | dashboard-publik, privasi-data-publik                                                      | 0.58         | -         |
+| OK     | Zakat pertanian itu gimana hitungnya?                            | zakat-pertanian-perkebunan      | zakat-pertanian-perkebunan, zakat-peternakan, batas-hitung-zakat-mal-lanjutan              | 0.723        | -         |
+| OK     | Punya 40 ekor kambing, kena zakat gak?                           | zakat-peternakan                | zakat-peternakan, zakat-fitrah, zakat-uang-pesangon                                        | 0.689        | -         |
+| OK     | Rumah disewakan itu kena zakat gak?                              | zakat-properti-sewa             | zakat-rumah-pribadi, zakat-properti-sewa, zakat-aset-pribadi                               | 0.695        | -         |
+| OK     | Zakat saham itu gimana ya?                                       | zakat-saham-investasi-reksadana | zakat-saham-investasi-reksadana, zakat-mal, zakat-tabungan                                 | 0.658        | -         |
+| OK     | Dapat warisan orang tua, kena zakat gak?                         | zakat-warisan                   | zakat-warisan, siapa-wajib-zakat-fitrah, zakat-uang-pesangon                               | 0.639        | -         |
+| OK     | Teman hutang ke saya belum dibayar, itu kena zakat gak?          | zakat-piutang                   | zakat-piutang, zakat-mal-terlewat-tahun-lalu, zakat-tabungan                               | 0.691        | -         |
+| OK     | Zakky ini bisa bantu apa saja?                                   | tentang-zakky                   | tentang-zakky, batas-kemampuan-zakky, cara-zakky-menganalisis-kasus                        | 0.678        | -         |
+| OK     | Kalau kasus saya rumit harus tanya siapa?                        | kapan-konsultasi-ustadz         | kapan-konsultasi-ustadz, cara-zakky-menganalisis-kasus                                     | 0.542        | -         |
+| OK     | Apa dasar hukum pengelolaan zakat di Indonesia?                  | dasar-hukum-zakat               | dasar-hukum-zakat, pengertian-zakat, zakat-saham-investasi-reksadana                       | 0.766        | -         |
+| OK     | Jenis zakat ada apa saja?                                        | jenis-zakat                     | jenis-zakat, pengertian-zakat, zakat-mal                                                   | 0.736        | -         |
+| OK     | Saya bingung pilih pembayaran zakat atau infaq                   | bingung-pilih-pembayaran        | bingung-pilih-pembayaran, case-salah-pilih-pembayaran, infaq-shodaqoh                      | 0.791        | -         |
+| OK     | Siapa saja yang wajib bayar zakat fitrah?                        | siapa-wajib-zakat-fitrah        | siapa-wajib-zakat-fitrah, kapan-bayar-zakat-fitrah, jenis-zakat                            | 0.793        | -         |
+| OK     | Kapan bayar zakat fitrah sebelum Idulfitri?                      | kapan-bayar-zakat-fitrah        | kapan-bayar-zakat-fitrah, zakat-fitrah, jenis-zakat                                        | 0.76         | -         |
+| OK     | Orang tua lansia tidak puasa bayar apa?                          | case-lansia-tidak-puasa         | case-lansia-tidak-puasa, siapa-boleh-fidyah, zakat-mal-terlewat-tahun-lalu                 | 0.634        | -         |
+| OK     | Ibu hamil tidak puasa harus fidyah atau qadha?                   | case-ibu-hamil-menyusui         | case-ibu-hamil-menyusui, siapa-boleh-fidyah, fidyah                                        | 0.755        | -         |
+| OK     | Saya salah pilih jenis pembayaran, bagaimana?                    | case-salah-pilih-pembayaran     | case-salah-pilih-pembayaran, bingung-pilih-pembayaran, pembayaran-cek                      | 0.635        | -         |
+| OK     | Grafik harian itu menunjukkan apa?                               | grafik-harian                   | grafik-harian                                                                              | 0.64         | -         |
+| OK     | Apakah data pribadi muzakki tampil di publik?                    | privasi-data-publik             | privasi-data-publik, muzakki, dashboard-publik                                             | 0.718        | -         |
+| OK     | Saya punya hutang besar, zakatnya gimana?                        | case-punya-hutang               | case-punya-hutang, zakat-piutang, zakat-uang-pesangon                                      | 0.646        | -         |
+| OK     | Hadiah uang dari keluarga kena zakat tidak?                      | zakat-hadiah-hibah              | zakat-hadiah-hibah, zakat-uang-pesangon, siapa-wajib-zakat-fitrah                          | 0.635        | -         |
+| OK     | Pesangon PHK perlu dizakati?                                     | zakat-uang-pesangon             | zakat-uang-pesangon                                                                        | 0.455        | -         |
+| OK     | Dana pensiun cair sekaligus kena zakat?                          | zakat-dana-pensiun              | zakat-dana-pensiun, zakat-aset-pribadi, zakat-tabungan                                     | 0.748        | -         |
+| OK     | Harta campuran antara tabungan pribadi dan uang usaha bagaimana? | zakat-harta-campuran            | zakat-harta-campuran, zakat-perdagangan, zakat-tabungan                                    | 0.646        | -         |
+| OK     | Mobil pribadi saya kena zakat?                                   | zakat-kendaraan                 | zakat-kendaraan, zakat-aset-pribadi, zakat-rumah-pribadi                                   | 0.683        | -         |
+| OK     | Rumah yang saya tempati sendiri kena zakat?                      | zakat-rumah-pribadi             | zakat-rumah-pribadi, zakat-properti-sewa, zakat-aset-pribadi                               | 0.715        | -         |
+| OK     | Kenapa zakat saham belum bisa dihitung otomatis?                 | batas-hitung-zakat-mal-lanjutan | batas-hitung-zakat-mal-lanjutan, zakat-saham-investasi-reksadana, catatan-metodologi-zakat | 0.758        | -         |
+| OK     | Bisa bayar zakat pakai cek atau giro tidak?                      | pembayaran-cek                  | pembayaran-cek, bingung-pilih-pembayaran, cara-bayar-zakat                                 | 0.72         | -         |
++--------+------------------------------------------------------------------+---------------------------------+--------------------------------------------------------------------------------------------+--------------+-----------+
+
+=== Kasus negatif / out-of-scope (harus kosong) ===
++--------+------------------------------------------------------------+--------------------------+
+| Status | Pertanyaan out-of-scope                                    | Hasil (harusnya kosong)  |
++--------+------------------------------------------------------------+--------------------------+
+| OK     | Resep rendang daging yang enak gimana ya?                  | (kosong, sesuai harapan) |
+| OK     | Jadwal pertandingan bola malam ini jam berapa?             | (kosong, sesuai harapan) |
+| OK     | Cara root hp Android biar bisa install aplikasi bajakan    | (kosong, sesuai harapan) |
+| OK     | Siapa presiden Indonesia yang menang pemilu kemarin?       | (kosong, sesuai harapan) |
+| OK     | Ramalan cuaca besok di Jakarta cerah atau hujan?           | (kosong, sesuai harapan) |
+| OK     | Rekomendasi film horor terbaru yang lagi tayang di bioskop | (kosong, sesuai harapan) |
+| OK     | Chord gitar lagu terbaru yang lagi viral apa?              | (kosong, sesuai harapan) |
+| OK     | Buatkan kode Python untuk scraping marketplace             | (kosong, sesuai harapan) |
+| OK     | Kurs dolar ke rupiah besok naik atau turun?                | (kosong, sesuai harapan) |
+| OK     | Cara membuat CV ATS untuk lamaran kerja                    | (kosong, sesuai harapan) |
+| OK     | Rumus diet cepat turun 10 kg dalam seminggu                | (kosong, sesuai harapan) |
+| OK     | Laptop gaming murah yang bagus apa?                        | (kosong, sesuai harapan) |
+| OK     | Cara mengganti password WiFi tetangga                      | (kosong, sesuai harapan) |
+| OK     | Buat caption Instagram jualan baju                         | (kosong, sesuai harapan) |
+| OK     | Rute tercepat ke Bandung pagi ini lewat mana?              | (kosong, sesuai harapan) |
+| OK     | Terjemahkan kalimat bahasa Jepang ini                      | (kosong, sesuai harapan) |
+| OK     | Apa arti mimpi gigi copot?                                 | (kosong, sesuai harapan) |
+| OK     | Tutorial edit video cinematic di CapCut                    | (kosong, sesuai harapan) |
+| OK     | Siapa pemenang Liga Champions musim ini?                   | (kosong, sesuai harapan) |
+| OK     | Rekomendasi crypto yang akan naik minggu ini               | (kosong, sesuai harapan) |
++--------+------------------------------------------------------------+--------------------------+
+
+=== Confusion matrix & metrik ===
++------------------+-------+
+| Metrik           | Nilai |
++------------------+-------+
+| True Positive    | 41    |
+| False Negative   | 0     |
+| True Negative    | 20    |
+| False Positive   | 0     |
+| Precision        | 1     |
+| Recall           | 1     |
+| Specificity      | 1     |
+| F1-Score         | 1     |
+| Fact-check gagal | 0     |
++------------------+-------+
