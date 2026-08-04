@@ -114,6 +114,7 @@ class ZakatPeriodResolver
             'default_fidyah_beras_per_hari' => (float) ($source?->default_fidyah_beras_per_hari ?? config('zakat.annual_defaults.fidyah_beras_per_hari', 0.75)),
             'nishab_gold_gram' => (int) ($source?->nishab_gold_gram ?? config('zakat.annual_defaults.nishab_gold_gram', 85)),
             'gold_price_per_gram' => (int) ($source?->gold_price_per_gram ?? config('zakat.annual_defaults.gold_price_per_gram', 1078609)),
+            'nishab_annual_rupiah' => $source?->nishab_annual_rupiah !== null ? (int) $source->nishab_annual_rupiah : null,
             'chart_fallback_buffer_days' => (int) ($source?->chart_fallback_buffer_days ?? 2),
         ]);
     }

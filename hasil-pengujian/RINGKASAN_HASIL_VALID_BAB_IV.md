@@ -84,6 +84,8 @@ Status: respons Zakky valid sudah tersimpan dan sudah dinilai manual mengikuti r
 File bukti utama: `hasil-pengujian/04-kualitas-jawaban/chatbot-eval-behavior-rubric-mysql.md`
 File skor final: `hasil-pengujian/04-kualitas-jawaban/rubrik-kualitas-jawaban-final.md`
 
+Catatan revisi (nisab BAZNAS): setelah nisab direvisi ke Rp91.681.728 (lihat catatan revisi nisab BAZNAS di bagian Catatan Pembekuan), respons BEH-12 berubah karena tabungan Rp90.000.000 pada skenario itu kini di bawah nisab baru (sebelumnya di atas nisab lama Rp76.500.000) - total pada respons turun dari Rp5.850.000 menjadi Rp3.600.000 (zakat tabungan jadi tidak wajib). Skor manual BEH-12 tidak diubah (tetap 4/4/4/4/4) karena rubrik menilai kualitas komunikasi respons, bukan nominal rupiahnya, dan respons baru tetap memberi closure yang jelas. Total skor 233/240 tetap berlaku. Skenario lain (BEH-01 s.d. BEH-11) tidak terpengaruh - nominal penghasilan/tabungannya berada jauh di bawah atau jauh di atas kedua nisab (lama maupun baru). Respons terbaru: `hasil-pengujian/04-kualitas-jawaban/hasil-rubrik-terbaru.md`.
+
 ## Hasil Evaluasi Keamanan
 
 Command: `php artisan chatbot:eval-safety`
@@ -162,13 +164,13 @@ Status: valid.
 - Fidyah 3 hari: Rp90.000 dan 2,25 kg beras.
 - Zakat mal lengkap: estimasi Rp5.500.000 per tahun.
 - Data zakat mal tidak lengkap: sistem meminta klarifikasi, tidak memaksa hasil.
-- Kasus batas nisab penghasilan: Rp6.375.000/bulan menghasilkan zakat Rp1.912.500/tahun.
+- Kasus batas nisab penghasilan: Rp7.640.144/bulan menghasilkan zakat Rp2.292.043/tahun (nisab direvisi, lihat catatan revisi nisab BAZNAS di bagian Catatan Pembekuan).
 - Format tidak valid: angka tahun 2026 tidak dipakai sebagai jumlah jiwa.
 - Perhitungan luar cakupan: zakat pertanian diberi arahan umum dan diarahkan ke panitia/ustadz.
 
-Nisab Rp76.500.000 berasal dari periode aktif MySQL lokal: 85 gram emas x Rp900.000/gram. Zakat penghasilan dan tabungan/emas dinilai terhadap nisab secara terpisah, lalu hanya nilai zakat akhirnya yang dijumlahkan.
+Nisab Rp91.681.728/tahun (Rp7.640.144/bulan) berasal dari override `nishab_annual_rupiah` pada periode aktif MySQL lokal, mengikuti Keputusan Ketua BAZNAS RI Nomor 15 Tahun 2026 - bukan lagi hasil kali 85 gram emas x harga emas (SK ini tidak habis dibagi 85 gram secara genap). Zakat penghasilan dan tabungan/emas dinilai terhadap nisab secara terpisah, lalu hanya nilai zakat akhirnya yang dijumlahkan.
 
-File bukti: `hasil-pengujian/03-kalkulasi/tabel-kalkulasi-deterministik.md`
+File bukti: `hasil-pengujian/03-kalkulasi/tabel-kalkulasi-deterministik.md`, `hasil-pengujian/03-kalkulasi/output-kalkulasi-extended-terbaru.txt`
 
 ## Format Arsip Evidence
 
@@ -179,4 +181,11 @@ File bukti teks yang sebelumnya terdeteksi sebagai UTF-16LE/UTF-8 BOM sudah diko
 Commit pembekuan evidence Bab IV (awal): `034f6b93523a08118d502874c89423b6e7884939`.
 
 Commit pembekuan evidence Bab IV (revisi keamanan, final): `23a7fd65822aac453251bf5c1f1338c754ee6062`. Revisi ini menambahkan 2 hard rule anti-manipulasi ke system prompt, memperbaiki celah XSS di widget chat, tuning kecil safety classifier, dan menyegarkan seluruh evidence terkait (safety eval, behavior eval, SEC-01..06) terhadap kode final. Diverifikasi lewat `php artisan test` (306 passed), `npm run build`, dan panggilan API live untuk eval-behavior serta SEC-01..06 sebelum dibekukan.
+
+Catatan revisi nisab BAZNAS (2026-08-05): nisab zakat mal diganti dari perkiraan gram emas (85 gram x Rp900.000 = Rp76.500.000) menjadi angka resmi Keputusan Ketua BAZNAS RI Nomor 15 Tahun 2026 (Rp91.681.728/tahun, Rp7.640.144/bulan), lewat kolom override baru `nishab_annual_rupiah` pada `zakat_periods` (`AnnualZakatDefaults::nishabAnnual()`). Dua bug ditemukan dan diperbaiki dalam proses ini:
+
+1. Kolom `nishab_gold_gram` dan `gold_price_per_gram` tidak ada di `$fillable` model `ZakatPeriod`, sehingga form pengaturan periode diam-diam gagal menyimpan perubahan pada kedua field itu sejak awal - sudah ditambahkan ke `$fillable` bersama kolom baru.
+2. `KnowledgeBaseSeeder` menghitung teks nisab dari `nishab_gold_gram x gold_price_per_gram` secara manual, bukan lewat `nishabAnnual()`, sehingga jawaban Zakky (retrieval knowledge base) masih mengutip nisab lama walau kalkulator sudah benar. Diperbaiki di seeder, dan konten KB yang sudah ter-seed (`zakat-penghasilan`) ditambal lewat migration data-patch `2026_08_05_040000_sync_nishab_annual_override_kb_content.php` (pola yang sama dengan `2026_07_29_010000_sync_bruto_methodology_kb_content.php`), diikuti `chatbot:cache-embeddings` ulang.
+
+Dampak terhadap evidence yang sudah dibekukan: CALC-05 (kasus batas nisab) dan skenario BEH-12 (lihat catatan di bagian Evaluasi Rubrik Kualitas Jawaban) berubah nominalnya; CALC-03/contoh Rp5.500.000, eval-rag, eval-behavior 19/19, eval-safety, dan pengukuran performa tidak terpengaruh. Diverifikasi lewat `php artisan test` (tetap 306 passed setelah semua perubahan), `chatbot:eval-rag` (tetap 41/0/20/0, F1=1), dan pemanggilan API live ulang untuk CALC-03/CALC-05/BEH-12.
 

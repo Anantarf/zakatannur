@@ -47,7 +47,7 @@
                     'period_label' => 2, 'period_starts_at' => 2, 'period_ends_at' => 2, 'hijri_year' => 2,
                     'default_fitrah_cash_per_jiwa' => 3, 'default_fitrah_beras_per_jiwa' => 3,
                     'default_fidyah_per_hari' => 3, 'default_fidyah_beras_per_hari' => 3,
-                    'nishab_gold_gram' => 3, 'gold_price_per_gram' => 3,
+                    'nishab_gold_gram' => 3, 'gold_price_per_gram' => 3, 'nishab_annual_rupiah' => 3,
                     'chart_starts_at' => 4, 'chart_ends_at' => 4, 'chart_fallback_buffer_days' => 4,
                     'dashboard_chart_mode' => 4, 'dashboard_chart_period_id' => 4,
                     'dashboard_chart_starts_at' => 4, 'dashboard_chart_ends_at' => 4,
@@ -228,6 +228,12 @@
                                         <label class="ui-form-label" for="gold_price_per_gram">Harga Emas per Gram (Rp)</label>
                                         <input id="gold_price_per_gram" name="gold_price_per_gram" type="number" min="1" value="{{ old('gold_price_per_gram', $goldPricePerGram ?? 1078609) }}" class="ui-input w-full" required />
                                         <x-input-error class="mt-2" :messages="$errors->get('gold_price_per_gram')" />
+                                    </div>
+                                    <div class="sm:col-span-2">
+                                        <label class="ui-form-label" for="nishab_annual_rupiah">Nisab Tahunan Override (Rp) - opsional</label>
+                                        <input id="nishab_annual_rupiah" name="nishab_annual_rupiah" type="number" min="1" value="{{ old('nishab_annual_rupiah', $nishabAnnualRupiah ?? '') }}" class="ui-input w-full" placeholder="Contoh: 91681728 (SK BAZNAS)" />
+                                        <p class="mt-1 text-xs text-slate-500">Kalau diisi, nilai ini dipakai langsung sebagai nisab zakat mal (menggantikan hasil kali gram x harga emas di atas) - untuk mengikuti angka resmi seperti SK Ketua BAZNAS yang tidak selalu genap dari 85 gram. Kosongkan untuk kembali memakai gram x harga emas.</p>
+                                        <x-input-error class="mt-2" :messages="$errors->get('nishab_annual_rupiah')" />
                                     </div>
                                 </div>
                             </div>

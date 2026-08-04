@@ -13,10 +13,11 @@ class KnowledgeBaseSeeder extends Seeder
     {
         // Nominal was previously hardcoded here as its own separate source of truth, which drifted
         // from the real configured ZakatPeriod (fidyah showed Rp30.000 in KB text vs Rp50.000
-        // actually configured; nisab showed a stale hardcoded Rp91.681.728 vs the Rp76.500.000 the
-        // real calculator computes). Reading from AnnualZakatDefaultsResolver - the same source the
+        // actually configured). Reading from AnnualZakatDefaultsResolver - the same source the
         // chatbot's own calculator (ChatbotZakatMalGuide) and the transaction system use - means the
-        // KB text can't drift from what the system actually does again.
+        // KB text can't drift from what the system actually does again. nishabAnnual() also picks up
+        // a direct rupiah override (e.g. SK BAZNAS) when the period has one set, instead of always
+        // deriving nisab from gold_gram x gold_price.
         $year = (int) AppSetting::getInt(AppSetting::KEY_ACTIVE_YEAR, (int) now()->year);
         $defaults = app(AnnualZakatDefaultsResolver::class)->resolve($year);
 
@@ -24,7 +25,7 @@ class KnowledgeBaseSeeder extends Seeder
         $zakatFitrahBerasKg = $defaults->fitrahBerasPerJiwa;
         $fidyahUang = $defaults->fidyahPerHari;
         $fidyahBerasKg = $defaults->fidyahBerasPerHari;
-        $nishabRupiah = $defaults->nishabGoldGram * $defaults->goldPricePerGram;
+        $nishabRupiah = $defaults->nishabAnnual();
 
         // Heredoc interpolation can't call number_format() inline, so format once here.
         $zakatFitrahUangFmt = number_format($zakatFitrahUang, 0, ',', '.');

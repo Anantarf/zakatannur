@@ -10,6 +10,7 @@ final class AnnualZakatDefaults
     public float $fidyahBerasPerHari;
     public int $nishabGoldGram;
     public int $goldPricePerGram;
+    public ?int $nishabAnnualRupiah;
 
     public function __construct(
         int $fitrahCashPerJiwa,
@@ -17,7 +18,8 @@ final class AnnualZakatDefaults
         float $fitrahBerasPerJiwa,
         float $fidyahBerasPerHari,
         int $nishabGoldGram = 85,
-        int $goldPricePerGram = 1078609
+        int $goldPricePerGram = 1078609,
+        ?int $nishabAnnualRupiah = null
     ) {
         $this->fitrahCashPerJiwa = $fitrahCashPerJiwa;
         $this->fidyahPerHari = $fidyahPerHari;
@@ -25,6 +27,13 @@ final class AnnualZakatDefaults
         $this->fidyahBerasPerHari = $fidyahBerasPerHari;
         $this->nishabGoldGram = $nishabGoldGram;
         $this->goldPricePerGram = $goldPricePerGram;
+        $this->nishabAnnualRupiah = $nishabAnnualRupiah;
+    }
+
+    /** Nisab tahunan aktual dipakai untuk kalkulasi zakat mal - pakai override rupiah langsung (mis. SK BAZNAS) bila diisi, jika tidak jatuh ke gram emas x harga emas. */
+    public function nishabAnnual(): int
+    {
+        return $this->nishabAnnualRupiah ?? ($this->nishabGoldGram * $this->goldPricePerGram);
     }
 
     /** @return array{0:int,1:int,2:float,3:float} */

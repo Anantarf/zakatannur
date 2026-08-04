@@ -31,6 +31,9 @@ class PeriodSettingsService
         $defaultFidyahBeras = (float) $data['default_fidyah_beras_per_hari'];
         $nishabGoldGram = (int) $data['nishab_gold_gram'];
         $goldPricePerGram = (int) $data['gold_price_per_gram'];
+        $nishabAnnualRupiah = isset($data['nishab_annual_rupiah']) && $data['nishab_annual_rupiah'] !== ''
+            ? (int) $data['nishab_annual_rupiah']
+            : null;
         $chartStartsAt = $data['chart_starts_at'] ?? null;
         $chartEndsAt = $data['chart_ends_at'] ?? null;
         $chartFallbackBufferDays = (int) $data['chart_fallback_buffer_days'];
@@ -46,7 +49,7 @@ class PeriodSettingsService
             $activeYear, $periodLabel, $hijriYear, $hijriMonth,
             $periodStartsAt, $periodEndsAt,
             $defaultFitrah, $defaultFitrahBeras, $defaultFidyah, $defaultFidyahBeras,
-            $nishabGoldGram, $goldPricePerGram,
+            $nishabGoldGram, $goldPricePerGram, $nishabAnnualRupiah,
             $chartStartsAt, $chartEndsAt, $chartFallbackBufferDays,
             $publicRefreshIntervalSeconds,
             $dashboardChartMode, $dashboardChartPeriodId,
@@ -112,6 +115,7 @@ class PeriodSettingsService
                 'default_fidyah_beras_per_hari' => $defaultFidyahBeras,
                 'nishab_gold_gram' => $nishabGoldGram,
                 'gold_price_per_gram' => $goldPricePerGram,
+                'nishab_annual_rupiah' => $nishabAnnualRupiah,
                 'chart_starts_at' => $chartStartsAt,
                 'chart_ends_at' => $chartEndsAt,
                 'chart_fallback_buffer_days' => $chartFallbackBufferDays,
@@ -135,6 +139,9 @@ class PeriodSettingsService
             'default_fitrah_beras_per_jiwa' => $defaultFitrahBeras,
             'default_fidyah_per_hari' => $defaultFidyah,
             'default_fidyah_beras_per_hari' => $defaultFidyahBeras,
+            'nishab_gold_gram' => $nishabGoldGram,
+            'gold_price_per_gram' => $goldPricePerGram,
+            'nishab_annual_rupiah' => $nishabAnnualRupiah,
             'chart_starts_at' => $chartStartsAt,
             'chart_ends_at' => $chartEndsAt,
             'chart_fallback_buffer_days' => $chartFallbackBufferDays,

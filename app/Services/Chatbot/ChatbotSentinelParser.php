@@ -35,7 +35,7 @@ class ChatbotSentinelParser
         $defaultsResolver = app(\App\Services\Transactions\AnnualZakatDefaultsResolver::class);
         $defaults = $defaultsResolver->resolve($year);
 
-        $maxPlausibleValue = ($defaults->nishabGoldGram * $defaults->goldPricePerGram) * 1000;
+        $maxPlausibleValue = $defaults->nishabAnnual() * 1000;
 
         $hasNegative = false;
         $hasImplausible = false;

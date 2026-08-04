@@ -15,7 +15,7 @@ $cases = [
     'CALC-02' => 'Hitungkan fidyah untuk 3 hari.',
     'CALC-03' => 'Saya punya penghasilan Rp10.000.000 per bulan, tabungan Rp100.000.000, emas 0 gram, dan hutang 0. Hitungkan zakat mal saya.',
     'CALC-04' => 'Saya punya penghasilan Rp4.000.000 per bulan dan tabungan Rp2.000.000. Hitungkan zakat mal saya.',
-    'CALC-05' => 'Saya punya penghasilan Rp6.375.000 per bulan, tabungan Rp0, emas 0 gram, hutang 0. Hitungkan zakat mal saya.',
+    'CALC-05' => 'Saya punya penghasilan Rp7.640.144 per bulan, tabungan Rp0, emas 0 gram, hutang 0. Hitungkan zakat mal saya.',
     'CALC-06' => 'Fitrah tahun 2026 itu berapa ya per orang?',
     'CALC-07' => 'Saya panen padi 2000 kg. Hitungkan zakat pertanian saya sekarang.',
 ];

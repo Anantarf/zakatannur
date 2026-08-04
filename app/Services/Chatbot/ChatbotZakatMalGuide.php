@@ -19,7 +19,7 @@ class ChatbotZakatMalGuide
         $debt = (int) ($data['debt'] ?? 0);
 
         $goldValue = $goldGram * $defaults->goldPricePerGram;
-        $nishab = $defaults->nishabGoldGram * $defaults->goldPricePerGram;
+        $nishab = $defaults->nishabAnnual();
 
         // 1. Zakat penghasilan - basis dari penghasilan bruto (gaji pokok + tunjangan), TANPA
         // dikurangi kebutuhan pokok/pengeluaran rutin - mengikuti SK Ketua BAZNAS No. 15/2026.

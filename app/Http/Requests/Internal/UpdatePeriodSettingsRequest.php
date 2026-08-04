@@ -34,6 +34,7 @@ class UpdatePeriodSettingsRequest extends FormRequest
             'default_fidyah_beras_per_hari' => ['required', 'numeric', 'min:0', 'max:100'],
             'nishab_gold_gram' => ['required', 'integer', 'min:1', 'max:1000'],
             'gold_price_per_gram' => ['required', 'integer', 'min:1', 'max:100000000'],
+            'nishab_annual_rupiah' => ['nullable', 'integer', 'min:1', 'max:100000000000'],
             'chart_starts_at' => ['nullable', 'date'],
             'chart_ends_at' => ['nullable', 'date'],
             'chart_fallback_buffer_days' => ['required', 'integer', 'min:0', 'max:14'],

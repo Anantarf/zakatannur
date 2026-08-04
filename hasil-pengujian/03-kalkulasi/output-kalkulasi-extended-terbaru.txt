@@ -1,0 +1,114 @@
+## CALC-01
+Pertanyaan: Hitungkan zakat fitrah untuk 4 orang.
+Source: calculation
+Status: 200
+Respons aktual:
+Fitrah untuk 4 orang:
+
+Uang  : 4 x Rp 50.000 = Rp 200.000
+Beras : 4 x 2.5 kg = 10.0 kg
+
+Angka ini mengacu tarif An-Nur tahun ini. Konfirmasi ke panitia sebelum bayar ya.
+
+## CALC-02
+Pertanyaan: Hitungkan fidyah untuk 3 hari.
+Source: calculation
+Status: 200
+Respons aktual:
+Fidyah untuk 3 hari:
+
+Uang  : 3 x Rp 30.000 = Rp 90.000
+Beras : 3 x 0.75 kg = 2.25 kg
+
+Angka ini mengacu tarif An-Nur tahun ini. Konfirmasi ke panitia sebelum bayar ya.
+
+## CALC-03
+Pertanyaan: Saya punya penghasilan Rp10.000.000 per bulan, tabungan Rp100.000.000, emas 0 gram, dan hutang 0. Hitungkan zakat mal saya.
+Source: ai
+Status: 200
+Respons aktual:
+Baik, saya rangkum dulu ya: penghasilan Rp10.000.000 per bulan, tabungan Rp100.000.000, emas 0 gram, dan tidak ada hutang.
+
+Baik, saya coba hitungkan dari data yang Anda berikan ya:
+- Penghasilan bulanan: Rp 10.000.000
+- Tabungan: Rp 100.000.000
+- Emas: 0 gram
+- Hutang: Rp 0
+(Kalau ada yang kurang tepat, tinggal koreksi saja nominalnya.)
+
+[[HASIL]]**Estimasi Zakat Penghasilan** (dari penghasilan bruto, terpisah dari tabungan):
+- Penghasilan tahunan: Rp 120.000.000
+- Nishab: Rp 91.681.728
+Kesimpulan: wajib zakat penghasilan, sekitar Rp 3.000.000 per tahun (~Rp 250.000 per bulan).
+
+**Estimasi Zakat Tabungan & Emas** (dari harta simpanan saat ini):
+- Aset simpanan (tabungan + emas - hutang): Rp 100.000.000
+- Nishab: Rp 91.681.728
+Kesimpulan: wajib zakat tabungan/emas, sekitar Rp 2.500.000 per tahun.
+
+**Total estimasi zakat: Rp 5.500.000 per tahun.**[[/HASIL]]
+
+Estimasi tabungan ini mengasumsikan syarat haul (disimpan genap 1 tahun) sudah terpenuhi. Setelah nominal estimasinya muncul, siapkan pembayaran sesuai hasil dan konfirmasi metode pembayaran resmi ke panitia.
+
+## CALC-04
+Pertanyaan: Saya punya penghasilan Rp4.000.000 per bulan dan tabungan Rp2.000.000. Hitungkan zakat mal saya.
+Source: ai
+Status: 200
+Respons aktual:
+Baik, saya rangkum dulu ya: penghasilan Rp4.000.000 per bulan dan tabungan Rp2.000.000.  
+
+Apakah ada hutang atau cicilan yang jatuh tempo dan perlu dibayar?  
+1) Tidak ada  
+2) Ada hutang jatuh tempo  
+3) Ada cicilan  
+4) Lainnya
+
+## CALC-05
+Pertanyaan: Saya punya penghasilan Rp7.640.144 per bulan, tabungan Rp0, emas 0 gram, hutang 0. Hitungkan zakat mal saya.
+Source: ai
+Status: 200
+Respons aktual:
+Baik, saya rangkum dulu ya: penghasilan bruto Rp7.640.144 per bulan, tanpa tabungan, emas, dan hutang. Penghasilan ini tepat pada batas nisab bulanan.
+
+Baik, saya coba hitungkan dari data yang Anda berikan ya:
+- Penghasilan bulanan: Rp 7.640.144
+- Tabungan: Rp 0
+- Emas: 0 gram
+- Hutang: Rp 0
+(Kalau ada yang kurang tepat, tinggal koreksi saja nominalnya.)
+
+[[HASIL]]**Estimasi Zakat Penghasilan** (dari penghasilan bruto, terpisah dari tabungan):
+- Penghasilan tahunan: Rp 91.681.728
+- Nishab: Rp 91.681.728
+Kesimpulan: wajib zakat penghasilan, sekitar Rp 2.292.043 per tahun (~Rp 191.003 per bulan).
+
+**Estimasi Zakat Tabungan & Emas** (dari harta simpanan saat ini):
+- Aset simpanan (tabungan + emas - hutang): Rp 0
+- Nishab: Rp 91.681.728
+Kesimpulan: belum wajib zakat tabungan/emas saat ini.
+
+**Total estimasi zakat: Rp 2.292.043 per tahun.**[[/HASIL]]
+
+Hasil ini memakai asumsi syarat haul (kepemilikan genap setahun) terpenuhi untuk harta simpanan; pada data Anda tidak ada harta simpanan. Siapkan pembayaran sesuai estimasi dan konfirmasi metode pembayaran resmi ke panitia.
+
+## CALC-06
+Pertanyaan: Fitrah tahun 2026 itu berapa ya per orang?
+Source: knowledge
+Status: 200
+Respons aktual:
+Berapa orang yang mau dihitung fitrahnya? Coba ketik: "Fitrah 4 orang berapa?"
+
+## CALC-07
+Pertanyaan: Saya panen padi 2000 kg. Hitungkan zakat pertanian saya sekarang.
+Source: ai
+Status: 200
+Respons aktual:
+Untuk zakat pertanian, panen padi/gabah dikeluarkan setiap kali panen dan nisabnya sekitar 653 kg gabah. Panen 2.000 kg berarti sudah melewati nisab.
+
+Kadarnya bergantung pada pengairan:
+1. Alami (hujan/sungai tanpa biaya besar): 10%.
+2. Berbiaya (pompa/irigasi/perawatan berbayar): 5%.
+3. Campuran: perlu dikonsultasikan ke panitia atau ustadz.
+
+Saya belum bisa menetapkan hitungan final untuk panen pribadi. Siapkan jenis pengairan, berat gabah bersih, dan waktu panen, lalu konfirmasi ke panitia agar jumlah zakatnya tepat.
+

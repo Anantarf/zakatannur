@@ -38,6 +38,7 @@ class PeriodSettingsController extends Controller
             'defaultFidyahBerasPerHari' => (float) $period->default_fidyah_beras_per_hari,
             'nishabGoldGram' => (int) ($period->nishab_gold_gram ?? 85),
             'goldPricePerGram' => (int) ($period->gold_price_per_gram ?? 1078609),
+            'nishabAnnualRupiah' => $period->nishab_annual_rupiah !== null ? (int) $period->nishab_annual_rupiah : null,
             'chartStartsAt' => optional($period->chart_starts_at)->toDateString(),
             'chartEndsAt' => optional($period->chart_ends_at)->toDateString(),
             'chartFallbackBufferDays' => (int) ($period->chart_fallback_buffer_days ?? 2),
