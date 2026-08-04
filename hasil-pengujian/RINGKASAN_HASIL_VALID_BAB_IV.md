@@ -11,6 +11,8 @@ Tanggal pengujian: 2026-08-03
 - Pesan commit pembekuan (awal): `docs(thesis): finalize Bab IV testing evidence`
 - Commit pembekuan evidence Bab IV (revisi keamanan): `23a7fd65822aac453251bf5c1f1338c754ee6062`
 - Pesan commit pembekuan (revisi keamanan): `fix(chatbot): harden prompt-injection defense and fix markdown-link XSS`
+- Commit pembekuan evidence Bab IV (revisi nisab BAZNAS, final): `34d89f1fdea044ae92d287a781b5553eac73949d`
+- Pesan commit pembekuan (revisi nisab BAZNAS): `feat(zakat-mal): support direct rupiah nisab override for BAZNAS SK figures`
 
 ## Konfigurasi Terverifikasi
 
@@ -188,4 +190,6 @@ Catatan revisi nisab BAZNAS (2026-08-05): nisab zakat mal diganti dari perkiraan
 2. `KnowledgeBaseSeeder` menghitung teks nisab dari `nishab_gold_gram x gold_price_per_gram` secara manual, bukan lewat `nishabAnnual()`, sehingga jawaban Zakky (retrieval knowledge base) masih mengutip nisab lama walau kalkulator sudah benar. Diperbaiki di seeder, dan konten KB yang sudah ter-seed (`zakat-penghasilan`) ditambal lewat migration data-patch `2026_08_05_040000_sync_nishab_annual_override_kb_content.php` (pola yang sama dengan `2026_07_29_010000_sync_bruto_methodology_kb_content.php`), diikuti `chatbot:cache-embeddings` ulang.
 
 Dampak terhadap evidence yang sudah dibekukan: CALC-05 (kasus batas nisab) dan skenario BEH-12 (lihat catatan di bagian Evaluasi Rubrik Kualitas Jawaban) berubah nominalnya; CALC-03/contoh Rp5.500.000, eval-rag, eval-behavior 19/19, eval-safety, dan pengukuran performa tidak terpengaruh. Diverifikasi lewat `php artisan test` (tetap 306 passed setelah semua perubahan), `chatbot:eval-rag` (tetap 41/0/20/0, F1=1), dan pemanggilan API live ulang untuk CALC-03/CALC-05/BEH-12.
+
+Commit pembekuan evidence Bab IV (revisi nisab BAZNAS, final): `34d89f1fdea044ae92d287a781b5553eac73949d`. Ini adalah commit acuan terbaru untuk skripsi - seluruh angka kalkulasi zakat mal, konfigurasi nisab, dan evidence terkait pada dokumen ini mengikuti kode per commit tersebut.
 
