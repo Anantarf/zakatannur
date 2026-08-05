@@ -72,7 +72,8 @@ class ChatbotSentinelParser
         // (e.g. "saya punya hutang 5 juta") would otherwise still light up the wealth
         // section with the same "assessed and came up empty" problem this guards against.
         $hasIncomeData = isset($data['income_monthly']);
-        $hasWealthData = isset($data['savings']) || isset($data['gold_gram']);
+        $hasWealthData = (isset($data['savings']) && (int) $data['savings'] > 0)
+            || (isset($data['gold_gram']) && (int) $data['gold_gram'] > 0);
 
         if ($hasNonNumeric) {
             ChatbotDiagnostics::warning(ChatbotDiagnostics::LAYER_SENTINEL_PARSER, 'rejected_non_numeric_value', ['data' => $data]);

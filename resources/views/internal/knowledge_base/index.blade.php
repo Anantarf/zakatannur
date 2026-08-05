@@ -133,12 +133,12 @@
                                                     </span>
                                                 @endif
                                             </td>
-                                            <td class="px-4 py-3 sm:px-5 text-right space-x-2">
-                                                <a href="{{ route('internal.knowledge-base.edit', $entry) }}" class="text-indigo-600 hover:text-indigo-900 text-xs font-medium">Edit</a>
+                                            <td class="px-4 py-3 sm:px-5 text-right space-x-1">
+                                                <a href="{{ route('internal.knowledge-base.edit', $entry) }}" class="inline-flex min-h-[32px] items-center px-2 text-xs font-medium text-indigo-600 hover:text-indigo-900">Edit</a>
                                                 <form action="{{ route('internal.knowledge-base.destroy', $entry) }}" method="POST" class="inline-block" onsubmit="return confirm('Hapus referensi ini?')">
                                                     @csrf
                                                     @method('DELETE')
-                                                    <button type="submit" class="text-red-600 hover:text-red-900 text-xs font-medium">Hapus</button>
+                                                    <button type="submit" class="inline-flex min-h-[32px] items-center px-2 text-xs font-medium text-red-600 hover:text-red-900">Hapus</button>
                                                 </form>
                                             </td>
                                         </tr>

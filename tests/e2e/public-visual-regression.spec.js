@@ -58,6 +58,17 @@ const expectVisibleText = async (page, text) => {
     ))).toBeGreaterThan(0);
 };
 
+const waitForActiveTabSettled = async (page) => {
+    await page.waitForFunction(() => {
+        const panel = Array.from(document.querySelectorAll('[x-show]')).find((element) => (
+            (element.getAttribute('x-show') || '').includes('activeTab ===')
+                && window.getComputedStyle(element).display !== 'none'
+        ));
+
+        return !!panel && window.getComputedStyle(panel).opacity === '1';
+    }, { timeout: 3000 });
+};
+
 const dynamicMasks = (page) => [
     page.locator('[x-text="clock"]'),
     page.locator('.tabular-nums'),
@@ -65,7 +76,6 @@ const dynamicMasks = (page) => [
     page.locator('[x-text="latestTransactionAgeLabel"]'),
     page.locator('.public-chart-metric'),
     page.locator('.public-chart-card'),
-    page.locator('[data-chatbot-widget]'),
     page.locator('canvas'),
     page.locator('img'),
 ];
@@ -85,6 +95,12 @@ test.describe('Visual Regression Publik', () => {
             await page.goto('/');
             await expect(page.getByRole('navigation')).toBeVisible();
             await expect(page.getByRole('main')).toBeVisible();
+            // The chatbot widget is position:fixed to the viewport, while these
+            // screenshots are scoped to the <main> element box, whose height varies
+            // per tab. Whether the fixed widget's viewport corner falls inside that
+            // box is incidental, not deterministic — so hide it outright instead of
+            // masking it, which was flaky depending on which tab was active.
+            await page.addStyleTag({ content: '[data-chatbot-widget] { display: none !important; }' });
 
             for (const state of states) {
                 const tabName = viewport.width >= 1024 ? state.desktopTab : state.mobileTab;
@@ -98,7 +114,11 @@ test.describe('Visual Regression Publik', () => {
                 if (state.readyText) {
                     await expectVisibleText(page, state.readyText);
                 }
-                await page.waitForTimeout(650);
+                // Wait for the Alpine enter-transition (opacity 0 -> 1) to actually finish
+                // instead of guessing a fixed delay; a blind timeout raced the transition
+                // under CPU load from the rest of the suite and produced flaky diffs.
+                await waitForActiveTabSettled(page);
+                await page.waitForTimeout(150);
 
                 await expect(page.locator('main')).toHaveScreenshot(`public-home-${state.name}-${viewport.name}.png`, {
                     animations: 'disabled',

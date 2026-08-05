@@ -1019,6 +1019,7 @@ class ChatbotApiTest extends TestCase
             'never self-calculate' => ['never_self_calculate', 'JANGAN PERNAH menghitung nominal zakat mal sendiri', 'NEVER calculate a zakat mal amount yourself'],
             'hitung json schema' => ['hitung_json_schema', '[HITUNG:{"income_monthly":10000000,"savings":50000000,"gold_gram":0,"debt":0}]', '[HITUNG:{"income_monthly":10000000,"savings":50000000,"gold_gram":0,"debt":0}]'],
             'confirm intent before collecting data' => ['confirm_intent', 'Konfirmasi dulu niatnya', 'Confirm their intent first'],
+            'income-only calculation stays income-only' => ['income_only_scope', 'Kalau user hanya bertanya zakat penghasilan/gaji', 'If the user asks only about zakat penghasilan/income'],
             'bruto clarification for net salary' => ['bruto_clarification', 'menghitung zakat penghasilan dari gaji kotor/bruto', 'calculates zakat penghasilan from the gross salary'],
             'advanced topics not covered by sentinel' => ['advanced_topics_restriction', 'sentinel [HITUNG:] TIDAK mencakup topik ini', 'the [HITUNG:] sentinel does NOT cover these'],
             'no self-invented UI tags' => ['no_suggest_tags', 'JANGAN membuat tag [SUGGEST]', 'Do not output [SUGGEST] tags'],

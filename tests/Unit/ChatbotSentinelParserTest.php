@@ -37,6 +37,30 @@ class ChatbotSentinelParserTest extends TestCase
         $this->assertSame(2, substr_count($reply, '[[HASIL]]'));
     }
 
+    public function test_income_only_hitung_renders_income_section_without_wealth_section(): void
+    {
+        $parser = app(ChatbotSentinelParser::class);
+
+        $reply = $parser->parseAndCalculateSentinel('[HITUNG:{"income_monthly":10000000}]');
+
+        $this->assertStringContainsString('[[HASIL]]', $reply);
+        $this->assertStringContainsString('Estimasi Zakat Penghasilan', $reply);
+        $this->assertStringNotContainsString('Estimasi Zakat Tabungan & Emas', $reply);
+        $this->assertStringNotContainsString('Total estimasi zakat', $reply);
+    }
+
+    public function test_income_with_zero_wealth_values_still_hides_wealth_section(): void
+    {
+        $parser = app(ChatbotSentinelParser::class);
+
+        $reply = $parser->parseAndCalculateSentinel('[HITUNG:{"income_monthly":10000000,"savings":0,"gold_gram":0,"debt":0}]');
+
+        $this->assertStringContainsString('[[HASIL]]', $reply);
+        $this->assertStringContainsString('Estimasi Zakat Penghasilan', $reply);
+        $this->assertStringNotContainsString('Estimasi Zakat Tabungan & Emas', $reply);
+        $this->assertStringNotContainsString('Total estimasi zakat', $reply);
+    }
+
     public function test_debt_alone_asks_for_more_data_instead_of_a_misleading_wealth_section(): void
     {
         $parser = app(ChatbotSentinelParser::class);

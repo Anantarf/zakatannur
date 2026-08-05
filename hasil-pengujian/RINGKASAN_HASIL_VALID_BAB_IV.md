@@ -1,6 +1,6 @@
 # Ringkasan Hasil Valid Untuk Bab IV
 
-Tanggal pengujian: 2026-08-03
+Tanggal pengujian: 2026-08-05
 
 ## Snapshot Repository
 
@@ -33,12 +33,12 @@ Tanggal pengujian: 2026-08-03
 
 ## Hasil Pengujian Otomatis
 
-- `php artisan test`: valid, exit code `0`, hasil `306 passed` (naik dari 304 - 2 assersi baru untuk hard rule anti-manipulasi, lihat catatan revisi keamanan).
+- `php artisan test`: valid, exit code `0`, hasil `309 passed` (bertambah dari 306 setelah regression test cakupan kalkulasi zakat penghasilan/tabungan ditambahkan).
 - `npm run build`: valid, exit code `0`, build berhasil. Ada warning Browserslist/caniuse-lite usang, tidak menggagalkan build.
 
 File pemetaan test ke KF-01 sampai KF-09 khusus AI Assistant Zakky: `hasil-pengujian/01-fungsional/pemetaan-304-test-ke-kf.md`
 
-Catatan: `304 passed` dipakai sebagai bukti stabilitas suite penuh. Untuk Bab IV Zakky, pemetaan KF hanya memakai test/evaluator yang relevan dengan AI Assistant, bukan modul umum seperti autentikasi, transaksi umum, dashboard admin, atau export.
+Catatan: `309 passed` dipakai sebagai bukti stabilitas suite penuh pada revisi terbaru. Untuk Bab IV Zakky, pemetaan KF hanya memakai test/evaluator yang relevan dengan AI Assistant, bukan modul umum seperti autentikasi, transaksi umum, dashboard admin, atau export.
 
 ## Hasil Evaluasi Retrieval
 
@@ -166,11 +166,12 @@ Status: valid.
 - Fidyah 3 hari: Rp90.000 dan 2,25 kg beras.
 - Zakat mal lengkap: estimasi Rp5.500.000 per tahun.
 - Data zakat mal tidak lengkap: sistem meminta klarifikasi, tidak memaksa hasil.
-- Kasus batas nisab penghasilan: Rp7.640.144/bulan menghasilkan zakat Rp2.292.043/tahun (nisab direvisi, lihat catatan revisi nisab BAZNAS di bagian Catatan Pembekuan).
+- Kasus batas nisab penghasilan: Rp7.640.144/bulan menghasilkan zakat Rp2.292.043/tahun; komponen tabungan/emas tidak ditampilkan ketika nilai tabungan dan emas nol.
+- Cakupan kalkulasi kontekstual: input penghasilan saja hanya menampilkan `Estimasi Zakat Penghasilan`; input tabungan saja hanya menampilkan `Estimasi Zakat Tabungan & Emas`; field tabungan/emas bernilai nol tidak memunculkan blok harta simpanan kosong.
 - Format tidak valid: angka tahun 2026 tidak dipakai sebagai jumlah jiwa.
 - Perhitungan luar cakupan: zakat pertanian diberi arahan umum dan diarahkan ke panitia/ustadz.
 
-Nisab Rp91.681.728/tahun (Rp7.640.144/bulan) berasal dari override `nishab_annual_rupiah` pada periode aktif MySQL lokal, mengikuti Keputusan Ketua BAZNAS RI Nomor 15 Tahun 2026 - bukan lagi hasil kali 85 gram emas x harga emas (SK ini tidak habis dibagi 85 gram secara genap). Zakat penghasilan dan tabungan/emas dinilai terhadap nisab secara terpisah, lalu hanya nilai zakat akhirnya yang dijumlahkan.
+Nisab Rp91.681.728/tahun (Rp7.640.144/bulan) berasal dari override `nishab_annual_rupiah` pada periode aktif MySQL lokal, mengikuti Keputusan Ketua BAZNAS RI Nomor 15 Tahun 2026 - bukan lagi hasil kali 85 gram emas x harga emas (SK ini tidak habis dibagi 85 gram secara genap). Zakat penghasilan dan tabungan/emas dinilai terhadap nisab secara terpisah, lalu hanya nilai zakat akhirnya yang dijumlahkan ketika kedua komponen relevan pada input pengguna.
 
 File bukti: `hasil-pengujian/03-kalkulasi/tabel-kalkulasi-deterministik.md`, `hasil-pengujian/03-kalkulasi/output-kalkulasi-extended-terbaru.txt`
 
@@ -182,14 +183,16 @@ File bukti teks yang sebelumnya terdeteksi sebagai UTF-16LE/UTF-8 BOM sudah diko
 
 Commit pembekuan evidence Bab IV (awal): `034f6b93523a08118d502874c89423b6e7884939`.
 
-Commit pembekuan evidence Bab IV (revisi keamanan, final): `23a7fd65822aac453251bf5c1f1338c754ee6062`. Revisi ini menambahkan 2 hard rule anti-manipulasi ke system prompt, memperbaiki celah XSS di widget chat, tuning kecil safety classifier, dan menyegarkan seluruh evidence terkait (safety eval, behavior eval, SEC-01..06) terhadap kode final. Diverifikasi lewat `php artisan test` (306 passed), `npm run build`, dan panggilan API live untuk eval-behavior serta SEC-01..06 sebelum dibekukan.
+Commit pembekuan evidence Bab IV (revisi keamanan, final): `23a7fd65822aac453251bf5c1f1338c754ee6062`. Revisi ini menambahkan 2 hard rule anti-manipulasi ke system prompt, memperbaiki celah XSS di widget chat, tuning kecil safety classifier, dan menyegarkan seluruh evidence terkait (safety eval, behavior eval, SEC-01..06) terhadap kode final. Pada revisi tersebut diverifikasi lewat `php artisan test` (306 passed), `npm run build`, dan panggilan API live untuk eval-behavior serta SEC-01..06 sebelum dibekukan.
 
 Catatan revisi nisab BAZNAS (2026-08-05): nisab zakat mal diganti dari perkiraan gram emas (85 gram x Rp900.000 = Rp76.500.000) menjadi angka resmi Keputusan Ketua BAZNAS RI Nomor 15 Tahun 2026 (Rp91.681.728/tahun, Rp7.640.144/bulan), lewat kolom override baru `nishab_annual_rupiah` pada `zakat_periods` (`AnnualZakatDefaults::nishabAnnual()`). Dua bug ditemukan dan diperbaiki dalam proses ini:
 
 1. Kolom `nishab_gold_gram` dan `gold_price_per_gram` tidak ada di `$fillable` model `ZakatPeriod`, sehingga form pengaturan periode diam-diam gagal menyimpan perubahan pada kedua field itu sejak awal - sudah ditambahkan ke `$fillable` bersama kolom baru.
 2. `KnowledgeBaseSeeder` menghitung teks nisab dari `nishab_gold_gram x gold_price_per_gram` secara manual, bukan lewat `nishabAnnual()`, sehingga jawaban Zakky (retrieval knowledge base) masih mengutip nisab lama walau kalkulator sudah benar. Diperbaiki di seeder, dan konten KB yang sudah ter-seed (`zakat-penghasilan`) ditambal lewat migration data-patch `2026_08_05_040000_sync_nishab_annual_override_kb_content.php` (pola yang sama dengan `2026_07_29_010000_sync_bruto_methodology_kb_content.php`), diikuti `chatbot:cache-embeddings` ulang.
 
-Dampak terhadap evidence yang sudah dibekukan: CALC-05 (kasus batas nisab) dan skenario BEH-12 (lihat catatan di bagian Evaluasi Rubrik Kualitas Jawaban) berubah nominalnya; CALC-03/contoh Rp5.500.000, eval-rag, eval-behavior 19/19, eval-safety, dan pengukuran performa tidak terpengaruh. Diverifikasi lewat `php artisan test` (tetap 306 passed setelah semua perubahan), `chatbot:eval-rag` (tetap 41/0/20/0, F1=1), dan pemanggilan API live ulang untuk CALC-03/CALC-05/BEH-12.
+Dampak terhadap evidence revisi nisab BAZNAS: CALC-05 (kasus batas nisab) dan skenario BEH-12 (lihat catatan di bagian Evaluasi Rubrik Kualitas Jawaban) berubah nominalnya; CALC-03/contoh Rp5.500.000, eval-rag, eval-behavior 19/19, eval-safety, dan pengukuran performa tidak terpengaruh pada revisi tersebut. Saat itu diverifikasi lewat `php artisan test` (306 passed), `chatbot:eval-rag` (tetap 41/0/20/0, F1=1), dan pemanggilan API live ulang untuk CALC-03/CALC-05/BEH-12.
 
 Commit pembekuan evidence Bab IV (revisi nisab BAZNAS, final): `34d89f1fdea044ae92d287a781b5553eac73949d`. Ini adalah commit acuan terbaru untuk skripsi - seluruh angka kalkulasi zakat mal, konfigurasi nisab, dan evidence terkait pada dokumen ini mengikuti kode per commit tersebut.
+
+Catatan revisi UX cakupan kalkulasi (2026-08-05): alur Zakky diperbaiki agar perhitungan mengikuti cakupan pertanyaan pengguna, bukan selalu menampilkan paket penghasilan + tabungan + emas. Jika pengguna hanya menanyakan zakat penghasilan, sistem hanya menampilkan komponen penghasilan. Jika pengguna hanya memberi data tabungan, sistem hanya menampilkan komponen tabungan/emas. Jika model mengirim `savings = 0` atau `gold_gram = 0`, parser tidak lagi memunculkan blok tabungan/emas kosong. Evidence diperbarui lewat CALC-08, CALC-09, dan CALC-10 pada `hasil-pengujian/03-kalkulasi/output-kalkulasi-extended-terbaru.txt` serta regression test `ChatbotSentinelParserTest`; suite penuh valid dengan `php artisan test` = `309 passed`.
 

@@ -6,9 +6,11 @@ $app = require_once __DIR__ . '/../../bootstrap/app.php';
 $app->make(Illuminate\Contracts\Console\Kernel::class)->bootstrap();
 
 use App\Services\Chatbot\ChatbotOrchestrator;
+use App\Services\Chatbot\ChatbotSentinelParser;
 use Illuminate\Support\Str;
 
 $orchestrator = app(ChatbotOrchestrator::class);
+$sentinelParser = app(ChatbotSentinelParser::class);
 
 $cases = [
     'CALC-01' => 'Hitungkan zakat fitrah untuk 4 orang.',
@@ -32,4 +34,30 @@ foreach ($cases as $code => $message) {
     echo "Source: {$response->source}\n";
     echo "Status: {$response->statusCode}\n";
     echo "Respons aktual:\n{$response->reply}\n\n";
+}
+
+$deterministicCases = [
+    'CALC-08' => [
+        'description' => 'Zakat penghasilan saja hanya menampilkan komponen penghasilan.',
+        'sentinel' => '[HITUNG:{"income_monthly":10000000}]',
+    ],
+    'CALC-09' => [
+        'description' => 'Zakat tabungan saja hanya menampilkan komponen tabungan/emas.',
+        'sentinel' => '[HITUNG:{"savings":100000000}]',
+    ],
+    'CALC-10' => [
+        'description' => 'Field tabungan/emas bernilai nol tidak memunculkan komponen tabungan/emas.',
+        'sentinel' => '[HITUNG:{"income_monthly":10000000,"savings":0,"gold_gram":0,"debt":0}]',
+    ],
+];
+
+foreach ($deterministicCases as $code => $case) {
+    $reply = $sentinelParser->parseAndCalculateSentinel($case['sentinel']);
+
+    echo "## {$code}\n";
+    echo "Pertanyaan: {$case['description']}\n";
+    echo "Source: deterministic_sentinel_parser\n";
+    echo "Status: 200\n";
+    echo "Sentinel: {$case['sentinel']}\n";
+    echo "Respons aktual:\n{$reply}\n\n";
 }
