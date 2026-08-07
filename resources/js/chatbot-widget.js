@@ -30,6 +30,20 @@ document.addEventListener('alpine:init', () => {
         sessionId: null,
         messageCount: 0,
         activityInterval: null,
+        width: 400,
+        height: 600,
+        isResizing: false,
+        resizeDir: '',
+        startX: 0,
+        startY: 0,
+        startWidth: 0,
+        startHeight: 0,
+
+        get resizeStyle() {
+            if (this.embedded) return '';
+            if (!window.matchMedia('(min-width: 640px)').matches) return '';
+            return `width: ${this.width}px; height: ${this.height}px; max-height: 85vh;`;
+        },
 
         get isInputEmpty() {
             return this.input.trim() === '';
@@ -205,6 +219,12 @@ document.addEventListener('alpine:init', () => {
         },
 
         init() {
+            if (!this.embedded && window.matchMedia('(min-width: 640px)').matches) {
+                const savedWidth = localStorage.getItem('zakky_chat_width');
+                const savedHeight = localStorage.getItem('zakky_chat_height');
+                if (savedWidth) this.width = parseInt(savedWidth, 10);
+                if (savedHeight) this.height = parseInt(savedHeight, 10);
+            }
             this.checkInactivity();
             this.generateOrLoadSessionId();
             this.loadHistory();
@@ -655,6 +675,69 @@ document.addEventListener('alpine:init', () => {
                 toast.style.opacity = '0';
                 setTimeout(() => toast.remove(), 300);
             }, 2000);
+        },
+
+        startResize(e, direction) {
+            if (this.embedded || !window.matchMedia('(min-width: 640px)').matches) return;
+            
+            this.isResizing = true;
+            this.resizeDir = direction;
+            this.startX = e.clientX;
+            this.startY = e.clientY;
+            this.startWidth = this.width;
+            this.startHeight = this.height;
+
+            this._mouseMoveHandler = (event) => this.doResize(event);
+            this._mouseUpHandler = () => this.stopResize();
+
+            document.addEventListener('mousemove', this._mouseMoveHandler);
+            document.addEventListener('mouseup', this._mouseUpHandler);
+            
+            document.body.style.userSelect = 'none';
+        },
+
+        doResize(e) {
+            if (!this.isResizing) return;
+
+            const deltaX = e.clientX - this.startX;
+            const deltaY = e.clientY - this.startY;
+
+            if (this.resizeDir === 'left' || this.resizeDir === 'top-left') {
+                const newWidth = this.startWidth - deltaX;
+                const maxScreenWidth = window.innerWidth * 0.9;
+                this.width = Math.min(Math.max(newWidth, 380), Math.min(800, maxScreenWidth));
+            }
+
+            if (this.resizeDir === 'top' || this.resizeDir === 'top-left') {
+                const newHeight = this.startHeight - deltaY;
+                const maxScreenHeight = window.innerHeight * 0.85;
+                this.height = Math.min(Math.max(newHeight, 450), Math.min(800, maxScreenHeight));
+            }
+            
+            this.$nextTick(() => this.scrollToBottom(false));
+        },
+
+        stopResize() {
+            if (!this.isResizing) return;
+            this.isResizing = false;
+
+            document.removeEventListener('mousemove', this._mouseMoveHandler);
+            document.removeEventListener('mouseup', this._mouseUpHandler);
+            
+            document.body.style.userSelect = '';
+
+            localStorage.setItem('zakky_chat_width', this.width.toString());
+            localStorage.setItem('zakky_chat_height', this.height.toString());
+        },
+
+        resetResize() {
+            if (this.embedded || !window.matchMedia('(min-width: 640px)').matches) return;
+            
+            this.width = 400;
+            this.height = 600;
+            localStorage.removeItem('zakky_chat_width');
+            localStorage.removeItem('zakky_chat_height');
+            this.$nextTick(() => this.scrollToBottom(false));
         },
     }));
 });

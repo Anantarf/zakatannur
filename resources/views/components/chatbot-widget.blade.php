@@ -145,12 +145,38 @@
         @if($embedded)
             class="flex h-full w-full flex-col overflow-hidden bg-white"
         @else
-            class="absolute bottom-0 right-0 z-50 flex w-[calc(100vw-2rem)] max-w-[400px] origin-bottom-right flex-col overflow-hidden rounded-2xl border border-slate-200/80 bg-white shadow-[0_24px_60px_-20px_rgba(15,23,42,0.25)] ring-1 ring-slate-200/70 sm:w-[400px]"
-            style="height: min(600px, 85vh); max-height: 85vh;"
+            class="absolute bottom-0 right-0 z-50 flex w-[calc(100vw-2rem)] max-w-[400px] sm:max-w-none origin-bottom-right flex-col overflow-hidden rounded-2xl border border-slate-200/80 bg-white shadow-[0_24px_60px_-20px_rgba(15,23,42,0.25)] ring-1 ring-slate-200/70 sm:w-[400px]"
+            :style="resizeStyle || 'height: min(600px, 85vh); max-height: 85vh;'"
         @endif
         role="dialog"
         aria-label="Chat dengan Zakky"
     >
+        @unless($embedded)
+        <!-- Resize Handles (Desktop Only) -->
+        <div class="hidden sm:block">
+            <!-- Top Handle -->
+            <div 
+                class="absolute top-0 left-0 right-0 h-1.5 cursor-ns-resize z-50 hover:bg-brand-500/10 transition-colors"
+                @mousedown.prevent="startResize($event, 'top')"
+                @dblclick="resetResize()"
+                title="Tarik untuk mengubah tinggi (Klik 2x untuk reset)"
+            ></div>
+            <!-- Left Handle -->
+            <div 
+                class="absolute top-0 bottom-0 left-0 w-1.5 cursor-ew-resize z-50 hover:bg-brand-500/10 transition-colors"
+                @mousedown.prevent="startResize($event, 'left')"
+                @dblclick="resetResize()"
+                title="Tarik untuk mengubah lebar (Klik 2x untuk reset)"
+            ></div>
+            <!-- Top-Left Corner Handle -->
+            <div 
+                class="absolute top-0 left-0 w-3 h-3 cursor-nwse-resize z-50 hover:bg-brand-500/20 transition-colors rounded-br"
+                @mousedown.prevent="startResize($event, 'top-left')"
+                @dblclick="resetResize()"
+                title="Tarik untuk mengubah ukuran (Klik 2x untuk reset)"
+            ></div>
+        </div>
+        @endunless
         <div class="z-10 flex items-center justify-between border-b border-slate-200 bg-white px-4 py-3">
             <div class="flex items-center space-x-3 min-w-0 flex-1">
                 <span class="flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-full bg-brand-600 text-white transform-gpu">

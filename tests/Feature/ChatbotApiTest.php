@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Services\Chatbot\ChatbotChatLogger;
 use App\Services\Chatbot\ChatbotOrchestrator;
 use App\Services\Chatbot\ChatbotServiceInterface;
 use App\Services\Chatbot\Providers\OpenAiChatbotProvider;
@@ -1076,15 +1077,11 @@ class ChatbotApiTest extends TestCase
 
     public function test_chatbot_sends_last_eight_conversation_turns_to_provider(): void
     {
+        $turns = [];
         for ($i = 1; $i <= 9; $i++) {
-            AiChatLog::query()->create([
-                'session_id' => 'history-session',
-                'question_md5' => md5('Pertanyaan ' . $i),
-                'question' => 'Pertanyaan ' . $i,
-                'answer' => 'Jawaban ' . $i,
-                'source_type' => 'ai',
-            ]);
+            $turns[] = ['question' => 'Pertanyaan ' . $i, 'answer' => 'Jawaban ' . $i];
         }
+        Cache::put(ChatbotChatLogger::conversationCacheKey('history-session'), $turns);
 
         Http::fake([
             'generativelanguage.googleapis.com/*' => Http::response([
@@ -1105,13 +1102,64 @@ class ChatbotApiTest extends TestCase
         ])->assertOk();
 
         Http::assertSent(function ($request) {
-            $messages = collect($request->data()['messages']);
+            $data = $request->data()['messages'] ?? null;
+            if (!$data) {
+                return false;
+            }
+
+            $messages = collect($data);
             $contents = $messages->pluck('content')->all();
 
             return !in_array('Pertanyaan 1', $contents, true)
                 && in_array('Pertanyaan 2', $contents, true)
                 && in_array('Jawaban 9', $contents, true)
                 && $messages->where('role', 'user')->count() === 9;
+        });
+    }
+
+    public function test_formatted_rupiah_nominal_survives_into_next_turn_context(): void
+    {
+        // Regression for a reported bug: ai_chat_logs redacts formatted nominals (e.g. "Rp7.500.000")
+        // to "[nominal]" before persisting for privacy. history() must not read that redacted copy
+        // back as conversation memory, or the model sees its own past reply as containing a literal
+        // "[nominal]" placeholder and echoes it back to the user on the next turn.
+        Http::fake([
+            'generativelanguage.googleapis.com/*' => Http::response([
+                'choices' => [[ 'message' => [ 'content' => 'Penghasilan Rp7.500.000 sudah di atas nisab.' ] ]],
+            ], 200),
+        ]);
+
+        $this->app->bind(ChatbotServiceInterface::class, fn () => new OpenAiChatbotProvider(
+            'test-key',
+            'gemini-2.5-flash',
+            'https://generativelanguage.googleapis.com/v1beta/openai'
+        ));
+
+        $this->postJson('/api/chatbot/message', [
+            'message' => 'Penghasilan saya Rp7.500.000 per bulan, apakah kena zakat?',
+            'session_id' => 'nominal-session',
+        ])->assertOk();
+
+        // The redacted copy in the audit log should not contain the raw figure.
+        $log = AiChatLog::where('session_id', 'nominal-session')->firstOrFail();
+        $this->assertStringNotContainsString('7.500.000', $log->question);
+
+        $this->postJson('/api/chatbot/message', [
+            'message' => 'ya berapa zakatnya?',
+            'session_id' => 'nominal-session',
+        ])->assertOk();
+
+        Http::assertSent(function ($request) {
+            $messages = $request->data()['messages'] ?? null;
+            if (!$messages) {
+                return false;
+            }
+
+            $contents = collect($messages)->pluck('content')->all();
+
+            return in_array('Penghasilan saya Rp7.500.000 per bulan, apakah kena zakat?', $contents, true)
+                && in_array('Penghasilan Rp7.500.000 sudah di atas nisab.', $contents, true)
+                && !collect($contents)->contains(fn ($c) => str_contains((string) $c, '[nominal]'));
         });
     }
 
