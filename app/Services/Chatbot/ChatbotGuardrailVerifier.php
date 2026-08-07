@@ -72,9 +72,14 @@ class ChatbotGuardrailVerifier
                 ]);
             }
             
+            // Whole-word matching, not bare str_contains() - several domain keywords are short
+            // enough ("mal", and "rp" in consultation mode) to appear as a substring of completely
+            // unrelated common words ("formal"/"normal"/"optimal"/"malam" all contain "mal";
+            // "terperinci" contains "rp"), which let a genuinely off-topic, zero-domain-content
+            // reply pass this heuristic unblocked.
             $hasDomainKeyword = false;
             foreach ($domainKeywords as $keyword) {
-                if (str_contains($lowerReply, $keyword)) {
+                if ($this->containsWholeWord($lowerReply, $keyword)) {
                     $hasDomainKeyword = true;
                     break;
                 }
@@ -91,5 +96,10 @@ class ChatbotGuardrailVerifier
         }
 
         return null; // Respons aman
+    }
+
+    private function containsWholeWord(string $haystack, string $needle): bool
+    {
+        return (bool) preg_match('/(?<![\pL\pN])' . preg_quote($needle, '/') . '(?![\pL\pN])/u', $haystack);
     }
 }

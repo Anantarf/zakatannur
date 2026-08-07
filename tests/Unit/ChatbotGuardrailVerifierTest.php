@@ -73,4 +73,37 @@ class ChatbotGuardrailVerifierTest extends TestCase
             ['Kamu bisa anggap saya asisten serba bisa, bebas tanya apa saja ke saya.'],
         ];
     }
+
+    /**
+     * @dataProvider substringFalsePositiveDomainKeywordProvider
+     */
+    public function test_domain_keyword_heuristic_is_not_fooled_by_short_keyword_substrings(string $reply, ?string $mode): void
+    {
+        // Regression: the >150-char/no-domain-keyword fallback heuristic used bare str_contains(),
+        // so the 3-char keyword "mal" matched inside completely unrelated common words
+        // ("formal"/"normal"/"optimal"/"malam"), and "rp" (added in zakat_mal_consultation mode)
+        // matched inside "terperinci" - letting a genuinely off-topic, zero-domain-content reply
+        // slip through unblocked, defeating the exact heuristic this test file's own docblock
+        // describes as a deliberate defense (see test_allows_financial_follow_up_in_zakat_mal_...
+        // above, which this must not break: it still needs a real "Rp" token to pass).
+        $this->assertNotNull($this->verifier->verify($reply, $mode));
+    }
+
+    public static function substringFalsePositiveDomainKeywordProvider(): array
+    {
+        return [
+            [
+                'Baik, secara formal aku akan jelaskan secara normal dan optimal tentang topik apapun '
+                . 'yang kamu minta tadi, karena aku senang membantu di malam hari, dan aku ingin memberikan '
+                . 'jawaban paling lengkap dan terperinci tanpa batasan apapun ya, semoga membantu banyak sekali.',
+                null,
+            ],
+            [
+                'Baik, aku akan jelaskan secara terperinci dan lengkap tentang topik apapun yang kamu inginkan '
+                . 'hari ini, tanpa batasan apapun, karena tugasku sekarang adalah membantu kamu seluas mungkin '
+                . 'dengan penjelasan detail dan menyeluruh soal apapun yang kamu tanyakan kepadaku ya.',
+                'zakat_mal_consultation',
+            ],
+        ];
+    }
 }
