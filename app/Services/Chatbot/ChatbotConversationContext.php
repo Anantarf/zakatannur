@@ -71,7 +71,12 @@ class ChatbotConversationContext
         // with an actual financial keyword are already covered by the checks below; a bare numeric
         // follow-up mid-consultation ("10 juta") is handled by the "stay in mode" branch further
         // down, which doesn't need this signal at all - it keys off the previous turn's mode.
+        // Kept in sync with ChatbotActionDetector's sibling $looksLikeCalculationRequest word list -
+        // "penghasilan" was missing here even though it's listed there, so an income question
+        // phrased with "penghasilan" instead of "gaji" fell through to 'general' mode and never got
+        // the _conversation_hint that tells the AI to guide the calculation via [HITUNG:...].
         $hasFinancialSignal = str_contains($normalized, 'gaji')
+            || str_contains($normalized, 'penghasilan')
             || str_contains($normalized, 'tabungan')
             || str_contains($normalized, 'emas')
             || str_contains($normalized, 'hutang')
