@@ -14,6 +14,14 @@ Commit pembekuan evidence Bab IV:
 2026-08-03
 docs(thesis): finalize Bab IV testing evidence
 
+Commit pembekuan evidence Bab IV (perbaikan bug chatbot, final):
+d81e219d905d595fbe0c1ee4f0f069548ddea111
+2026-08-07 19:36:06 +0700
+fix(chatbot): use whole-word matching for guardrail domain-keyword heuristic
+
+Tanggal pengujian (revisi perbaikan bug chatbot):
+2026-08-07
+
 Tanggal pengujian:
 2026-08-03 19.16.46 +07:00
 

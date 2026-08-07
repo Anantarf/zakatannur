@@ -334,11 +334,13 @@ Selain 4 command evaluasi di atas (yang butuh API key asli dan bersifat manual/n
 
 **Perbaikan**: menambah guard `$looksLikeCalculationRequest` ([ChatbotActionDetector.php:49](../app/Services/Chatbot/ChatbotActionDetector.php#L49)) — kalau pesan mengandung angka + kata "hitung"/"konsultasi", intent definisi di-skip, pesan dibiarkan lanjut ke jalur AI.
 
-### 10.2 Redaksi privasi tidak merusak kontinuitas percakapan
+### 10.2 Redaksi privasi tidak merusak kontinuitas percakapan — **koreksi lihat Bab 10.19, kesimpulan ini terbukti tidak lengkap**
 
 Kekhawatiran awal: `redactNominals()` mengganti angka di balasan tersimpan dengan `[nominal]` sebelum masuk `ai_chat_logs` — apakah ini membuat LLM "lupa" angka yang baru saja dihitungnya sendiri di giliran berikutnya?
 
-**Hasil investigasi**: tidak masalah dalam praktik. User biasanya menulis angka dalam format bebas ("12 juta", bukan "Rp12.000.000"), yang tidak cocok pola regex redaksi (yang menyasar angka berformat grouping panjang) — sehingga pesan **user** tetap utuh di histori, dan model bisa merekonstruksi konteks dari situ meski balasan **asisten** sebelumnya sudah ter-redaksi.
+**Hasil investigasi (awal, ternyata tidak lengkap)**: tidak masalah dalam praktik. User biasanya menulis angka dalam format bebas ("12 juta", bukan "Rp12.000.000"), yang tidak cocok pola regex redaksi (yang menyasar angka berformat grouping panjang) — sehingga pesan **user** tetap utuh di histori, dan model bisa merekonstruksi konteks dari situ meski balasan **asisten** sebelumnya sudah ter-redaksi.
+
+Investigasi ini tidak menguji kasus user menulis angka dalam **format Rupiah baku dengan titik ribuan** (mis. "Rp7.500.000") — format yang justru sangat umum, dan persis yang dipakai Zakky sendiri di setiap balasannya. Bug nyata yang muncul dari celah ini didokumentasikan di Bab 10.19.
 
 ### 10.3 Kesalahan desain evaluasi (bukan bug produk)
 
@@ -532,6 +534,92 @@ Dua bug ini saling menutupi: karena field yang salah (`source_label`) dipakai, b
 **Akar masalah**: cek digit polos ini sebenarnya redundan — pasangan kata kunci finansial eksplisit (`gaji`, `tabungan`, `emas`, `hutang`, `pengeluaran`, `aset`) sudah cukup menangkap kasus sah ("gaji 10 juta" tetap match lewat kata "gaji"), dan follow-up angka polos di tengah konsultasi ("50 juta" tanpa kata kunci) sudah ditangani terpisah oleh logika "stay in mode" yang mengandalkan mode giliran sebelumnya, bukan `$hasFinancialSignal`.
 
 **Perbaikan** ([ChatbotConversationContext.php](../app/Services/Chatbot/ChatbotConversationContext.php)): hapus klausa `preg_match('/\d/', ...)`, sisakan kata kunci finansial eksplisit saja. Diverifikasi lewat `tinker`: ketiga pesan adversarial di atas sekarang resolve ke `general`; kasus sah ("gaji 10 juta", "tabungan...hutang...") tetap `zakat_mal_consultation`; follow-up angka polos mid-konsultasi ("50 juta", "tidak ada hutang") tetap bertahan di mode lewat logika stay-in-mode yang independen dari perubahan ini. Regresi penuh tetap bersih: `php artisan test` 258/258 (di titik ini, sebelum penambahan fitur observability Bab 13).
+
+### 10.19 Bug: redaksi privasi (`ChatbotChatLogger`) membocorkan placeholder `[nominal]` ke konteks AI — koreksi atas Bab 10.2
+
+**Gejala**: dilaporkan langsung dari chat nyata — user bertanya *"Penghasilan saya Rp7.500.000 per bulan. Apakah sudah mencapai nisab zakat penghasilan dan berapa zakat yang harus saya bayar?"*, dijawab penjelasan generik nisab/haul (lihat Bab 10.20 untuk sebab jawaban generik itu sendiri). Giliran kedua, user menjawab *"ya berapa"* — balasan Zakky malah menyebut literal **"Rp[nominal]"** dan meminta user menyebutkan ulang nominalnya, seolah `[nominal]` adalah placeholder yang belum terisi.
+
+**Akar masalah**: `ChatbotChatLogger::redactNominals()` ([ChatbotChatLogger.php](../app/Services/Chatbot/ChatbotChatLogger.php)) memakai regex `/\d[\d.,]{5,}\d|\b\d{6,}\b/` untuk mengganti angka berformat grouping panjang dengan `[nominal]` sebelum disimpan ke `ai_chat_logs` — tujuannya privasi jangka panjang. Regex ini cocok dengan **"Rp7.500.000"**, format Rupiah baku bertitik ribuan yang justru dipakai Zakky sendiri di setiap balasannya (lihat Bab 10.10). `ChatbotChatLogger::history()` kemudian membaca ulang **teks yang sudah ter-redaksi ini langsung dari `ai_chat_logs`** untuk dijadikan riwayat percakapan yang dikirim balik ke LLM di giliran berikutnya (`OpenAiChatbotProvider::buildMessagesArray()`). LLM pun melihat literal `"Rp[nominal]"` sebagai bagian dari histori percakapannya sendiri, dan membalasnya seolah itu adalah placeholder yang belum diisi.
+
+**Kenapa investigasi Bab 10.2 meleset**: kesimpulan awal ("user biasanya menulis angka bebas, bukan format Rupiah") tidak menguji kasus format Rupiah baku secara eksplisit — asumsi yang keliru untuk format yang justru sangat lazim ditulis user saat menyebut nominal gaji/tabungan.
+
+**Perbaikan** ([ChatbotChatLogger.php](../app/Services/Chatbot/ChatbotChatLogger.php)): memisahkan dua kebutuhan yang sebelumnya digabung di satu tempat penyimpanan. `ai_chat_logs` (DB permanen, dipakai untuk audit/analitik) **tetap** ter-redaksi seperti semula — tujuan privasinya (jangan simpan angka finansial jamaah dalam bentuk plain text jangka panjang) tetap valid dan dipertahankan. Ditambahkan cache terpisah berumur pendek (session-scoped, TTL 30 menit, key `chatbot:conversation:{session_id}`) yang menyimpan teks **asli tanpa redaksi** — dipakai khusus untuk membangun ulang konteks percakapan ke LLM. `history()` sekarang membaca dari cache ini, bukan dari kolom `ai_chat_logs` yang ter-redaksi.
+
+**Verifikasi**: test regresi baru `test_formatted_rupiah_nominal_survives_into_next_turn_context` ([ChatbotApiTest.php](../tests/Feature/ChatbotApiTest.php)) mereproduksi persis skenario yang dilaporkan (dua giliran, "Rp7.500.000" di giliran pertama) dan memastikan riwayat yang dikirim ke provider AI di giliran kedua memuat angka asli, bukan `[nominal]`, sementara salinan di `ai_chat_logs` tetap ter-redaksi. Regresi penuh tetap bersih.
+
+**Pembelajaran metodologis**: kesimpulan "tidak masalah dalam praktik" di Bab 10.2 ditulis berdasarkan asumsi soal kebiasaan format penulisan user, bukan pengujian eksplisit terhadap format yang justru dipakai sistem sendiri di balasannya — kesalahan yang sama persis kelasnya dengan Bab 10.10 (asumsi soal format input LLM, dibuktikan salah lewat pengujian langsung, bukan penalaran).
+
+### 10.20 5 kasus pembajakan lanjutan di `ChatbotActionDetector` lolos dari audit sistematis Bab 10.15
+
+**Konteks**: Bab 10.15 mengklaim audit sistematis atas seluruh fungsi `intent()` menutup 11 kasus pembajakan. Laporan bug Bab 10.19 di atas memicu pemeriksaan ulang cabang `ask_zakat_mal_nishab` — dan menemukan bahwa cabang itu (serta 4 cabang lain) **tidak pernah** diberi guard `!$looksLikeCalculationRequest` yang sudah dipasang di cabang-cabang tetangganya sejak Bab 10.13, kemungkinan karena ditambahkan pada titik kode yang berbeda dan tidak ikut disisir saat guard itu disebarkan. Audit lanjutan proaktif ke sisa fungsi (bukan cuma titik yang dilaporkan) menemukan 2 kasus tambahan lagi dengan pola yang sama.
+
+**5 kasus pembajakan ditemukan dan diperbaiki** ([ChatbotActionDetector.php](../app/Services/Chatbot/ChatbotActionDetector.php)):
+
+| Pesan | Salah dibajak ke (sebelum) | Sekarang |
+|---|---|---|
+| "Penghasilan saya Rp8.000.000 per bulan. Apakah sudah mencapai nisab...?" | `ask_zakat_mal_nishab` (definisi generik) | lolos ke AI |
+| "Gaji saya 8 juta, tanggungan 3 jiwa, hitung zakat mal saya berapa?" | `calculate_fitrah_case` (dari "jiwa"+hitung+angka) | lolos ke AI |
+| "Saya batal puasa 3 hari..., gaji 8 juta hitung zakat mal saya gimana?" | `calculate_fidyah_case` (dari "puasa"+hitung+angka) | lolos ke AI |
+| "Kasih contoh hitungan zakat mal untuk gaji saya 8 juta dong" | `ask_zakat_mal_example` (contoh generik) | lolos ke AI |
+| "Panen saya 500 kg beras, hitungkan zakatnya berapa kg" / "Saya punya beras 800 kg..., berapa zakat yang harus dikeluarkan?" | `ask_total_rice` (total beras se-masjid) | lolos ke AI |
+| "Kapan sebaiknya saya bayar zakat mal saya, gaji saya 8 juta?" | `ask_payment_info` (dari substring "bayar zakat" di dalam "bayar zakat **mal**") | lolos ke AI |
+| "Totalnya gaji saya 8 juta..., kena zakat gak?" (setelah sesi sempat bertopik data publik) | `publicDataFollowUpIntent()` — duplikat tak terjaga dari `ask_total_summary`/`ask_latest_update` | lolos ke AI |
+
+**Perbaikan per cabang**:
+- `ask_zakat_mal_nishab` ([ChatbotActionDetector.php:87](../app/Services/Chatbot/ChatbotActionDetector.php#L87)): ditambah guard `!$looksLikeCalculationRequest`, pola identik dengan `ask_zakat_mal_definition`.
+- `calculate_fitrah_case`/`calculate_fidyah_case` ([ChatbotActionDetector.php:65-71](../app/Services/Chatbot/ChatbotActionDetector.php#L65-L71)): **tidak** dijaga oleh `$looksLikeCalculationRequest` biasa (kata "hitung" + angka juga cara paling wajar menulis permintaan fitrah/fidyah yang sah — men-guard dengan itu akan mematikan fitur yang benar). Ditambah variabel baru `$hasZakatMalSignal` ([ChatbotActionDetector.php:32](../app/Services/Chatbot/ChatbotActionDetector.php#L32)) — subset lebih sempit yang cuma memeriksa kata sinyal zakat-mal (`gaji`/`tabungan`/`penghasilan`/`emas`/`hutang`/`aset`) tanpa "hitung"/"konsultasi" — supaya "hitung fitrah saya 4 orang" (sah) tetap lolos sementara "gaji 8 juta ... hitung zakat mal" (salah topik) tertahan.
+- `ask_zakat_mal_example` ([ChatbotActionDetector.php:79](../app/Services/Chatbot/ChatbotActionDetector.php#L79)): ditambah guard `!$looksLikeCalculationRequest`, pola identik dengan `ask_zakat_mal_definition` tepat di bawahnya — cabang ini terlewat saat guard itu ditambahkan meski secara struktur bersebelahan.
+- `ask_total_rice` ([ChatbotActionDetector.php:145](../app/Services/Chatbot/ChatbotActionDetector.php#L145)): ditambah guard `!$looksLikeCalculationRequest`, dan pasangan kata dipersempit — "berapa"/"kg" (generik, bukan penanda agregat) dihapus, disisakan "total"/"terkumpul"/"jumlah" saja, mengikuti pola yang sudah dipakai `ask_total_money`/`ask_total_summary`.
+- `ask_payment_info` ([ChatbotActionDetector.php:185](../app/Services/Chatbot/ChatbotActionDetector.php#L185)): ditambah guard `!$looksLikeCalculationRequest` — frasa "bayar zakat" (sudah dipersempit dari kata tunggal sejak Bab 10.15) ternyata masih jadi substring dari frasa alami "bayar zakat **mal**".
+- `publicDataFollowUpIntent()` ([ChatbotActionDetector.php:202](../app/Services/Chatbot/ChatbotActionDetector.php#L202)): pemanggilannya digerbang tambahan `&& !$looksLikeCalculationRequest` — method ini adalah versi follow-up dari `ask_total_summary`/`ask_latest_update` yang aktif kalau topik giliran sebelumnya `public_data`, tapi tidak pernah ikut dijaga guard yang sama seperti versi aslinya, sehingga sesi yang pernah bertopik data publik jadi rentan membajak pertanyaan kalkulasi berikutnya.
+
+**Verifikasi**: 5 test method baru (13 kasus data-provider) di `ChatbotActionDetectorTest.php` memastikan seluruh pesan di tabel di atas resolve ke `null` (lolos ke AI). Regresi penuh tetap bersih: `php artisan test` 326/326 (lihat Bab 10.23 untuk hitungan final pasca seluruh perbaikan hari ini).
+
+**Pembelajaran metodologis**: mengonfirmasi ulang catatan Bab 10.15 sendiri — audit "sistematis" tetap punya batas dan bukan jaminan tuntas. 5 kasus di atas ditemukan lewat kombinasi laporan pengguna nyata (memicu pemeriksaan ulang satu cabang) diikuti audit proaktif ke cabang lain dengan pola serupa — bukan lewat metode yang berbeda dari Bab 10.15, tapi bukti bahwa metode yang sama perlu diulang berkala, bukan dianggap selesai setelah satu putaran.
+
+### 10.21 Bug: `ChatbotConversationContext` kehilangan sinyal "penghasilan", tidak konsisten dengan `ChatbotActionDetector`
+
+**Gejala**: ditemukan lewat audit lanjutan (bukan laporan terpisah) setelah Bab 10.20 — pertanyaan *"Penghasilan saya 8 juta, kena zakat gak?"* lolos dari pembajakan `ChatbotActionDetector` (benar, sampai ke AI) tapi `ChatbotConversationContext::detectMode()` salah meresolvenya ke mode `general`, bukan `zakat_mal_consultation`. Dibuktikan lewat perbandingan langsung: pesan yang secara makna identik, *"Gaji saya 8 juta, kena zakat gak?"*, resolve dengan benar ke `zakat_mal_consultation`.
+
+**Dampak**: begitu mode salah terdeteksi sebagai `general`, `applyConversationHint()` tidak menyuntikkan instruksi konsultasi terpandu ke system prompt — LLM tidak diberi tahu untuk merangkum data, menanyakan data yang kurang, dan mengeluarkan `[HITUNG:...]`. Kemungkinan besar ini kontributor utama gejala awal yang dilaporkan user (Bab 10.19): jawaban generik nisab/haul, bukan alur konsultasi yang mengarah ke perhitungan.
+
+**Akar masalah**: `$hasFinancialSignal` di `detectMode()` ([ChatbotConversationContext.php](../app/Services/Chatbot/ChatbotConversationContext.php)) berisi `gaji`, `tabungan`, `emas`, `hutang`, `pengeluaran`, `aset` — daftar kata kunci yang seharusnya sinkron dengan `$looksLikeCalculationRequest`/`$hasZakatMalSignal` di `ChatbotActionDetector` (dua file yang secara desain memakai "universe kata sinyal finansial" yang sama, ditegaskan eksplisit di Bab 10.13 poin 2) — tapi "penghasilan" ada di daftar `ChatbotActionDetector`, tidak pernah ditambahkan ke daftar `ChatbotConversationContext`.
+
+**Perbaikan** ([ChatbotConversationContext.php](../app/Services/Chatbot/ChatbotConversationContext.php)): menambahkan `penghasilan` ke `$hasFinancialSignal`, menyamakan kembali kedua daftar.
+
+**Verifikasi**: test regresi baru `test_penghasilan_keyword_triggers_the_mode_same_as_gaji` memastikan kedua frasa ("penghasilan" dan "gaji") resolve ke mode yang sama. Regresi penuh tetap bersih.
+
+**Pembelajaran metodologis**: dua daftar kata kunci yang dimaksudkan identik tapi didefinisikan terpisah di dua file berbeda adalah sumber drift yang mudah luput — satu file diperbarui (Bab 10.13), satunya tidak, tanpa mekanisme apa pun yang memberi tahu bahwa keduanya seharusnya tetap sinkron.
+
+### 10.22 Bug: guardrail (Lapisan 2) lolos oleh kata pendek "mal"/"rp" sebagai substring kata umum
+
+**Gejala**: ditemukan lewat audit lanjutan terhadap `ChatbotGuardrailVerifier` (bukan laporan produksi) — heuristik fallback "balasan >150 karakter tanpa kata kunci domain zakat = kemungkinan LLM melantur/jailbreak" ([ChatbotGuardrailVerifier.php](../app/Services/Chatbot/ChatbotGuardrailVerifier.php)) memakai `str_contains()` polos, bukan pencocokan kata utuh. Dibuktikan lewat balasan buatan yang sengaja 100% di luar topik zakat (tidak menyebut satu pun kata domain sungguhan): balasan yang memuat kata "formal"/"normal"/"optimal"/"malam" **lolos tanpa diblokir** karena semuanya mengandung substring "mal" (salah satu kata kunci domain), dan balasan yang memuat "terperinci" lolos di mode `zakat_mal_consultation` karena mengandung substring "rp" (kata kunci domain khusus mode itu).
+
+**Akar masalah**: kata kunci domain di daftar `$domainKeywords` dicek dengan `str_contains($lowerReply, $keyword)` — cocok kalau muncul di **mana pun** dalam teks, termasuk sebagai potongan kata lain. "mal" (3 huruf) dan "rp" (2 huruf) cukup pendek untuk muncul sebagai substring berbagai kata umum bahasa Indonesia/Inggris sehari-hari yang tidak ada hubungannya dengan zakat.
+
+**Perbaikan** ([ChatbotGuardrailVerifier.php](../app/Services/Chatbot/ChatbotGuardrailVerifier.php)): menambahkan method `containsWholeWord()` — pola yang sama persis dengan yang sudah dipakai `KnowledgeRetriever::containsWholeWord()` — dan menggantikan `str_contains()` di pengecekan `$domainKeywords` dengan pencocokan kata utuh ini.
+
+**Verifikasi**: 2 test regresi baru (`test_domain_keyword_heuristic_is_not_fooled_by_short_keyword_substrings`) memastikan balasan buatan tanpa konten domain sungguhan tetap terblokir walau memuat kata-kata yang mengandung "mal"/"rp" sebagai substring. Test lama yang memverifikasi balasan sah dengan "Rp1.000.000" (memakai kata kunci lain, "penghasilan", untuk lolos) tetap hijau — perbaikan ini tidak menyempitkan cakupan untuk balasan yang memang sah. Regresi penuh tetap bersih.
+
+**Catatan soal Bab 11 poin 1**: ini adalah celah yang **berbeda** dari keterbatasan "parafrase melewati guardrail" yang sudah didokumentasikan di Bab 11 poin 1 — celah itu soal balasan yang memang tidak memakai kata terlarang apa pun (batasan desain yang disengaja, bukan bug), sementara celah ini soal heuristik yang seharusnya menangkap kasus itu (tidak ada kata domain sama sekali) tapi gagal karena kesalahan pencocokan string, bukan keterbatasan desain.
+
+### 10.23 Verifikasi akhir: audit sistematis + evaluasi perilaku nyata pasca-perbaikan Bab 10.19-10.22
+
+**Konteks**: setelah 4 bug di atas diperbaiki (Bab 10.19-10.22, ditambah 5 kasus pembajakan Bab 10.20 dihitung sebagai satu kelompok), dilakukan dua lapis verifikasi sebelum menganggap sesi perbaikan ini selesai: (1) audit manual manual seluruh file `app/Services/Chatbot/` yang tersisa (16 file) untuk pola bug serupa, dan (2) evaluasi perilaku end-to-end dengan API key asli, bukan cuma test unit/feature.
+
+**Audit manual seluruh direktori chatbot**: `ChatbotSentinelParser`, `ChatbotZakatMalGuide`, `ChatbotCalculatorService`, `ChatbotPublicDataResponder`, `ChatbotSafetyClassifier`, `ChatbotStreamParser`, `ChatbotSentimentDetector`, `ChatbotLanguageDetector`, dan `getSystemInstruction()` dibaca penuh — tidak ditemukan bug baru yang clear-cut (bukti input→output salah yang konkret) di luar 9 yang sudah didokumentasikan. Dua catatan berseverity rendah (bukan bug, batasan desain): `ChatbotSentimentDetector` memakai `str_contains` biasa untuk kata penanda nada (frustrasi/bingung) tanpa whole-word matching, tapi dampaknya cuma ke nada balasan, bukan rute/isi jawaban; `ChatbotLanguageDetector` punya potensi salah deteksi bahasa untuk pesan sangat pendek yang memakai "no" sebagai singkatan "nomor" — trade-off inheren classifier rasio-kata pendek, menghapusnya akan merusak deteksi balasan Inggris singkat yang genuine.
+
+**Evaluasi perilaku nyata (2026-08-07, API key asli, dijalankan manual sesuai Bab 11 poin 6)**:
+
+| Command | Hasil |
+|---|---|
+| `chatbot:eval-behavior` | **19/19 skenario lolos** (100%) |
+| `chatbot:eval-rag` | **Precision 1,0 / Recall 1,0 / F1 1,0** — 41 kasus positif semua menemukan topik tepat, 20 kasus out-of-scope semua kosong sesuai harapan |
+| `chatbot:eval-safety` | Akurasi tier "confident" (satu-satunya tier yang benar-benar memblokir balasan) **1,0** pada threshold 0,66 — threshold sweep independen mengonfirmasi ulang titik 0,66 sebagai titik 0% false-positive `in_domain`, sama persis dengan `CONFIDENT_THRESHOLD` yang sudah dipakai kode (Bab 20.2) |
+
+Ketiga hasil ini konsisten dengan yang sudah didokumentasikan sebelumnya (tidak ada regresi dari perbaikan Bab 10.19-10.22) dan menjadi bukti tambahan bahwa perbaikan hari ini tidak mengorbankan cakupan retrieval atau perilaku multi-turn yang sudah tervalidasi.
+
+**Regresi test suite penuh**: `php artisan test` **326/326** (naik dari 258/258 di titik Bab 10.18 — selisih 68 test mencakup seluruh sesi Bab 13-18 di antaranya, plus 17 test baru dari Bab 10.19-10.22: 13 dari `ChatbotActionDetectorTest`, 1 dari `ChatbotConversationContextTest`, 1 dari `ChatbotApiTest`, 2 dari `ChatbotGuardrailVerifierTest`).
 
 ---
 

@@ -22,7 +22,7 @@ dan file mana yang boleh dilewati (bukti mentah/pendukung/superseded).
 | File | Kenapa penting |
 |---|---|
 | `pemetaan-304-test-ke-kf.md` | **Baca ini.** Memetakan test otomatis ke KF-01–KF-09, ini bukti fungsional utama. |
-| `php-artisan-test-final.txt` | Output lengkap `php artisan test` (309 passed). |
+| `php-artisan-test-final.txt` | Output lengkap `php artisan test` (326 passed, per 2026-08-07 - lihat catatan perbaikan di bawah). |
 | `npm-run-test-e2e-final-pass-11.txt` | Output E2E publik (Playwright). |
 
 Boleh dilewati: `*-exit-code.txt` (isinya cuma angka `0`), `php-artisan-test-list.txt` (daftar mentah semua nama test), `npm-run-build-final.txt` (log build, bukan hasil uji).
@@ -73,6 +73,21 @@ Boleh dilewati: `respons-aktual-keamanan-terbaru.txt` dan `.json` — versi anta
 | `pengukuran-performa-berulang.json` | Data mentah tiap pengulangan (buat siapa yang mau cek angka individual). |
 
 Boleh dilewati: `pengukuran-performa-terbaru.txt` — draft sebelum data final `-berulang.*`. `performance-runner.php` — script generator.
+
+## Catatan perbaikan (2026-08-07)
+
+9 bug chatbot ditemukan dan diperbaiki (`ChatbotChatLogger`, `ChatbotActionDetector` x5,
+`ChatbotConversationContext`, `ChatbotGuardrailVerifier`) - dipicu laporan pengguna nyata,
+diikuti audit manual menyeluruh seluruh `app/Services/Chatbot/`. Detail lengkap tiap bug:
+`docs/chatbot-dokumentasi-skripsi.md` bagian 10.19-10.23. Ringkasan dampak ke evidence:
+`RINGKASAN_HASIL_VALID_BAB_IV.md` bagian "Catatan revisi (perbaikan bug chatbot, 2026-08-07)".
+
+Evidence yang diregenerasi ulang pasca-perbaikan: `01-fungsional/php-artisan-test-final.txt`
+dan `php-artisan-test-list.txt` (326 passed, naik dari 309), `pemetaan-304-test-ke-kf.md`
+(jumlah bukti KF-02/04/06 disesuaikan), `02-retrieval/chatbot-eval-rag-mysql.txt` dan
+`hasil-eval-rag-terbaru.txt`, `04-kualitas-jawaban/chatbot-eval-behavior-mysql.txt`, dan
+`05-keamanan/chatbot-eval-safety.txt` - semua angka retrieval/perilaku/keamanan tetap identik
+dengan sebelum perbaikan (tidak ada regresi), jadi ini penyegaran bukti, bukan perubahan hasil.
 
 ## Catatan perbaikan (2026-08-05)
 

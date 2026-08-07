@@ -1,409 +1,426 @@
 Warning: TTY mode is not supported on Windows platform.
 
-  [30;42;1m PASS [39;49;22m[39m Tests\Unit\AutocompleteServiceTest[39m
-  [32;1m✓[39;22m[39m [2mget autocomplete data returns unique pembayar names[22m[39m
-  [32;1m✓[39;22m[39m [2mget autocomplete data with no types returns all[22m[39m
+   PASS  Tests\Unit\AutocompleteServiceTest
+  ✓ [2mget autocomplete data returns unique pembayar names[22m
+  ✓ [2mget autocomplete data with no types returns all[22m
 
-  [30;42;1m PASS [39;49;22m[39m Tests\Unit\ChatbotActionDetectorTest[39m
-  [32;1m✓[39;22m[39m [2mpersonal calculation requests are not hijacked into public data intents[22m[39m
-  [32;1m✓[39;22m[39m [2mpersonal calculation requests are not hijacked into public data intents with data set #1[22m[39m
-  [32;1m✓[39;22m[39m [2mpersonal calculation requests are not hijacked into public data intents with data set #2[22m[39m
-  [32;1m✓[39;22m[39m [2mpersonal calculation requests are not hijacked into public data intents with data set #3[22m[39m
-  [32;1m✓[39;22m[39m [2mgenuine aggregate total questions still resolve to public data intents[22m[39m
-  [32;1m✓[39;22m[39m [2munrelated questions are not hijacked by bare generic words[22m[39m
-  [32;1m✓[39;22m[39m [2munrelated questions are not hijacked by bare generic words with data set #1[22m[39m
-  [32;1m✓[39;22m[39m [2munrelated questions are not hijacked by other generic anchor words[22m[39m
-  [32;1m✓[39;22m[39m [2munrelated questions are not hijacked by other generic anchor words with data set #1[22m[39m
-  [32;1m✓[39;22m[39m [2munrelated questions are not hijacked by other generic anchor words with data set #2[22m[39m
-  [32;1m✓[39;22m[39m [2munrelated questions are not hijacked by other generic anchor words with data set #3[22m[39m
-  [32;1m✓[39;22m[39m [2munrelated questions are not hijacked by other generic anchor words with data set #4[22m[39m
-  [32;1m✓[39;22m[39m [2munrelated questions are not hijacked by other generic anchor words with data set #5[22m[39m
-  [32;1m✓[39;22m[39m [2munrelated questions are not hijacked by other generic anchor words with data set #6[22m[39m
-  [32;1m✓[39;22m[39m [2munrelated questions are not hijacked by other generic anchor words with data set #7[22m[39m
-  [32;1m✓[39;22m[39m [2munrelated questions are not hijacked by other generic anchor words with data set #8[22m[39m
-  [32;1m✓[39;22m[39m [2munrelated questions are not hijacked by other generic anchor words with data set #9[22m[39m
-  [32;1m✓[39;22m[39m [2munrelated questions are not hijacked by other generic anchor words with data set #10[22m[39m
-  [32;1m✓[39;22m[39m [2mnarrowed intents still resolve for their genuine phrasing[22m[39m
+   PASS  Tests\Unit\ChatbotActionDetectorTest
+  ✓ [2mpersonal calculation requests are not hijacked into public data intents[22m
+  ✓ [2mpersonal calculation requests are not hijacked into public data intents with data set #1[22m
+  ✓ [2mpersonal calculation requests are not hijacked into public data intents with data set #2[22m
+  ✓ [2mpersonal calculation requests are not hijacked into public data intents with data set #3[22m
+  ✓ [2mzakat mal requests are not hijacked into the wrong calculator or a canned example[22m
+  ✓ [2mzakat mal requests are not hijacked into the wrong calculator or a canned example with data set #1[22m
+  ✓ [2mzakat mal requests are not hijacked into the wrong calculator or a canned example with data set #2[22m
+  ✓ [2mzakat mal requests are not hijacked into the wrong calculator or a canned example with data set #3[22m
+  ✓ [2mpersonal rice harvest questions are not hijacked into mosque rice total[22m
+  ✓ [2mpersonal rice harvest questions are not hijacked into mosque rice total with data set #1[22m
+  ✓ [2mzakat mal calculation requests are not hijacked into payment info[22m
+  ✓ [2mzakat mal calculation requests are not hijacked into payment info with data set #1[22m
+  ✓ [2mcalculation requests are not hijacked by public data follow up when prior topic was public data[22m
+  ✓ [2mcalculation requests are not hijacked by public data follow up when prior topic was public data with data set #1[22m
+  ✓ [2mcalculation requests are not hijacked by public data follow up when prior topic was public data with data set #2[22m
+  ✓ [2mpersonal calculation requests are not hijacked into nishab definition[22m
+  ✓ [2mpersonal calculation requests are not hijacked into nishab definition with data set #1[22m
+  ✓ [2mgenuine aggregate total questions still resolve to public data intents[22m
+  ✓ [2munrelated questions are not hijacked by bare generic words[22m
+  ✓ [2munrelated questions are not hijacked by bare generic words with data set #1[22m
+  ✓ [2munrelated questions are not hijacked by other generic anchor words[22m
+  ✓ [2munrelated questions are not hijacked by other generic anchor words with data set #1[22m
+  ✓ [2munrelated questions are not hijacked by other generic anchor words with data set #2[22m
+  ✓ [2munrelated questions are not hijacked by other generic anchor words with data set #3[22m
+  ✓ [2munrelated questions are not hijacked by other generic anchor words with data set #4[22m
+  ✓ [2munrelated questions are not hijacked by other generic anchor words with data set #5[22m
+  ✓ [2munrelated questions are not hijacked by other generic anchor words with data set #6[22m
+  ✓ [2munrelated questions are not hijacked by other generic anchor words with data set #7[22m
+  ✓ [2munrelated questions are not hijacked by other generic anchor words with data set #8[22m
+  ✓ [2munrelated questions are not hijacked by other generic anchor words with data set #9[22m
+  ✓ [2munrelated questions are not hijacked by other generic anchor words with data set #10[22m
+  ✓ [2mnarrowed intents still resolve for their genuine phrasing[22m
 
-  [30;42;1m PASS [39;49;22m[39m Tests\Unit\ChatbotBehaviorDatasetTest[39m
-  [32;1m✓[39;22m[39m [2mcorrection scenario accepts real model phrasings with data set "explicit ganti + negated old value"[22m[39m
-  [32;1m✓[39;22m[39m [2mcorrection scenario accepts real model phrasings with data set "no acknowledgment keyword, full-digit new value"[22m[39m
-  [32;1m✓[39;22m[39m [2mcorrection scenario rejects a reply that keeps the old value[22m[39m
+   PASS  Tests\Unit\ChatbotBehaviorDatasetTest
+  ✓ [2mcorrection scenario accepts real model phrasings with data set "explicit ganti + negated old value"[22m
+  ✓ [2mcorrection scenario accepts real model phrasings with data set "no acknowledgment keyword, full-digit new value"[22m
+  ✓ [2mcorrection scenario rejects a reply that keeps the old value[22m
 
-  [30;42;1m PASS [39;49;22m[39m Tests\Unit\ChatbotCalculatorServiceTest[39m
-  [32;1m✓[39;22m[39m [2mcalculates fitrah for digit near keyword[22m[39m
-  [32;1m✓[39;22m[39m [2mcalculates fitrah for word number near keyword[22m[39m
-  [32;1m✓[39;22m[39m [2mcalculates fidyah for digit near keyword[22m[39m
-  [32;1m✓[39;22m[39m [2mfitrah does not grab an unrelated number like a year[22m[39m
-  [32;1m✓[39;22m[39m [2mfidyah does not grab an unrelated year number[22m[39m
-  [32;1m✓[39;22m[39m [2masks for clarification when no number present[22m[39m
+   PASS  Tests\Unit\ChatbotCalculatorServiceTest
+  ✓ [2mcalculates fitrah for digit near keyword[22m
+  ✓ [2mcalculates fitrah for word number near keyword[22m
+  ✓ [2mcalculates fidyah for digit near keyword[22m
+  ✓ [2mfitrah does not grab an unrelated number like a year[22m
+  ✓ [2mfidyah does not grab an unrelated year number[22m
+  ✓ [2masks for clarification when no number present[22m
 
-  [30;42;1m PASS [39;49;22m[39m Tests\Unit\ChatbotCitationTest[39m
-  [32;1m✓[39;22m[39m [2mfrom knowledge array reads source label not label[22m[39m
-  [32;1m✓[39;22m[39m [2mfrom knowledge array falls back when source label missing[22m[39m
-  [32;1m✓[39;22m[39m [2mto array shape matches what the frontend reads[22m[39m
+   PASS  Tests\Unit\ChatbotCitationTest
+  ✓ [2mfrom knowledge array reads source label not label[22m
+  ✓ [2mfrom knowledge array falls back when source label missing[22m
+  ✓ [2mto array shape matches what the frontend reads[22m
 
-  [30;42;1m PASS [39;49;22m[39m Tests\Unit\ChatbotConversationContextTest[39m
-  [32;1m✓[39;22m[39m [2mbare digits do not trigger zakat mal consultation mode[22m[39m
-  [32;1m✓[39;22m[39m [2mbare digits do not trigger zakat mal consultation mode with data set #1[22m[39m
-  [32;1m✓[39;22m[39m [2mbare digits do not trigger zakat mal consultation mode with data set #2[22m[39m
-  [32;1m✓[39;22m[39m [2mexplicit financial keywords still trigger the mode[22m[39m
-  [32;1m✓[39;22m[39m [2mbare numeric follow up stays in mode once already consulting[22m[39m
+   PASS  Tests\Unit\ChatbotConversationContextTest
+  ✓ [2mbare digits do not trigger zakat mal consultation mode[22m
+  ✓ [2mbare digits do not trigger zakat mal consultation mode with data set #1[22m
+  ✓ [2mbare digits do not trigger zakat mal consultation mode with data set #2[22m
+  ✓ [2mexplicit financial keywords still trigger the mode[22m
+  ✓ [2mpenghasilan keyword triggers the mode same as gaji[22m
+  ✓ [2mbare numeric follow up stays in mode once already consulting[22m
 
-  [30;42;1m PASS [39;49;22m[39m Tests\Unit\ChatbotGuardrailVerifierTest[39m
-  [32;1m✓[39;22m[39m [2mblocks explicit off topic keywords[22m[39m
-  [32;1m✓[39;22m[39m [2mblocks explicit off topic keywords with data set #1[22m[39m
-  [32;1m✓[39;22m[39m [2mblocks explicit off topic keywords with data set #2[22m[39m
-  [32;1m✓[39;22m[39m [2mblocks explicit off topic keywords with data set #3[22m[39m
-  [32;1m✓[39;22m[39m [2mallows financial follow up in zakat mal consultation mode[22m[39m
-  [32;1m✓[39;22m[39m [2mstill blocks explicit off topic keywords in zakat mal consultation mode[22m[39m
-  [32;1m✓[39;22m[39m [2mknown limitation paraphrased off topic content is not caught[22m[39m
-  [32;1m✓[39;22m[39m [2mknown limitation paraphrased off topic content is not caught with data set #1[22m[39m
+   PASS  Tests\Unit\ChatbotGuardrailVerifierTest
+  ✓ [2mblocks explicit off topic keywords[22m
+  ✓ [2mblocks explicit off topic keywords with data set #1[22m
+  ✓ [2mblocks explicit off topic keywords with data set #2[22m
+  ✓ [2mblocks explicit off topic keywords with data set #3[22m
+  ✓ [2mallows financial follow up in zakat mal consultation mode[22m
+  ✓ [2mstill blocks explicit off topic keywords in zakat mal consultation mode[22m
+  ✓ [2mknown limitation paraphrased off topic content is not caught[22m
+  ✓ [2mknown limitation paraphrased off topic content is not caught with data set #1[22m
+  ✓ [2mdomain keyword heuristic is not fooled by short keyword substrings[22m
+  ✓ [2mdomain keyword heuristic is not fooled by short keyword substrings with data set #1[22m
 
-  [30;42;1m PASS [39;49;22m[39m Tests\Unit\ChatbotResponseTest[39m
-  [32;1m✓[39;22m[39m [2mactions passed to constructor are not silently discarded[22m[39m
-  [32;1m✓[39;22m[39m [2mcitations serialize with the label key the frontend reads[22m[39m
+   PASS  Tests\Unit\ChatbotResponseTest
+  ✓ [2mactions passed to constructor are not silently discarded[22m
+  ✓ [2mcitations serialize with the label key the frontend reads[22m
 
-  [30;42;1m PASS [39;49;22m[39m Tests\Unit\ChatbotSafetyClassifierTest[39m
-  [32;1m✓[39;22m[39m [2mclassify vector picks nearest reference by cosine similarity[22m[39m
-  [32;1m✓[39;22m[39m [2mconfidence tiers match documented thresholds[22m[39m
-  [32;1m✓[39;22m[39m [2mclassify vector returns null for empty reference set[22m[39m
-  [32;1m✓[39;22m[39m [2mclassify vector resolves in domain category at index zero[22m[39m
+   PASS  Tests\Unit\ChatbotSafetyClassifierTest
+  ✓ [2mclassify vector picks nearest reference by cosine similarity[22m
+  ✓ [2mconfidence tiers match documented thresholds[22m
+  ✓ [2mclassify vector returns null for empty reference set[22m
+  ✓ [2mclassify vector resolves in domain category at index zero[22m
 
-  [30;42;1m PASS [39;49;22m[39m Tests\Unit\ChatbotSentimentDetectorTest[39m
-  [32;1m✓[39;22m[39m [2meveryday question words do not trigger frustrated sentiment[22m[39m
-  [32;1m✓[39;22m[39m [2meveryday question words do not trigger frustrated sentiment with data set #1[22m[39m
-  [32;1m✓[39;22m[39m [2meveryday question words do not trigger frustrated sentiment with data set #2[22m[39m
-  [32;1m✓[39;22m[39m [2meveryday question words do not trigger frustrated sentiment with data set #3[22m[39m
-  [32;1m✓[39;22m[39m [2mgenuine frustration still detected[22m[39m
-  [32;1m✓[39;22m[39m [2mcommon words containing correction substrings do not false positive[22m[39m
-  [32;1m✓[39;22m[39m [2mcommon words containing correction substrings do not false positive with data set #1[22m[39m
-  [32;1m✓[39;22m[39m [2mcommon words containing correction substrings do not false positive with data set #2[22m[39m
-  [32;1m✓[39;22m[39m [2mgenuine number corrections are still detected[22m[39m
-  [32;1m✓[39;22m[39m [2mgenuine number corrections are still detected with data set #1[22m[39m
-  [32;1m✓[39;22m[39m [2mgenuine number corrections are still detected with data set #2[22m[39m
+   PASS  Tests\Unit\ChatbotSentimentDetectorTest
+  ✓ [2meveryday question words do not trigger frustrated sentiment[22m
+  ✓ [2meveryday question words do not trigger frustrated sentiment with data set #1[22m
+  ✓ [2meveryday question words do not trigger frustrated sentiment with data set #2[22m
+  ✓ [2meveryday question words do not trigger frustrated sentiment with data set #3[22m
+  ✓ [2mgenuine frustration still detected[22m
+  ✓ [2mcommon words containing correction substrings do not false positive[22m
+  ✓ [2mcommon words containing correction substrings do not false positive with data set #1[22m
+  ✓ [2mcommon words containing correction substrings do not false positive with data set #2[22m
+  ✓ [2mgenuine number corrections are still detected[22m
+  ✓ [2mgenuine number corrections are still detected with data set #1[22m
+  ✓ [2mgenuine number corrections are still detected with data set #2[22m
 
-  [30;42;1m PASS [39;49;22m[39m Tests\Unit\ChatbotSentinelParserTest[39m
-  [32;1m✓[39;22m[39m [2msingle hitung tag is replaced with computed result[22m[39m
-  [32;1m✓[39;22m[39m [2mmultiple hitung tags are each replaced not just the first[22m[39m
-  [32;1m✓[39;22m[39m [2mincome only hitung renders income section without wealth section[22m[39m
-  [32;1m✓[39;22m[39m [2mincome with zero wealth values still hides wealth section[22m[39m
-  [32;1m✓[39;22m[39m [2mdebt alone asks for more data instead of a misleading wealth section[22m[39m
-  [32;1m✓[39;22m[39m [2mrupiah formatted string value is rejected instead of silently truncated[22m[39m
+   PASS  Tests\Unit\ChatbotSentinelParserTest
+  ✓ [2msingle hitung tag is replaced with computed result[22m
+  ✓ [2mmultiple hitung tags are each replaced not just the first[22m
+  ✓ [2mincome only hitung renders income section without wealth section[22m
+  ✓ [2mincome with zero wealth values still hides wealth section[22m
+  ✓ [2mdebt alone asks for more data instead of a misleading wealth section[22m
+  ✓ [2mrupiah formatted string value is rejected instead of silently truncated[22m
 
-  [30;42;1m PASS [39;49;22m[39m Tests\Unit\ChatbotStreamParserTest[39m
-  [32;1m✓[39;22m[39m [2mplain text streams through as sentences[22m[39m
-  [32;1m✓[39;22m[39m [2msuggest sentinel is swallowed even when split across chunks[22m[39m
-  [32;1m✓[39;22m[39m [2mguardrail violation stops streaming[22m[39m
-  [32;1m✓[39;22m[39m [2mstream allows financial follow up in consultation mode[22m[39m
+   PASS  Tests\Unit\ChatbotStreamParserTest
+  ✓ [2mplain text streams through as sentences[22m
+  ✓ [2msuggest sentinel is swallowed even when split across chunks[22m
+  ✓ [2mguardrail violation stops streaming[22m
+  ✓ [2mstream allows financial follow up in consultation mode[22m
 
-  [30;42;1m PASS [39;49;22m[39m Tests\Unit\DuplicateTransactionDetectorTest[39m
-  [32;1m✓[39;22m[39m [2mno other transactions returns zero score[22m[39m
-  [32;1m✓[39;22m[39m [2mexact duplicate within window scores 60[22m[39m
-  [32;1m✓[39;22m[39m [2mtransfer duplicate candidate scores 50[22m[39m
-  [32;1m✓[39;22m[39m [2msame payer name and amount different beneficiary scores 35[22m[39m
-  [32;1m✓[39;22m[39m [2mdifferent tahun zakat not flagged[22m[39m
-  [32;1m✓[39;22m[39m [2mdifferent category not flagged[22m[39m
-  [32;1m✓[39;22m[39m [2mtransaction outside 30 min window not flagged[22m[39m
-  [32;1m✓[39;22m[39m [2mdifferent payer name not flagged[22m[39m
-  [32;1m✓[39;22m[39m [2mdifferent amount not flagged[22m[39m
-  [32;1m✓[39;22m[39m [2msame transaction group excluded[22m[39m
-  [32;1m✓[39;22m[39m [2mberas duplicate uses kg comparison[22m[39m
-  [32;1m✓[39;22m[39m [2mpayer match same beneficiary when phone differs[22m[39m
-  [32;1m✓[39;22m[39m [2mexact duplicate takes priority when both phone empty[22m[39m
-  [32;1m✓[39;22m[39m [2mpayer match same beneficiary skips when names differ[22m[39m
-  [32;1m✓[39;22m[39m [2mpayer name comparison is case insensitive[22m[39m
+   PASS  Tests\Unit\DuplicateTransactionDetectorTest
+  ✓ [2mno other transactions returns zero score[22m
+  ✓ [2mexact duplicate within window scores 60[22m
+  ✓ [2mtransfer duplicate candidate scores 50[22m
+  ✓ [2msame payer name and amount different beneficiary scores 35[22m
+  ✓ [2mdifferent tahun zakat not flagged[22m
+  ✓ [2mdifferent category not flagged[22m
+  ✓ [2mtransaction outside 30 min window not flagged[22m
+  ✓ [2mdifferent payer name not flagged[22m
+  ✓ [2mdifferent amount not flagged[22m
+  ✓ [2msame transaction group excluded[22m
+  ✓ [2mberas duplicate uses kg comparison[22m
+  ✓ [2mpayer match same beneficiary when phone differs[22m
+  ✓ [2mexact duplicate takes priority when both phone empty[22m
+  ✓ [2mpayer match same beneficiary skips when names differ[22m
+  ✓ [2mpayer name comparison is case insensitive[22m
 
-  [30;42;1m PASS [39;49;22m[39m Tests\Unit\ExampleTest[39m
-  [32;1m✓[39;22m[39m [2mthat true is true[22m[39m
+   PASS  Tests\Unit\ExampleTest
+  ✓ [2mthat true is true[22m
 
-  [30;42;1m PASS [39;49;22m[39m Tests\Unit\MigrationPolicyTest[39m
-  [32;1m✓[39;22m[39m [2mmigrations do not hide empty rollbacks[22m[39m
+   PASS  Tests\Unit\MigrationPolicyTest
+  ✓ [2mmigrations do not hide empty rollbacks[22m
 
-  [30;42;1m PASS [39;49;22m[39m Tests\Unit\TransactionAnomalyDetectorTest[39m
-  [32;1m✓[39;22m[39m [2mno context returns zero score[22m[39m
-  [32;1m✓[39;22m[39m [2mrestored after delete adds correct score[22m[39m
-  [32;1m✓[39;22m[39m [2mupdated after receipt printed adds 30[22m[39m
-  [32;1m✓[39;22m[39m [2msignificant nominal change adds 35 with money reason[22m[39m
-  [32;1m✓[39;22m[39m [2msignificant beras change uses kg in reason[22m[39m
-  [32;1m✓[39;22m[39m [2mmultiple flags accumulate score[22m[39m
-  [32;1m✓[39;22m[39m [2mberas transaction skipped for outlier check[22m[39m
-  [32;1m✓[39;22m[39m [2moutlier not flagged when sample below minimum[22m[39m
-  [32;1m✓[39;22m[39m [2mstatistical outlier flagged when nominal exceeds 5x average[22m[39m
-  [32;1m✓[39;22m[39m [2mnominal within 5x average not flagged[22m[39m
+   PASS  Tests\Unit\TransactionAnomalyDetectorTest
+  ✓ [2mno context returns zero score[22m
+  ✓ [2mrestored after delete adds correct score[22m
+  ✓ [2mupdated after receipt printed adds 30[22m
+  ✓ [2msignificant nominal change adds 35 with money reason[22m
+  ✓ [2msignificant beras change uses kg in reason[22m
+  ✓ [2mmultiple flags accumulate score[22m
+  ✓ [2mberas transaction skipped for outlier check[22m
+  ✓ [2moutlier not flagged when sample below minimum[22m
+  ✓ [2mstatistical outlier flagged when nominal exceeds 5x average[22m
+  ✓ [2mnominal within 5x average not flagged[22m
 
-  [30;42;1m PASS [39;49;22m[39m Tests\Unit\TransactionRiskAnalyzerTest[39m
-  [32;1m✓[39;22m[39m [2mzero score returns level normal[22m[39m
-  [32;1m✓[39;22m[39m [2mscore 19 stays normal[22m[39m
-  [32;1m✓[39;22m[39m [2mscore 20 becomes warning[22m[39m
-  [32;1m✓[39;22m[39m [2mscores from both detectors are summed[22m[39m
-  [32;1m✓[39;22m[39m [2mflags from both detectors are merged and deduplicated[22m[39m
-  [32;1m✓[39;22m[39m [2mreasons from both detectors are deduplicated[22m[39m
-  [32;1m✓[39;22m[39m [2mduplicate candidates come from dup detector[22m[39m
-  [32;1m✓[39;22m[39m [2mresult always contains expected keys[22m[39m
+   PASS  Tests\Unit\TransactionRiskAnalyzerTest
+  ✓ [2mzero score returns level normal[22m
+  ✓ [2mscore 19 stays normal[22m
+  ✓ [2mscore 20 becomes warning[22m
+  ✓ [2mscores from both detectors are summed[22m
+  ✓ [2mflags from both detectors are merged and deduplicated[22m
+  ✓ [2mreasons from both detectors are deduplicated[22m
+  ✓ [2mduplicate candidates come from dup detector[22m
+  ✓ [2mresult always contains expected keys[22m
 
-  [30;42;1m PASS [39;49;22m[39m Tests\Feature\AuditLogTest[39m
-  [32;1m✓[39;22m[39m [2maudit log search uses existing columns[22m[39m
-  [32;1m✓[39;22m[39m [2mtrashing transaction writes audit log[22m[39m
-  [32;1m✓[39;22m[39m [2mstart new period writes audit log[22m[39m
-  [32;1m✓[39;22m[39m [2mtemplate upload and activation write audit logs[22m[39m
-  [32;1m✓[39;22m[39m [2muser create writes audit log[22m[39m
-  [32;1m✓[39;22m[39m [2mupdating risk review status writes audit log when status changes[22m[39m
-  [32;1m✓[39;22m[39m [2mfirst receipt print writes audit log[22m[39m
-  [32;1m✓[39;22m[39m [2madmin update after receipt print writes audit log[22m[39m
-  [32;1m✓[39;22m[39m [2maction label and color class are resolved consistently[22m[39m
+   PASS  Tests\Feature\AuditLogTest
+  ✓ [2maudit log search uses existing columns[22m
+  ✓ [2mtrashing transaction writes audit log[22m
+  ✓ [2mstart new period writes audit log[22m
+  ✓ [2mtemplate upload and activation write audit logs[22m
+  ✓ [2muser create writes audit log[22m
+  ✓ [2mupdating risk review status writes audit log when status changes[22m
+  ✓ [2mfirst receipt print writes audit log[22m
+  ✓ [2madmin update after receipt print writes audit log[22m
+  ✓ [2maction label and color class are resolved consistently[22m
 
-  [30;42;1m PASS [39;49;22m[39m Tests\Feature\Auth\AuthenticationTest[39m
-  [32;1m✓[39;22m[39m [2mlogin screen can be rendered[22m[39m
-  [32;1m✓[39;22m[39m [2musers can authenticate using the login screen[22m[39m
-  [32;1m✓[39;22m[39m [2musers can not authenticate with invalid password[22m[39m
+   PASS  Tests\Feature\Auth\AuthenticationTest
+  ✓ [2mlogin screen can be rendered[22m
+  ✓ [2musers can authenticate using the login screen[22m
+  ✓ [2musers can not authenticate with invalid password[22m
 
-  [30;42;1m PASS [39;49;22m[39m Tests\Feature\Auth\PasswordConfirmationTest[39m
-  [32;1m✓[39;22m[39m [2mconfirm password screen can be rendered[22m[39m
-  [32;1m✓[39;22m[39m [2mpassword can be confirmed[22m[39m
-  [32;1m✓[39;22m[39m [2mpassword is not confirmed with invalid password[22m[39m
+   PASS  Tests\Feature\Auth\PasswordConfirmationTest
+  ✓ [2mconfirm password screen can be rendered[22m
+  ✓ [2mpassword can be confirmed[22m
+  ✓ [2mpassword is not confirmed with invalid password[22m
 
-  [30;42;1m PASS [39;49;22m[39m Tests\Feature\Auth\PasswordUpdateTest[39m
-  [32;1m✓[39;22m[39m [2mpassword can be updated[22m[39m
-  [32;1m✓[39;22m[39m [2mcorrect password must be provided to update password[22m[39m
+   PASS  Tests\Feature\Auth\PasswordUpdateTest
+  ✓ [2mpassword can be updated[22m
+  ✓ [2mcorrect password must be provided to update password[22m
 
-  [30;42;1m PASS [39;49;22m[39m Tests\Feature\Auth\RegistrationTest[39m
-  [32;1m✓[39;22m[39m [2mregistration screen is not available[22m[39m
-  [32;1m✓[39;22m[39m [2mnew users cannot register[22m[39m
+   PASS  Tests\Feature\Auth\RegistrationTest
+  ✓ [2mregistration screen is not available[22m
+  ✓ [2mnew users cannot register[22m
 
-  [30;42;1m PASS [39;49;22m[39m Tests\Feature\ChatbotApiTest[39m
-  [32;1m✓[39;22m[39m [2mchatbot returns success payload[22m[39m
-  [32;1m✓[39;22m[39m [2mchatbot does not expose internal exception messages[22m[39m
-  [32;1m✓[39;22m[39m [2mchatbot returns gemini reply when provider responds ok[22m[39m
-  [32;1m✓[39;22m[39m [2mchatbot returns 503 when gemini model missing[22m[39m
-  [32;1m✓[39;22m[39m [2mchatbot returns 503 with quota message when gemini rate limited[22m[39m
-  [32;1m✓[39;22m[39m [2mchatbot returns 503 when gemini returns 500[22m[39m
-  [32;1m✓[39;22m[39m [2mchatbot falls back to mock when no provider key[22m[39m
-  [32;1m✓[39;22m[39m [2mchatbot answers summary request without opening tab[22m[39m
-  [32;1m✓[39;22m[39m [2mchatbot answers chart request without opening tab[22m[39m
-  [32;1m✓[39;22m[39m [2mchatbot answers payment from knowledge[22m[39m
-  [32;1m✓[39;22m[39m [2mchatbot answers nisab from nisab knowledge entry[22m[39m
-  [32;1m✓[39;22m[39m [2mchatbot capability question is not hijacked by total summary[22m[39m
-  [32;1m✓[39;22m[39m [2mopenai provider routes fast default and premium models[22m[39m
-  [32;1m✓[39;22m[39m [2mchatbot logs openai token usage and estimated cost[22m[39m
-  [32;1m✓[39;22m[39m [2mchatbot bills cached prompt tokens at the discounted rate[22m[39m
-  [32;1m✓[39;22m[39m [2mchatbot answers total from public data[22m[39m
-  [32;1m✓[39;22m[39m [2mchatbot uses public data context for follow up question[22m[39m
-  [32;1m✓[39;22m[39m [2mchatbot answers rice total from public data[22m[39m
-  [32;1m✓[39;22m[39m [2mchatbot answers people total from public data[22m[39m
-  [32;1m✓[39;22m[39m [2mchatbot answers categories and top category[22m[39m
-  [32;1m✓[39;22m[39m [2mchatbot answers latest update and empty data[22m[39m
-  [32;1m✓[39;22m[39m [2mchatbot computes zakat mal from hitung sentinel and shows inputs used[22m[39m
-  [32;1m✓[39;22m[39m [2mchatbot rejects implausible hitung amount instead of computing[22m[39m
-  [32;1m✓[39;22m[39m [2mchatbot asks for more data instead of computing from debt alone[22m[39m
-  [32;1m✓[39;22m[39m [2mchatbot stream blocks off topic reply before yielding the violating sentence[22m[39m
-  [32;1m✓[39;22m[39m [2mchatbot guardrail does not block legitimate zakat saham reply[22m[39m
-  [32;1m✓[39;22m[39m [2mchatbot guardrail still catches off topic content hidden alongside hitung sentinel[22m[39m
-  [32;1m✓[39;22m[39m [2mchatbot sends correction hint even when no knowledge context matches[22m[39m
-  [32;1m✓[39;22m[39m [2mzakat mal consultation mode is sent to provider and returned as context[22m[39m
-  [32;1m✓[39;22m[39m [2mai reply citations do not leak internal conversation hints[22m[39m
-  [32;1m✓[39;22m[39m [2mai reply citations use the label key the frontend reads[22m[39m
-  [32;1m✓[39;22m[39m [2msystem prompt instructs confirming intent before collecting financial data[22m[39m
-  [32;1m✓[39;22m[39m [2msystem prompt instructs clarifying bruto when user states net salary[22m[39m
-  [32;1m✓[39;22m[39m [2msystem prompt forbids self calculating advanced zakat mal topics[22m[39m
-  [32;1m✓[39;22m[39m [2mhard rule is present in both language prompts with data set "never self-calculate"[22m[39m
-  [32;1m✓[39;22m[39m [2mhard rule is present in both language prompts with data set "hitung json schema"[22m[39m
-  [32;1m✓[39;22m[39m [2mhard rule is present in both language prompts with data set "confirm intent before collecting data"[22m[39m
-  [32;1m✓[39;22m[39m [2mhard rule is present in both language prompts with data set "income-only calculation stays income-only"[22m[39m
-  [32;1m✓[39;22m[39m [2mhard rule is present in both language prompts with data set "bruto clarification for net salary"[22m[39m
-  [32;1m✓[39;22m[39m [2mhard rule is present in both language prompts with data set "advanced topics not covered by sentinel"[22m[39m
-  [32;1m✓[39;22m[39m [2mhard rule is present in both language prompts with data set "no self-invented UI tags"[22m[39m
-  [32;1m✓[39;22m[39m [2mhard rule is present in both language prompts with data set "stop calculating if already paid"[22m[39m
-  [32;1m✓[39;22m[39m [2mhard rule is present in both language prompts with data set "assume gross when user does not say net or gross"[22m[39m
-  [32;1m✓[39;22m[39m [2mhard rule is present in both language prompts with data set "recalculate immediately on single-variable follow-up"[22m[39m
-  [32;1m✓[39;22m[39m [2mhard rule is present in both language prompts with data set "assume haul satisfied when never raised by the user"[22m[39m
-  [32;1m✓[39;22m[39m [2mhard rule is present in both language prompts with data set "fallback gives practical next step"[22m[39m
-  [32;1m✓[39;22m[39m [2mhard rule is present in both language prompts with data set "post-result closure includes practical next step"[22m[39m
-  [32;1m✓[39;22m[39m [2mhard rule is present in both language prompts with data set "refuse role override and instruction leak attempts"[22m[39m
-  [32;1m✓[39;22m[39m [2mhard rule is present in both language prompts with data set "no authority over payment status or user data"[22m[39m
-  [32;1m✓[39;22m[39m [2mswitching topic mid consultation leaves zakat mal consultation mode[22m[39m
-  [32;1m✓[39;22m[39m [2mchatbot sends last eight conversation turns to provider[22m[39m
-  [32;1m✓[39;22m[39m [2mchatbot guardrail blocks off topic reply[22m[39m
-  [32;1m✓[39;22m[39m [2msentinel parser rejection is logged with layer tag[22m[39m
-  [32;1m✓[39;22m[39m [2morchestrator exception is logged with layer tag[22m[39m
-  [32;1m✓[39;22m[39m [2mai conversation reply is not hijacked by quick response keyword match[22m[39m
-  [32;1m✓[39;22m[39m [2msuggest tags are stripped instead of becoming quick replies[22m[39m
+   PASS  Tests\Feature\ChatbotApiTest
+  ✓ [2mchatbot returns success payload[22m
+  ✓ [2mchatbot does not expose internal exception messages[22m
+  ✓ [2mchatbot returns gemini reply when provider responds ok[22m
+  ✓ [2mchatbot returns 503 when gemini model missing[22m
+  ✓ [2mchatbot returns 503 with quota message when gemini rate limited[22m
+  ✓ [2mchatbot returns 503 when gemini returns 500[22m
+  ✓ [2mchatbot falls back to mock when no provider key[22m
+  ✓ [2mchatbot answers summary request without opening tab[22m
+  ✓ [2mchatbot answers chart request without opening tab[22m
+  ✓ [2mchatbot answers payment from knowledge[22m
+  ✓ [2mchatbot answers nisab from nisab knowledge entry[22m
+  ✓ [2mchatbot capability question is not hijacked by total summary[22m
+  ✓ [2mopenai provider routes fast default and premium models[22m
+  ✓ [2mchatbot logs openai token usage and estimated cost[22m
+  ✓ [2mchatbot bills cached prompt tokens at the discounted rate[22m
+  ✓ [2mchatbot answers total from public data[22m
+  ✓ [2mchatbot uses public data context for follow up question[22m
+  ✓ [2mchatbot answers rice total from public data[22m
+  ✓ [2mchatbot answers people total from public data[22m
+  ✓ [2mchatbot answers categories and top category[22m
+  ✓ [2mchatbot answers latest update and empty data[22m
+  ✓ [2mchatbot computes zakat mal from hitung sentinel and shows inputs used[22m
+  ✓ [2mchatbot rejects implausible hitung amount instead of computing[22m
+  ✓ [2mchatbot asks for more data instead of computing from debt alone[22m
+  ✓ [2mchatbot stream blocks off topic reply before yielding the violating sentence[22m
+  ✓ [2mchatbot guardrail does not block legitimate zakat saham reply[22m
+  ✓ [2mchatbot guardrail still catches off topic content hidden alongside hitung sentinel[22m
+  ✓ [2mchatbot sends correction hint even when no knowledge context matches[22m
+  ✓ [2mzakat mal consultation mode is sent to provider and returned as context[22m
+  ✓ [2mai reply citations do not leak internal conversation hints[22m
+  ✓ [2mai reply citations use the label key the frontend reads[22m
+  ✓ [2msystem prompt instructs confirming intent before collecting financial data[22m
+  ✓ [2msystem prompt instructs clarifying bruto when user states net salary[22m
+  ✓ [2msystem prompt forbids self calculating advanced zakat mal topics[22m
+  ✓ [2mhard rule is present in both language prompts with data set "never self-calculate"[22m
+  ✓ [2mhard rule is present in both language prompts with data set "hitung json schema"[22m
+  ✓ [2mhard rule is present in both language prompts with data set "confirm intent before collecting data"[22m
+  ✓ [2mhard rule is present in both language prompts with data set "income-only calculation stays income-only"[22m
+  ✓ [2mhard rule is present in both language prompts with data set "bruto clarification for net salary"[22m
+  ✓ [2mhard rule is present in both language prompts with data set "advanced topics not covered by sentinel"[22m
+  ✓ [2mhard rule is present in both language prompts with data set "no self-invented UI tags"[22m
+  ✓ [2mhard rule is present in both language prompts with data set "stop calculating if already paid"[22m
+  ✓ [2mhard rule is present in both language prompts with data set "assume gross when user does not say net or gross"[22m
+  ✓ [2mhard rule is present in both language prompts with data set "recalculate immediately on single-variable follow-up"[22m
+  ✓ [2mhard rule is present in both language prompts with data set "assume haul satisfied when never raised by the user"[22m
+  ✓ [2mhard rule is present in both language prompts with data set "fallback gives practical next step"[22m
+  ✓ [2mhard rule is present in both language prompts with data set "post-result closure includes practical next step"[22m
+  ✓ [2mhard rule is present in both language prompts with data set "refuse role override and instruction leak attempts"[22m
+  ✓ [2mhard rule is present in both language prompts with data set "no authority over payment status or user data"[22m
+  ✓ [2mswitching topic mid consultation leaves zakat mal consultation mode[22m
+  ✓ [2mchatbot sends last eight conversation turns to provider[22m
+  ✓ [2mformatted rupiah nominal survives into next turn context[22m
+  ✓ [2mchatbot guardrail blocks off topic reply[22m
+  ✓ [2msentinel parser rejection is logged with layer tag[22m
+  ✓ [2morchestrator exception is logged with layer tag[22m
+  ✓ [2mai conversation reply is not hijacked by quick response keyword match[22m
+  ✓ [2msuggest tags are stripped instead of becoming quick replies[22m
 
-  [30;42;1m PASS [39;49;22m[39m Tests\Feature\ChatbotDiagnosticsSummaryTest[39m
-  [32;1m✓[39;22m[39m [2msummary reports a logged layer event[22m[39m
+   PASS  Tests\Feature\ChatbotDiagnosticsSummaryTest
+  ✓ [2msummary reports a logged layer event[22m
 
-  [30;42;1m PASS [39;49;22m[39m Tests\Feature\ChatbotKnowledgeRetrievalEvalTest[39m
-  [32;1m✓[39;22m[39m [2mkeyword fallback routes canonical questions to the expected topic[22m[39m
-  [32;1m✓[39;22m[39m [2mkeyword fallback does not match out of scope questions[22m[39m
+   PASS  Tests\Feature\ChatbotKnowledgeRetrievalEvalTest
+  ✓ [2mkeyword fallback routes canonical questions to the expected topic[22m
+  ✓ [2mkeyword fallback does not match out of scope questions[22m
 
-  [30;42;1m PASS [39;49;22m[39m Tests\Feature\DashboardTest[39m
-  [32;1m✓[39;22m[39m [2mstaff can view dashboard and latest transactions[22m[39m
-  [32;1m✓[39;22m[39m [2mdashboard year filter changes latest transactions[22m[39m
-  [32;1m✓[39;22m[39m [2mdashboard chart uses admin setting even when year filter changes table[22m[39m
-  [32;1m✓[39;22m[39m [2mdashboard rekap can filter same year by zakat period[22m[39m
-  [32;1m✓[39;22m[39m [2mdashboard chart cache is separated per period[22m[39m
-  [32;1m✓[39;22m[39m [2mdashboard shows fallback note when last completed period is unavailable[22m[39m
-  [32;1m✓[39;22m[39m [2mdashboard last completed mode prefers finished period over active one[22m[39m
+   PASS  Tests\Feature\DashboardTest
+  ✓ [2mstaff can view dashboard and latest transactions[22m
+  ✓ [2mdashboard year filter changes latest transactions[22m
+  ✓ [2mdashboard chart uses admin setting even when year filter changes table[22m
+  ✓ [2mdashboard rekap can filter same year by zakat period[22m
+  ✓ [2mdashboard chart cache is separated per period[22m
+  ✓ [2mdashboard shows fallback note when last completed period is unavailable[22m
+  ✓ [2mdashboard last completed mode prefers finished period over active one[22m
 
-  [30;42;1m PASS [39;49;22m[39m Tests\Feature\EnterpriseFeatureTest[39m
-  [32;1m✓[39;22m[39m [2mhealth endpoint returns ok[22m[39m
-  [32;1m✓[39;22m[39m [2mhealth endpoint requires no auth[22m[39m
-  [32;1m✓[39;22m[39m [2midle timeout logs out inactive user[22m[39m
-  [32;1m✓[39;22m[39m [2midle timeout keeps active user logged in[22m[39m
-  [32;1m✓[39;22m[39m [2mtwo factor middleware redirects when 2fa enabled but not passed[22m[39m
-  [32;1m✓[39;22m[39m [2mtwo factor middleware passes when session flag set[22m[39m
-  [32;1m✓[39;22m[39m [2mtwo factor middleware passes when 2fa not enabled[22m[39m
-  [32;1m✓[39;22m[39m [2mtwo factor profile page accessible[22m[39m
+   PASS  Tests\Feature\EnterpriseFeatureTest
+  ✓ [2mhealth endpoint returns ok[22m
+  ✓ [2mhealth endpoint requires no auth[22m
+  ✓ [2midle timeout logs out inactive user[22m
+  ✓ [2midle timeout keeps active user logged in[22m
+  ✓ [2mtwo factor middleware redirects when 2fa enabled but not passed[22m
+  ✓ [2mtwo factor middleware passes when session flag set[22m
+  ✓ [2mtwo factor middleware passes when 2fa not enabled[22m
+  ✓ [2mtwo factor profile page accessible[22m
 
-  [30;42;1m PASS [39;49;22m[39m Tests\Feature\ExampleTest[39m
-  [32;1m✓[39;22m[39m [2mthe application returns a successful response[22m[39m
+   PASS  Tests\Feature\ExampleTest
+  ✓ [2mthe application returns a successful response[22m
 
-  [30;42;1m PASS [39;49;22m[39m Tests\Feature\ExportCompatibilityTest[39m
-  [32;1m✓[39;22m[39m [2madmin can export daily rekap file[22m[39m
-  [32;1m✓[39;22m[39m [2madmin can export yearly rekap file[22m[39m
+   PASS  Tests\Feature\ExportCompatibilityTest
+  ✓ [2madmin can export daily rekap file[22m
+  ✓ [2madmin can export yearly rekap file[22m
 
-  [30;42;1m PASS [39;49;22m[39m Tests\Feature\InternalTransactionTest[39m
-  [32;1m✓[39;22m[39m [2minternal create requires auth[22m[39m
-  [32;1m✓[39;22m[39m [2minternal create forbidden for unallowed role[22m[39m
-  [32;1m✓[39;22m[39m [2mstaff can create transaction and get no transaksi[22m[39m
-  [32;1m✓[39;22m[39m [2mbatch transaction persists transfer flag[22m[39m
-  [32;1m✓[39;22m[39m [2mfitrah beras auto calculates beras from jiwa[22m[39m
-  [32;1m✓[39;22m[39m [2mmal requires nominal for non beras method[22m[39m
-  [32;1m✓[39;22m[39m [2mfitrah requires defaults or nominal for non beras method[22m[39m
-  [32;1m✓[39;22m[39m [2mtransaction rejects non active year[22m[39m
-  [32;1m✓[39;22m[39m [2mtransaction uses active zakat period snapshot[22m[39m
-  [32;1m✓[39;22m[39m [2mfitrah cash custom nominal is allowed and marked khusus[22m[39m
-  [32;1m✓[39;22m[39m [2mfitrah beras custom quantity is allowed and marked khusus[22m[39m
-  [32;1m✓[39;22m[39m [2mcreating transaction restores soft deleted muzakki instead of creating duplicate[22m[39m
-  [32;1m✓[39;22m[39m [2mcreating transaction with empty phone does not reuse existing muzakki with same name[22m[39m
-  [32;1m✓[39;22m[39m [2madmin can update historical transaction without requiring active year[22m[39m
-  [32;1m✓[39;22m[39m [2mupdate rejects item ids from other transaction groups[22m[39m
-  [32;1m✓[39;22m[39m [2mstaff cannot update transaction after receipt is printed[22m[39m
-  [32;1m✓[39;22m[39m [2madmin can update transaction after receipt is printed[22m[39m
+   PASS  Tests\Feature\InternalTransactionTest
+  ✓ [2minternal create requires auth[22m
+  ✓ [2minternal create forbidden for unallowed role[22m
+  ✓ [2mstaff can create transaction and get no transaksi[22m
+  ✓ [2mbatch transaction persists transfer flag[22m
+  ✓ [2mfitrah beras auto calculates beras from jiwa[22m
+  ✓ [2mmal requires nominal for non beras method[22m
+  ✓ [2mfitrah requires defaults or nominal for non beras method[22m
+  ✓ [2mtransaction rejects non active year[22m
+  ✓ [2mtransaction uses active zakat period snapshot[22m
+  ✓ [2mfitrah cash custom nominal is allowed and marked khusus[22m
+  ✓ [2mfitrah beras custom quantity is allowed and marked khusus[22m
+  ✓ [2mcreating transaction restores soft deleted muzakki instead of creating duplicate[22m
+  ✓ [2mcreating transaction with empty phone does not reuse existing muzakki with same name[22m
+  ✓ [2madmin can update historical transaction without requiring active year[22m
+  ✓ [2mupdate rejects item ids from other transaction groups[22m
+  ✓ [2mstaff cannot update transaction after receipt is printed[22m
+  ✓ [2madmin can update transaction after receipt is printed[22m
 
-  [30;42;1m PASS [39;49;22m[39m Tests\Feature\KnowledgeBaseSeederSmokeTest[39m
-  [32;1m✓[39;22m[39m [2mseeder runs and produces expected merged entries[22m[39m
+   PASS  Tests\Feature\KnowledgeBaseSeederSmokeTest
+  ✓ [2mseeder runs and produces expected merged entries[22m
 
-  [30;42;1m PASS [39;49;22m[39m Tests\Feature\MuzakkiCrudTest[39m
-  [32;1m✓[39;22m[39m [2mmuzakki pages require auth[22m[39m
-  [32;1m✓[39;22m[39m [2munallowed role cannot access muzakki[22m[39m
-  [32;1m✓[39;22m[39m [2mstaff can update search and soft delete muzakki[22m[39m
-  [32;1m✓[39;22m[39m [2mstaff can view muzakki crm profile[22m[39m
-  [32;1m✓[39;22m[39m [2madmin can merge duplicate muzakki safely[22m[39m
-  [32;1m✓[39;22m[39m [2mstaff cannot merge duplicate muzakki[22m[39m
+   PASS  Tests\Feature\MuzakkiCrudTest
+  ✓ [2mmuzakki pages require auth[22m
+  ✓ [2munallowed role cannot access muzakki[22m
+  ✓ [2mstaff can update search and soft delete muzakki[22m
+  ✓ [2mstaff can view muzakki crm profile[22m
+  ✓ [2madmin can merge duplicate muzakki safely[22m
+  ✓ [2mstaff cannot merge duplicate muzakki[22m
 
-  [30;42;1m PASS [39;49;22m[39m Tests\Feature\PeriodSettingsTest[39m
-  [32;1m✓[39;22m[39m [2mperiod settings requires auth[22m[39m
-  [32;1m✓[39;22m[39m [2mperiod settings forbidden for staff[22m[39m
-  [32;1m✓[39;22m[39m [2msuper admin can view period settings[22m[39m
-  [32;1m✓[39;22m[39m [2msuper admin can update period settings and defaults[22m[39m
-  [32;1m✓[39;22m[39m [2mchart window end date cannot be before start date[22m[39m
-  [32;1m✓[39;22m[39m [2mrefresh interval validation allows zero or 10 to 60[22m[39m
-  [32;1m✓[39;22m[39m [2mstart new period forbidden for staff[22m[39m
-  [32;1m✓[39;22m[39m [2msuper admin can start new period and annual defaults are copied[22m[39m
-  [32;1m✓[39;22m[39m [2mstart new period requires backup confirmation and new year cannot go backwards[22m[39m
-  [32;1m✓[39;22m[39m [2mstart new period rejects active year and does not create duplicate period[22m[39m
+   PASS  Tests\Feature\PeriodSettingsTest
+  ✓ [2mperiod settings requires auth[22m
+  ✓ [2mperiod settings forbidden for staff[22m
+  ✓ [2msuper admin can view period settings[22m
+  ✓ [2msuper admin can update period settings and defaults[22m
+  ✓ [2mchart window end date cannot be before start date[22m
+  ✓ [2mrefresh interval validation allows zero or 10 to 60[22m
+  ✓ [2mstart new period forbidden for staff[22m
+  ✓ [2msuper admin can start new period and annual defaults are copied[22m
+  ✓ [2mstart new period requires backup confirmation and new year cannot go backwards[22m
+  ✓ [2mstart new period rejects active year and does not create duplicate period[22m
 
-  [30;42;1m PASS [39;49;22m[39m Tests\Feature\PublicSummaryApiTest[39m
-  [32;1m✓[39;22m[39m [2mpublic summary updated at wib reflects cached compute time[22m[39m
-  [32;1m✓[39;22m[39m [2mpublic summary aggregates only valid transactions[22m[39m
-  [32;1m✓[39;22m[39m [2mpublic summary latest transaction uses latest valid transaction time[22m[39m
-  [32;1m✓[39;22m[39m [2mpublic daily chart uses configured admin range and effective transaction date[22m[39m
-  [32;1m✓[39;22m[39m [2mpublic daily chart falls back to transaction window with buffer[22m[39m
+   PASS  Tests\Feature\PublicSummaryApiTest
+  ✓ [2mpublic summary updated at wib reflects cached compute time[22m
+  ✓ [2mpublic summary aggregates only valid transactions[22m
+  ✓ [2mpublic summary latest transaction uses latest valid transaction time[22m
+  ✓ [2mpublic daily chart uses configured admin range and effective transaction date[22m
+  ✓ [2mpublic daily chart falls back to transaction window with buffer[22m
 
-  [30;42;1m PASS [39;49;22m[39m Tests\Feature\RateLimitingTest[39m
-  [32;1m✓[39;22m[39m [2mpublic summary api is rate limited[22m[39m
-  [32;1m✓[39;22m[39m [2mpublic landing page is rate limited[22m[39m
+   PASS  Tests\Feature\RateLimitingTest
+  ✓ [2mpublic summary api is rate limited[22m
+  ✓ [2mpublic landing page is rate limited[22m
 
-  [30;42;1m PASS [39;49;22m[39m Tests\Feature\RbacGatesTest[39m
-  [32;1m✓[39;22m[39m [2mdashboard redirects to login when unauthenticated[22m[39m
-  [32;1m✓[39;22m[39m [2mdashboard forbidden when authenticated with unallowed role[22m[39m
-  [32;1m✓[39;22m[39m [2mdashboard ok for staff[22m[39m
-  [32;1m✓[39;22m[39m [2mdashboard ok for super admin[22m[39m
-  [32;1m✓[39;22m[39m [2mregister route is not available[22m[39m
+   PASS  Tests\Feature\RbacGatesTest
+  ✓ [2mdashboard redirects to login when unauthenticated[22m
+  ✓ [2mdashboard forbidden when authenticated with unallowed role[22m
+  ✓ [2mdashboard ok for staff[22m
+  ✓ [2mdashboard ok for super admin[22m
+  ✓ [2mregister route is not available[22m
 
-  [30;42;1m PASS [39;49;22m[39m Tests\Feature\ReceiptPrintTest[39m
-  [32;1m✓[39;22m[39m [2mreceipt requires auth[22m[39m
-  [32;1m✓[39;22m[39m [2mreceipt forbidden for unallowed role[22m[39m
-  [32;1m✓[39;22m[39m [2mstaff can print receipt pdf when letterhead active[22m[39m
-  [32;1m✓[39;22m[39m [2mprinting trashed transaction is forbidden[22m[39m
-  [32;1m✓[39;22m[39m [2mstaff cannot print other staff receipt[22m[39m
-  [32;1m✓[39;22m[39m [2mreceipt redirects with error when no active letterhead[22m[39m
+   PASS  Tests\Feature\ReceiptPrintTest
+  ✓ [2mreceipt requires auth[22m
+  ✓ [2mreceipt forbidden for unallowed role[22m
+  ✓ [2mstaff can print receipt pdf when letterhead active[22m
+  ✓ [2mprinting trashed transaction is forbidden[22m
+  ✓ [2mstaff cannot print other staff receipt[22m
+  ✓ [2mreceipt redirects with error when no active letterhead[22m
 
-  [30;42;1m PASS [39;49;22m[39m Tests\Feature\SyncBrutoMethodologyKbContentMigrationTest[39m
-  [32;1m✓[39;22m[39m [2mmigration overwrites pre bab 6 2 stale answer text[22m[39m
-  [32;1m✓[39;22m[39m [2mmigration overwrites pre bab 6 2 stale answer text with data set #1[22m[39m
-  [32;1m✓[39;22m[39m [2mmigration is a no op when the slug does not exist[22m[39m
+   PASS  Tests\Feature\SyncBrutoMethodologyKbContentMigrationTest
+  ✓ [2mmigration overwrites pre bab 6 2 stale answer text[22m
+  ✓ [2mmigration overwrites pre bab 6 2 stale answer text with data set #1[22m
+  ✓ [2mmigration is a no op when the slug does not exist[22m
 
-  [30;42;1m PASS [39;49;22m[39m Tests\Feature\TemplateLetterheadTest[39m
-  [32;1m✓[39;22m[39m [2mletterhead templates requires auth[22m[39m
-  [32;1m✓[39;22m[39m [2mletterhead templates forbidden for admin and staff[22m[39m
-  [32;1m✓[39;22m[39m [2msuper admin can upload pdf and see it listed[22m[39m
-  [32;1m✓[39;22m[39m [2muploading new template replaces old and is active[22m[39m
-  [32;1m✓[39;22m[39m [2mactivate switches active template[22m[39m
-  [32;1m✓[39;22m[39m [2mold storage file deleted only after successful upload[22m[39m
-  [32;1m✓[39;22m[39m [2msuper admin can preview pdf[22m[39m
+   PASS  Tests\Feature\TemplateLetterheadTest
+  ✓ [2mletterhead templates requires auth[22m
+  ✓ [2mletterhead templates forbidden for admin and staff[22m
+  ✓ [2msuper admin can upload pdf and see it listed[22m
+  ✓ [2muploading new template replaces old and is active[22m
+  ✓ [2mactivate switches active template[22m
+  ✓ [2mold storage file deleted only after successful upload[22m
+  ✓ [2msuper admin can preview pdf[22m
 
-  [30;42;1m PASS [39;49;22m[39m Tests\Feature\ThrottleChatbotTest[39m
-  [32;1m✓[39;22m[39m [2mrequests under the limit pass through with a remaining count header[22m[39m
-  [32;1m✓[39;22m[39m [2mthe 51st request within a minute is blocked with retry headers[22m[39m
+   PASS  Tests\Feature\ThrottleChatbotTest
+  ✓ [2mrequests under the limit pass through with a remaining count header[22m
+  ✓ [2mthe 51st request within a minute is blocked with retry headers[22m
 
-  [30;42;1m PASS [39;49;22m[39m Tests\Feature\TransactionConcurrencyTest[39m
-  [32;1m✓[39;22m[39m [2msequential transactions on same day get unique numbers[22m[39m
-  [32;1m✓[39;22m[39m [2mno transaksi sequence increments correctly across multiple creates[22m[39m
-  [32;1m✓[39;22m[39m [2mgenerator never produces duplicate no transaksi[22m[39m
+   PASS  Tests\Feature\TransactionConcurrencyTest
+  ✓ [2msequential transactions on same day get unique numbers[22m
+  ✓ [2mno transaksi sequence increments correctly across multiple creates[22m
+  ✓ [2mgenerator never produces duplicate no transaksi[22m
 
-  [30;42;1m PASS [39;49;22m[39m Tests\Feature\TransactionHistoryFilterTest[39m
-  [32;1m✓[39;22m[39m [2mhistory defaults to active year when year not provided[22m[39m
-  [32;1m✓[39;22m[39m [2mhistory can filter by category metode and petugas[22m[39m
-  [32;1m✓[39;22m[39m [2mhistory search matches trashed muzakki phone[22m[39m
-  [32;1m✓[39;22m[39m [2mhistory grouped transaction keeps multiple categories and methods visible[22m[39m
-  [32;1m✓[39;22m[39m [2mhistory can filter same year by zakat period[22m[39m
+   PASS  Tests\Feature\TransactionHistoryFilterTest
+  ✓ [2mhistory defaults to active year when year not provided[22m
+  ✓ [2mhistory can filter by category metode and petugas[22m
+  ✓ [2mhistory search matches trashed muzakki phone[22m
+  ✓ [2mhistory grouped transaction keeps multiple categories and methods visible[22m
+  ✓ [2mhistory can filter same year by zakat period[22m
 
-  [30;42;1m PASS [39;49;22m[39m Tests\Feature\TransactionRiskReviewBackfillCommandTest[39m
-  [32;1m✓[39;22m[39m [2mbackfill command creates missing risk reviews without overwriting existing ones[22m[39m
-  [32;1m✓[39;22m[39m [2mbackfill command reports when nothing needs processing[22m[39m
+   PASS  Tests\Feature\TransactionRiskReviewBackfillCommandTest
+  ✓ [2mbackfill command creates missing risk reviews without overwriting existing ones[22m
+  ✓ [2mbackfill command reports when nothing needs processing[22m
 
-  [30;42;1m PASS [39;49;22m[39m Tests\Feature\TransactionRiskReviewTest[39m
-  [32;1m✓[39;22m[39m [2mcreate transaction creates risk review record[22m[39m
-  [32;1m✓[39;22m[39m [2mupdate transaction refreshes risk review analysis[22m[39m
-  [32;1m✓[39;22m[39m [2mreanalysis preserves operator review decision[22m[39m
-  [32;1m✓[39;22m[39m [2mduplicate detection ignores transactions from different years[22m[39m
-  [32;1m✓[39;22m[39m [2msame payer different beneficiary is not marked warning[22m[39m
-  [32;1m✓[39;22m[39m [2mupdate after receipt printed creates warning review[22m[39m
-  [32;1m✓[39;22m[39m [2mflag label helper resolves localized text[22m[39m
-  [32;1m✓[39;22m[39m [2mrestore transaction creates warning review[22m[39m
-  [32;1m✓[39;22m[39m [2msignificant nominal change creates warning review[22m[39m
-  [32;1m✓[39;22m[39m [2minfaq transaction does not create warning from histori pattern[22m[39m
-  [32;1m✓[39;22m[39m [2minfaq transaction stays normal without histori pattern rule[22m[39m
-  [32;1m✓[39;22m[39m [2mhistory shows risk badges and filters[22m[39m
-  [32;1m✓[39;22m[39m [2manomaly detail shows review data and allows status update[22m[39m
-  [32;1m✓[39;22m[39m [2mfollow up review requires operator note[22m[39m
-  [32;1m✓[39;22m[39m [2madmin can view anomaly index and filter cases[22m[39m
-  [32;1m✓[39;22m[39m [2mmixed group review status stays pending across history and anomaly views[22m[39m
-  [32;1m✓[39;22m[39m [2mdeleted warning row is ignored by active anomaly views[22m[39m
-  [32;1m✓[39;22m[39m [2mactive anomaly queue prioritizes pending review then higher score[22m[39m
-  [32;1m✓[39;22m[39m [2mguest cannot access risk review endpoints[22m[39m
-  [32;1m✓[39;22m[39m [2mstaff cannot access risk review endpoints or ui[22m[39m
+   PASS  Tests\Feature\TransactionRiskReviewTest
+  ✓ [2mcreate transaction creates risk review record[22m
+  ✓ [2mupdate transaction refreshes risk review analysis[22m
+  ✓ [2mreanalysis preserves operator review decision[22m
+  ✓ [2mduplicate detection ignores transactions from different years[22m
+  ✓ [2msame payer different beneficiary is not marked warning[22m
+  ✓ [2mupdate after receipt printed creates warning review[22m
+  ✓ [2mflag label helper resolves localized text[22m
+  ✓ [2mrestore transaction creates warning review[22m
+  ✓ [2msignificant nominal change creates warning review[22m
+  ✓ [2minfaq transaction does not create warning from histori pattern[22m
+  ✓ [2minfaq transaction stays normal without histori pattern rule[22m
+  ✓ [2mhistory shows risk badges and filters[22m
+  ✓ [2manomaly detail shows review data and allows status update[22m
+  ✓ [2mfollow up review requires operator note[22m
+  ✓ [2madmin can view anomaly index and filter cases[22m
+  ✓ [2mmixed group review status stays pending across history and anomaly views[22m
+  ✓ [2mdeleted warning row is ignored by active anomaly views[22m
+  ✓ [2mactive anomaly queue prioritizes pending review then higher score[22m
+  ✓ [2mguest cannot access risk review endpoints[22m
+  ✓ [2mstaff cannot access risk review endpoints or ui[22m
 
-  [30;42;1m PASS [39;49;22m[39m Tests\Feature\TransactionTest[39m
-  [32;1m✓[39;22m[39m [2mtransaction index returns successful response[22m[39m
+   PASS  Tests\Feature\TransactionTest
+  ✓ [2mtransaction index returns successful response[22m
 
-  [30;42;1m PASS [39;49;22m[39m Tests\Feature\TransactionTrashTest[39m
-  [32;1m✓[39;22m[39m [2mhistory requires auth[22m[39m
-  [32;1m✓[39;22m[39m [2mstaff can view history[22m[39m
-  [32;1m✓[39;22m[39m [2mstaff cannot trash transaction[22m[39m
-  [32;1m✓[39;22m[39m [2madmin can trash with reason and restore[22m[39m
-  [32;1m✓[39;22m[39m [2mtrash page requires admin or super admin[22m[39m
-  [32;1m✓[39;22m[39m [2mstaff cannot view trashed transaction detail[22m[39m
+   PASS  Tests\Feature\TransactionTrashTest
+  ✓ [2mhistory requires auth[22m
+  ✓ [2mstaff can view history[22m
+  ✓ [2mstaff cannot trash transaction[22m
+  ✓ [2madmin can trash with reason and restore[22m
+  ✓ [2mtrash page requires admin or super admin[22m
+  ✓ [2mstaff cannot view trashed transaction detail[22m
 
-  [30;42;1m PASS [39;49;22m[39m Tests\Feature\UserManagementTest[39m
-  [32;1m✓[39;22m[39m [2mstaff cannot access user management[22m[39m
-  [32;1m✓[39;22m[39m [2madmin can list and create staff only[22m[39m
-  [32;1m✓[39;22m[39m [2madmin cannot edit non staff user[22m[39m
-  [32;1m✓[39;22m[39m [2msuper admin can create admin[22m[39m
+   PASS  Tests\Feature\UserManagementTest
+  ✓ [2mstaff cannot access user management[22m
+  ✓ [2madmin can list and create staff only[22m
+  ✓ [2madmin cannot edit non staff user[22m
+  ✓ [2msuper admin can create admin[22m
 
-  [37;1mTests:  [39;22m[32;1m309 passed[39;22m
-  [37;1mTime:   [39;22m[39m51.51s[39m
+  Tests:  326 passed
+  Time:   28.84s
 
 

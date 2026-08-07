@@ -33,7 +33,7 @@ Tanggal pengujian: 2026-08-05
 
 ## Hasil Pengujian Otomatis
 
-- `php artisan test`: valid, exit code `0`, hasil `309 passed` (bertambah dari 306 setelah regression test cakupan kalkulasi zakat penghasilan/tabungan ditambahkan).
+- `php artisan test`: valid, exit code `0`, hasil `326 passed` (bertambah dari 309 setelah 9 bug intent-routing/redaksi-privasi/guardrail chatbot ditemukan dan diperbaiki - lihat catatan revisi 2026-08-07 di bagian Catatan Pembekuan, dan `docs/chatbot-dokumentasi-skripsi.md` bagian 10.19-10.23).
 - `npm run build`: valid, exit code `0`, build berhasil. Ada warning Browserslist/caniuse-lite usang, tidak menggagalkan build.
 
 File pemetaan test ke KF-01 sampai KF-09 khusus AI Assistant Zakky: `hasil-pengujian/01-fungsional/pemetaan-304-test-ke-kf.md`
@@ -69,6 +69,8 @@ Status: valid setelah MySQL aktif dan API/model merespons.
 - Gagal: `0`
 
 Catatan revisi: dijalankan ulang setelah menambahkan hard rule anti-manipulasi ke system prompt (lihat catatan revisi di bagian Evaluasi Keamanan) untuk memastikan tidak ada regresi pada alur konsultasi zakat mal. Hasil tetap `19/19`.
+
+Catatan revisi (2026-08-07): dijalankan ulang dua kali setelah perbaikan 9 bug chatbot (lihat Catatan Pembekuan). Run pertama sempat `18/19` (skenario "mengakui jawaban pendek dan mengklarifikasi rentang" gagal) - run kedua kembali `19/19` tanpa perubahan kode apa pun di antara keduanya, mengonfirmasi ini variasi LLM nondeterministik (Keterbatasan #6 di `docs/chatbot-dokumentasi-skripsi.md`), bukan regresi dari perbaikan bug. File bukti memuat hasil run kedua (`19/19`).
 
 File bukti utama: `hasil-pengujian/04-kualitas-jawaban/chatbot-eval-behavior-mysql.txt`
 
@@ -195,4 +197,15 @@ Dampak terhadap evidence revisi nisab BAZNAS: CALC-05 (kasus batas nisab) dan sk
 Commit pembekuan evidence Bab IV (revisi nisab BAZNAS, final): `34d89f1fdea044ae92d287a781b5553eac73949d`. Ini adalah commit acuan terbaru untuk skripsi - seluruh angka kalkulasi zakat mal, konfigurasi nisab, dan evidence terkait pada dokumen ini mengikuti kode per commit tersebut.
 
 Catatan revisi UX cakupan kalkulasi (2026-08-05): alur Zakky diperbaiki agar perhitungan mengikuti cakupan pertanyaan pengguna, bukan selalu menampilkan paket penghasilan + tabungan + emas. Jika pengguna hanya menanyakan zakat penghasilan, sistem hanya menampilkan komponen penghasilan. Jika pengguna hanya memberi data tabungan, sistem hanya menampilkan komponen tabungan/emas. Jika model mengirim `savings = 0` atau `gold_gram = 0`, parser tidak lagi memunculkan blok tabungan/emas kosong. Evidence diperbarui lewat CALC-08, CALC-09, dan CALC-10 pada `hasil-pengujian/03-kalkulasi/output-kalkulasi-extended-terbaru.txt` serta regression test `ChatbotSentinelParserTest`; suite penuh valid dengan `php artisan test` = `309 passed`.
+
+Catatan revisi (perbaikan bug chatbot, 2026-08-07): dipicu laporan pengguna nyata ("Penghasilan saya Rp7.500.000 per bulan..." dijawab penjelasan generik, bukan alur konsultasi), diikuti audit manual menyeluruh terhadap seluruh 16 file `app/Services/Chatbot/`. **9 bug ditemukan dan diperbaiki**, didokumentasikan lengkap di `docs/chatbot-dokumentasi-skripsi.md` bagian 10.19-10.23:
+
+1. **Redaksi privasi (`ChatbotChatLogger`) membocorkan placeholder `[nominal]` ke konteks AI** (Bab 10.19) - koreksi atas kesimpulan Bab 10.2 yang ternyata tidak lengkap. Angka berformat Rupiah baku ("Rp7.500.000") ter-redaksi ke `[nominal]` sebelum masuk `ai_chat_logs`, lalu `history()` membaca ulang teks ter-redaksi itu sebagai konteks percakapan ke LLM - LLM melihat placeholder-nya sendiri dan membalas seolah data belum terisi. Diperbaiki dengan memisahkan cache percakapan session-scoped (raw, TTL 30 menit) dari `ai_chat_logs` (tetap redaksi, permanen).
+2. **5 kasus pembajakan lanjutan di `ChatbotActionDetector`** (Bab 10.20) lolos dari audit sistematis Bab 10.15 sebelumnya - cabang nishab, fitrah/fidyah, contoh zakat mal, total beras, info pembayaran, dan follow-up data-publik semuanya kekurangan guard `!$looksLikeCalculationRequest` yang sudah dipasang di cabang tetangganya.
+3. **`ChatbotConversationContext` kehilangan sinyal "penghasilan"** (Bab 10.21) - tidak sinkron dengan daftar kata kunci `ChatbotActionDetector`, menyebabkan pertanyaan berbasis "penghasilan" (bukan "gaji") gagal masuk mode konsultasi terpandu.
+4. **Guardrail (Lapisan 2) lolos oleh kata pendek "mal"/"rp" sebagai substring kata umum** (Bab 10.22) - heuristik "balasan panjang tanpa kata domain = mencurigakan" memakai `str_contains` biasa, sehingga kata seperti "formal"/"normal"/"malam"/"terperinci" salah dianggap mengandung kata kunci domain.
+
+**Verifikasi**: seluruh perbaikan disertai test regresi TDD (merah sebelum perbaikan, hijau sesudah). `php artisan test` naik dari `258 passed` (titik Bab 10.18) menjadi **`326 passed`**. Evaluasi perilaku nyata dijalankan ulang pasca-perbaikan (API key asli, 2026-08-07): `chatbot:eval-behavior` 19/19, `chatbot:eval-rag` precision/recall/F1 = 1,0, `chatbot:eval-safety` akurasi tier confident = 1,0 - seluruhnya konsisten dengan angka sebelum perbaikan, mengonfirmasi tidak ada regresi.
+
+Commit pembekuan evidence Bab IV (perbaikan bug chatbot, final): `d81e219`. Tiga commit kode terpisah (`7114108`, `101fe29`, `d81e219`) masing-masing menutup satu kelompok bug (ChatbotActionDetector, ChatbotConversationContext, ChatbotGuardrailVerifier); perbaikan `ChatbotChatLogger` tercatat lebih awal, tergabung dalam commit `8bf4e06` (bersama perubahan UI drag-to-resize yang tidak terkait Bab IV).
 

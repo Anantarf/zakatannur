@@ -1,3 +1,4 @@
+Warning: TTY mode is not supported on Windows platform.
 PHPUnit 9.6.34 by Sebastian Bergmann and contributors.
 
 Available test(s):
@@ -7,6 +8,19 @@ Available test(s):
  - Tests\Unit\ChatbotActionDetectorTest::test_personal_calculation_requests_are_not_hijacked_into_public_data_intents#1
  - Tests\Unit\ChatbotActionDetectorTest::test_personal_calculation_requests_are_not_hijacked_into_public_data_intents#2
  - Tests\Unit\ChatbotActionDetectorTest::test_personal_calculation_requests_are_not_hijacked_into_public_data_intents#3
+ - Tests\Unit\ChatbotActionDetectorTest::test_zakat_mal_requests_are_not_hijacked_into_the_wrong_calculator_or_a_canned_example#0
+ - Tests\Unit\ChatbotActionDetectorTest::test_zakat_mal_requests_are_not_hijacked_into_the_wrong_calculator_or_a_canned_example#1
+ - Tests\Unit\ChatbotActionDetectorTest::test_zakat_mal_requests_are_not_hijacked_into_the_wrong_calculator_or_a_canned_example#2
+ - Tests\Unit\ChatbotActionDetectorTest::test_zakat_mal_requests_are_not_hijacked_into_the_wrong_calculator_or_a_canned_example#3
+ - Tests\Unit\ChatbotActionDetectorTest::test_personal_rice_harvest_questions_are_not_hijacked_into_mosque_rice_total#0
+ - Tests\Unit\ChatbotActionDetectorTest::test_personal_rice_harvest_questions_are_not_hijacked_into_mosque_rice_total#1
+ - Tests\Unit\ChatbotActionDetectorTest::test_zakat_mal_calculation_requests_are_not_hijacked_into_payment_info#0
+ - Tests\Unit\ChatbotActionDetectorTest::test_zakat_mal_calculation_requests_are_not_hijacked_into_payment_info#1
+ - Tests\Unit\ChatbotActionDetectorTest::test_calculation_requests_are_not_hijacked_by_public_data_follow_up_when_prior_topic_was_public_data#0
+ - Tests\Unit\ChatbotActionDetectorTest::test_calculation_requests_are_not_hijacked_by_public_data_follow_up_when_prior_topic_was_public_data#1
+ - Tests\Unit\ChatbotActionDetectorTest::test_calculation_requests_are_not_hijacked_by_public_data_follow_up_when_prior_topic_was_public_data#2
+ - Tests\Unit\ChatbotActionDetectorTest::test_personal_calculation_requests_are_not_hijacked_into_nishab_definition#0
+ - Tests\Unit\ChatbotActionDetectorTest::test_personal_calculation_requests_are_not_hijacked_into_nishab_definition#1
  - Tests\Unit\ChatbotActionDetectorTest::test_genuine_aggregate_total_questions_still_resolve_to_public_data_intents
  - Tests\Unit\ChatbotActionDetectorTest::test_unrelated_questions_are_not_hijacked_by_bare_generic_words#0
  - Tests\Unit\ChatbotActionDetectorTest::test_unrelated_questions_are_not_hijacked_by_bare_generic_words#1
@@ -38,6 +52,7 @@ Available test(s):
  - Tests\Unit\ChatbotConversationContextTest::test_bare_digits_do_not_trigger_zakat_mal_consultation_mode#1
  - Tests\Unit\ChatbotConversationContextTest::test_bare_digits_do_not_trigger_zakat_mal_consultation_mode#2
  - Tests\Unit\ChatbotConversationContextTest::test_explicit_financial_keywords_still_trigger_the_mode
+ - Tests\Unit\ChatbotConversationContextTest::test_penghasilan_keyword_triggers_the_mode_same_as_gaji
  - Tests\Unit\ChatbotConversationContextTest::test_bare_numeric_follow_up_stays_in_mode_once_already_consulting
  - Tests\Unit\ChatbotGuardrailVerifierTest::test_blocks_explicit_off_topic_keywords#0
  - Tests\Unit\ChatbotGuardrailVerifierTest::test_blocks_explicit_off_topic_keywords#1
@@ -47,6 +62,8 @@ Available test(s):
  - Tests\Unit\ChatbotGuardrailVerifierTest::test_still_blocks_explicit_off_topic_keywords_in_zakat_mal_consultation_mode
  - Tests\Unit\ChatbotGuardrailVerifierTest::test_known_limitation_paraphrased_off_topic_content_is_not_caught#0
  - Tests\Unit\ChatbotGuardrailVerifierTest::test_known_limitation_paraphrased_off_topic_content_is_not_caught#1
+ - Tests\Unit\ChatbotGuardrailVerifierTest::test_domain_keyword_heuristic_is_not_fooled_by_short_keyword_substrings#0
+ - Tests\Unit\ChatbotGuardrailVerifierTest::test_domain_keyword_heuristic_is_not_fooled_by_short_keyword_substrings#1
  - Tests\Unit\ChatbotResponseTest::test_actions_passed_to_constructor_are_not_silently_discarded
  - Tests\Unit\ChatbotResponseTest::test_citations_serialize_with_the_label_key_the_frontend_reads
  - Tests\Unit\ChatbotSafetyClassifierTest::test_classify_vector_picks_nearest_reference_by_cosine_similarity
@@ -179,6 +196,7 @@ Available test(s):
  - Tests\Feature\ChatbotApiTest::test_hard_rule_is_present_in_both_language_prompts"no authority over payment status or user data"
  - Tests\Feature\ChatbotApiTest::test_switching_topic_mid_consultation_leaves_zakat_mal_consultation_mode
  - Tests\Feature\ChatbotApiTest::test_chatbot_sends_last_eight_conversation_turns_to_provider
+ - Tests\Feature\ChatbotApiTest::test_formatted_rupiah_nominal_survives_into_next_turn_context
  - Tests\Feature\ChatbotApiTest::test_chatbot_guardrail_blocks_off_topic_reply
  - Tests\Feature\ChatbotApiTest::test_sentinel_parser_rejection_is_logged_with_layer_tag
  - Tests\Feature\ChatbotApiTest::test_orchestrator_exception_is_logged_with_layer_tag
@@ -310,3 +328,4 @@ Available test(s):
  - Tests\Feature\UserManagementTest::test_admin_can_list_and_create_staff_only
  - Tests\Feature\UserManagementTest::test_admin_cannot_edit_non_staff_user
  - Tests\Feature\UserManagementTest::test_super_admin_can_create_admin
+
