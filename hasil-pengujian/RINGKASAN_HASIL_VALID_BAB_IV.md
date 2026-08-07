@@ -33,7 +33,7 @@ Tanggal pengujian: 2026-08-05
 
 ## Hasil Pengujian Otomatis
 
-- `php artisan test`: valid, exit code `0`, hasil `326 passed` (bertambah dari 309 setelah 9 bug intent-routing/redaksi-privasi/guardrail chatbot ditemukan dan diperbaiki - lihat catatan revisi 2026-08-07 di bagian Catatan Pembekuan, dan `docs/chatbot-dokumentasi-skripsi.md` bagian 10.19-10.23).
+- `php artisan test`: valid, exit code `0`, hasil `338 passed` (bertambah dari 309 setelah total 11 bug chatbot ditemukan dan diperbaiki dalam dua putaran perbaikan - lihat catatan revisi 2026-08-07 dan 2026-08-08 di bagian Catatan Pembekuan, dan `docs/chatbot-dokumentasi-skripsi.md` bagian 10.19-10.25).
 - `npm run build`: valid, exit code `0`, build berhasil. Ada warning Browserslist/caniuse-lite usang, tidak menggagalkan build.
 
 File pemetaan test ke KF-01 sampai KF-09 khusus AI Assistant Zakky: `hasil-pengujian/01-fungsional/pemetaan-304-test-ke-kf.md`
@@ -208,4 +208,13 @@ Catatan revisi (perbaikan bug chatbot, 2026-08-07): dipicu laporan pengguna nyat
 **Verifikasi**: seluruh perbaikan disertai test regresi TDD (merah sebelum perbaikan, hijau sesudah). `php artisan test` naik dari `258 passed` (titik Bab 10.18) menjadi **`326 passed`**. Evaluasi perilaku nyata dijalankan ulang pasca-perbaikan (API key asli, 2026-08-07): `chatbot:eval-behavior` 19/19, `chatbot:eval-rag` precision/recall/F1 = 1,0, `chatbot:eval-safety` akurasi tier confident = 1,0 - seluruhnya konsisten dengan angka sebelum perbaikan, mengonfirmasi tidak ada regresi.
 
 Commit pembekuan evidence Bab IV (perbaikan bug chatbot, final): `d81e219`. Tiga commit kode terpisah (`7114108`, `101fe29`, `d81e219`) masing-masing menutup satu kelompok bug (ChatbotActionDetector, ChatbotConversationContext, ChatbotGuardrailVerifier); perbaikan `ChatbotChatLogger` tercatat lebih awal, tergabung dalam commit `8bf4e06` (bersama perubahan UI drag-to-resize yang tidak terkait Bab IV).
+
+Catatan revisi (perbaikan bug chatbot lanjutan, 2026-08-08): dipicu laporan pengguna nyata lain ("nishab zakat penghasilan berapa" dijawab definisi generik nisab/haul, bukan angka nisab penghasilan), diikuti audit lanjutan sesuai permintaan eksplisit "cek masih ada bug lagi ga" sebelum penulisan skripsi dilanjutkan. **2 bug tambahan ditemukan dan diperbaiki**, didokumentasikan di `docs/chatbot-dokumentasi-skripsi.md` bagian 10.24-10.25 (total jadi 11 bug dari seluruh sesi perbaikan chatbot):
+
+1. **`ask_zakat_mal_nishab`/`ask_zakat_mal_definition`/`ask_zakat_mal_example` selalu menjawab entri KB generik** (Bab 10.24) - ketiga intent ini di-*hardcode* memetakan ke satu entri KB tetap (`nisab-dan-haul` atau `zakat-mal`) tanpa pernah mempertimbangkan aset spesifik yang disebut user ("Apa itu zakat penghasilan?", "Berapa nisab emas?", "Contoh zakat pertanian dong" semuanya dijawab generik, bukan entri yang jauh lebih relevan). Diperbaiki dengan `$hasSpecificAssetTopic` - kalau pesan menyebut aset spesifik apa pun, jalur cepat dilewati dan diteruskan ke AI+RAG.
+2. **Balasan lokasi/kontak masjid berisi data placeholder** (Bab 10.25) - "Jl. Contoh Alamat No. 123, Kelurahan Maju, Kecamatan Bersama, Kota Sejahtera" dan "0812-3456-7890 (Bapak Fulan)" adalah data contoh yang tidak pernah diganti data asli, disampaikan percaya diri ke user sungguhan seolah resmi. Sesuai keputusan produk, diganti jadi arahan umum ke panitia tanpa menyebut detail spesifik apa pun.
+
+**Verifikasi**: test regresi TDD baru (12 test, seluruhnya di `ChatbotActionDetectorTest`). `php artisan test` naik dari `326 passed` menjadi **`338 passed`**. Diverifikasi ulang lewat API asli pasca-perbaikan: `chatbot:eval-rag` tetap precision/recall/F1 = 1,0; `chatbot:eval-behavior` 19/19 (run pertama sempat 18/19 pada skenario yang sama yang sebelumnya juga flaky di revisi 2026-08-07 - dikonfirmasi nondeterminisme LLM lewat run ulang, bukan regresi).
+
+Commit pembekuan evidence Bab IV (perbaikan bug chatbot lanjutan, final): `f0a0df3`.
 

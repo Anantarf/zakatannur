@@ -22,6 +22,17 @@ Warning: TTY mode is not supported on Windows platform.
   ✓ [2mcalculation requests are not hijacked by public data follow up when prior topic was public data with data set #2[22m
   ✓ [2mpersonal calculation requests are not hijacked into nishab definition[22m
   ✓ [2mpersonal calculation requests are not hijacked into nishab definition with data set #1[22m
+  ✓ [2masset specific nishab questions are not hijacked into the generic definition[22m
+  ✓ [2masset specific nishab questions are not hijacked into the generic definition with data set #1[22m
+  ✓ [2masset specific nishab questions are not hijacked into the generic definition with data set #2[22m
+  ✓ [2masset specific definition and example questions are not hijacked into the generic zakat mal entry[22m
+  ✓ [2masset specific definition and example questions are not hijacked into the generic zakat mal entry with data set #1[22m
+  ✓ [2masset specific definition and example questions are not hijacked into the generic zakat mal entry with data set #2[22m
+  ✓ [2masset specific definition and example questions are not hijacked into the generic zakat mal entry with data set #3[22m
+  ✓ [2masset specific definition and example questions are not hijacked into the generic zakat mal entry with data set #4[22m
+  ✓ [2masset specific definition and example questions are not hijacked into the generic zakat mal entry with data set #5[22m
+  ✓ [2mgeneric definition and example questions still resolve to their intents[22m
+  ✓ [2mgeneric nishab questions still resolve to the definition intent[22m
   ✓ [2mgenuine aggregate total questions still resolve to public data intents[22m
   ✓ [2munrelated questions are not hijacked by bare generic words[22m
   ✓ [2munrelated questions are not hijacked by bare generic words with data set #1[22m
@@ -37,6 +48,7 @@ Warning: TTY mode is not supported on Windows platform.
   ✓ [2munrelated questions are not hijacked by other generic anchor words with data set #9[22m
   ✓ [2munrelated questions are not hijacked by other generic anchor words with data set #10[22m
   ✓ [2mnarrowed intents still resolve for their genuine phrasing[22m
+  ✓ [2mlocation and contact replies do not contain placeholder data[22m
 
    PASS  Tests\Unit\ChatbotBehaviorDatasetTest
   ✓ [2mcorrection scenario accepts real model phrasings with data set "explicit ganti + negated old value"[22m
@@ -420,7 +432,7 @@ Warning: TTY mode is not supported on Windows platform.
   ✓ [2madmin cannot edit non staff user[22m
   ✓ [2msuper admin can create admin[22m
 
-  Tests:  326 passed
-  Time:   28.84s
+  Tests:  338 passed
+  Time:   34.09s
 
 

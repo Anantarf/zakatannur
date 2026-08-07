@@ -19,6 +19,14 @@ d81e219d905d595fbe0c1ee4f0f069548ddea111
 2026-08-07 19:36:06 +0700
 fix(chatbot): use whole-word matching for guardrail domain-keyword heuristic
 
+Commit pembekuan evidence Bab IV (perbaikan bug chatbot lanjutan, final):
+f0a0df30888b3481fd4469fdbd77c10a342ab2bd
+2026-08-08 03:27:31 +0700
+fix(chatbot): stop generic-entry hijack and remove placeholder contact info
+
+Tanggal pengujian (revisi perbaikan bug chatbot lanjutan):
+2026-08-08
+
 Tanggal pengujian (revisi perbaikan bug chatbot):
 2026-08-07
 
