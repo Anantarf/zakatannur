@@ -35,6 +35,119 @@ class ChatbotActionDetectorTest extends TestCase
         ];
     }
 
+    /**
+     * @dataProvider hijackedByWrongCalculatorProvider
+     */
+    public function test_zakat_mal_requests_are_not_hijacked_into_the_wrong_calculator_or_a_canned_example(string $message): void
+    {
+        // Same bug class as the nishab regression above, found by auditing every other unguarded
+        // branch in intent() for the same pattern: a zakat-mal calculation request that happens to
+        // share a keyword with an unrelated fast-path intent gets short-circuited before it ever
+        // reaches AI/the real calculator - so the user's actual numbers are silently ignored.
+        // - calculate_fitrah_case/calculate_fidyah_case: "jiwa"/"puasa" + "hitung" + a digit is also
+        //   how a zakat-mal question mentioning dependents or a missed fast can read, which routed
+        //   it to the wrong calculator entirely (fitrah/fidyah instead of zakat mal).
+        // - ask_zakat_mal_example: "contoh"/"skenario" + "hitung" matched even when the user gave
+        //   their own real figures, returning a generic canned example instead of computing theirs.
+        $this->assertNull($this->detector()->intent($message));
+    }
+
+    public static function hijackedByWrongCalculatorProvider(): array
+    {
+        return [
+            ['Gaji saya 8 juta, tanggungan 3 jiwa, hitung zakat mal saya berapa?'],
+            ['Saya batal puasa 3 hari karena sakit, terus gaji 8 juta hitung zakat mal saya gimana?'],
+            ['Kasih contoh hitungan zakat mal untuk gaji saya 8 juta dong'],
+            ['Ada contoh kasus zakat mal kalau gaji 10 juta, tabungan 20 juta?'],
+        ];
+    }
+
+    /**
+     * @dataProvider hijackedByRiceTotalProvider
+     */
+    public function test_personal_rice_harvest_questions_are_not_hijacked_into_mosque_rice_total(string $message): void
+    {
+        // ask_total_rice required only "beras" + a bare "berapa"/"kg" - no aggregate-implying
+        // pairing like its ask_total_money/ask_total_summary siblings require ("total"/"terkumpul"/
+        // "jumlah"), so a personal harvest question ("saya punya beras 800 kg... berapa zakat yang
+        // harus dikeluarkan?") got answered with the mosque's aggregate rice total instead.
+        $this->assertNull($this->detector()->intent($message));
+    }
+
+    public static function hijackedByRiceTotalProvider(): array
+    {
+        return [
+            ['Panen saya 500 kg beras, hitungkan zakatnya berapa kg'],
+            ['Saya punya beras 800 kg dari panen sendiri, berapa zakat yang harus dikeluarkan?'],
+        ];
+    }
+
+    /**
+     * @dataProvider hijackedByPaymentInfoProvider
+     */
+    public function test_zakat_mal_calculation_requests_are_not_hijacked_into_payment_info(string $message): void
+    {
+        // ask_payment_info matched on the bare substring "bayar zakat" (unguarded), which is also
+        // contained in the very natural phrase "bayar zakat mal" - so a real calculation question
+        // like "kapan sebaiknya saya bayar zakat mal saya, gaji saya 8 juta?" got answered with the
+        // generic "how to pay" instructions instead of ever reaching AI.
+        $this->assertNull($this->detector()->intent($message));
+    }
+
+    public static function hijackedByPaymentInfoProvider(): array
+    {
+        return [
+            ['Kapan sebaiknya saya bayar zakat mal saya, gaji saya 8 juta?'],
+            ['Kalau gaji saya 8 juta, apakah wajib bayar zakat mal bulan ini?'],
+        ];
+    }
+
+    /**
+     * @dataProvider hijackedByPublicDataFollowUpProvider
+     */
+    public function test_calculation_requests_are_not_hijacked_by_public_data_follow_up_when_prior_topic_was_public_data(string $message): void
+    {
+        // publicDataFollowUpIntent() - the follow-up routing used once the previous turn's topic was
+        // public_data - is a near-duplicate of the guarded ask_total_summary/ask_latest_update checks
+        // above, but was never guarded by !$looksLikeCalculationRequest itself. So once a session had
+        // asked one public-data question (e.g. "total zakat terkumpul"), any later real calculation
+        // question containing "semua"/"totalnya"/"kapan" got hijacked by this leftover context - even
+        // though the message itself is an unrelated personal calculation request.
+        $context = ['topic' => 'public_data', 'last_source' => 'public_data'];
+        $this->assertNull($this->detector()->intent($message, $context));
+    }
+
+    public static function hijackedByPublicDataFollowUpProvider(): array
+    {
+        return [
+            ['Saya sudah coba semua cara hitung sendiri tapi masih bingung, gaji saya 8 juta zakatnya berapa?'],
+            ['Totalnya gaji saya 8 juta per bulan, kena zakat gak?'],
+            ['Kapan sebaiknya saya keluarkan zakat mal kalau gaji saya 8 juta?'],
+        ];
+    }
+
+    /**
+     * @dataProvider hijackedNishabCalculationRequestProvider
+     */
+    public function test_personal_calculation_requests_are_not_hijacked_into_nishab_definition(string $message): void
+    {
+        // Regression for a reported bug: unlike the sibling ask_total_*/ask_zakat_mal_definition
+        // checks, the ask_zakat_mal_nishab check wasn't guarded by !$looksLikeCalculationRequest.
+        // A message with a concrete income figure ("Rp8.000.000") that also happens to contain
+        // "nisab" + "apa"/"berapa" got short-circuited to the generic nisab-dan-haul KB answer
+        // instead of ever reaching AI/calculation - so the user got the same canned explanation
+        // no matter what number they gave.
+        $this->assertNull($this->detector()->intent($message));
+    }
+
+    public static function hijackedNishabCalculationRequestProvider(): array
+    {
+        return [
+            ['Penghasilan saya Rp8.000.000 per bulan. Apakah sudah mencapai nisab zakat penghasilan dan berapa zakat yang harus saya bayar?'],
+            ['Gaji saya 7 juta, apa sudah kena nisab?'],
+        ];
+    }
+
     public function test_genuine_aggregate_total_questions_still_resolve_to_public_data_intents(): void
     {
         // The fix must not swallow the legitimate "mosque-wide total" questions these intents

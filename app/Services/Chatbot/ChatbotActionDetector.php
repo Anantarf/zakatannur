@@ -22,6 +22,15 @@ class ChatbotActionDetector
             || $this->containsAny($message, ['gaji', 'tabungan', 'penghasilan', 'emas', 'hutang', 'aset'])
         );
 
+        // Narrower than $looksLikeCalculationRequest above - deliberately doesn't include
+        // "hitung"/"konsultasi", since "hitung" + a digit is also how nearly every legitimate
+        // fitrah/fidyah request is phrased ("hitung fitrah saya 4 orang"), so gating those
+        // calculators on $looksLikeCalculationRequest itself would misroute them to AI. This only
+        // catches the zakat-mal-specific words, to stop a message like "gaji saya 8 juta,
+        // tanggungan 3 jiwa, hitung zakat mal saya berapa?" from being misrouted to the fitrah
+        // calculator just because it mentions "jiwa".
+        $hasZakatMalSignal = $this->containsAny($message, ['gaji', 'tabungan', 'penghasilan', 'emas', 'hutang', 'aset']);
+
         if ($this->containsAny($message, ['bisa bantu apa', 'seberapa jago', 'kemampuan', 'zakky bisa apa', 'chatbot bisa apa', 'jago bahas zakat'])) {
             return 'ask_zakky_capability';
         }
@@ -53,21 +62,29 @@ class ChatbotActionDetector
 
         // "orang" dropped as an anchor here too - "Saya mau hitung THR buat 3 orang karyawan"
         // (hitung + orang + digit, nothing to do with zakat fitrah) used to match this.
-        if ($this->containsAny($message, ['fitrah', 'jiwa']) && $this->containsAny($message, ['berapa', 'hitung', 'brp']) && preg_match('/\d+/', $message)) {
+        if (!$hasZakatMalSignal && $this->containsAny($message, ['fitrah', 'jiwa']) && $this->containsAny($message, ['berapa', 'hitung', 'brp']) && preg_match('/\d+/', $message)) {
             return 'calculate_fitrah_case';
         }
 
         // "hari" dropped as an anchor - "Ada 5 hari libur lebaran ini, mau hitung cuti tambahan
         // gimana?" (hitung + hari + digit, about leave days, not fidyah) used to match this.
-        if ($this->containsAny($message, ['fidyah', 'puasa']) && $this->containsAny($message, ['berapa', 'hitung', 'brp']) && preg_match('/\d+/', $message)) {
+        if (!$hasZakatMalSignal && $this->containsAny($message, ['fidyah', 'puasa']) && $this->containsAny($message, ['berapa', 'hitung', 'brp']) && preg_match('/\d+/', $message)) {
             return 'calculate_fidyah_case';
         }
 
-        if ($this->containsAny($message, ['contoh', 'skenario']) && $this->containsAny($message, ['zakat', 'hitung', 'berapa'])) {
+        // Guarded the same way as ask_zakat_mal_definition below - "kasih contoh hitungan zakat mal
+        // untuk gaji saya 8 juta dong" is a real calculation request with the user's own figures,
+        // not a request for a generic canned example.
+        if (!$looksLikeCalculationRequest && $this->containsAny($message, ['contoh', 'skenario']) && $this->containsAny($message, ['zakat', 'hitung', 'berapa'])) {
             return 'ask_zakat_mal_example';
         }
 
-        if ($this->containsAny($message, ['nishab', 'nisab']) && $this->containsAny($message, ['berapa', 'apa', 'hitung'])) {
+        // Unguarded, this matched "Penghasilan saya Rp8.000.000... apakah sudah mencapai nisab...
+        // berapa zakat yang harus saya bayar?" too - a concrete calculation request that happens to
+        // contain "nisab" + "apa"/"berapa" - and short-circuited it to the generic nisab-dan-haul KB
+        // answer before it ever reached AI, so the user got the same canned explanation regardless
+        // of the number they gave.
+        if (!$looksLikeCalculationRequest && $this->containsAny($message, ['nishab', 'nisab']) && $this->containsAny($message, ['berapa', 'apa', 'hitung'])) {
             return 'ask_zakat_mal_nishab';
         }
 
@@ -118,8 +135,13 @@ class ChatbotActionDetector
         // mal pertanian question like "panen saya 2000 kg gabah, hitungkan zakatnya berapa kg" -
         // that would otherwise get hijacked into an unrelated "total beras terkumpul" public-data
         // answer before it ever reaches AI (same class of bug as Bab 10.1, different keyword).
-        if ($this->containsAny($message, ['beras'])
-            && $this->containsAny($message, ['berapa', 'total', 'jumlah', 'terkumpul', 'kg'])) {
+        // "berapa"/"kg" alone dropped as sufficient pairing too - same reasoning as ask_total_money/
+        // ask_total_summary above: only an aggregate-implying word (total/terkumpul/jumlah) actually
+        // signals "the mosque's total", not a bare "berapa"/"kg" which any personal harvest question
+        // ("saya punya beras 800 kg... berapa zakat yang harus dikeluarkan?") also contains.
+        if (!$looksLikeCalculationRequest
+            && $this->containsAny($message, ['beras'])
+            && $this->containsAny($message, ['total', 'jumlah', 'terkumpul'])) {
             return 'ask_total_rice';
         }
 
@@ -152,7 +174,11 @@ class ChatbotActionDetector
         // "Rekening BCA punya saya kena zakat gak kalau isinya banyak?" (a zakat-mal savings
         // question) and "Cara bayar hutang riba itu gimana, ada hubungannya sama zakat?" (a debt
         // question) into an unrelated "how to pay zakat" reply.
-        if ($this->containsAny($message, [
+        // !$looksLikeCalculationRequest added because "bayar zakat" is itself a substring of the
+        // very natural "bayar zakat mal" - without the guard, "kapan sebaiknya saya bayar zakat mal
+        // saya, gaji saya 8 juta?" (a real calculation question) got the generic payment
+        // instructions instead of ever reaching AI.
+        if (!$looksLikeCalculationRequest && $this->containsAny($message, [
             'cara bayar zakat', 'cara bayar infaq', 'cara bayar fidyah', 'cara bayar sedekah',
             'bayar zakat', 'pembayaran zakat', 'rekening zakat', 'transfer zakat', 'qris zakat',
         ])) {
@@ -172,7 +198,7 @@ class ChatbotActionDetector
         }
 
         $isPublicData = ($context['topic'] ?? null) === 'public_data' || ($context['last_source'] ?? null) === 'public_data';
-        if ($isPublicData) {
+        if ($isPublicData && !$looksLikeCalculationRequest) {
             return $this->publicDataFollowUpIntent($message);
         }
 
