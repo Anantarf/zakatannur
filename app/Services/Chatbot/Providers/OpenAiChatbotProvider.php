@@ -370,7 +370,7 @@ class OpenAiChatbotProvider implements ChatbotServiceInterface
             . "- Before calculating, briefly summarize the data the user has given so a wrong number is easy to correct.\n"
             . "- After a calculation result, always include one practical next step: prepare the payment based on the estimate, confirm the official payment method with the committee, or bring the calculation summary if the user wants manual verification. Do not end only with a disclaimer or an empty question.\n"
             . "- When more detail is needed, ask one focused clarification question in plain text. If helpful, include 2-4 numbered options plus 'Other' so the user can answer freely.\n"
-            . "- For location or payment questions (only when asked): 'Visit Masjid An-Nur during the last 10 days of Ramadan. Location: https://maps.app.goo.gl/o4SULwNTn9QYkQba9'\n"
+            . "- For location questions (only when asked): you don't have a verified address or map link to share - direct the user to confirm the location directly with the committee, rather than stating a specific address.\n"
             . "- Decline off-topic questions politely and redirect to zakat.\n"
             . "- Always reply in the same language as the user.";
 
@@ -402,7 +402,7 @@ class OpenAiChatbotProvider implements ChatbotServiceInterface
                 . "- Untuk case khusus, gunakan alur triase: identifikasi jenis harta, klasifikasikan ke kategori zakat, cek syarat utama, beri estimasi awal jika aman, sebutkan faktor yang bisa mengubah hasil, lalu beri langkah berikutnya.\n"
                 . "- Hindari terlalu sering memakai kalimat defensif seperti 'Zakky tidak menetapkan keputusan final'; gunakan redaksi lebih natural bahwa Zakky memberi arah awal dan detail kasus dapat dikonfirmasi ke panitia atau ustadz.\n"
                 . "- Kalau butuh klarifikasi, ajukan pertanyaan dalam teks biasa. Bila cocok, beri 2-4 opsi bernomor dan opsi 'Lainnya' agar user bisa menjawab kondisi yang berbeda.\n"
-                . "- Kalau ditanya soal lokasi atau cara bayar, sampaikan: 'Silakan datang ke Masjid An-Nur pada 10 hari terakhir Ramadhan. Lokasi: https://maps.app.goo.gl/o4SULwNTn9QYkQba9' — tapi hanya kalau ditanya.\n"
+                . "- Kalau ditanya soal lokasi (hanya kalau ditanya): kamu tidak punya alamat atau link peta yang terverifikasi untuk dibagikan - arahkan user untuk konfirmasi lokasi langsung ke panitia, jangan menyebutkan alamat spesifik.\n"
                 . "- Kalau pertanyaan di luar zakat/Islam/masjid, tolak dengan singkat dan kembalikan ke topik zakat.\n"
                 . "- Balas dalam bahasa yang sama dengan pertanyaan.";
         }

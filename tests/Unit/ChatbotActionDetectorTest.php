@@ -148,6 +148,73 @@ class ChatbotActionDetectorTest extends TestCase
         ];
     }
 
+    /**
+     * @dataProvider assetSpecificNishabQuestionProvider
+     */
+    public function test_asset_specific_nishab_questions_are_not_hijacked_into_the_generic_definition(string $message): void
+    {
+        // Reported as a relevance gap, not a routing crash: "nishab zakat penghasilan berapa" has
+        // no digit, so it's not a calculation request - it's a genuine information question. But the
+        // fast path answered with the generic nisab-dan-haul entry (85 gram emas, 653 kg gabah, 40
+        // ekor kambing - none of it about income), completely ignoring that the message names a
+        // specific asset type ("penghasilan") which has its own KB entry with the actual Rupiah
+        // figure the user is asking for. `ask_zakat_mal_nishab` unconditionally mapped to
+        // 'nisab-dan-haul' regardless of message content (ChatbotOrchestrator.php:177) - the fix is
+        // to let messages naming a specific asset fall through to AI/RAG instead, which retrieves
+        // the asset-specific entry (already verified via chatbot:eval-rag).
+        $this->assertNull($this->detector()->intent($message));
+    }
+
+    public static function assetSpecificNishabQuestionProvider(): array
+    {
+        return [
+            ['Nishab zakat penghasilan berapa?'],
+            ['Nisab tabungan berapa ya?'],
+            ['Berapa nisab emas?'],
+        ];
+    }
+
+    /**
+     * @dataProvider assetSpecificDefinitionOrExampleQuestionProvider
+     */
+    public function test_asset_specific_definition_and_example_questions_are_not_hijacked_into_the_generic_zakat_mal_entry(string $message): void
+    {
+        // Same relevance gap as the nishab case above, found in the two sibling intents that also
+        // unconditionally map to a single generic KB entry ('zakat-mal', ChatbotOrchestrator.php) -
+        // "Apa itu zakat penghasilan?" and "Kasih contoh zakat emas dong" got the generic zakat-mal
+        // definition/example instead of the far more relevant zakat-penghasilan/zakat-emas-perak
+        // entries that actually name the asset asked about.
+        $this->assertNull($this->detector()->intent($message));
+    }
+
+    public static function assetSpecificDefinitionOrExampleQuestionProvider(): array
+    {
+        return [
+            ['Apa itu zakat penghasilan?'],
+            ['Apa itu zakat emas?'],
+            ['Pengertian zakat tabungan itu apa?'],
+            ['Definisi zakat pertanian gimana?'],
+            ['Kasih contoh zakat emas dong'],
+            ['Ada contoh perhitungan zakat pertanian gak?'],
+        ];
+    }
+
+    public function test_generic_definition_and_example_questions_still_resolve_to_their_intents(): void
+    {
+        // Must not regress: genuinely generic questions (no specific asset named) should still
+        // fast-path as before.
+        $this->assertSame('ask_zakat_mal_definition', $this->detector()->intent('Apa itu zakat mal?'));
+        $this->assertSame('ask_zakat_mal_example', $this->detector()->intent('Contoh zakat mal gimana?'));
+    }
+
+    public function test_generic_nishab_questions_still_resolve_to_the_definition_intent(): void
+    {
+        // Must not regress: a genuinely generic nisab/haul question (no specific asset named) should
+        // still fast-path to the nisab-dan-haul KB entry - that's the whole point of this intent.
+        $this->assertSame('ask_zakat_mal_nishab', $this->detector()->intent('Nisab itu apa sih?'));
+        $this->assertSame('ask_zakat_mal_nishab', $this->detector()->intent('Berapa nisab zakat mal?'));
+    }
+
     public function test_genuine_aggregate_total_questions_still_resolve_to_public_data_intents(): void
     {
         // The fix must not swallow the legitimate "mosque-wide total" questions these intents
@@ -222,5 +289,23 @@ class ChatbotActionDetectorTest extends TestCase
         $this->assertSame('ask_categories', $this->detector()->intent('Kategori apa saja yang tercatat?'));
         $this->assertSame('ask_top_category', $this->detector()->intent('Kategori terbesar apa?'));
         $this->assertSame('ask_payment_info', $this->detector()->intent('Bagaimana cara bayar zakat?'));
+    }
+
+    public function test_location_and_contact_replies_do_not_contain_placeholder_data(): void
+    {
+        // Regression: ask_location/ask_contact used to hardcode example/template data ("Jl. Contoh
+        // Alamat", "Kelurahan Maju", "Bapak Fulan", "0812-3456-7890") that was never replaced with
+        // real information, so real users asking for the mosque's location/contact got confident,
+        // fabricated answers. Zakky has no verified address/CP to share, so it defers to the
+        // committee instead of stating specifics.
+        $locationReply = $this->detector()->detect('Dimana lokasi masjid?')->reply;
+        $contactReply = $this->detector()->detect('Boleh minta kontak panitia?')->reply;
+
+        foreach ([$locationReply, $contactReply] as $reply) {
+            $this->assertStringNotContainsStringIgnoringCase('Contoh Alamat', $reply);
+            $this->assertStringNotContainsStringIgnoringCase('Kelurahan Maju', $reply);
+            $this->assertStringNotContainsStringIgnoringCase('Bapak Fulan', $reply);
+            $this->assertStringNotContainsString('0812-3456-7890', $reply);
+        }
     }
 }

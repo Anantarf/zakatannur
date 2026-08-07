@@ -31,6 +31,20 @@ class ChatbotActionDetector
         // calculator just because it mentions "jiwa".
         $hasZakatMalSignal = $this->containsAny($message, ['gaji', 'tabungan', 'penghasilan', 'emas', 'hutang', 'aset']);
 
+        // Broader than $hasZakatMalSignal above (which is scoped to the [HITUNG:] sentinel's own
+        // fields: income/savings/gold/debt) - this also covers the other zakat mal sub-topics that
+        // have their own dedicated, more detailed KB entry (zakat-pertanian-perkebunan,
+        // zakat-peternakan, zakat-properti-sewa, zakat-saham-investasi-reksadana, zakat-warisan,
+        // zakat-perdagangan, etc). Used to stop "apa itu zakat penghasilan?" / "nishab zakat
+        // pertanian berapa?" / "contoh zakat emas dong" from being answered with the generic
+        // zakat-mal/nisab-dan-haul KB entry when a much more specific, relevant entry exists.
+        $hasSpecificAssetTopic = $hasZakatMalSignal || $this->containsAny($message, [
+            'pertanian', 'perkebunan', 'peternakan', 'ternak', 'kambing', 'sapi',
+            'properti', 'sewa', 'saham', 'investasi', 'reksadana', 'warisan',
+            'perdagangan', 'piutang', 'kendaraan', 'pensiun', 'hadiah', 'hibah',
+            'pesangon', 'campuran',
+        ]);
+
         if ($this->containsAny($message, ['bisa bantu apa', 'seberapa jago', 'kemampuan', 'zakky bisa apa', 'chatbot bisa apa', 'jago bahas zakat'])) {
             return 'ask_zakky_capability';
         }
@@ -74,8 +88,10 @@ class ChatbotActionDetector
 
         // Guarded the same way as ask_zakat_mal_definition below - "kasih contoh hitungan zakat mal
         // untuk gaji saya 8 juta dong" is a real calculation request with the user's own figures,
-        // not a request for a generic canned example.
-        if (!$looksLikeCalculationRequest && $this->containsAny($message, ['contoh', 'skenario']) && $this->containsAny($message, ['zakat', 'hitung', 'berapa'])) {
+        // not a request for a generic canned example. !$hasSpecificAssetTopic added separately -
+        // this intent always maps to the generic 'zakat-mal' KB entry regardless of message content,
+        // so "kasih contoh zakat emas dong" got the generic example instead of the emas-specific one.
+        if (!$looksLikeCalculationRequest && !$hasSpecificAssetTopic && $this->containsAny($message, ['contoh', 'skenario']) && $this->containsAny($message, ['zakat', 'hitung', 'berapa'])) {
             return 'ask_zakat_mal_example';
         }
 
@@ -84,7 +100,14 @@ class ChatbotActionDetector
         // contain "nisab" + "apa"/"berapa" - and short-circuited it to the generic nisab-dan-haul KB
         // answer before it ever reached AI, so the user got the same canned explanation regardless
         // of the number they gave.
-        if (!$looksLikeCalculationRequest && $this->containsAny($message, ['nishab', 'nisab']) && $this->containsAny($message, ['berapa', 'apa', 'hitung'])) {
+        // !$hasSpecificAssetTopic added separately: this intent always maps to the generic
+        // 'nisab-dan-haul' entry (ChatbotOrchestrator.php) regardless of message content, so a
+        // relevance gap remained even without a calculation request - "Nishab zakat penghasilan
+        // berapa?" has no digit (not a calculation request) but names a specific asset, and got the
+        // same generic 85-gram-emas/653-kg-gabah answer instead of the actual income-nisab figure
+        // that lives in the 'zakat-penghasilan' entry. Letting it fall through to AI/RAG instead
+        // retrieves the asset-specific entry (verified via chatbot:eval-rag).
+        if (!$looksLikeCalculationRequest && !$hasSpecificAssetTopic && $this->containsAny($message, ['nishab', 'nisab']) && $this->containsAny($message, ['berapa', 'apa', 'hitung'])) {
             return 'ask_zakat_mal_nishab';
         }
 
@@ -104,7 +127,12 @@ class ChatbotActionDetector
             'pengertian zakat',
         ]);
         $asksSpecificStyle = $this->containsAny($message, ['singkat', 'pendek', 'detail', 'rinci']);
-        if (!$looksLikeCalculationRequest && !$asksSpecificStyle && $asksDefinition) {
+        // !$hasSpecificAssetTopic added separately: this intent always maps to the generic
+        // 'zakat-mal' entry, so the loose "apa itu zakat"/"definisi zakat"/"pengertian zakat"
+        // patterns (needed to catch bare "apa itu zakat?") also matched "apa itu zakat penghasilan?"
+        // /"pengertian zakat tabungan itu apa?" and answered with the generic definition instead of
+        // the asset-specific entry that actually names the topic asked about.
+        if (!$looksLikeCalculationRequest && !$hasSpecificAssetTopic && !$asksSpecificStyle && $asksDefinition) {
             return 'ask_zakat_mal_definition';
         }
 
@@ -239,15 +267,17 @@ class ChatbotActionDetector
                 [],
                 [new ChatbotCitation('tentang-zakky', 'Panduan Publik Masjid An-Nur')]
             ),
+            // No hardcoded street address/maps link or phone number/CP name here on purpose - this
+            // used to be placeholder/example text ("Jl. Contoh Alamat", "Bapak Fulan") that was
+            // never replaced with real data and got confidently told to real users as if genuine.
+            // Zakky has no verified source of truth for these details, so it defers to the
+            // committee directly rather than stating specifics it can't confirm.
             'ask_location' => ChatbotResponse::success(
-                "Masjid An-Nur berlokasi di Jl. Contoh Alamat No. 123, Kelurahan Maju, Kecamatan Bersama, Kota Sejahtera.\n\n"
-                . "Google Maps: [Buka di Google Maps](https://maps.app.goo.gl/o4SULwNTn9QYkQba9)",
+                "Untuk info lokasi Masjid An-Nur, silakan konfirmasi langsung ke panitia ya.",
                 'action'
             ),
             'ask_contact' => ChatbotResponse::success(
-                "Jika membutuhkan bantuan langsung, hubungi Panitia Zakat An-Nur.\n\n"
-                . "WhatsApp/Telp: 0812-3456-7890 (Bapak Fulan)\n"
-                . "Jam operasional: 08.00 - 17.00 WIB",
+                "Untuk bantuan langsung, silakan hubungi panitia Masjid An-Nur melalui jalur komunikasi resmi yang mereka sediakan.",
                 'action'
             ),
             default => null,
