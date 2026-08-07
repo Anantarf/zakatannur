@@ -13,6 +13,8 @@ Tanggal pengujian: 2026-08-05
 - Pesan commit pembekuan (revisi keamanan): `fix(chatbot): harden prompt-injection defense and fix markdown-link XSS`
 - Commit pembekuan evidence Bab IV (revisi nisab BAZNAS, final): `34d89f1fdea044ae92d287a781b5553eac73949d`
 - Pesan commit pembekuan (revisi nisab BAZNAS): `feat(zakat-mal): support direct rupiah nisab override for BAZNAS SK figures`
+- Commit pembekuan evidence Bab IV (perbaikan bug chatbot, final): `8b3cb086ab6768d724b1442df801a89b013e3a5c`
+- Pesan commit pembekuan (perbaikan bug chatbot): `docs(thesis): document 2 more chatbot bugs and refresh Bab IV evidence`
 
 ## Konfigurasi Terverifikasi
 
