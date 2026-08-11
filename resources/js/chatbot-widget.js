@@ -526,11 +526,16 @@ document.addEventListener('alpine:init', () => {
         },
 
         async tryStreaming(userMessage, streamEndpoint) {
-            // One controller/timer covers both connecting and reading: aborting it rejects
-            // whichever await (fetch() or reader.read()) is currently pending, so a stall at
-            // either stage is bounded the same way.
+            // Idle timeout, not a total-duration cap: reset on every chunk received, so a long
+            // but actively-streaming answer (a detailed multi-paragraph reply) isn't aborted
+            // mid-response just for taking longer than REQUEST_TIMEOUT_MS in total - only a genuine
+            // stall (no bytes for REQUEST_TIMEOUT_MS) trips it.
             const controller = new AbortController();
-            const watchdog = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
+            let watchdog = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
+            const resetWatchdog = () => {
+                clearTimeout(watchdog);
+                watchdog = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
+            };
 
             try {
                 const response = await fetch(streamEndpoint, {
@@ -563,10 +568,12 @@ document.addEventListener('alpine:init', () => {
 
                 let msgIndex = -1;
                 let firstChunkPlayed = false;
+                let streamErrorWasRetryable = false;
 
-                while (true) {
+                streamLoop: while (true) {
                     const { done, value } = await reader.read();
                     if (done) break;
+                    resetWatchdog();
 
                     buffer += decoder.decode(value, { stream: true });
                     const lines = buffer.split('\n');
@@ -606,7 +613,12 @@ document.addEventListener('alpine:init', () => {
                                 this.messages[msgIndex].isError = true;
                                 this.messages[msgIndex].isRetryable = data.retryable;
                                 this.messages[msgIndex].content = data.error;
-                                break;
+                                // An in-band error already ended the bot's turn - stop reading
+                                // instead of waiting on a stream the backend may not close, and
+                                // report success so sendMessage doesn't also fire a duplicate
+                                // non-streaming fallback on top of the error already shown.
+                                streamErrorWasRetryable = data.retryable === true;
+                                break streamLoop;
                             }
                         }
                     }
@@ -614,7 +626,7 @@ document.addEventListener('alpine:init', () => {
                     buffer = lines[lines.length - 1];
                 }
 
-                this.isOnline = true;
+                this.isOnline = !streamErrorWasRetryable;
                 return true;
             } catch (error) {
                 console.warn('Streaming failed, will fallback to regular message', error);
