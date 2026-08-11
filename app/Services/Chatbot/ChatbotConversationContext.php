@@ -154,12 +154,22 @@ class ChatbotConversationContext
             return $contexts;
         }
 
+        // Grounds the LLM with the real configured nisab instead of relying on it obeying a
+        // "don't invent a figure" prohibition - retrieval is skipped for most turns in this mode
+        // (see ChatbotOrchestrator::retrieveContexts), so without this the model's only source
+        // for a nisab rupiah figure is its own (often stale) training memory.
+        $year = (int) \App\Models\AppSetting::getInt(\App\Models\AppSetting::KEY_ACTIVE_YEAR, (int) now()->year);
+        $nishabAnnual = app(\App\Services\Transactions\AnnualZakatDefaultsResolver::class)->resolve($year)->nishabAnnual();
+        $nishabMonthly = (int) ($nishabAnnual / 12);
+
         return $this->mergeHintIntoContexts($contexts, [
             '_conversation_hint' => 'Mode percakapan: konsultasi zakat mal. '
                 . 'Rangkum singkat data yang sudah diberikan user, tanyakan hanya data penting yang belum ada, '
                 . 'dan jangan mengulang penjelasan umum kecuali diminta. Jika data belum cukup, beri opsi bernomor seperti '
                 . '1) tidak ada hutang, 2) ada hutang jatuh tempo, 3) ada cicilan, 4) lainnya. '
-                . 'Jika data sudah cukup, gunakan [HITUNG:{...}].',
+                . 'Jika data sudah cukup, gunakan [HITUNG:{...}]. '
+                . "Nisab yang berlaku saat ini: Rp" . number_format($nishabAnnual, 0, ',', '.') . " per tahun, "
+                . "atau Rp" . number_format($nishabMonthly, 0, ',', '.') . " per bulan - kalau menyebut nisab, WAJIB pakai angka ini persis, jangan angka lain.",
         ]);
     }
 
