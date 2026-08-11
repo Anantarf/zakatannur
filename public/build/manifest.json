@@ -9,7 +9,7 @@
     "isEntry": true
   },
   "resources/js/app.js": {
-    "file": "assets/app-CZ8lZWAd.js",
+    "file": "assets/app-Bu6sVQja.js",
     "name": "app",
     "src": "resources/js/app.js",
     "isEntry": true,
@@ -20,13 +20,13 @@
     ]
   },
   "resources/js/chatbot-widget.js": {
-    "file": "assets/chatbot-widget-5m-S1a7X.js",
+    "file": "assets/chatbot-widget-Dxn812uW.js",
     "name": "chatbot-widget",
     "src": "resources/js/chatbot-widget.js",
     "isDynamicEntry": true
   },
   "resources/js/public-home.js": {
-    "file": "assets/public-home-BBFG-4sZ.js",
+    "file": "assets/public-home-BU4G0_6W.js",
     "name": "public-home",
     "src": "resources/js/public-home.js",
     "isDynamicEntry": true,
