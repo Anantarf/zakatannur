@@ -16,7 +16,12 @@ class ChatbotGuardrailVerifier
         // they must not blank out checking of the rest of the reply too (previously a bare
         // str_contains($llmReply, '[HITUNG:') short-circuited the ENTIRE check, so real
         // off-topic content sitting alongside a sentinel slipped through unchecked).
-        $llmReply = preg_replace('/\[HITUNG:.*/is', '', $llmReply) ?? $llmReply;
+        // Bounded to the next ']' (or end of string if none exists yet, for the legitimate
+        // mid-stream case) rather than a greedy '.*' to end-of-string — an unbounded strip let a
+        // malformed/never-computed [HITUNG: tag (one ChatbotSentinelParser's stricter JSON regex
+        // doesn't match, so it's never replaced) blind this checker to everything typed after it,
+        // including real off-topic/injected content placed past a deliberately-broken tag.
+        $llmReply = preg_replace('/\[HITUNG:[^\]]*\]?/is', '', $llmReply) ?? $llmReply;
 
         $lowerReply = strtolower($llmReply);
 

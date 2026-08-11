@@ -2,6 +2,12 @@ const DEFAULT_ERROR_MESSAGE = 'Maaf, terjadi kesalahan. Silakan coba lagi.';
 const NETWORK_ERROR_MESSAGE = 'Gangguan jaringan. Periksa koneksi internet Anda.';
 const COPY_SUCCESS_MESSAGE = 'Tersalin!';
 const FEEDBACK_SUCCESS_MESSAGE = 'Terima kasih atas feedback!';
+// Backend's own HTTP timeout to OpenAI tops out around ~25-33s (see OpenAiChatbotProvider's
+// timeout+retry config) - this must stay above that or we'd abort requests the backend was
+// still going to finish successfully. Without this, a stalled connection (proxy/hosting
+// swallowing the SSE stream mid-response) left `reader.read()` awaiting forever with no way
+// to resolve, keeping isTyping stuck true and the send button permanently disabled.
+const REQUEST_TIMEOUT_MS = 40000;
 
 const timeFormatter = new Intl.DateTimeFormat('id-ID', {
     hour: '2-digit',
@@ -447,6 +453,8 @@ document.addEventListener('alpine:init', () => {
             }
 
             // Fallback to regular message
+            const controller = new AbortController();
+            const watchdog = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
             try {
                 const response = await fetch(this.endpoint, {
                     method: 'POST',
@@ -459,6 +467,7 @@ document.addEventListener('alpine:init', () => {
                         context: this.conversationContext,
                         session_id: this.sessionId,
                     }),
+                    signal: controller.signal,
                 });
 
                 const payload = await this.parseResponse(response);
@@ -500,6 +509,7 @@ document.addEventListener('alpine:init', () => {
                 this.lastError = NETWORK_ERROR_MESSAGE;
                 this.isOnline = false;
             } finally {
+                clearTimeout(watchdog);
                 this.isTyping = false;
                 this.$nextTick(() => this.scrollToBottom());
             }
@@ -516,6 +526,12 @@ document.addEventListener('alpine:init', () => {
         },
 
         async tryStreaming(userMessage, streamEndpoint) {
+            // One controller/timer covers both connecting and reading: aborting it rejects
+            // whichever await (fetch() or reader.read()) is currently pending, so a stall at
+            // either stage is bounded the same way.
+            const controller = new AbortController();
+            const watchdog = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
+
             try {
                 const response = await fetch(streamEndpoint, {
                     method: 'POST',
@@ -528,6 +544,7 @@ document.addEventListener('alpine:init', () => {
                         context: this.conversationContext,
                         session_id: this.sessionId,
                     }),
+                    signal: controller.signal,
                 });
 
                 if (!response.ok) {
@@ -606,6 +623,8 @@ document.addEventListener('alpine:init', () => {
                     this.messages.pop();
                 }
                 return false;
+            } finally {
+                clearTimeout(watchdog);
             }
         },
 
